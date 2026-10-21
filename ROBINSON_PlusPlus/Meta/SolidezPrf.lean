@@ -47,8 +47,8 @@ theorem wN_le : ∀ n : Nat, triN (wN n) ≤ n
       have ih := wN_le n
       simp only [wN]
       by_cases h : triN (wN n + 1) ≤ n + 1
-      · rw [if_pos h]; exact h
-      · rw [if_neg h]; omega
+      · rw [ite_eq_left h]; exact h
+      · rw [ite_eq_right h]; omega
 
 theorem lt_wN_succ : ∀ n : Nat, n < triN (wN n + 1)
   | 0 => by simp [wN, triN]
@@ -56,8 +56,8 @@ theorem lt_wN_succ : ∀ n : Nat, n < triN (wN n + 1)
       have ih := lt_wN_succ n
       simp only [wN]
       by_cases h : triN (wN n + 1) ≤ n + 1
-      · rw [if_pos h]; have := triN_succ' (wN n + 1); omega
-      · rw [if_neg h]; exact Nat.lt_of_not_le h
+      · rw [ite_eq_left h]; have := triN_succ' (wN n + 1); omega
+      · rw [ite_eq_right h]; exact Nat.lt_of_not_le h
 
 /-- Sin basura (ADR-113): todo m+1 es un cons con cabeza y cola MENORES.
     Control: con el consN viejo es FALSO en m = 0. -/

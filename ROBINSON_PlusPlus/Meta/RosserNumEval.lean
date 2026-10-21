@@ -84,8 +84,8 @@ theorem codT_liftcN {t : Nat} (h : CodT t) (c : Nat) : CodT (liftcN c t) :=
   | .var n => by
       rw [liftcN_var]
       by_cases hn : n < c
-      · rw [if_pos hn]; exact .var n
-      · rw [if_neg hn]; exact .var (n + 1)
+      · rw [ite_eq_left hn]; exact .var n
+      · rw [ite_eq_right hn]; exact .var (n + 1)
   | .func s ts hts => by
       rw [liftcN_func]; exact .func s _ (codTs_liftscN hts c)
 theorem codTs_liftscN {ts : Nat} (h : CodTs ts) (c : Nat) : CodTs (liftscN c ts) :=
@@ -101,11 +101,11 @@ theorem codT_substtcN {c : Nat} (h : CodT c) {s : Nat} (hs : CodT s) (k : Nat) :
   | .var n => by
       rw [substtcN_var]
       by_cases e : k = n
-      · rw [if_pos e]; exact hs
-      · rw [if_neg e]
+      · rw [ite_eq_left e]; exact hs
+      · rw [ite_eq_right e]
         by_cases hl : k < n
-        · rw [if_pos hl]; exact .var (n - 1)
-        · rw [if_neg hl]; exact .var n
+        · rw [ite_eq_left hl]; exact .var (n - 1)
+        · rw [ite_eq_right hl]; exact .var n
   | .func sy ts hts => by
       rw [substtcN_func]; exact .func sy _ (codTs_substtscN hts hs k)
 theorem codTs_substtscN {ts : Nat} (h : CodTs ts) {s : Nat} (hs : CodT s) (k : Nat) :
@@ -256,16 +256,16 @@ theorem prf_substtc_var (k s n : Nat) :
   refine prf_eq_trans (NumCodeClosedPrf.prf_congr_substtc3 (prf_eq_symm (prf_varc_numeral n))) ?_
   rw [substtcN_var]
   rcases Nat.lt_trichotomy k n with hlt | rfl | hgt
-  · rw [if_neg (Nat.ne_of_lt hlt), if_pos hlt]
+  · rw [ite_eq_right (Nat.ne_of_lt hlt), ite_eq_left hlt]
     cases n with
     | zero => exact absurd hlt (Nat.not_lt_zero k)
     | succ m =>
       rw [Nat.add_sub_cancel]
       exact prf_eq_trans (prf_mp (prf_substtc_var_gt _ _ _) (LineWFTrackedPrf.prf_lt_numeralM hlt))
         (prf_eq_trans (prf_congr_un (BoundedInPrf.prf_pred_succ (numeralM m))) (prf_varc_numeral m))
-  · rw [if_pos rfl]
+  · rw [ite_eq_left rfl]
     exact prf_mp (prf_substtc_var_eq _ _ _) (prf_refl _)
-  · rw [if_neg (Nat.ne_of_lt hgt).symm, if_neg (Nat.lt_asymm hgt)]
+  · rw [ite_eq_right (Nat.ne_of_lt hgt).symm, ite_eq_right (Nat.lt_asymm hgt)]
     exact prf_eq_trans (prf_mp (prf_substtc_var_lt _ _ _) (LineWFTrackedPrf.prf_lt_numeralM hgt))
       (prf_varc_numeral n)
 
@@ -297,9 +297,9 @@ theorem prf_liftc_var (c n : Nat) :
   refine prf_eq_trans (NumCodeClosedPrf.prf_congr_liftc (prf_eq_symm (prf_varc_numeral n))) ?_
   rw [liftcN_var]
   by_cases h : n < c
-  · rw [if_pos h]
+  · rw [ite_eq_left h]
     exact prf_eq_trans (prf_mp (prf_liftc_var_lt _ _) (LineWFTrackedPrf.prf_lt_numeralM h)) (prf_varc_numeral n)
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     exact prf_eq_trans
       (prf_mp (prf_liftc_var_ge _ _) (LineWFTrackedPrf.prf_lt_numeralM (Nat.lt_succ_of_le (Nat.not_lt.mp h))))
       (prf_varc_numeral (n + 1))

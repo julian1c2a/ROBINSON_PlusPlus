@@ -1,0 +1,57 @@
+# T42b (ADR-181): el LEXER de Lean, v4.31.0 frente a v4.35.0 — lo que strip-lean.awk y scripts/pruebas/leanlex.py siguen.
+# (1) las funciones, por su TEXTO en ~/.elan/toolchains/*/src/lean (lexdiff.py, en esta carpeta); (2) la tabla de
+# tokens del core, con `import Lean` (Tokens.lean.txt, en esta carpeta, con el lean de cada toolchain).
+# Medido el 2026-10-21T13:32Z.
+
+== (1) funciones
+whitespace           Lean/Parser/Basic.lean                 25 líneas  igual
+finishCommentBlock   Lean/Parser/Basic.lean                 24 líneas  igual
+tokenFnAux           Lean/Parser/Basic.lean                 19 líneas  igual
+strLitFnAux          Lean/Parser/Basic.lean                 10 líneas  igual
+charLitFnAux         Lean/Parser/Basic.lean                 14 líneas  igual
+quotedCharCoreFn     Lean/Parser/Basic.lean                 15 líneas  igual
+quotedStringFn       Lean/Parser/Basic.lean                  2 líneas  igual
+rawStrLitFnAux       Lean/Parser/Basic.lean                 60 líneas  igual
+identFnAux           Lean/Parser/Basic.lean                 36 líneas  igual
+numberFnAux          Lean/Parser/Basic.lean                 20 líneas  igual
+isIdFirst            Init/Meta/Defs.lean                     2 líneas  igual
+isIdRest             Init/Meta/Defs.lean                     2 líneas  igual
+isLetterLike         Init/Meta/Defs.lean                     9 líneas  igual
+isSubScriptAlnum     Init/Meta/Defs.lean                     5 líneas  igual
+isIdBeginEscape      Init/Meta/Defs.lean                     1 líneas  igual
+isIdEndEscape        Init/Meta/Defs.lean                     1 líneas  igual
+interpolatedStrFn    Lean/Parser/StrInterpolation.lean      40 líneas  igual
+takeUntilFn          Lean/Parser/Basic.lean                  5 líneas  igual
+mkIdResult           Lean/Parser/Basic.lean                 15 líneas  igual
+decimalNumberFn      Lean/Parser/Basic.lean                 52 líneas  igual
+binNumberFn          Lean/Parser/Basic.lean                  3 líneas  igual
+octalNumberFn        Lean/Parser/Basic.lean                  3 líneas  igual
+hexNumberFn          Lean/Parser/Basic.lean                  3 líneas  igual
+nameLitAux           Lean/Parser/Basic.lean                 11 líneas  igual
+splitNameLitAux      Init/Meta/Defs.lean                    24 líneas  igual
+
+== (2) tabla de tokens: v4.31.0 499, v4.35.0 504; diff (< v4.31.0, > v4.35.0):
+123c123
+< @TOK "EPost⟨"
+---
+> @TOK "EStack⟨"
+146a147
+> @TOK "`(grind_mod|"
+165a167
+> @TOK "`(vcgenDischarge|"
+247c249
+< @TOK "epost⟨"
+---
+> @TOK "estack⟨"
+311a314
+> @TOK "monotonicity_by"
+338a342,343
+> @TOK "recall"
+> @TOK "recall?"
+419a425
+> @TOK "wait_for_expected_type%"
+495d500
+< @TOK "▸*"
+
+== los que pueden pegar con un comentario (con / o - en un extremo, o -- o /- dentro), iguales en las dos:
+  IGUALES: "-" "->" "/" "/-!" "/--" "//" "/\\" "<-" "\\/" 

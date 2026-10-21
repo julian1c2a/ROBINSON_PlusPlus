@@ -4,3 +4,4 @@
 # registrando la prueba en un ADR y añadiendo aquí su línea, a mano. La última línea es la que cuenta.
 # versión	fecha	veredicto	ADR
 v4.35.0	2026-10-20	rompe: Meta/PremsBdAllPrf.lean (rcases), IteSimboloNucleo (#guard_msgs), 419 avisos de deprecación	ADR-176
+v4.35.0	2026-10-21	ADOPTADA: el par sube (una corrección de fuente, 629 renombres —no los 19 de seis congelados de FOL, declarados—, 12 #guard_msgs regenerados, los dos censos y un sondeo de registro)	ADR-181

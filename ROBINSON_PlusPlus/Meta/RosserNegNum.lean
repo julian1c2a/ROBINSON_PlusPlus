@@ -128,7 +128,7 @@ theorem prf_tag {x k : Nat} (h1 : 1 < lenN x) (hk : nthN x 1 = k) :
 theorem prf_premsOf_mp_num {x : Nat} (hl : lenN x = 3) (hk : nthN x 1 = 16) :
     Prf (lineWF (numeralM x) ⇒ (premsOf (numeralM x) =eq numeralM (premsOfN x))) := by
   have hP : premsOfN x = consN (implcN (nthN x 2) (carN x)) (consN (nthN x 2) 0) := by
-    rw [premsOfN, if_pos hk]
+    rw [premsOfN, ite_eq_left hk]
     rfl
   rw [hP]
   refine prf_deduction ?_
@@ -141,7 +141,7 @@ theorem prf_premsOf_mp_num {x : Nat} (hl : lenN x = 3) (hk : nthN x 1 = 16) :
 theorem prf_premsOf_gen_num {x : Nat} (hl : lenN x = 3) (hk : nthN x 1 = 17) :
     Prf (lineWF (numeralM x) ⇒ (premsOf (numeralM x) =eq numeralM (premsOfN x))) := by
   have hP : premsOfN x = consN (nthN x 2) 0 := by
-    rw [premsOfN, if_neg (by rw [hk]; decide), if_pos hk]
+    rw [premsOfN, ite_eq_right (by rw [hk]; decide), ite_eq_left hk]
   rw [hP]
   refine prf_deduction ?_
   have h1 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (PremsOfTagPrf.prf_premsOf_gen (numeralM x)) _)
@@ -156,7 +156,7 @@ theorem prf_neg_lineOk_prem {c x y : Nat} (hw : lineWFN Vax x) (hy : memN y (pre
     · exact prf_premsOf_mp_num ((lineWFN_of_tag h16 (by decide)).mp hw) h16
     · by_cases h17 : nthN x 1 = 17
       · exact prf_premsOf_gen_num ((lineWFN_of_tag h17 (by decide)).mp hw).1 h17
-      · have hP : premsOfN x = 0 := by rw [premsOfN, if_neg h16, if_neg h17]
+      · have hP : premsOfN x = 0 := by rw [premsOfN, ite_eq_right h16, ite_eq_right h17]
         rw [hP] at hy
         exact absurd hy (memN_zero y)
   refine prf_deduction ?_

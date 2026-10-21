@@ -133,7 +133,7 @@ theorem prf_premsOf_of_tag {k m : Nat} {D : Formula} (t R : Term)
   have hS : ∀ s : Term, substFormula 0 s A = Formula.eq (premsOf s) R := by
     intro s
     simp only [A, premsOf, cons, nil, substFormula, substTerm, substTerms,
-      FOL.substTerm_liftTerm, if_true]
+      FOL.substTerm_liftTerm, ite_true]
   exact (hS t) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm ht)
     ((hS (etaTag t m k)) ▸ prf_to_prfH hpre _)
 

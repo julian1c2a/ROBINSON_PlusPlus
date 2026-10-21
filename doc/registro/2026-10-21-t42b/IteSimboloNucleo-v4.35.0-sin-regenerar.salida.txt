@@ -1,0 +1,515 @@
+sondeos/IteSimboloNucleo.lean:648:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhS (TermG.func cs [a, t]) = some n
+but function has type
+  (if (cs == consS) = true then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsS u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+sondeos/IteSimboloNucleo.lean:647:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+    Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhS (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == consS) = true then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsS u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+sondeos/IteSimboloNucleo.lean:662:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhL (TermG.func cs [a, t]) = some n
+but function has type
+  (if (cs == cons_sym) = true then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsL u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+sondeos/IteSimboloNucleo.lean:661:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+    Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhL (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsL u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+sondeos/IteSimboloNucleo.lean:710:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhPS (TermG.func cs [a, t]) = some n
+but function has type
+  (if cs = consS then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPS u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+sondeos/IteSimboloNucleo.lean:709:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+    Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhPS (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if cs = consS then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPS u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+sondeos/IteSimboloNucleo.lean:724:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhPL (TermG.func cs [a, t]) = some n
+but function has type
+  (if cs = cons_sym then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPL u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+sondeos/IteSimboloNucleo.lean:723:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+    Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhPL (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if cs = cons_sym then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPL u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+sondeos/IteSimboloNucleo.lean:738:8: error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNS_dsimp' has type
+  ∀ (cs : String) (a t : TS) (n : Nat), mhNS (TermG.func cs [a, t]) = some n → mhNS (TermG.func cs [a, t]) = some n
+but it is expected to have type
+  ∀ (cs : String) (a t : TS) (n : Nat),
+    mhNS (TermG.func cs [a, t]) = some n →
+      id
+          (match t with
+          | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNS u)
+          | x => none) =
+        some n
+sondeos/IteSimboloNucleo.lean:736:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNS_dsimp' has type
+    ∀ (cs : String) (a t : TS) (n : Nat), mhNS (TermG.func cs [a, t]) = some n → mhNS (TermG.func cs [a, t]) = some n
+  but it is expected to have type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   ∀ (cs : String) (a t : TS) (n : Nat),
++     mhNS (TermG.func cs [a, t]) = some n →
++       id
++           (match t with
++           | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNS u)
++           | x => none) =
++         some n
+sondeos/IteSimboloNucleo.lean:749:8: error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNL_dsimp' has type
+  ∀ (cs : List Char) (a t : Term) (n : Nat), mhNL (TermG.func cs [a, t]) = some n → mhNL (TermG.func cs [a, t]) = some n
+but it is expected to have type
+  ∀ (cs : List Char) (a t : Term) (n : Nat),
+    mhNL (TermG.func cs [a, t]) = some n →
+      id
+          (match t with
+          | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNL u)
+          | x => none) =
+        some n
+sondeos/IteSimboloNucleo.lean:748:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNL_dsimp' has type
+    ∀ (cs : List Char) (a t : Term) (n : Nat), mhNL (TermG.func cs [a, t]) = some n → mhNL (TermG.func cs [a, t]) = some n
+  but it is expected to have type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   ∀ (cs : List Char) (a t : Term) (n : Nat),
++     mhNL (TermG.func cs [a, t]) = some n →
++       id
++           (match t with
++           | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNL u)
++           | x => none) =
++         some n
+sondeos/IteSimboloNucleo.lean:769:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+argument has type
+  decodeTerm (TermG.func cs [hd, tl]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
+sondeos/IteSimboloNucleo.lean:768:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+    Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+  argument has type
+    decodeTerm (TermG.func cs [hd, tl]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     none = some x
+sondeos/IteSimboloNucleo.lean:785:8: error: (kernel) application type mismatch
+  Eq.mp (congrArg (fun _a => _a = some x) (ite_eq_right hc)) h
+argument has type
+  decodeTerm (TermG.func cs [hd, tl]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
+sondeos/IteSimboloNucleo.lean:784:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+    Eq.mp (congrArg (fun _a => _a = some x) (ite_eq_right hc)) h
+  argument has type
+    decodeTerm (TermG.func cs [hd, tl]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     none = some x
+sondeos/IteSimboloNucleo.lean:815:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+argument has type
+  decodeTerm (TermG.func cs [hd, tl]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
+sondeos/IteSimboloNucleo.lean:814:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+    Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+  argument has type
+    decodeTerm (TermG.func cs [hd, tl]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     none = some x
+sondeos/IteSimboloNucleo.lean:897:0: error: Not a definitional equality: the left-hand side
+  decodeTerm (TermG.func cs [hd, tl])
+is not definitionally equal to the right-hand side
+  if (cs == cons_sym) = true then
+    match decodeNat hd, tl with
+    | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+      if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+    | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+      if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+        (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+      else none
+    | x, x_1 => none
+  else none
+sondeos/IteSimboloNucleo.lean:897:8: error: (kernel) declaration type mismatch, 'IteSimboloNucleo.real_rfl' has type
+  ∀ (cs : List Char) (hd tl : Term), decodeTerm (TermG.func cs [hd, tl]) = decodeTerm (TermG.func cs [hd, tl])
+but it is expected to have type
+  ∀ (cs : List Char) (hd tl : Term),
+    decodeTerm (TermG.func cs [hd, tl]) =
+      if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none
+sondeos/IteSimboloNucleo.lean:896:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: Not a definitional equality: the left-hand side
+    decodeTerm (TermG.func cs [hd, tl])
+  is not definitionally equal to the right-hand side
+    if (cs == cons_sym) = true then
+      match decodeNat hd, tl with
+      | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+      | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+        if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+          (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+        else none
+      | x, x_1 => none
+    else none
+  ---
+  error: (kernel) declaration type mismatch, 'IteSimboloNucleo.real_rfl' has type
+    ∀ (cs : List Char) (hd tl : Term), decodeTerm (TermG.func cs [hd, tl]) = decodeTerm (TermG.func cs [hd, tl])
+  but it is expected to have type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   ∀ (cs : List Char) (hd tl : Term),
++     decodeTerm (TermG.func cs [hd, tl]) =
++       if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none
+sondeos/IteSimboloNucleo.lean:929:8: error: (kernel) application type mismatch
+  congrArg Eq
+    (ite_congr (Eq.refl ((cs == cons_sym) = true))
+      (fun a =>
+        Eq.trans
+          (congrArg
+            (fun x =>
+              match x, TermG.func c2 [hn, TermG.func c3 []] with
+              | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+                if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+              | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+                if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                  (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+                else none
+              | x, x_1 => none)
+            hnat)
+          (decodeTerm.match_1.eq_1 (fun x t => Option Term) c2 hn c3
+            (fun c2 hn c3 =>
+              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none)
+            (fun c2 hs c3 hts c4 =>
+              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+              else none)
+            fun x x_1 => none))
+      fun a => Eq.refl none)
+argument has type
+  (if (cs == cons_sym) = true then
+      match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
+      | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+      | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+        if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+          (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+        else none
+      | x, x_1 => none
+    else none) =
+    if (cs == cons_sym) = true then
+      if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+    else none
+but function has type
+  (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) =
+      if (cs == cons_sym) = true then
+        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+      else none) →
+    Eq (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]])) =
+      Eq
+        (if (cs == cons_sym) = true then
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        else none)
+sondeos/IteSimboloNucleo.lean:928:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   congrArg Eq
++     (ite_congr (Eq.refl ((cs == cons_sym) = true))
++       (fun a =>
++         Eq.trans
++           (congrArg
++             (fun x =>
++               match x, TermG.func c2 [hn, TermG.func c3 []] with
++               | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++                 if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++               | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++                 if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++                   (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++                 else none
++               | x, x_1 => none)
++             hnat)
++           (decodeTerm.match_1.eq_1 (fun x t => Option Term) c2 hn c3
++             (fun c2 hn c3 =>
++               if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none)
++             (fun c2 hs c3 hts c4 =>
++               if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++                 (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++               else none)
++             fun x x_1 => none))
++       fun a => Eq.refl none)
+  argument has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++       match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
++       | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++         if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++       | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++         if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++           (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++         else none
++       | x, x_1 => none
++     else none) =
++     if (cs == cons_sym) = true then
++       if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++     else none
+  but function has type
+    (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) =
+        if (cs == cons_sym) = true then
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        else none) →
+      Eq (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]])) =
+        Eq
+          (if (cs == cons_sym) = true then
+            if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+          else none)
+sondeos/IteSimboloNucleo.lean:945:8: error: (kernel) application type mismatch
+  Eq.mp
+    (congrArg
+      (fun _a =>
+        (if (cs == cons_sym) = true then
+            match _a, TermG.func c2 [hn, TermG.func c3 []] with
+            | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+            | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+              else none
+            | x, x_1 => none
+          else none) =
+          some x)
+      hnat)
+    h
+argument has type
+  decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    (if (cs == cons_sym) = true then
+        match some 0, TermG.func c2 [hn, TermG.func c3 []] with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x
+sondeos/IteSimboloNucleo.lean:944:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   Eq.mp
++     (congrArg
++       (fun _a =>
++         (if (cs == cons_sym) = true then
++             match _a, TermG.func c2 [hn, TermG.func c3 []] with
++             | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++               if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++             | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++               if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++                 (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++               else none
++             | x, x_1 => none
++           else none) =
++           some x)
++       hnat)
++     h
+  argument has type
+    decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     (if (cs == cons_sym) = true then
++         match some 0, TermG.func c2 [hn, TermG.func c3 []] with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x

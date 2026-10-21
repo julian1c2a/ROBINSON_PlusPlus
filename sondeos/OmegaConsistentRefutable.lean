@@ -214,9 +214,9 @@ def OmegaConsistentPrf : Prop :=
 theorem not_omegaConsistentPrf : Not OmegaConsistentPrf := fun hω =>
   hω (Formula.eq (.var 0) (succ zero))
     (prf_ex_intro (succ zero)
-      (by simp only [substFormula, substTerm, substTerms, succ, zero, if_true]; exact prf_refl _))
+      (by simp only [substFormula, substTerm, substTerms, succ, zero, ite_true]; exact prf_refl _))
     (fun l hl => by
-      simpa only [substFormula, substTerm, substTerms, succ, zero, if_true] using prf_objList_ne_one l hl)
+      simpa only [substFormula, substTerm, substTerms, succ, zero, ite_true] using prf_objList_ne_one l hl)
 
 end Sondeos.OmegaConsistentRefutable
 

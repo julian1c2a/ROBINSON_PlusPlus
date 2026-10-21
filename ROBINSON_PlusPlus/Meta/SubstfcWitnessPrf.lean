@@ -97,7 +97,7 @@ theorem substF_hasWitArgs (v : Nat) (s Y : Term) :
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
   simp only [hasWitArgs, land, substFormula, substF_wfAll1, substF_argsIn, substTerm,
-    hz, hz2, if_false, FOL.substTerm_lift_comm_zero]
+    hz, hz2, ite_false, FOL.substTerm_lift_comm_zero]
 
 /-! ## §2 · EL ARMAZÓN de la inducción conjuntiva
 
@@ -139,7 +139,7 @@ theorem PHIT_at (t : Term) :
       (BODY (.var 2) (.var 1) (.var 0)
         (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
   simp only [PHIT, PHITbody, substFormula, substF_BODY, substTerm, Nat.reduceAdd,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 /-! ### Los tres colapsos, uno por binder -/
 
@@ -151,7 +151,7 @@ theorem PHIT_spec1 (t w : Term) :
             (liftTerm 0 (liftTerm 0 t)))) := by
   have h3 := substTerm_liftLiftLift t 0 (liftTerm 0 (liftTerm 0 w))
   simp only [substFormula, substF_BODY, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, h3]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3]
 
 theorem PHIT_spec2 (t w v : Term) :
     substFormula 0 v (Formula.forall
@@ -160,12 +160,12 @@ theorem PHIT_spec2 (t w v : Term) :
   have hw := FOL.substTerm_liftLift w 0 (liftTerm 0 v)
   have ht := FOL.substTerm_liftLift t 0 (liftTerm 0 v)
   simp only [substFormula, substF_BODY, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, hw, ht]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, hw, ht]
 
 theorem PHIT_spec3 (t w v s : Term) :
     substFormula 0 s (BODY (liftTerm 0 w) (liftTerm 0 v) (.var 0) (liftTerm 0 t))
       = BODY w v s t := by
-  simp only [substF_BODY, substTerm, if_true, FOL.substTerm_liftTerm]
+  simp only [substF_BODY, substTerm, ite_true, FOL.substTerm_liftTerm]
 
 /-- Instanciación de los tres binders (`w`, `v`, `s`), en ese orden. -/
 theorem PHIT_use {Γ : List Formula} (t w v s : Term) (h : PrfH Γ (substFormula 0 t PHIT)) :
@@ -203,7 +203,7 @@ theorem prf_hasWit_varc (m : Term) : Prf (hasWit (varc m)) := by
   refine prf_ex_intro (cons (varc m) nil) ?_
   have h : substFormula 0 (cons (varc m) nil) (isTC1 (.var 0) (liftTerm 0 (varc m)))
       = isTC1 (cons (varc m) nil) (varc m) := by
-    simp only [substF_isTC1, substTerm, if_true, FOL.substTerm_liftTerm]
+    simp only [substF_isTC1, substTerm, ite_true, FOL.substTerm_liftTerm]
   rw [h]
   refine prf_and_intro ?_ (prf_in_cons_head _ _)
   exact prf_mp (prf_wfAll1_cons (varc m) nil)
@@ -335,7 +335,7 @@ theorem prf_hasWit_funcc (S Y : Term) :
       (isTC1 (.var 0) (liftTerm 0 (funcc (liftTerm 0 S) (liftTerm 0 Y))))
       = isTC1 (cons (funcc (liftTerm 0 S) (liftTerm 0 Y)) (.var 0))
           (funcc (liftTerm 0 S) (liftTerm 0 Y)) := by
-    simp only [substF_isTC1, substTerm, if_true, FOL.substTerm_liftTerm]
+    simp only [substF_isTC1, substTerm, ite_true, FOL.substTerm_liftTerm]
   rw [hs]
   exact PrfH_and_intro hwf' (prf_to_prfH (prf_in_cons_head _ _) _)
 
@@ -407,7 +407,7 @@ def nilOrCons : Formula := lor (Formula.eq (.var 0) nil) (consOk (.var 0))
 theorem nilOrCons_at (Y : Term) :
     substFormula 0 Y nilOrCons = lor (Formula.eq Y nil) (consOk Y) := by
   simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, substFormula, substTerm,
-    substTerms, if_true]
+    substTerms, ite_true]
 
 theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
   refine prf_list_induction nilOrCons ?base ?step
@@ -418,7 +418,7 @@ theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
         = lor (Formula.eq (cons (.var 1) (.var 0)) nil) (consOk (cons (.var 1) (.var 0))) := by
       simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, liftFormula, substFormula,
         liftTerm, liftTerms, substTerm, substTerms, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
-        reduceIte, if_true]
+        reduceIte, ite_true]
     rw [hR]
     exact prf_mp (Prf.incl (Prfᵢ.p1 _ _)) (prf_orR (prf_consOk_cons _ _))
 
@@ -501,14 +501,14 @@ theorem PrfH_congr_substtsc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (
   have hS : ∀ x : Term, substFormula 0 x f
       = Formula.eq (substtsc v s a) (substtsc v s x) := by
     intro x
-    simp only [f, substtsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substtsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst (A := f) h
     ((hS a) ▸ prf_to_prfH (prf_refl (substtsc v s a)) _)
 
 theorem PrfH_congr_hasWitArgs {Γ : List Formula} {a b : Term}
     (h : PrfH Γ (a =eq b)) (hw : PrfH Γ (hasWitArgs a)) : PrfH Γ (hasWitArgs b) := by
   have e : ∀ x : Term, substFormula 0 x (hasWitArgs (.var 0)) = hasWitArgs x := by
-    intro x; simp only [substF_hasWitArgs, substTerm, if_true]
+    intro x; simp only [substF_hasWitArgs, substTerm, ite_true]
   exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
     (A := hasWitArgs (.var 0)) h ((e a) ▸ hw)
 
@@ -518,7 +518,7 @@ theorem prf_hasWitArgs_nil : Prf (hasWitArgs nil) := by
   have h : substFormula 0 nil (land (wfAll1 (.var 0)) (argsIn (.var 0) (liftTerm 0 nil)))
       = land (wfAll1 nil) (argsIn nil nil) := by
     simp only [land, substFormula, substF_wfAll1, substF_argsIn, substTerm, substTerms,
-      if_true, FOL.substTerm_liftTerm]
+      ite_true, FOL.substTerm_liftTerm]
   rw [h]
   exact prf_and_intro prf_wfAll1_nil (prf_argsIn_nil nil)
 
@@ -560,7 +560,7 @@ theorem prf_in_nthc (L i : Term) :
       (Formula.eq (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 (nthc L i))))
       = land (lt i (lenc L)) (Formula.eq (nthc L i) (nthc L i)) := by
     simp only [land, lt, lenc, nthc, In, substFormula, substTerm, substTerms,
-      FOL.substTerm_liftTerm, if_true]
+      FOL.substTerm_liftTerm, ite_true]
   have hb : PrfH [lt i (lenc L)] (boundedIn (nthc L i) L) := by
     unfold boundedIn
     refine PrfH_ex_intro i ?_
@@ -749,7 +749,7 @@ theorem prf_hasWitArgs_cons (a as : Term) :
           (argsIn (concat (.var 1) (.var 0))
             (cons (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 as)))) := by
     simp only [land, substFormula, substF_wfAll1, substF_argsIn, substTerm, substTerms,
-      if_true, FOL.substTerm_liftTerm]
+      ite_true, FOL.substTerm_liftTerm]
   rw [hs]
   exact PrfH_and_intro hwfC hargsCons
 
@@ -915,7 +915,7 @@ theorem PHIF_at (t : Term) :
       (BODYF (.var 3) (.var 2) (.var 1) (.var 0)
         (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))))) := by
   simp only [PHIF, PHIFbody, substFormula, substF_BODYF, substTerm, Nat.reduceAdd,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 theorem PHIF_spec1 (t wF : Term) :
     substFormula 0 wF (Formula.forall (Formula.forall (Formula.forall
@@ -926,7 +926,7 @@ theorem PHIF_spec1 (t wF : Term) :
             (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
   have h4 := substTerm_liftLiftLiftLift t 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 wF)))
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, h4]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h4]
 
 theorem PHIF_spec2 (t wF wT : Term) :
     substFormula 0 wT (Formula.forall (Formula.forall
@@ -938,7 +938,7 @@ theorem PHIF_spec2 (t wF wT : Term) :
   have h3 := substTerm_liftLiftLift t 0 (liftTerm 0 (liftTerm 0 wT))
   have hw := substTerm_liftLiftLift wF 0 (liftTerm 0 (liftTerm 0 wT))
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, h3, hw]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3, hw]
 
 theorem PHIF_spec3 (t wF wT v : Term) :
     substFormula 0 v (Formula.forall
@@ -950,12 +950,12 @@ theorem PHIF_spec3 (t wF wT v : Term) :
   have hF := FOL.substTerm_liftLift wF 0 (liftTerm 0 v)
   have hT := FOL.substTerm_liftLift wT 0 (liftTerm 0 v)
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, h2, hF, hT]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h2, hF, hT]
 
 theorem PHIF_spec4 (t wF wT v s : Term) :
     substFormula 0 s (BODYF (liftTerm 0 wF) (liftTerm 0 wT) (liftTerm 0 v) (.var 0)
       (liftTerm 0 t)) = BODYF wF wT v s t := by
-  simp only [substF_BODYF, substTerm, if_true, FOL.substTerm_liftTerm]
+  simp only [substF_BODYF, substTerm, ite_true, FOL.substTerm_liftTerm]
 
 /-- Instanciación de los cuatro binders. -/
 theorem PHIF_use {Γ : List Formula} (t wF wT v s : Term)
@@ -1311,14 +1311,14 @@ theorem prf_hasWitF_imp (wF wT X : Term) :
     Prf.incl (Prfᵢ.q2 _ wT)
   have h2' : Prf (Formula.impl (isFC1 wF wT X)
       (Formula.ex (isFC1 (liftTerm 0 wF) (.var 0) (liftTerm 0 X)))) := by
-    simpa only [substF_isFC1, substTerm, if_true, FOL.substTerm_liftTerm] using h2
+    simpa only [substF_isFC1, substTerm, ite_true, FOL.substTerm_liftTerm] using h2
   have h1 : Prf (Formula.impl (substFormula 0 wF (Formula.ex (isFC1 (.var 1) (.var 0)
       (liftTerm 0 (liftTerm 0 X))))) (hasWitF X)) := Prf.incl (Prfᵢ.q2 _ wF)
   have hz1 : (0 = 1) = False := eq_false (by omega)
   have h1' : Prf (Formula.impl (Formula.ex (isFC1 (liftTerm 0 wF) (.var 0) (liftTerm 0 X)))
       (hasWitF X)) := by
     simpa only [substFormula, substF_isFC1, substTerm, Nat.reduceAdd, Nat.reduceLT,
-      Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, hz1, if_false,
+      Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, hz1, ite_false,
       FOL.substTerm_liftLift] using h1
   exact ROBINSON_PlusPlus.Meta.ReprPrf.prf_syll h2' h1'
 
@@ -1502,7 +1502,7 @@ theorem prf_wfAllF_nil (wT : Term) : Prf (wfAllF nil wT) := by
 theorem PrfH_congr_hasWitF {Γ : List Formula} {a b : Term}
     (h : PrfH Γ (a =eq b)) (hw : PrfH Γ (hasWitF a)) : PrfH Γ (hasWitF b) := by
   have e : ∀ x : Term, substFormula 0 x (hasWitF (.var 0)) = hasWitF x := by
-    intro x; simp only [substF_hasWitF, substTerm, if_true]
+    intro x; simp only [substF_hasWitF, substTerm, ite_true]
   exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
     (A := hasWitF (.var 0)) h ((e a) ▸ hw)
 

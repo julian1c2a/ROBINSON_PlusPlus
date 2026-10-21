@@ -1320,7 +1320,7 @@ theorem substF_argsIn (v : Nat) (s wT Y : Term) :
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
   simp only [argsIn, argsInBody, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
-    liftTerm, liftTerms, hz, hz2, if_false, FOL.substTerm_lift_comm_zero]
+    liftTerm, liftTerms, hz, hz2, ite_false, FOL.substTerm_lift_comm_zero]
 
 theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
     substFormula v s (isTermCodeE1 wT X)
@@ -1333,7 +1333,7 @@ theorem substF_wfAll1 (v : Nat) (s w : Term) :
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
   simp only [wfAll1, wfAll1Body, substFormula, substF_isTermCodeE1, lt, lenc, nthc,
-    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, if_false,
+    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, ite_false,
     FOL.substTerm_lift_comm_zero]
 
 theorem substF_isTC1 (v : Nat) (s w c : Term) :
@@ -1344,7 +1344,7 @@ theorem substF_hasWit (v : Nat) (s c : Term) :
     substFormula v s (hasWit c) = hasWit (substTerm v s c) := by
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
-  simp only [hasWit, substFormula, substF_isTC1, substTerm, hz, hz2, if_false,
+  simp only [hasWit, substFormula, substF_isTC1, substTerm, hz, hz2, ite_false,
     FOL.substTerm_lift_comm_zero]
 
 theorem substF_isFormCodeE2 (v : Nat) (s wF wT X : Term) :
@@ -1359,7 +1359,7 @@ theorem substF_wfAllF (v : Nat) (s wF wT : Term) :
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
   simp only [wfAllF, wfAllFBody, substFormula, substF_isFormCodeE2, lt, lenc, nthc,
-    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, if_false,
+    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, ite_false,
     FOL.substTerm_lift_comm_zero]
 
 theorem substF_isFC1 (v : Nat) (s wF wT c : Term) :
@@ -1382,7 +1382,7 @@ theorem substF_hasWitF (v : Nat) (s c : Term) :
   have h2 : (1 > v + 1 + 1) = False := eq_false (by omega)
   have hz : (0 = v + 1 + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1 + 1) = False := eq_false (by omega)
-  simp only [hasWitF, substFormula, substF_isFC1, substTerm, h1, h2, hz, hz2, if_false,
+  simp only [hasWitF, substFormula, substF_isFC1, substTerm, h1, h2, hz, hz2, ite_false,
     FOL.substTerm_lift_comm_zero]
 
 /-! ### `lineWF` / `premsOf` por regla (validez de líneas del verificador `runFn`)

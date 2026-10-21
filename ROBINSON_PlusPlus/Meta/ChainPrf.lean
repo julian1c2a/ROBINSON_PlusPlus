@@ -52,7 +52,7 @@ theorem PrfH_eq_trans {Γ : List Formula} {a b c : Term}
     (h1 : PrfH Γ (a =eq b)) (h2 : PrfH Γ (b =eq c)) : PrfH Γ (a =eq c) := by
   let f : Formula := Formula.eq (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq a s := by
-    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS c) ▸ PrfH_leibniz_subst (A := f) h2 ((hS b) ▸ h1)
 
 /-- ⭐ Congruencia de `liftc` en el argumento código, en `PrfH`, con el nivel **implícito**.
@@ -68,7 +68,7 @@ theorem PrfH_congr_liftc {Γ : List Formula} {c a b : Term} (h : PrfH Γ (a =eq 
   let f : Formula := Formula.eq (liftc (liftTerm 0 c) (liftTerm 0 a)) (liftc (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftc c a) (liftc c s) := by
     intro s
-    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (liftc c a)) Γ)
 
 /-- ⭐ Congruencia de `<` en el 1er argumento, en `PrfH`.
@@ -82,7 +82,7 @@ theorem PrfH_lt_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a�
     (hlt : PrfH Γ (lt a₁ b)) : PrfH Γ (lt a₂ b) := by
   let f : Formula := lt (.var 0) (liftTerm 0 b)
   have hS : ∀ s : Term, substFormula 0 s f = lt s b := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hlt)
 
 /-- ⭐ Congruencia de `<` en el 2º argumento, en `PrfH`. Misma historia que la anterior; ésta es
@@ -91,7 +91,7 @@ theorem PrfH_lt_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b�
     (hlt : PrfH Γ (lt a b₁)) : PrfH Γ (lt a b₂) := by
   let f : Formula := lt (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
 
 /-- Congruencia de `cons` en la cola, en `PrfH`. -/
@@ -99,7 +99,7 @@ theorem PrfH_congr_cons_tail {Γ : List Formula} {hd t₁ t₂ : Term}
     (h : PrfH Γ (t₁ =eq t₂)) : PrfH Γ (cons hd t₁ =eq cons hd t₂) := by
   let f : Formula := Formula.eq (cons (liftTerm 0 hd) (liftTerm 0 t₁)) (cons (liftTerm 0 hd) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (cons hd t₁) (cons hd s) := by
-    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (cons hd t₁)) Γ)
 
 /-- Sustitución bajo `In` (2º arg) en `PrfH`. -/
@@ -107,7 +107,7 @@ theorem PrfH_eq_subst_in {Γ : List Formula} {x t₁ t₂ : Term}
     (h : PrfH Γ (t₁ =eq t₂)) (hin : PrfH Γ (In x t₁)) : PrfH Γ (In x t₂) := by
   let f : Formula := In (liftTerm 0 x) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = In x s := by
-    intro s; simp only [f, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ hin)
 
 /-- `In x t → In x (cons hd t)` en `PrfH` (vía `ax_L2` + `j2` + `iff` mpr). -/
@@ -155,7 +155,7 @@ theorem norm32 (z t : Term) :
         show ¬ (n < 0) from by omega, show ¬ (n + 1 < 0) from by omega,
         show ¬ (n + 1 + 1 < 2) from by omega, show ¬ (n + 1 + 1 + 1 < 3) from by omega,
         show ¬ (n + 1 + 1 + 1 + 1 = 1) from by omega, show n + 1 + 1 + 1 + 1 > 1 from by omega,
-        if_false, if_true]
+        ite_false, ite_true]
       congr 1
   | func f ts => simp only [liftTerm, substTerm]; congr 1; exact norm32_terms z ts
 theorem norm32_terms (z : Term) (ts : List Term) :
@@ -207,7 +207,7 @@ theorem PrfH_iff_mpr {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) 
 theorem PrfH_eq_symm {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b)) : PrfH Γ (b =eq a) := by
   let f : Formula := Formula.eq (.var 0) (liftTerm 0 a)
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq s a := by
-    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl a) Γ)
 
 /-- Congruencia de `concat` en el 2º argumento, en `PrfH`. -/
@@ -215,7 +215,7 @@ theorem PrfH_congr_concat_left {Γ : List Formula} {u t₁ t₂ : Term} (h : Prf
     PrfH Γ (concat u t₁ =eq concat u t₂) := by
   let f : Formula := Formula.eq (concat (liftTerm 0 u) (liftTerm 0 t₁)) (concat (liftTerm 0 u) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (concat u t₁) (concat u s) := by
-    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (concat u t₁)) Γ)
 
 /-- Congruencia de `chainOk` en el 1er argumento (acumulador), en `PrfH`. -/
@@ -223,7 +223,7 @@ theorem PrfH_chainOk_subst1 {Γ : List Formula} {c₁ c₂ p : Term} (h : PrfH �
     (hok : PrfH Γ (chainOk c₁ p)) : PrfH Γ (chainOk c₂ p) := by
   let f : Formula := chainOk (.var 0) (liftTerm 0 p)
   have hS : ∀ s : Term, substFormula 0 s f = chainOk s p := by
-    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS c₂) ▸ PrfH_leibniz_subst (A := f) h ((hS c₁) ▸ hok)
 
 /-- Congruencia de `chainOk` en el 2º argumento (cadena), en `PrfH`. -/
@@ -231,7 +231,7 @@ theorem PrfH_chainOk_subst2 {Γ : List Formula} {c p₁ p₂ : Term} (h : PrfH �
     (hok : PrfH Γ (chainOk c p₁)) : PrfH Γ (chainOk c p₂) := by
   let f : Formula := chainOk (liftTerm 0 c) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = chainOk c s := by
-    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS p₂) ▸ PrfH_leibniz_subst (A := f) h ((hS p₁) ▸ hok)
 
 /-- Congruencia de `allIn` en el 2º argumento (lista), en `PrfH`. -/
@@ -239,7 +239,7 @@ theorem PrfH_allIn_subst2 {Γ : List Formula} {c L₁ L₂ : Term} (h : PrfH Γ 
     (hok : PrfH Γ (allIn c L₁)) : PrfH Γ (allIn c L₂) := by
   let f : Formula := allIn (liftTerm 0 c) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = allIn c s := by
-    intro s; simp only [f, allIn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, allIn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS L₂) ▸ PrfH_leibniz_subst (A := f) h ((hS L₁) ▸ hok)
 
 /-- `In x t → In x (cons hd t)` ya estaba; aquí `In x (cons x t)` en `PrfH`. -/
@@ -253,7 +253,7 @@ theorem prf_congr_concat_first {u₁ u₂ t : Term} (h : Prf (u₁ =eq u₂)) :
     Prf (concat u₁ t =eq concat u₂ t) := by
   let f : Formula := Formula.eq (concat (liftTerm 0 u₁) (liftTerm 0 t)) (concat (.var 0) (liftTerm 0 t))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (concat u₁ t) (concat s t) := by
-    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS u₂) ▸ prf_leibniz_subst (A := f) h ((hS u₁) ▸ prf_refl (concat u₁ t))
 
 /-- **Asociatividad de `concat` en `Prf`**: `(L ++ M) ++ N =eq L ++ (M ++ N)`.
@@ -267,7 +267,7 @@ theorem prf_concat_assoc (M N L : Term) :
     · have hb : Prf (concat (concat nil M) N =eq concat nil (concat M N)) :=
         prf_eq_trans (prf_congr_concat_first (prf_concat_nil_eq M))
           (prf_eq_symm (prf_concat_nil_eq (concat M N)))
-      simpa only [substFormula, substTerm, substTerms, concat, nil, zero, if_true,
+      simpa only [substFormula, substTerm, substTerms, concat, nil, zero, ite_true,
         FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
@@ -286,7 +286,7 @@ theorem prf_concat_assoc (M N L : Term) :
           (prf_concat_cons_eq (.var 1) (.var 0)
             (concat (liftTerm 1 (liftTerm 0 M)) (liftTerm 1 (liftTerm 0 N))))) _))
   have hL := prf_spec key L
-  simpa only [substFormula, substTerm, substTerms, concat, if_true, FOL.substTerm_liftTerm] using hL
+  simpa only [substFormula, substTerm, substTerms, concat, ite_true, FOL.substTerm_liftTerm] using hL
 
 /-- `concat X nil =eq X` en `Prf` (inducción de listas sobre `X`). -/
 theorem prf_concat_nil_right (X : Term) : Prf (concat X nil =eq X) := by
@@ -317,7 +317,7 @@ theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (conc
     · have hb : Prf (Formula.impl (In x c) (In x (concat nil c))) :=
         prf_deduction (PrfH_eq_subst_in
           (prf_to_prfH (prf_eq_symm (prf_concat_nil_eq c)) _) (prfH_hyp_self _))
-      simpa only [substFormula, substTerm, substTerms, In, concat, nil, zero, if_true,
+      simpa only [substFormula, substTerm, substTerms, In, concat, nil, zero, ite_true,
         FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
@@ -336,7 +336,7 @@ theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (conc
       exact PrfH_eq_subst_in
         (prf_to_prfH (prf_eq_symm (prf_concat_cons_eq (.var 1) (.var 0) (liftTerm 1 (liftTerm 0 c)))) _) hcons
   have hkey := prf_spec key c0
-  simpa only [substFormula, substTerm, substTerms, In, concat, if_true, FOL.substTerm_liftTerm] using hkey
+  simpa only [substFormula, substTerm, substTerms, In, concat, ite_true, FOL.substTerm_liftTerm] using hkey
 
 theorem prf_In_mono (x c c0 : Term) (h : Prf (In x c)) : Prf (In x (concat c0 c)) :=
   prf_mp (prf_In_mono_imp x c c0) h
@@ -352,7 +352,7 @@ theorem PrfH_congr_cons_head {Γ : List Formula} {hd₁ hd₂ t : Term}
     (h : PrfH Γ (hd₁ =eq hd₂)) : PrfH Γ (cons hd₁ t =eq cons hd₂ t) := by
   let f : Formula := Formula.eq (cons (liftTerm 0 hd₁) (liftTerm 0 t)) (cons (.var 0) (liftTerm 0 t))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (cons hd₁ t) (cons s t) := by
-    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS hd₂) ▸ PrfH_leibniz_subst (A := f) h ((hS hd₁) ▸ prf_to_prfH (prf_refl (cons hd₁ t)) Γ)
 
 /-- `In x (cons hd t)` se descompone en `(x =eq hd) ∨ In x t` (cierre `Prf` de `ax_L2`). -/
@@ -383,7 +383,7 @@ theorem prf_In_mono_right_imp (x M L : Term) :
         refine prf_deduction ?_
         exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq (In x (concat nil M))))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil x) _) (prfH_hyp_self _))
-      simpa only [substFormula, substTerm, substTerms, In, concat, nil, zero, if_true,
+      simpa only [substFormula, substTerm, substTerms, In, concat, nil, zero, ite_true,
         FOL.substTerm_liftTerm] using hb
     · -- step
       refine Prf.gen _ (Prf.gen _ ?_)
@@ -418,7 +418,7 @@ theorem prf_In_mono_right_imp (x M L : Term) :
           PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
         exact PrfH_in_cons_tail (.var 1) (PrfH.mp _ _ _ hIH hin)
   have hkey := prf_spec key L
-  simpa only [substFormula, substTerm, substTerms, In, concat, if_true, FOL.substTerm_liftTerm] using hkey
+  simpa only [substFormula, substTerm, substTerms, In, concat, ite_true, FOL.substTerm_liftTerm] using hkey
 
 theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat L M)) :=
   prf_mp (prf_In_mono_right_imp x M L) h
@@ -433,7 +433,7 @@ theorem prf_allIn_mono_imp (c c0 M : Term) :
     refine prf_list_induction _ ?base ?step
     · have hb : Prf (Formula.impl (allIn c nil) (allIn (concat c0 c) nil)) :=
         prf_deduction (prf_to_prfH (prf_allIn_nil (concat c0 c)) _)
-      simpa only [substFormula, substTerm, substTerms, allIn, concat, nil, zero, if_true,
+      simpa only [substFormula, substTerm, substTerms, allIn, concat, nil, zero, ite_true,
         FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
@@ -455,7 +455,7 @@ theorem prf_allIn_mono_imp (c c0 M : Term) :
       exact PrfH_iff_mpr (prf_allIn_cons (concat C0s Cs) (.var 1) (.var 0))
         (PrfH_and_intro hIn hrest)
   have hkey := prf_spec key M
-  simpa only [substFormula, substTerm, substTerms, allIn, concat, if_true, FOL.substTerm_liftTerm] using hkey
+  simpa only [substFormula, substTerm, substTerms, allIn, concat, ite_true, FOL.substTerm_liftTerm] using hkey
 
 /-- **Monotonía de `lineOk` (contexto izq.)** en `Prf` (implicación):
     `lineOk c line ⇒ lineOk (c0 ++ c) line` (la parte `lineWF` es independiente del contexto). -/
@@ -471,7 +471,7 @@ theorem prf_chainOk_subst2 {c p₁ p₂ : Term} (h : Prf (p₁ =eq p₂)) (hok :
     Prf (chainOk c p₂) := by
   let f : Formula := chainOk (liftTerm 0 c) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = chainOk c s := by
-    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS p₂) ▸ prf_leibniz_subst (A := f) h ((hS p₁) ▸ hok)
 
 /-! ### Lemas de cadena con acumulador `∀c` interno (compositividad de `runFn`)

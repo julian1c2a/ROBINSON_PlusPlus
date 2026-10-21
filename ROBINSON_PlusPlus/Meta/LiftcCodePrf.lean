@@ -954,12 +954,12 @@ que ya está en producción. -/
     ⚠️ El nivel viaja `liftTerm`‑eado: es un parámetro del hueco, no el agujero. -/
 theorem substF_targetLiftAt_hole (c t : Term) :
     substFormula 0 t (targetLiftAt (liftTerm 0 c) (.var 0)) = targetLiftAt c t := by
-  simp only [substF_targetLiftAt, FOL.substTerm_liftTerm, substTerm, if_true]
+  simp only [substF_targetLiftAt, FOL.substTerm_liftTerm, substTerm, ite_true]
 
 /-- El HUECO de la LISTA, misma forma. -/
 theorem substF_targetLiftscAt_hole (c t : Term) :
     substFormula 0 t (targetLiftscAt (liftTerm 0 c) (.var 0)) = targetLiftscAt c t := by
-  simp only [substF_targetLiftscAt, FOL.substTerm_liftTerm, substTerm, if_true]
+  simp only [substF_targetLiftscAt, FOL.substTerm_liftTerm, substTerm, ite_true]
 
 /-- Transporte de Leibniz del objetivo a nivel abierto (espeja `PrfH_congr_targetLift`). -/
 theorem PrfH_congr_targetLiftAt {Γ : List Formula} (c : Term) {s s' : Term}

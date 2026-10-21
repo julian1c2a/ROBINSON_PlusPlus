@@ -1,0 +1,15 @@
+# T42b (ADR-181): sondeos/IteSimboloNucleo.lean (de CONTROL) con v4.35.0.
+# (1) Compilado con v4.35.0 y los mensajes de v4.31.0 (`lake env lean`, tras la migración de nombres): 12 de sus 23
+#     bloques `#guard_msgs` rompen. La salida entera, en IteSimboloNucleo-v4.35.0-sin-regenerar.salida.txt.
+# (2) Lo que cambia, del propio diff que imprime `#guard_msgs` («  » igual, «- » sólo en el fijado, «+ » sólo en el
+#     generado):
+      bloques que rompen: 12
+      líneas que se pierden («- »): 14, todas iguales:
+            14 -   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+      líneas que entran («+ »): 165 (el tipo que antes no se imprimía)
+# (3) regenera_guard.py (en esta carpeta) reescribe cada docstring con el mensaje generado, comprobando antes que el
+#     docstring del fuente es el «viejo» del diff y avisando si un bloque que fijaba un error deja de fijarlo:
+      12 «error: (kernel)» fijados antes; 12 después
+      las CABECERAS de todos los mensajes fijados (error/info/warning), idénticas antes y después: 24
+# (4) Recompilado con v4.35.0: sin ningún mensaje (los 23 bloques cuadran), y `check-sondeos.bash --controles`: los
+#     11, verdes. El defecto del núcleo (leanprover/lean4#15822) SIGUE: los mismos 12 rechazos.

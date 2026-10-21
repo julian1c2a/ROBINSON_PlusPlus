@@ -184,7 +184,7 @@ theorem prf_argsIn_body (q i : Term) :
   have heq : substFormula 0 i (argsInBody (carc q) (cdrc q))
       = Formula.impl (lt i (lenc (cdrc q))) (In (nthc (cdrc q) i) (carc q)) := by
     simp only [argsInBody, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
-      FOL.substTerm_liftTerm, if_true]
+      FOL.substTerm_liftTerm, ite_true]
   rw [argsInPair, argsIn, heq] at hspec
   have hin : PrfH _ (In (nthc (cdrc q) i) (carc q)) := PrfH.mp _ _ _ hspec hlt
   have hchild := PrfH.mp _ _ _
@@ -224,7 +224,7 @@ theorem PrfH_congr_argsIn_wit {Γ : List Formula} {wT₁ wT₂ Y : Term}
     (h : PrfH Γ (wT₁ =eq wT₂)) (ha : PrfH Γ (argsIn wT₁ Y)) : PrfH Γ (argsIn wT₂ Y) := by
   have hS : ∀ s : Term, substFormula 0 s (argsIn (.var 0) (liftTerm 0 Y)) = argsIn s Y := by
     intro s
-    simp only [substF_argsIn, substTerm, FOL.substTerm_liftTerm, if_true]
+    simp only [substF_argsIn, substTerm, FOL.substTerm_liftTerm, ite_true]
   exact (hS wT₂) ▸ PrfH_leibniz_subst (A := argsIn (.var 0) (liftTerm 0 Y)) h ((hS wT₁) ▸ ha)
 
 /-- **El puente al par de §4**: `argsIn wT Y` es `argsInPair (cons wT Y)` módulo las dos
@@ -884,7 +884,7 @@ theorem hbody_wfAll1 : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
   have heq : substFormula 0 i (wfAll1Body q)
       = Formula.impl (lt i (lenc q)) (isTermCodeE1 q (nthc q i)) := by
     simp only [wfAll1Body, substFormula, substTerm, substTerms, lt, lenc, nthc,
-      substF_isTermCodeE1, FOL.substTerm_liftTerm, if_true]
+      substF_isTermCodeE1, FOL.substTerm_liftTerm, ite_true]
   rw [wfAll1, heq] at hspec
   have hE1 : PrfH [lt i (lenc q), wfAll1 q] (isTermCodeE1 q (nthc q i)) :=
     PrfH.mp _ _ _ hspec hlt
@@ -1164,7 +1164,7 @@ theorem pcc_hasWit_exc (t : Term) (i : Nat) :
   simpa only [liftFormula, liftFormula_provFromCode_open, liftTerm_exc_open,
     liftTerm_hasWitAc, liftTerm_tcFn, liftTerm_termCode, isTC1, land, wfAll1, wfAll1Body,
     lt, lenc, nthc, liftTerm, liftTerms, liftTerm_numeralM, cons, nil, zero, succ,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true]
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true]
     using prf_to_prfH (pcc_isTC1_exc_body (liftTerm 0 t) i)
       [isTC1 (.var 0) (liftTerm 0 (nthc t (numeralM i)))]
 
@@ -1220,7 +1220,7 @@ theorem pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) :
   have hsub : substFormula 0 t (hasWit (nthc (.var 0) (numeralM i)))
       = hasWit (nthc t (numeralM i)) := by
     simp only [substF_hasWit, nthc, substTerm, substTerms, substTerm_numeralM,
-      FOL.substTerm_liftTerm, if_true]
+      FOL.substTerm_liftTerm, ite_true]
   rw [hsub]
   refine prf_deduction (deduction_aux (deduction_aux ?_
     (hasWit (nthc t (numeralM i))) [lenc t =eq numeralM n, lineWF t] rfl)

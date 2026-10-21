@@ -66,7 +66,7 @@ def PHI : Formula := hasWit (tcFn (.var 0))
 
 /-- `PHI` instanciada es lo que se espera. -/
 theorem PHI_at (t : Term) : substFormula 0 t PHI = hasWit (tcFn t) := by
-  simp only [PHI, substF_hasWit, tcFn, substTerm, substTerms, if_true]
+  simp only [PHI, substF_hasWit, tcFn, substTerm, substTerms, ite_true]
 
 /-! ## §2 · LA BASE — y sale GRATIS de la rama A
 
@@ -221,7 +221,7 @@ theorem prf_ax_tc_succ (x : Term) : Prf (tcFn (succ x) =eq SUCCNODE x) := by
   have h := prf_spec (prf_ax (show ax_tc_succ ∈ axioms by simp [axioms])) x
   simpa only [ax_tc_succ, SUCCNODE, substFormula, substTerm, substTerms, tcFn, succ, cons, nil,
     zero, substTerm_numeralM, substTerm_strCodeM, substTerm_nil,
-    FOL.substTerm_liftTerm, if_true] using h
+    FOL.substTerm_liftTerm, ite_true] using h
 
 /-! ## §6 · `argsIn` DE UN SINGLETON
 
@@ -309,7 +309,7 @@ theorem prf_isTermCodeE1_succnode (W x : Term) :
 theorem PrfH_congr_hasWit {Γ : List Formula} {a b : Term}
     (h : PrfH Γ (a =eq b)) (hw : PrfH Γ (hasWit a)) : PrfH Γ (hasWit b) := by
   have e : ∀ s : Term, substFormula 0 s (hasWit (.var 0)) = hasWit s := by
-    intro s; simp only [substF_hasWit, substTerm, if_true]
+    intro s; simp only [substF_hasWit, substTerm, ite_true]
   exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
     (A := hasWit (.var 0)) h ((e a) ▸ hw)
 
@@ -338,7 +338,7 @@ theorem step_at (x : Term) :
       (isTC1 (.var 0) (liftTerm 1 (liftTerm 0 (SUCCNODE x))))
       = isTC1 (cons (liftTerm 0 (SUCCNODE x)) (.var 0)) (liftTerm 0 (SUCCNODE x)) := by
     rw [← FOL.liftTerm_comm_zero, substF_isTC1, FOL.substTerm_liftTerm]
-    simp only [substTerm, if_true]
+    simp only [substTerm, ite_true]
   rw [hsub]
   -- el contexto trae `isTC1 #0 ↑(tcFn x)`
   have hctx : PrfH [isTC1 (.var 0) (liftTerm 0 (tcFn x))]

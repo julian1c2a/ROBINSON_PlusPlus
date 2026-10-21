@@ -99,12 +99,12 @@ theorem prf_substtc_tcFn_all_at (k : Nat) (W : Term) :
     Prf (Formula.forall (substtcTcPredAt k W)) := by
   refine prf_nat_induction (substtcTcPredAt k W) ?base ?step
   · simpa only [substtcTcPredAt, substFormula, substTerm, substTerms, substtc, tcFn, zero,
-      substTerm_numeral, reduceIte, if_true, FOL.substTerm_liftTerm]
+      substTerm_numeral, reduceIte, ite_true, FOL.substTerm_liftTerm]
       using prf_substtc_tcFn_zero_at k W
   · refine Prf.gen _ ?_
     simpa only [substtcTcPredAt, liftFormula, liftTerm, liftTerms, substFormula, substTerm,
       substTerms, substtc, tcFn, zero, succ, liftTerm_numeral, substTerm_numeral, Nat.reduceAdd,
-      Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, norm11]
+      Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, norm11]
       using prf_substtc_tcFn_succ_imp_at k (liftTerm 0 W) (.var 0)
 
 /-- **`substtc ⌜k⌝ W (tcFn a) =eq tcFn a`** a nivel `k` arbitrario (instancia del ∀). -/
@@ -112,7 +112,7 @@ theorem prf_substtc_tcFn_at (k : Nat) (W a : Term) :
     Prf (substtc (numeral k) W (tcFn a) =eq tcFn a) := by
   have h := prf_spec (prf_substtc_tcFn_all_at k W) a
   simpa only [substtcTcPredAt, substFormula, substTerm, substTerms, substtc, tcFn, zero,
-    substTerm_numeral, reduceIte, if_true, FOL.substTerm_liftTerm] using h
+    substTerm_numeral, reduceIte, ite_true, FOL.substTerm_liftTerm] using h
 
 /-! ### Código del átomo `<` y cuerpo del existencial -/
 

@@ -318,7 +318,7 @@ theorem substF_hole_fc (v s u : Term) :
     substFormula 0 u (targetSubstfc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
       = targetSubstfc v s u := by
   rw [substF_targetSubstfc]
-  simp only [substTerm, FOL.substTerm_liftTerm, if_true]
+  simp only [substTerm, FOL.substTerm_liftTerm, ite_true]
 
 theorem PrfH_congr_targetSubstfc {Γ : List Formula} {v s X X' : Term} (h : PrfH Γ (X =eq X'))
     (ha : PrfH Γ (targetSubstfc v s X)) : PrfH Γ (targetSubstfc v s X') :=
@@ -371,7 +371,7 @@ theorem PHIsubstfc_at (t : Term) :
           (BODYsubstfc (.var 3) (.var 2) (.var 1) (.var 0)
             (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))))) := by
   simp only [PHIsubstfc, PHIsubstfcBody, substFormula, substF_BODYsubstfc, substTerm, Nat.reduceAdd,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 theorem PHI_spec1 (t wF : Term) :
     substFormula 0 wF (Formula.forall (Formula.forall (Formula.forall
@@ -381,7 +381,7 @@ theorem PHI_spec1 (t wF : Term) :
           (BODYsubstfc (liftTerm 0 (liftTerm 0 (liftTerm 0 wF))) (.var 2) (.var 1) (.var 0)
             (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
   simp only [substFormula, substF_BODYsubstfc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, substTerm_liftLiftLiftLift]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, substTerm_liftLiftLiftLift]
 
 theorem PHI_spec2 (t wF wT : Term) :
     substFormula 0 wT (Formula.forall (Formula.forall
@@ -391,7 +391,7 @@ theorem PHI_spec2 (t wF wT : Term) :
           (BODYsubstfc (liftTerm 0 (liftTerm 0 wF)) (liftTerm 0 (liftTerm 0 wT)) (.var 1) (.var 0)
             (liftTerm 0 (liftTerm 0 t)))) := by
   simp only [substFormula, substF_BODYsubstfc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, substTerm_liftLiftLift]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, substTerm_liftLiftLift]
 
 theorem PHI_spec3 (t wF wT v : Term) :
     substFormula 0 v (Formula.forall
@@ -400,13 +400,13 @@ theorem PHI_spec3 (t wF wT v : Term) :
       = Formula.forall
           (BODYsubstfc (liftTerm 0 wF) (liftTerm 0 wT) (liftTerm 0 v) (.var 0) (liftTerm 0 t)) := by
   simp only [substFormula, substF_BODYsubstfc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftLift]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftLift]
 
 theorem PHI_spec4 (t wF wT v s : Term) :
     substFormula 0 s
         (BODYsubstfc (liftTerm 0 wF) (liftTerm 0 wT) (liftTerm 0 v) (.var 0) (liftTerm 0 t))
       = BODYsubstfc wF wT v s t := by
-  simp only [substF_BODYsubstfc, substTerm, FOL.substTerm_liftTerm, if_true]
+  simp only [substF_BODYsubstfc, substTerm, FOL.substTerm_liftTerm, ite_true]
 
 theorem PHIsubstfc_use {Γ : List Formula} (t wF wT v s : Term) (h : PrfH Γ (substFormula 0 t PHIsubstfc)) :
     PrfH Γ (BODYsubstfc wF wT v s t) := by
@@ -432,7 +432,7 @@ theorem PSIat_inst {Γ : List Formula} {X : Term} (h : PrfH Γ (PSIat X)) (z : T
   have hi := PrfH_spec h z
   have e : substFormula 0 z (Formula.impl (lt (.var 0) (liftTerm 0 X)) PHIsubstfc)
       = Formula.impl (lt z X) (substFormula 0 z PHIsubstfc) := by
-    simp only [substFormula, lt, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [substFormula, lt, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   rwa [e] at hi
 
 /-- **La HIPOTESIS DE INDUCCION, ya instanciada**: si `z < X`, `z` tiene testigo de formula
@@ -900,7 +900,7 @@ theorem casoHasWitLift : HasWitLift := by
       (isTC1 (.var 0) (liftTerm 1 (liftTerm 0 (liftc zero c))))
       = isTC1 (liftsc zero (.var 0)) (liftc zero (liftTerm 0 c)) := by
     have hv : substTerm 0 (liftsc zero (Term.var 0)) (Term.var 0) = liftsc zero (.var 0) := by
-      simp only [substTerm, if_true]
+      simp only [substTerm, ite_true]
     rw [← FOL.liftTerm_comm_zero, substF_isTC1, FOL.substTerm_liftTerm, hv, liftT_liftc]
   rw [hsub]
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_isTC1_lift (.var 0) (liftTerm 0 c)) _)

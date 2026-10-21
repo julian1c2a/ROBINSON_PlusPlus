@@ -95,7 +95,7 @@ theorem prf_lineWF_of_chainOk (q i : Term) :
       (lineOkB (liftTerm 0 nil) (liftTerm 0 q) (.var 0)))
       = Formula.impl (lt i (lenc q)) (lineOkB nil q i) := by
     simp only [substFormula, substFormula_lineOkB, lt, lenc, nil, zero, substTerm, substTerms,
-      FOL.substTerm_liftTerm, if_true]
+      FOL.substTerm_liftTerm, ite_true]
   rw [heq] at hspec
   exact PrfH_and_elim_left (PrfH.mp _ _ _ hspec hlt)
 

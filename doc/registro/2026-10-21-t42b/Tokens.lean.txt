@@ -1,0 +1,12 @@
+import Lean
+open Lean
+
+-- T42b: la tabla de TOKENS del core (con `import Lean`), entera, una por línea, ordenada: para comparar v4.31.0 con
+-- v4.35.0. `strip-lean.awk` lee enteros los tokens que pueden pegar con un comentario (`\/`, `//`, `<-`).
+run_cmd do
+  let env ← getEnv
+  let tt := Lean.Parser.getTokenTable env
+  let todos := (tt.findPrefix "").qsort (· < ·)
+  for t in todos do
+    logInfo m!"@TOK {repr t}"
+  logInfo m!"@NTOK {todos.size}"

@@ -205,7 +205,7 @@ theorem PSI_inst (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula
   have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 2)) Φ)
       = Formula.impl (lt z (.var 1)) (substFormula 0 z Φ) := by
     simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
-      Nat.reduceSub, reduceIte, if_true]
+      Nat.reduceSub, reduceIte, ite_true]
   rwa [e] at h
 
 /-! ### Los escalones 2 y 3 de la misma escalera
@@ -246,7 +246,7 @@ theorem PSI_inst2 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formul
   have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 3)) Φ)
       = Formula.impl (lt z (.var 2)) (substFormula 0 z Φ) := by
     simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
-      Nat.reduceSub, reduceIte, if_true]
+      Nat.reduceSub, reduceIte, ite_true]
   rwa [e] at h
 
 /-- La extraccion al TERCER nivel de lift — la que consume una induccion con TRES binders
@@ -259,7 +259,7 @@ theorem PSI_inst3 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formul
   have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 4)) Φ)
       = Formula.impl (lt z (.var 3)) (substFormula 0 z Φ) := by
     simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
-      Nat.reduceSub, reduceIte, if_true]
+      Nat.reduceSub, reduceIte, ite_true]
   rwa [e] at h
 
 /-- El CUARTO escalon, subido en la via C (2026-09-06) por la misma razon que los tres
@@ -282,7 +282,7 @@ theorem PSI_inst4 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formul
   have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 5)) Φ)
       = Formula.impl (lt z (.var 4)) (substFormula 0 z Φ) := by
     simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
-      Nat.reduceSub, reduceIte, if_true]
+      Nat.reduceSub, reduceIte, ite_true]
   rwa [e] at h
 
 theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)

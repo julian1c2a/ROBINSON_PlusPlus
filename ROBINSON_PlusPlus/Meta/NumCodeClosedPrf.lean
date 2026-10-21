@@ -59,7 +59,7 @@ theorem prf_congr_liftc {c a b : Term} (h : Prf (a =eq b)) :
   let f : Formula := Formula.eq (liftc (liftTerm 0 c) (liftTerm 0 a)) (liftc (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftc c a) (liftc c s) := by
     intro s
-    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftc c a))
 
 /-- Congruencia de `liftsc` en la lista, la gemela de `prf_congr_liftc`, con el nivel implícito. Llega con
@@ -70,7 +70,7 @@ theorem prf_congr_liftsc {c a b : Term} (h : Prf (a =eq b)) :
   let f : Formula := Formula.eq (liftsc (liftTerm 0 c) (liftTerm 0 a)) (liftsc (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftsc c a) (liftsc c s) := by
     intro s
-    simp only [f, liftsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, liftsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftsc c a))
 
 /-! ⛔ **`PrfH_congr_liftc` bajó a `Meta/ChainPrf.lean`** (2026‑09‑09d): estaba también en
@@ -85,7 +85,7 @@ theorem PrfH_congr_substtc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a
                                 (substtc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
   have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substtc v s a) (substtc v s u) := by
     intro u
-    simp only [f, substtc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substtc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (substtc v s a)) Γ)
 
 /-- Congruencia de `substtc` en el código (3er argumento). -/
@@ -101,7 +101,7 @@ theorem prf_congr_substtsc3 {v s a b : Term} (h : Prf (a =eq b)) :
                                 (substtsc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
   have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substtsc v s a) (substtsc v s u) := by
     intro u
-    simp only [f, substtsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substtsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (substtsc v s a))
 
 /-- Congruencia de `substfc` en el código (3er argumento), en `PrfH` (espejo exacto de
@@ -117,7 +117,7 @@ theorem PrfH_congr_substfc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a
                                 (substfc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
   have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substfc v s a) (substfc v s u) := by
     intro u
-    simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (substfc v s a)) Γ)
 
 /-- Congruencia de `substfc` en el código (3er argumento). -/
@@ -167,17 +167,17 @@ def liftcTcPred : Formula := Formula.eq (liftc zero (tcFn (.var 0))) (tcFn (.var
 theorem prf_liftc_tcFn_all : Prf (Formula.forall liftcTcPred) := by
   refine prf_nat_induction liftcTcPred ?base ?step
   · simpa only [liftcTcPred, substFormula, substTerm, substTerms, liftc, tcFn, zero,
-      reduceIte, if_true] using prf_liftc_tcFn_zero
+      reduceIte, ite_true] using prf_liftc_tcFn_zero
   · refine Prf.gen _ ?_
     simpa only [liftcTcPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
       liftc, tcFn, zero, succ, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
-      reduceIte, if_true] using prf_liftc_tcFn_succ_imp (.var 0)
+      reduceIte, ite_true] using prf_liftc_tcFn_succ_imp (.var 0)
 
 /-- **`liftc zero (tcFn a) =eq tcFn a`** para todo término `a` (instancia del ∀). -/
 theorem prf_liftc_tcFn (a : Term) : Prf (liftc zero (tcFn a) =eq tcFn a) := by
   have h := prf_spec prf_liftc_tcFn_all a
   simpa only [liftcTcPred, substFormula, substTerm, substTerms, liftc, tcFn, zero,
-    reduceIte, if_true] using h
+    reduceIte, ite_true] using h
 
 /-! ### `substtc` deja invariante el código de un numeral -/
 
@@ -212,17 +212,17 @@ def substtcTcPred (W : Term) : Formula :=
 theorem prf_substtc_tcFn_all (W : Term) : Prf (Formula.forall (substtcTcPred W)) := by
   refine prf_nat_induction (substtcTcPred W) ?base ?step
   · simpa only [substtcTcPred, substFormula, substTerm, substTerms, substtc, tcFn, zero,
-      reduceIte, if_true, FOL.substTerm_liftTerm] using prf_substtc_tcFn_zero W
+      reduceIte, ite_true, FOL.substTerm_liftTerm] using prf_substtc_tcFn_zero W
   · refine Prf.gen _ ?_
     simpa only [substtcTcPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm,
       substTerms, substtc, tcFn, zero, succ, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-      Nat.reduceGT, reduceIte, if_true, norm11] using prf_substtc_tcFn_succ_imp (liftTerm 0 W) (.var 0)
+      Nat.reduceGT, reduceIte, ite_true, norm11] using prf_substtc_tcFn_succ_imp (liftTerm 0 W) (.var 0)
 
 /-- **`substtc zero W (tcFn a) =eq tcFn a`** para todo `a` (instancia del ∀). -/
 theorem prf_substtc_tcFn (W a : Term) : Prf (substtc zero W (tcFn a) =eq tcFn a) := by
   have h := prf_spec (prf_substtc_tcFn_all W) a
   simpa only [substtcTcPred, substFormula, substTerm, substTerms, substtc, tcFn, zero,
-    reduceIte, if_true, FOL.substTerm_liftTerm] using h
+    reduceIte, ite_true, FOL.substTerm_liftTerm] using h
 
 end ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 

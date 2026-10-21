@@ -88,7 +88,7 @@ theorem prf_congr_tc2 {S A A' B B' : Term} (hA : Prf (A =eq A')) (hB : Prf (B =e
 theorem prf_congr_tcFn {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (tcFn t₁ =eq tcFn t₂) := by
   let f : Formula := Formula.eq (tcFn (liftTerm 0 t₁)) (tcFn (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (tcFn t₁) (tcFn s) := by
-    intro s; simp only [f, substFormula, tcFn, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, tcFn, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (tcFn t₁))
 
 end ROBINSON_PlusPlus.Meta.TcArithPrf

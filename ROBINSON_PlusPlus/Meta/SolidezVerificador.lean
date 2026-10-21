@@ -97,19 +97,19 @@ theorem decT_unfold (c : Nat) : decT c =
 theorem decTs_unfold (l : Nat) : decTs l = if _h : l = 0 then [] else decT (carN l) :: decTs (cdrN l) := by
   rw [decTs]
 
-theorem decT_zero : decT 0 = dflt := by rw [decT_unfold, dif_pos rfl]
+theorem decT_zero : decT 0 = dflt := by rw [decT_unfold, dite_eq_left rfl]
 
 theorem decT_var (n r : Nat) : decT (consN 0 (consN n r)) = Term.var n := by
-  rw [decT_unfold, dif_neg (consN_ne_zero _ _), nthN_cz, if_pos rfl, nthN_cs, nthN_cz]
+  rw [decT_unfold, dite_eq_right (consN_ne_zero _ _), nthN_cz, ite_eq_left rfl, nthN_cs, nthN_cz]
 
 theorem decT_func (s ts r : Nat) : decT (consN 1 (consN s (consN ts r))) = Term.func (decS s) (decTs ts) := by
-  rw [decT_unfold, dif_neg (consN_ne_zero _ _), nthN_cz, if_neg (by decide), if_pos rfl,
+  rw [decT_unfold, dite_eq_right (consN_ne_zero _ _), nthN_cz, ite_eq_right (by decide), ite_eq_left rfl,
     nthN_cs, nthN_cz, nthN_cs, nthN_cs, nthN_cz]
 
-theorem decTs_zero : decTs 0 = [] := by rw [decTs_unfold, dif_pos rfl]
+theorem decTs_zero : decTs 0 = [] := by rw [decTs_unfold, dite_eq_left rfl]
 
 theorem decTs_consN (a b : Nat) : decTs (consN a b) = decT a :: decTs b := by
-  rw [decTs_unfold, dif_neg (consN_ne_zero _ _), carN_consN, cdrN_consN]
+  rw [decTs_unfold, dite_eq_right (consN_ne_zero _ _), carN_consN, cdrN_consN]
 
 theorem dec_unfold (f : Nat) : dec f =
     if _h : f = 0 then Formula.bottom
@@ -124,7 +124,7 @@ theorem dec_unfold (f : Nat) : dec f =
     else Formula.bottom := by
   rw [dec]
 
-theorem dec_zero : dec 0 = Formula.bottom := by rw [dec_unfold, dif_pos rfl]
+theorem dec_zero : dec 0 = Formula.bottom := by rw [dec_unfold, dite_eq_left rfl]
 
 theorem dec_bot (r : Nat) : dec (consN 2 r) = Formula.bottom := by
   rw [dec_unfold]; simp only [consN_ne_zero, nthN_cz, dite_false]; rfl
@@ -238,11 +238,11 @@ theorem decT_substVar (k s n : Nat) :
       substTerm k (decT s) (Term.var n) := by
   show _ = (if n = k then decT s else if n > k then Term.var (n - 1) else Term.var n)
   by_cases e : k = n
-  · rw [if_pos e, if_pos (show n = k from e.symm)]
-  · rw [if_neg e, if_neg (show ¬ (n = k) from fun h => e h.symm)]
+  · rw [ite_eq_left e, ite_eq_left (show n = k from e.symm)]
+  · rw [ite_eq_right e, ite_eq_right (show ¬ (n = k) from fun h => e h.symm)]
     by_cases l : k < n
-    · rw [if_pos l, if_pos (show n > k from l), decT_var]
-    · rw [if_neg l, if_neg (show ¬ (n > k) from l), decT_var]
+    · rw [ite_eq_left l, ite_eq_left (show n > k from l), decT_var]
+    · rw [ite_eq_right l, ite_eq_right (show ¬ (n > k) from l), decT_var]
 
 theorem decT_substtc (k s : Nat) : ∀ c : Nat,
     And (decT (substtcN k s c) = substTerm k (decT s) (decT c))
@@ -253,25 +253,25 @@ theorem decT_substtc (k s : Nat) : ∀ c : Nat,
     by_cases h0 : c = 0
     · subst h0
       refine ⟨?_, ?_⟩
-      · rw [substtcN_unfold, dif_pos rfl, decT_zero]; rfl
-      · rw [substtscN_unfold, dif_pos rfl, decTs_zero]; rfl
+      · rw [substtcN_unfold, dite_eq_left rfl, decT_zero]; rfl
+      · rw [substtscN_unfold, dite_eq_left rfl, decTs_zero]; rfl
     · refine ⟨?_, ?_⟩
-      · rw [substtcN_unfold, dif_neg h0, decT_unfold c, dif_neg h0]
+      · rw [substtcN_unfold, dite_eq_right h0, decT_unfold c, dite_eq_right h0]
         by_cases t0 : nthN c 0 = 0
-        · rw [if_pos t0, if_pos t0]; exact decT_substVar k s (nthN c 1)
-        · rw [if_neg t0, if_neg t0]
+        · rw [ite_eq_left t0, ite_eq_left t0]; exact decT_substVar k s (nthN c 1)
+        · rw [ite_eq_right t0, ite_eq_right t0]
           by_cases t1 : nthN c 0 = 1
-          · rw [if_pos t1, if_pos t1, decT_func, (ih (nthN c 2) (nthN_lt 2 h0)).2]; rfl
-          · rw [if_neg t1, if_neg t1, decT_zero]; rfl
-      · rw [substtscN_unfold, dif_neg h0, decTs_unfold c, dif_neg h0, decTs_consN,
+          · rw [ite_eq_left t1, ite_eq_left t1, decT_func, (ih (nthN c 2) (nthN_lt 2 h0)).2]; rfl
+          · rw [ite_eq_right t1, ite_eq_right t1, decT_zero]; rfl
+      · rw [substtscN_unfold, dite_eq_right h0, decTs_unfold c, dite_eq_right h0, decTs_consN,
           (ih (carN c) (carN_lt h0)).1, (ih (cdrN c) (cdrN_lt h0)).2]; rfl
 
 theorem decT_liftVar (c n : Nat) :
     decT (if n < c then consN 0 (consN n 0) else consN 0 (consN (n + 1) 0)) = liftTerm c (Term.var n) := by
   show _ = (if n < c then Term.var n else Term.var (n + 1))
   by_cases l : n < c
-  · rw [if_pos l, if_pos l, decT_var]
-  · rw [if_neg l, if_neg l, decT_var]
+  · rw [ite_eq_left l, ite_eq_left l, decT_var]
+  · rw [ite_eq_right l, ite_eq_right l, decT_var]
 
 theorem decT_liftc (c : Nat) : ∀ t : Nat,
     And (decT (liftcN c t) = liftTerm c (decT t)) (decTs (liftscN c t) = liftTerms c (decTs t)) := by
@@ -281,17 +281,17 @@ theorem decT_liftc (c : Nat) : ∀ t : Nat,
     by_cases h0 : t = 0
     · subst h0
       refine ⟨?_, ?_⟩
-      · rw [liftcN_unfold, dif_pos rfl, decT_zero]; rfl
-      · rw [liftscN_unfold, dif_pos rfl, decTs_zero]; rfl
+      · rw [liftcN_unfold, dite_eq_left rfl, decT_zero]; rfl
+      · rw [liftscN_unfold, dite_eq_left rfl, decTs_zero]; rfl
     · refine ⟨?_, ?_⟩
-      · rw [liftcN_unfold, dif_neg h0, decT_unfold t, dif_neg h0]
+      · rw [liftcN_unfold, dite_eq_right h0, decT_unfold t, dite_eq_right h0]
         by_cases t0 : nthN t 0 = 0
-        · rw [if_pos t0, if_pos t0]; exact decT_liftVar c (nthN t 1)
-        · rw [if_neg t0, if_neg t0]
+        · rw [ite_eq_left t0, ite_eq_left t0]; exact decT_liftVar c (nthN t 1)
+        · rw [ite_eq_right t0, ite_eq_right t0]
           by_cases t1 : nthN t 0 = 1
-          · rw [if_pos t1, if_pos t1, decT_func, (ih (nthN t 2) (nthN_lt 2 h0)).2]; rfl
-          · rw [if_neg t1, if_neg t1, decT_zero]; rfl
-      · rw [liftscN_unfold, dif_neg h0, decTs_unfold t, dif_neg h0, decTs_consN,
+          · rw [ite_eq_left t1, ite_eq_left t1, decT_func, (ih (nthN t 2) (nthN_lt 2 h0)).2]; rfl
+          · rw [ite_eq_right t1, ite_eq_right t1, decT_zero]; rfl
+      · rw [liftscN_unfold, dite_eq_right h0, decTs_unfold t, dite_eq_right h0, decTs_consN,
           (ih (carN t) (carN_lt h0)).1, (ih (cdrN t) (cdrN_lt h0)).2]; rfl
 
 theorem substfcN_unfold (v t f : Nat) : substfcN v t f =
@@ -313,34 +313,34 @@ theorem dec_substfc : ∀ f : Nat, ∀ v t : Nat, dec (substfcN v t f) = substFo
   | ind f ih =>
     intro v t
     by_cases h0 : f = 0
-    · subst h0; rw [substfcN_unfold, dif_pos rfl, dec_zero]; rfl
-    rw [substfcN_unfold, dif_neg h0, dec_unfold f, dif_neg h0]
+    · subst h0; rw [substfcN_unfold, dite_eq_left rfl, dec_zero]; rfl
+    rw [substfcN_unfold, dite_eq_right h0, dec_unfold f, dite_eq_right h0]
     have i1 := ih (nthN f 1) (nthN_lt 1 h0)
     have i2 := ih (nthN f 2) (nthN_lt 2 h0)
     by_cases t2 : nthN f 0 = 2
-    · rw [if_pos t2, if_pos t2, dec_bot]; rfl
-    rw [if_neg t2, if_neg t2]
+    · rw [ite_eq_left t2, ite_eq_left t2, dec_bot]; rfl
+    rw [ite_eq_right t2, ite_eq_right t2]
     by_cases t3 : nthN f 0 = 3
-    · rw [if_pos t3, if_pos t3, dec_atom, (decT_substtc v t (nthN f 2)).2]; rfl
-    rw [if_neg t3, if_neg t3]
+    · rw [ite_eq_left t3, ite_eq_left t3, dec_atom, (decT_substtc v t (nthN f 2)).2]; rfl
+    rw [ite_eq_right t3, ite_eq_right t3]
     by_cases t4 : nthN f 0 = 4
-    · rw [if_pos t4, if_pos t4, dec_eq, (decT_substtc v t (nthN f 1)).1, (decT_substtc v t (nthN f 2)).1]; rfl
-    rw [if_neg t4, if_neg t4]
+    · rw [ite_eq_left t4, ite_eq_left t4, dec_eq, (decT_substtc v t (nthN f 1)).1, (decT_substtc v t (nthN f 2)).1]; rfl
+    rw [ite_eq_right t4, ite_eq_right t4]
     by_cases t5 : nthN f 0 = 5
-    · rw [if_pos t5, if_pos t5, dec_impl, i1, i2]; rfl
-    rw [if_neg t5, if_neg t5]
+    · rw [ite_eq_left t5, ite_eq_left t5, dec_impl, i1, i2]; rfl
+    rw [ite_eq_right t5, ite_eq_right t5]
     by_cases t6 : nthN f 0 = 6
-    · rw [if_pos t6, if_pos t6, dec_forall, i1, (decT_liftc 0 t).1]; rfl
-    rw [if_neg t6, if_neg t6]
+    · rw [ite_eq_left t6, ite_eq_left t6, dec_forall, i1, (decT_liftc 0 t).1]; rfl
+    rw [ite_eq_right t6, ite_eq_right t6]
     by_cases t7 : nthN f 0 = 7
-    · rw [if_pos t7, if_pos t7, dec_and, i1, i2]; rfl
-    rw [if_neg t7, if_neg t7]
+    · rw [ite_eq_left t7, ite_eq_left t7, dec_and, i1, i2]; rfl
+    rw [ite_eq_right t7, ite_eq_right t7]
     by_cases t8 : nthN f 0 = 8
-    · rw [if_pos t8, if_pos t8, dec_or, i1, i2]; rfl
-    rw [if_neg t8, if_neg t8]
+    · rw [ite_eq_left t8, ite_eq_left t8, dec_or, i1, i2]; rfl
+    rw [ite_eq_right t8, ite_eq_right t8]
     by_cases t9 : nthN f 0 = 9
-    · rw [if_pos t9, if_pos t9, dec_ex, i1, (decT_liftc 0 t).1]; rfl
-    rw [if_neg t9, if_neg t9, dec_zero]; rfl
+    · rw [ite_eq_left t9, ite_eq_left t9, dec_ex, i1, (decT_liftc 0 t).1]; rfl
+    rw [ite_eq_right t9, ite_eq_right t9, dec_zero]; rfl
 
 theorem liftfcN_unfold (c f : Nat) : liftfcN c f =
     if _h : f = 0 then 0
@@ -361,34 +361,34 @@ theorem dec_liftfc : ∀ f : Nat, ∀ c : Nat, dec (liftfcN c f) = liftFormula c
   | ind f ih =>
     intro c
     by_cases h0 : f = 0
-    · subst h0; rw [liftfcN_unfold, dif_pos rfl, dec_zero]; rfl
-    rw [liftfcN_unfold, dif_neg h0, dec_unfold f, dif_neg h0]
+    · subst h0; rw [liftfcN_unfold, dite_eq_left rfl, dec_zero]; rfl
+    rw [liftfcN_unfold, dite_eq_right h0, dec_unfold f, dite_eq_right h0]
     have i1 := ih (nthN f 1) (nthN_lt 1 h0)
     have i2 := ih (nthN f 2) (nthN_lt 2 h0)
     by_cases t2 : nthN f 0 = 2
-    · rw [if_pos t2, if_pos t2, dec_bot]; rfl
-    rw [if_neg t2, if_neg t2]
+    · rw [ite_eq_left t2, ite_eq_left t2, dec_bot]; rfl
+    rw [ite_eq_right t2, ite_eq_right t2]
     by_cases t3 : nthN f 0 = 3
-    · rw [if_pos t3, if_pos t3, dec_atom, (decT_liftc c (nthN f 2)).2]; rfl
-    rw [if_neg t3, if_neg t3]
+    · rw [ite_eq_left t3, ite_eq_left t3, dec_atom, (decT_liftc c (nthN f 2)).2]; rfl
+    rw [ite_eq_right t3, ite_eq_right t3]
     by_cases t4 : nthN f 0 = 4
-    · rw [if_pos t4, if_pos t4, dec_eq, (decT_liftc c (nthN f 1)).1, (decT_liftc c (nthN f 2)).1]; rfl
-    rw [if_neg t4, if_neg t4]
+    · rw [ite_eq_left t4, ite_eq_left t4, dec_eq, (decT_liftc c (nthN f 1)).1, (decT_liftc c (nthN f 2)).1]; rfl
+    rw [ite_eq_right t4, ite_eq_right t4]
     by_cases t5 : nthN f 0 = 5
-    · rw [if_pos t5, if_pos t5, dec_impl, i1, i2]; rfl
-    rw [if_neg t5, if_neg t5]
+    · rw [ite_eq_left t5, ite_eq_left t5, dec_impl, i1, i2]; rfl
+    rw [ite_eq_right t5, ite_eq_right t5]
     by_cases t6 : nthN f 0 = 6
-    · rw [if_pos t6, if_pos t6, dec_forall, i1]; rfl
-    rw [if_neg t6, if_neg t6]
+    · rw [ite_eq_left t6, ite_eq_left t6, dec_forall, i1]; rfl
+    rw [ite_eq_right t6, ite_eq_right t6]
     by_cases t7 : nthN f 0 = 7
-    · rw [if_pos t7, if_pos t7, dec_and, i1, i2]; rfl
-    rw [if_neg t7, if_neg t7]
+    · rw [ite_eq_left t7, ite_eq_left t7, dec_and, i1, i2]; rfl
+    rw [ite_eq_right t7, ite_eq_right t7]
     by_cases t8 : nthN f 0 = 8
-    · rw [if_pos t8, if_pos t8, dec_or, i1, i2]; rfl
-    rw [if_neg t8, if_neg t8]
+    · rw [ite_eq_left t8, ite_eq_left t8, dec_or, i1, i2]; rfl
+    rw [ite_eq_right t8, ite_eq_right t8]
     by_cases t9 : nthN f 0 = 9
-    · rw [if_pos t9, if_pos t9, dec_ex, i1]; rfl
-    rw [if_neg t9, if_neg t9, dec_zero]; rfl
+    · rw [ite_eq_left t9, ite_eq_left t9, dec_ex, i1]; rfl
+    rw [ite_eq_right t9, ite_eq_right t9, dec_zero]; rfl
 
 
 /-! ## §4 · W1: lo que el verificador ACEPTA en el modelo, decodificado, es teorema de `Prf` -/
@@ -472,7 +472,7 @@ theorem linea_listInd (hT : lineWFT V 20 x) : Prf (dec (carN x)) := by
 theorem linea_mp {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nthN x 1 = 16) :
     Prf (dec (carN x)) := by
   have e : premsOfN x = consN (consN 5 (consN (nthN x 2) (consN (carN x) 0))) (consN (nthN x 2) 0) := by
-    rw [premsOfN, if_pos hk]; rfl
+    rw [premsOfN, ite_eq_left hk]; rfl
   rw [e] at hp
   have h1 := (allInN_consN c _ _).mp hp
   have h2 := (allInN_consN c _ _).mp h1.2
@@ -484,7 +484,7 @@ theorem linea_mp {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nth
 theorem linea_gen {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nthN x 1 = 17)
     (hT : lineWFT V 17 x) : Prf (dec (carN x)) := by
   have e : premsOfN x = consN (nthN x 2) 0 := by
-    rw [premsOfN, if_neg (by rw [hk]; decide), if_pos hk]
+    rw [premsOfN, ite_eq_right (by rw [hk]; decide), ite_eq_left hk]
   rw [e] at hp
   have hA := hc _ ((allInN_consN c _ _).mp hp).1
   rw [hT.2, dec_forall]

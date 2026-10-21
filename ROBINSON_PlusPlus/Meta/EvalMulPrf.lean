@@ -278,7 +278,7 @@ theorem step_evalMulPred (a : Term) :
       = provFromCode (evalMulCode (liftTerm 0 a) (succ (.var 0))) := by
   rw [liftFormula_provFromCode_open, liftTerm_evalMulCode, substFormula_provFromCode_open,
     substTerm_evalMulCode, ← FOL.liftTerm_comm_zero a 0, FOL.substTerm_liftTerm]
-  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, if_true]
+  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, ite_true]
 
 /-- **EVALUACIÓN PROVABLE DE `·` (∀ object)**. -/
 theorem prf_eval_mul_all (a : Term) : Prf (Formula.forall (evalMulPred a)) := by

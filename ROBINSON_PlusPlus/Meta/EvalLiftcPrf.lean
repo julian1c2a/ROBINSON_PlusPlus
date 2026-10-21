@@ -297,7 +297,7 @@ theorem PrfH_congr_targetLiftsc {Γ : List Formula} {s s' : Term} (h : PrfH Γ (
   have hS : ∀ u : Term, substFormula 0 u (targetLiftsc (.var 0)) = targetLiftsc u := by
     intro u
     rw [substF_targetLiftsc]
-    simp only [substTerm, if_true]
+    simp only [substTerm, ite_true]
   exact (hS s') ▸ PrfH_leibniz_subst (A := targetLiftsc (.var 0)) h ((hS s) ▸ ha)
 
 /-! ## §2 · LA ESTRUCTURA: `⊢ Y ≐ nil ∨ Y ≐ cons (carc Y) (cdrc Y)` para `Y` ARBITRARIO
@@ -363,7 +363,7 @@ theorem PHI_at (t : Term) :
              (targetLiftsc (liftTerm 0 t)))) := by
   simp only [PHI, PHIbody, land, substFormula, substF_isTC1, substF_wfAll1, substF_argsIn,
     substF_targetLift, substF_targetLiftsc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 /-- Instanciacion de las dos mitades a un testigo `w` concreto. -/
 theorem PHI_use {Γ : List Formula} (t w : Term) (h : PrfH Γ (substFormula 0 t PHI)) :
@@ -372,7 +372,7 @@ theorem PHI_use {Γ : List Formula} (t w : Term) (h : PrfH Γ (substFormula 0 t 
   rw [PHI_at] at h
   have hs := PrfH_spec h w
   simpa only [land, substFormula, substF_isTC1, substF_wfAll1, substF_argsIn,
-    substF_targetLift, substF_targetLiftsc, substTerm, FOL.substTerm_liftTerm, if_true] using hs
+    substF_targetLift, substF_targetLiftsc, substTerm, FOL.substTerm_liftTerm, ite_true] using hs
 
 /-! ⚠️ **`psi_lift_form` y `PSI_inst` NO viven aqui.** El sondeo los tenia instanciados a
     `Φ := PHI`, pero son maquinaria GENERICA de la induccion fuerte: `psi_lift_form` sale en
@@ -592,7 +592,7 @@ theorem PHIat_use {Γ : List Formula} (t c w : Term) (h : PrfH Γ (substFormula 
   simpa only [e, PHIat, PHIatBody, land, substFormula, substF_isTC1, substF_wfAll1, substF_argsIn,
     substF_targetLiftAt, substF_targetLiftscAt, substTerm, substTerms,
     FOL.substTerm_liftTerm, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-    reduceIte, if_true] using h2
+    reduceIte, ite_true] using h2
 
 theorem PHIat_step : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
   refine Prf.gen _ (prf_deduction ?_)

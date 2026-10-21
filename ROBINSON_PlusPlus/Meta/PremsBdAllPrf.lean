@@ -91,13 +91,15 @@ theorem liftTerm_substCodeT2 (k v : Nat) (u W : Term) : ∀ t : Term,
     liftTerm k (substCodeT2 v u W t) = substCodeT2 v (liftTerm k u) (liftTerm k W) t
   | .var n => by
       simp only [substCodeT2]
-      rcases Nat.decEq n (v + 1) with h1 | h1
-      · rcases Nat.decEq n v with h2 | h2
-        · rw [if_neg h1, if_neg h2, if_neg h1, if_neg h2]
-          by_cases h3 : n > v + 1 <;> simp only [if_pos, if_neg, h3, reduceIte] <;>
+      -- (✏️ v4.35, T42b: `Decidable` es una ESTRUCTURA —`decide` y `reflects_decide`— y `rcases Nat.decEq …` ya no da
+      -- las ramas `isFalse`/`isTrue` con su hipótesis: `by_cases`, con la rama positiva primero)
+      by_cases h1 : n = v + 1
+      · rw [ite_eq_left h1, ite_eq_left h1]
+      · by_cases h2 : n = v
+        · rw [ite_eq_right h1, ite_eq_left h2, ite_eq_right h1, ite_eq_left h2]
+        · rw [ite_eq_right h1, ite_eq_right h2, ite_eq_right h1, ite_eq_right h2]
+          by_cases h3 : n > v + 1 <;> simp only [ite_eq_left, ite_eq_right, h3, reduceIte] <;>
             simp only [varc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeral]
-        · rw [if_neg h1, if_pos h2, if_neg h1, if_pos h2]
-      · rw [if_pos h1, if_pos h1]
   | .func sym ts => by
       simp only [substCodeT2, funcc, cons, nil, zero, succ, liftTerm, liftTerms,
         liftTerm_strCode, liftTerms_substCodeTs2 k v u W ts]
@@ -150,13 +152,15 @@ theorem substTerm_substCodeT2 (c v : Nat) (s u W : Term) : ∀ t : Term,
     substTerm c s (substCodeT2 v u W t) = substCodeT2 v (substTerm c s u) (substTerm c s W) t
   | .var n => by
       simp only [substCodeT2]
-      rcases Nat.decEq n (v + 1) with h1 | h1
-      · rcases Nat.decEq n v with h2 | h2
-        · rw [if_neg h1, if_neg h2, if_neg h1, if_neg h2]
-          by_cases h3 : n > v + 1 <;> simp only [if_pos, if_neg, h3, reduceIte] <;>
+      -- (✏️ v4.35, T42b: `Decidable` es una ESTRUCTURA —`decide` y `reflects_decide`— y `rcases Nat.decEq …` ya no da
+      -- las ramas `isFalse`/`isTrue` con su hipótesis: `by_cases`, con la rama positiva primero)
+      by_cases h1 : n = v + 1
+      · rw [ite_eq_left h1, ite_eq_left h1]
+      · by_cases h2 : n = v
+        · rw [ite_eq_right h1, ite_eq_left h2, ite_eq_right h1, ite_eq_left h2]
+        · rw [ite_eq_right h1, ite_eq_right h2, ite_eq_right h1, ite_eq_right h2]
+          by_cases h3 : n > v + 1 <;> simp only [ite_eq_left, ite_eq_right, h3, reduceIte] <;>
             simp only [varc, cons, nil, zero, substTerm, substTerms, substTerm_numeral]
-        · rw [if_neg h1, if_pos h2, if_neg h1, if_pos h2]
-      · rw [if_pos h1, if_pos h1]
   | .func sym ts => by
       simp only [substCodeT2, funcc, cons, nil, zero, succ, substTerm, substTerms,
         substTerm_strCode, substTerms_substCodeTs2 c v s u W ts]
@@ -274,13 +278,13 @@ theorem substtc_id_substCodeT2 (v : Nat) (u0 W : Term)
         rcases Nat.lt_or_ge n (v + 3) with h | h
         · exact Nat.le_of_lt_succ h
         · have hne : ¬ (n < v + 3) := Nat.not_lt.mpr h
-          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          simp only [liftTerm, ite_eq_right hne, Term.var.injEq] at hfv
           exact absurd hfv (Nat.succ_ne_self n)
       rcases Nat.lt_or_ge n (v + 1) with hlt | hge
       · -- n ≤ v : casilla de variable de código CERRADA
         have hsub : substCodeT2 (v + 1) u0 W (.var n) = varc (numeral n) := by
           simp only [substCodeT2]
-          rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+          rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         rcases Nat.lt_or_ge n v with hlt2 | hge2
         · exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
@@ -293,7 +297,7 @@ theorem substtc_id_substCodeT2 (v : Nat) (u0 W : Term)
           have hnv : n = v + 1 := by omega
           subst hnv
           have hsub : substCodeT2 (v + 1) u0 W (.var (v + 1)) = u0 := by
-            simp only [substCodeT2]; rw [if_neg (by omega)]; simp
+            simp only [substCodeT2]; rw [ite_eq_right (by omega)]; simp
           rw [hsub]; exact hu0 v u
         · -- n = v+2 : el hueco ALTO
           have hnv : n = v + 2 := Nat.le_antisymm hn hge3
@@ -765,7 +769,7 @@ theorem prf_premsDisj_of_chainOk (q i j : Term) :
       (lineOkB (liftTerm 0 nil) (liftTerm 0 q) (.var 0)))
       = Formula.impl (lt i (lenc q)) (lineOkB nil q i) := by
     simp only [substFormula, substFormula_lineOkB, lt, lenc, nil, zero, substTerm, substTerms,
-      FOL.substTerm_liftTerm, if_true]
+      FOL.substTerm_liftTerm, ite_true]
   rw [heq] at hspec
   have hline : PrfH Gm (lineOkB nil q i) := PrfH.mp _ _ _ hspec hlt
   have hprems : PrfH Gm (boundedPremsIn nil q i L) := PrfH_and_elim_right hline
@@ -780,7 +784,7 @@ theorem prf_premsDisj_of_chainOk (q i j : Term) :
       = Formula.impl (lt j (lenc L))
           (lor (In (nthc L j) nil) (boundedCarcLt (nthc L j) q i)) := by
     simp only [substFormula, substFormula_boundedCarcLt, lor, In, lt, lenc, nthc, nil, zero,
-      substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+      substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   rw [heq2] at hspec2
   exact PrfH.mp _ _ _ hspec2 hltj
 
@@ -1054,7 +1058,7 @@ theorem substFormula_bodyF_snd (s X X2 : Term) (hX : substTerm 0 s X = X2) :
     land, bdAllCode, forallc, implc, ltCodeFn, atom2CodeFn, varc, tcFn, cons,
     substFormula_provFromCode_open, substFormula, substTerm, substTerms,
     substTerm_strCode, substTerm_numeral,
-    hPs_premsPsi, hX, if_true]
+    hPs_premsPsi, hX, ite_true]
 
 theorem substFormula_bodyF_fst (s Y Y2 : Term) (hY : substTerm 0 s Y = Y2) :
     substFormula 0 s (bodyF (.var 0) Y) = bodyF s Y2 := by
@@ -1062,7 +1066,7 @@ theorem substFormula_bodyF_fst (s Y Y2 : Term) (hY : substTerm 0 s Y = Y2) :
     land, bdAllCode, forallc, implc, ltCodeFn, atom2CodeFn, varc, tcFn, cons,
     substFormula_provFromCode_open, substFormula, substTerm, substTerms,
     substTerm_strCode, substTerm_numeral,
-    hPs_premsPsi, hY, if_true]
+    hPs_premsPsi, hY, ite_true]
 
 /-- El chasis interior, ya **desempaquetado**. -/
 theorem hbdAllPrems_unpacked (q i : Term) : Prf (bodyF q i) := by
@@ -1110,12 +1114,12 @@ theorem substtc_inv_substCodeT2 (v : Nat) (u0 W : Term)
         rcases Nat.lt_or_ge n (v + 3) with h | h
         · exact Nat.le_of_lt_succ h
         · have hne : ¬ (n < v + 3) := Nat.not_lt.mpr h
-          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          simp only [liftTerm, ite_eq_right hne, Term.var.injEq] at hfv
           exact absurd hfv (Nat.succ_ne_self n)
       rcases Nat.lt_or_ge n (v + 1) with hlt | hge
       · have hsub : substCodeT2 (v + 1) u0 W (.var n) = varc (numeral n) := by
           simp only [substCodeT2]
-          rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+          rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         exact prf_mp (prf_substtc_var_lt (numeral (v + 1)) u (numeral n))
           (prf_gnum_lt (by omega))
@@ -1123,7 +1127,7 @@ theorem substtc_inv_substCodeT2 (v : Nat) (u0 W : Term)
         · have hnv : n = v + 1 := by omega
           subst hnv
           have hsub : substCodeT2 (v + 1) u0 W (.var (v + 1)) = u0 := by
-            simp only [substCodeT2]; rw [if_neg (by omega)]; simp
+            simp only [substCodeT2]; rw [ite_eq_right (by omega)]; simp
           rw [hsub]; exact hu0 (v + 1) u
         · have hnv : n = v + 2 := Nat.le_antisymm hn hge3
           subst hnv

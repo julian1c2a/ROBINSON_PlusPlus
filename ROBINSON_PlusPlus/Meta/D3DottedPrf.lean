@@ -58,7 +58,7 @@ theorem formCode_provCodeC'_eq (φ : Formula) :
     formCode (provCodeC' φ) = exc (formCode (bodyF φ)) := by
   simp only [provCodeC', provFormulaC', bodyF, substFormula, substTerm, substTerms, land,
     chainOk, In, runFn, nil, zero, formCode, exc, numeral, Nat.reduceAdd, Nat.reduceLT,
-    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm, liftTerm_formCode]
+    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm, liftTerm_formCode]
 
 /-- **D3 reducida a la reflexión PUNTEADA del cuerpo** (keystone de la ruta B): dada
     `hbody : bodyF φ ⇒ provFromCode (substfc 0 (tcFn #0) (formCode (bodyF φ)))` —la reflexión del

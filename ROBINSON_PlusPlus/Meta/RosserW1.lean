@@ -62,7 +62,7 @@ theorem proofN_axioma {a : Formula} (ha : List.Mem a axioms) :
   have hk : nthN (lineaThy a) 1 = 15 := by rw [lineaThy, nthN_cs, nthN_cz]
   have hl : lenN (lineaThy a) = 2 := by rw [lineaThy, lenN_consN, lenN_consN, lenN_zero]
   have hp : premsOfN (lineaThy a) = 0 := by
-    rw [premsOfN, if_neg (by rw [hk]; decide), if_neg (by rw [hk]; decide)]
+    rw [premsOfN, ite_eq_right (by rw [hk]; decide), ite_eq_right (by rw [hk]; decide)]
   have hT : lineWFT (codeNatList axioms) 15 (lineaThy a) :=
     And.intro hl (by rw [hc]; exact memN_codeNatList_of_mem ha)
   refine And.intro ?_ ?_

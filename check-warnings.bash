@@ -32,10 +32,19 @@ cd "$(dirname "$0")" || exit 2
 # clases:
 #   simp-unused  →  "This simp argument is unused"
 #   var-unref    →  "Variable name `x` is not explicitly referenced"
+#   deprecated   →  "`x` has been deprecated" (✏️ 2026-10-21, T42b, ADR-181: v4.35.0 da por obsoletos «if_pos», «if_neg»,
+#                   «dif_pos», «dif_neg», «if_true» e «if_false»; se renombraron en todo el árbol MENOS en los módulos
+#                   CONGELADOS de FOL —`../FOL/frozen_files.txt`: inmutables sin un «thaw», que decide el propietario—)
 DECLARED=$(cat <<'TABLA'
 ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean|simp-unused|4
 ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean|var-unref|1
 TheoryFramework/Relations.lean|var-unref|4
+FOL/Compacity0.lean|deprecated|2
+FOL/Hauptsatz0.lean|deprecated|2
+FOL/QFDecide0.lean|deprecated|8
+FOL/Rename.lean|deprecated|2
+FOL/Skolem0.lean|deprecated|3
+FOL/SkolemN0.lean|deprecated|2
 TABLA
 )
 
@@ -62,6 +71,7 @@ while IFS= read -r line; do
   case "$line" in
     *"simp argument is unused"*) c="simp-unused" ;;
     *"is not explicitly referenced"*) c="var-unref" ;;
+    *"has been deprecated"*) c="deprecated" ;;
     *) c="OTRA" ;;
   esac
   printf '%s|%s\n' "$f" "$c" >> "$MEASURED"

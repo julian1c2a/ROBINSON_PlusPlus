@@ -91,7 +91,7 @@ theorem PrfH_congr_liftsc {Γ : List Formula} {c a b : Term} (h : PrfH Γ (a =eq
                                 (liftsc (liftTerm 0 c) (.var 0))
   have hS : ∀ x : Term, substFormula 0 x f = Formula.eq (liftsc c a) (liftsc c x) := by
     intro x
-    simp only [f, liftsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, liftsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   have h0 : PrfH Γ (substFormula 0 a f) := by rw [hS a]; exact prf_to_prfH (prf_refl _) _
   have h1 := PrfH_leibniz_subst (A := f) h h0
   rwa [hS b] at h1
@@ -102,7 +102,7 @@ theorem PrfH_congr_liftfc {Γ : List Formula} {c a b : Term} (h : PrfH Γ (a =eq
                                 (liftfc (liftTerm 0 c) (.var 0))
   have hS : ∀ x : Term, substFormula 0 x f = Formula.eq (liftfc c a) (liftfc c x) := by
     intro x
-    simp only [f, liftfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, liftfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   have h0 : PrfH Γ (substFormula 0 a f) := by rw [hS a]; exact prf_to_prfH (prf_refl _) _
   have h1 := PrfH_leibniz_subst (A := f) h h0
   rwa [hS b] at h1
@@ -144,18 +144,18 @@ theorem PHIL_at (t : Term) :
     substFormula 0 t PHIL = Formula.forall (Formula.forall
       (BODYL (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t)))) := by
   simp only [PHIL, PHILbody, substFormula, substF_BODYL, substTerm, Nat.reduceAdd,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 theorem PHIL_spec1 (t w : Term) :
     substFormula 0 w (Formula.forall (BODYL (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
       = Formula.forall (BODYL (liftTerm 0 w) (.var 0) (liftTerm 0 t)) := by
   have ht := FOL.substTerm_liftLift t 0 (liftTerm 0 w)
   simp only [substFormula, substF_BODYL, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, ht]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, ht]
 
 theorem PHIL_spec2 (t w v : Term) :
     substFormula 0 v (BODYL (liftTerm 0 w) (.var 0) (liftTerm 0 t)) = BODYL w v t := by
-  simp only [substF_BODYL, substTerm, if_true, FOL.substTerm_liftTerm]
+  simp only [substF_BODYL, substTerm, ite_true, FOL.substTerm_liftTerm]
 
 /-- Instanciación de los dos binders (`w`, `v`), en ese orden. -/
 theorem PHIL_use {Γ : List Formula} (t w v : Term) (h : PrfH Γ (substFormula 0 t PHIL)) :
@@ -396,7 +396,7 @@ theorem PHILF_at (t : Term) :
       (BODYFL (.var 2) (.var 1) (.var 0)
         (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
   simp only [PHILF, PHILFbody, substFormula, substF_BODYFL, substTerm, Nat.reduceAdd,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 theorem PHILF_spec1 (t wF : Term) :
     substFormula 0 wF (Formula.forall (Formula.forall
@@ -406,7 +406,7 @@ theorem PHILF_spec1 (t wF : Term) :
             (liftTerm 0 (liftTerm 0 t)))) := by
   have h3 := substTerm_liftLiftLift t 0 (liftTerm 0 (liftTerm 0 wF))
   simp only [substFormula, substF_BODYFL, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, h3]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3]
 
 theorem PHILF_spec2 (t wF wT : Term) :
     substFormula 0 wT (Formula.forall
@@ -415,12 +415,12 @@ theorem PHILF_spec2 (t wF wT : Term) :
   have hw := FOL.substTerm_liftLift wF 0 (liftTerm 0 wT)
   have ht := FOL.substTerm_liftLift t 0 (liftTerm 0 wT)
   simp only [substFormula, substF_BODYFL, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm, hw, ht]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, hw, ht]
 
 theorem PHILF_spec3 (t wF wT v : Term) :
     substFormula 0 v (BODYFL (liftTerm 0 wF) (liftTerm 0 wT) (.var 0) (liftTerm 0 t))
       = BODYFL wF wT v t := by
-  simp only [substF_BODYFL, substTerm, if_true, FOL.substTerm_liftTerm]
+  simp only [substF_BODYFL, substTerm, ite_true, FOL.substTerm_liftTerm]
 
 theorem PHILF_use {Γ : List Formula} (t wF wT v : Term)
     (h : PrfH Γ (substFormula 0 t PHILF)) : PrfH Γ (BODYFL wF wT v t) := by

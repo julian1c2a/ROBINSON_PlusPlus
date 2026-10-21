@@ -770,7 +770,7 @@ theorem hfv_chainOkBPsi : liftFormula 2 (lineOkB nil (.var 1) (.var 0))
     = lineOkB nil (.var 1) (.var 0) := by
   have h1 : (1 : Nat) < 2 := by omega
   have h0 : (0 : Nat) < 2 := by omega
-  simp only [liftFormula_lineOkB, liftTerm, nil, zero, liftTerms, if_pos h1, if_pos h0]
+  simp only [liftFormula_lineOkB, liftTerm, nil, zero, liftTerms, ite_eq_left h1, ite_eq_left h0]
 
 /-- ⭐⭐⭐ **`hPinv` PARA `chainOkBPsi`.** Una de las tres obligaciones que §8 dejó abiertas,
     cerrada. -/

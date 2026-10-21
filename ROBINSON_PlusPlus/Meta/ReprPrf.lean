@@ -106,14 +106,14 @@ fontanería `substF_*` bajaron a `Minimal/Axioms.lean`. -/
 theorem prf_congr_hasWit {a b : Term} (h : Prf (a =eq b)) (hw : Prf (hasWit a)) :
     Prf (hasWit b) := by
   have e : ∀ s : Term, substFormula 0 s (hasWit (.var 0)) = hasWit s := by
-    intro s; simp only [substF_hasWit, substTerm, if_true]
+    intro s; simp only [substF_hasWit, substTerm, ite_true]
   exact (e b) ▸ prf_leibniz_subst (A := hasWit (.var 0)) h ((e a) ▸ hw)
 
 /-- Congruencia de `hasWitF` (Leibniz objeto). -/
 theorem prf_congr_hasWitF {a b : Term} (h : Prf (a =eq b)) (hw : Prf (hasWitF a)) :
     Prf (hasWitF b) := by
   have e : ∀ s : Term, substFormula 0 s (hasWitF (.var 0)) = hasWitF s := by
-    intro s; simp only [substF_hasWitF, substTerm, if_true]
+    intro s; simp only [substF_hasWitF, substTerm, ite_true]
   exact (e b) ▸ prf_leibniz_subst (A := hasWitF (.var 0)) h ((e a) ▸ hw)
 
 theorem prf_and_intro {a b : Formula} (ha : Prf a) (hb : Prf b) : Prf (a ∧ b) :=
@@ -136,14 +136,14 @@ theorem prf_or_intro_right {a b : Formula} (hb : Prf b) : Prf (a ∨ b) :=
 theorem prf_eq_trans {a b c : Term} (h1 : Prf (a =eq b)) (h2 : Prf (b =eq c)) : Prf (a =eq c) := by
   let f : Formula := Formula.eq (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq a s := by
-    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS c) ▸ prf_leibniz_subst (A := f) h2 ((hS b) ▸ h1)
 
 /-- Simetría de `=eq` en `Prf`. -/
 theorem prf_eq_symm {a b : Term} (h : Prf (a =eq b)) : Prf (b =eq a) := by
   let f : Formula := Formula.eq (.var 0) (liftTerm 0 a)
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq s a := by
-    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl a)
 
 /-! ### Congruencias en `Prf` (vía `prf_leibniz_subst`) -/
@@ -152,49 +152,49 @@ theorem prf_congr_cons_head {h₁ h₂ t : Term} (hh : Prf (h₁ =eq h₂)) :
     Prf (cons h₁ t =eq cons h₂ t) := by
   let f : Formula := Formula.eq (cons (liftTerm 0 h₁) (liftTerm 0 t)) (cons (.var 0) (liftTerm 0 t))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (cons h₁ t) (cons s t) := by
-    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS h₂) ▸ prf_leibniz_subst (A := f) hh ((hS h₁) ▸ prf_refl (cons h₁ t))
 
 theorem prf_congr_cons_tail {h t₁ t₂ : Term} (hh : Prf (t₁ =eq t₂)) :
     Prf (cons h t₁ =eq cons h t₂) := by
   let f : Formula := Formula.eq (cons (liftTerm 0 h) (liftTerm 0 t₁)) (cons (liftTerm 0 h) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (cons h t₁) (cons h s) := by
-    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) hh ((hS t₁) ▸ prf_refl (cons h t₁))
 
 theorem prf_congr_runFn_1 {c₁ c₂ rest : Term} (h : Prf (c₁ =eq c₂)) :
     Prf (runFn c₁ rest =eq runFn c₂ rest) := by
   let f : Formula := Formula.eq (runFn (liftTerm 0 c₁) (liftTerm 0 rest)) (runFn (.var 0) (liftTerm 0 rest))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (runFn c₁ rest) (runFn s rest) := by
-    intro s; simp only [f, substFormula, runFn, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, runFn, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS c₂) ▸ prf_leibniz_subst (A := f) h ((hS c₁) ▸ prf_refl (runFn c₁ rest))
 
 theorem prf_congr_runFn_2 {c a b : Term} (h : Prf (a =eq b)) :
     Prf (runFn c a =eq runFn c b) := by
   let f : Formula := Formula.eq (runFn (liftTerm 0 c) (liftTerm 0 a)) (runFn (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (runFn c a) (runFn c s) := by
-    intro s; simp only [f, substFormula, runFn, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, runFn, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (runFn c a))
 
 theorem prf_congr_concat_left {u t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) :
     Prf (concat u t₁ =eq concat u t₂) := by
   let f : Formula := Formula.eq (concat (liftTerm 0 u) (liftTerm 0 t₁)) (concat (liftTerm 0 u) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (concat u t₁) (concat u s) := by
-    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (concat u t₁))
 
 theorem prf_chainOk_subst1 {c₁ c₂ p : Term} (h : Prf (c₁ =eq c₂)) (hok : Prf (chainOk c₁ p)) :
     Prf (chainOk c₂ p) := by
   let f : Formula := chainOk (.var 0) (liftTerm 0 p)
   have hS : ∀ s : Term, substFormula 0 s f = chainOk s p := by
-    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS c₂) ▸ prf_leibniz_subst (A := f) h ((hS c₁) ▸ hok)
 
 theorem prf_allIn_subst2 {c L₁ L₂ : Term} (h : Prf (L₁ =eq L₂)) (hok : Prf (allIn c L₁)) :
     Prf (allIn c L₂) := by
   let f : Formula := allIn (liftTerm 0 c) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = allIn c s := by
-    intro s; simp only [f, allIn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, allIn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS L₂) ▸ prf_leibniz_subst (A := f) h ((hS L₁) ▸ hok)
 
 /-- Sustitución bajo `In` (2º arg) en `Prf`. -/
@@ -202,7 +202,7 @@ theorem prf_eq_subst_in {x t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) (hin : Pr
     Prf (In x t₂) := by
   let f : Formula := In (liftTerm 0 x) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = In x s := by
-    intro s; simp only [f, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ hin)
 
 /-! ### Ecuaciones `Prf` de `carc`/`concat`/`chainOk`/`allIn` -/
@@ -250,7 +250,7 @@ private theorem prf_eq_congr_succ_loc {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂
   let f : Formula := Formula.eq (succ (liftTerm 0 t₁)) (succ (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (succ t₁) (succ s) := by
     intro s
-    simp only [f, substFormula, succ, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, succ, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (succ t₁))
 
 /-- **Elimina un conjunto izquierdo DEMOSTRABLE de una equivalencia** (esquemas ESTRICTOS, plan A):
@@ -312,7 +312,7 @@ private theorem prf_congr_substfc_a2_loc {x z a b : Term} (h : Prf (a =eq b)) :
   let f : Formula := Formula.eq (substfc (liftTerm 0 x) (liftTerm 0 a) (liftTerm 0 z))
                                  (substfc (liftTerm 0 x) (.var 0) (liftTerm 0 z))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (substfc x a z) (substfc x s z) := by
-    intro s; simp only [f, substFormula, substfc, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, substfc, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (substfc x a z))
 /-- Congruencia de `substfc` en arg3 (copia local privada). -/
 private theorem prf_congr_substfc_a3_loc {x t a b : Term} (h : Prf (a =eq b)) :
@@ -320,14 +320,14 @@ private theorem prf_congr_substfc_a3_loc {x t a b : Term} (h : Prf (a =eq b)) :
   let f : Formula := Formula.eq (substfc (liftTerm 0 x) (liftTerm 0 t) (liftTerm 0 a))
                                  (substfc (liftTerm 0 x) (liftTerm 0 t) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (substfc x t a) (substfc x t s) := by
-    intro s; simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (substfc x t a))
 /-- Congruencia de `liftfc` en arg2 (copia local privada). -/
 private theorem prf_congr_liftfc_a2_loc {c a b : Term} (h : Prf (a =eq b)) :
     Prf (liftfc c a =eq liftfc c b) := by
   let f : Formula := Formula.eq (liftfc (liftTerm 0 c) (liftTerm 0 a)) (liftfc (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftfc c a) (liftfc c s) := by
-    intro s; simp only [f, liftfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, liftfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftfc c a))
 
 -- (los wrappers por‑constructor `prf_congr_implc`/`andc`/… se omiten: colisionan con copias
@@ -343,12 +343,12 @@ theorem prf_lineWF_iff_transport {L x x' y y' : Term}
     let A : Formula := iff (lineWF (liftTerm 0 L)) (Formula.eq (.var 0) (liftTerm 0 y))
     have hS : ∀ s : Term, substFormula 0 s A = iff (lineWF L) (Formula.eq s y) := by
       intro s
-      simp only [A, iff, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+      simp only [A, iff, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
     exact (hS x') ▸ prf_leibniz_subst (A := A) hx ((hS x) ▸ h)
   let B : Formula := iff (lineWF (liftTerm 0 L)) (Formula.eq (liftTerm 0 x') (.var 0))
   have hS : ∀ s : Term, substFormula 0 s B = iff (lineWF L) (Formula.eq x' s) := by
     intro s
-    simp only [B, iff, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [B, iff, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS y') ▸ prf_leibniz_subst (A := B) hy ((hS y) ▸ h1)
 
 
@@ -375,12 +375,12 @@ theorem prf_lineWF_imp_transport {L x x' y y' : Term}
     let A : Formula := Formula.impl (lineWF (liftTerm 0 L)) (Formula.eq (.var 0) (liftTerm 0 y))
     have hS : ∀ s : Term, substFormula 0 s A = Formula.impl (lineWF L) (Formula.eq s y) := by
       intro s
-      simp only [A, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+      simp only [A, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
     exact (hS x') ▸ prf_leibniz_subst (A := A) hx ((hS x) ▸ h)
   let B : Formula := Formula.impl (lineWF (liftTerm 0 L)) (Formula.eq (liftTerm 0 x') (.var 0))
   have hS : ∀ s : Term, substFormula 0 s B = Formula.impl (lineWF L) (Formula.eq x' s) := by
     intro s
-    simp only [B, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [B, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS y') ▸ prf_leibniz_subst (A := B) hy ((hS y) ▸ h1)
 
 /-- Transporte de `lineWF L ⇔ In x C` por una igualdad provable en el ELEMENTO. Análogo de
@@ -393,7 +393,7 @@ theorem prf_lineWF_iff_transport_in {L x x' C : Term}
   have hS : ∀ s : Term, substFormula 0 s A = iff (lineWF L) (In s C) := by
     intro s
     simp only [A, iff, lineWF, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
-      if_true]
+      ite_true]
   exact (hS x') ▸ prf_leibniz_subst (A := A) hx ((hS x) ▸ h)
 
 theorem prf_concat_nil_eq (X : Term) : Prf (concat nil X =eq X) := by

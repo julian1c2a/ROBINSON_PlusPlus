@@ -83,7 +83,7 @@ theorem pcc_mp_code_open (Ac Bc : Term) :
     liftTerm_implc_open, liftTerm, liftTerms,
     substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
     Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
-    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   -- abreviaturas: los códigos van DOBLEMENTE lifteados
   let A2 : Term := liftTerm 0 (liftTerm 0 Ac)
   let B2 : Term := liftTerm 0 (liftTerm 0 Bc)

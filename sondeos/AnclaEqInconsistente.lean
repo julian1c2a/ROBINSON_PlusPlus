@@ -149,10 +149,10 @@ theorem repT_lift (hl : ∀ c, liftTerm c r = r) (c : Nat) :
   | .func f ts => by
       by_cases h : esAC f ts = true
       · have h0 := esAC_true h; subst h0
-        simp only [liftTerm, liftTerms, repT, h, if_true, hl]
+        simp only [liftTerm, liftTerms, repT, h, ite_true, hl]
       · have h' : esAC f (liftTerms c ts) = false := by
           rw [esAC_liftTerms]; simpa using h
-        simp only [liftTerm, repT, h', h, if_false, Bool.false_eq_true, repTs_lift hl c ts]
+        simp only [liftTerm, repT, h', h, ite_false, Bool.false_eq_true, repTs_lift hl c ts]
 theorem repTs_lift (hl : ∀ c, liftTerm c r = r) (c : Nat) : ∀ ts : List Term, repTs r (liftTerms c ts) = liftTerms c (repTs r ts)
   | [] => rfl
   | t :: ts => by simp only [liftTerms, repTs, repT_lift hl c t, repTs_lift hl c ts]
@@ -168,10 +168,10 @@ theorem repT_subst (hs : ∀ v s, substTerm v s r = r) (v : Nat) (s : Term) :
   | .func f ts => by
       by_cases h : esAC f ts = true
       · have h0 := esAC_true h; subst h0
-        simp only [substTerm, substTerms, repT, h, if_true, hs]
+        simp only [substTerm, substTerms, repT, h, ite_true, hs]
       · have h' : esAC f (substTerms v s ts) = false := by
           rw [esAC_substTerms]; simpa using h
-        simp only [substTerm, repT, h', h, if_false, Bool.false_eq_true, repTs_subst hs v s ts]
+        simp only [substTerm, repT, h', h, ite_false, Bool.false_eq_true, repTs_subst hs v s ts]
 theorem repTs_subst (hs : ∀ v s, substTerm v s r = r) (v : Nat) (s : Term) :
     ∀ ts : List Term, repTs r (substTerms v s ts) = substTerms v (repT r s) (repTs r ts)
   | [] => rfl
@@ -230,7 +230,7 @@ theorem repT_of_occ (r : Term) : ∀ t : Term, occT t = false → repT r t = t
   | .var _, _ => rfl
   | .func f ts, h => by
       simp only [occT, Bool.or_eq_false_iff] at h
-      simp only [repT, h.1, Bool.false_eq_true, if_false, repTs_of_occ r ts h.2]
+      simp only [repT, h.1, Bool.false_eq_true, ite_false, repTs_of_occ r ts h.2]
 theorem repTs_of_occ (r : Term) : ∀ ts : List Term, occTs ts = false → repTs r ts = ts
   | [], _ => rfl
   | t :: ts, h => by

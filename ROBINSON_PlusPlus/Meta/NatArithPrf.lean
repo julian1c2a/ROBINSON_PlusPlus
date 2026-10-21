@@ -46,7 +46,7 @@ theorem PrfH_eq_congr_succ {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (
     PrfH Γ (succ t₁ =eq succ t₂) := by
   let f : Formula := Formula.eq (succ (liftTerm 0 t₁)) (succ (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (succ t₁) (succ s) := by
-    intro s; simp only [f, succ, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, succ, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (succ t₁)) Γ)
 
 /-- **Eliminador de inducción natural en `Prf`**: de `Prf (Φ[0])` y
@@ -75,7 +75,7 @@ theorem prf_add_zero_left (n : Term) : Prf (add zero n =eq n) := by
       exact PrfH_eq_trans (prf_to_prfH (prf_add_succ_t zero (.var 0)) _) (PrfH_eq_congr_succ ih)
   have hn := prf_spec key n
   simpa only [substFormula, substTerm, substTerms, add, zero, Nat.reduceEqDiff, Nat.reduceGT,
-    reduceIte, if_true, FOL.substTerm_liftTerm] using hn
+    reduceIte, ite_true, FOL.substTerm_liftTerm] using hn
 
 /-- Normalización De Bruijn de un binder: el parámetro `t` (protegido por `liftTerm 0`)
     vuelve intacto tras `substTerm 0 s (liftTerm 1 ·)` del `step` de `prf_nat_induction`. -/
@@ -90,12 +90,12 @@ theorem prf_add_succ_left (m n : Term) : Prf (add (succ m) n =eq succ (add m n))
       (add (succ (liftTerm 0 m)) (.var 0)) (succ (add (liftTerm 0 m) (.var 0))))) := by
     refine prf_nat_induction _ ?base ?step
     · simp only [substFormula, substTerm, substTerms, add, succ, zero, Nat.reduceEqDiff,
-        reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+        reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
       exact prf_eq_trans (prf_add_zero_t (succ m))
         (prf_eq_symm (prf_eq_congr_succ (prf_add_zero_t m)))
     · refine Prf.gen _ ?_
       simp only [substFormula, substTerm, substTerms, add, succ, liftFormula, liftTerm, liftTerms,
-        zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, reduceIte, if_true,
+        zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, reduceIte, ite_true,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift, norm11]
       refine prf_deduction ?_
       have ih : PrfH [Formula.eq (add (succ (liftTerm 0 m)) (.var 0)) (succ (add (liftTerm 0 m) (.var 0)))]
@@ -105,7 +105,7 @@ theorem prf_add_succ_left (m n : Term) : Prf (add (succ m) n =eq succ (add m n))
           (prf_to_prfH (prf_eq_symm (prf_eq_congr_succ (prf_add_succ_t (liftTerm 0 m) (.var 0)))) _))
   have hn := prf_spec key n
   simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff, Nat.reduceGT,
-    reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hn
+    reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hn
 
 /-- **Introducción de `<` desde un testigo** en `PrfH`: de `add a (σk) =eq b` sale `lt a b`
     (`k` es el testigo del `∃k. a + σk = b` de `ax13_lt_def`). -/
@@ -117,7 +117,7 @@ theorem PrfH_lt_intro {Γ : List Formula} (a b k : Term)
   refine PrfH_iff_mpr hiff ?_
   refine PrfH_ex_intro k ?_
   simp only [substFormula, substTerm, substTerms, add, succ, zero, Nat.reduceEqDiff, reduceIte,
-    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   exact h
 
 /-- Introducción de `<` desde un testigo, versión `Prf` (cerrada). -/
@@ -218,16 +218,16 @@ theorem prf_zero_or_succ (n : Term) :
     · refine Prf.gen _ ?_
       simp only [substFormula, substTerm, substTerms, lor, zero, succ, liftFormula, liftTerm,
         liftTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-        reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+        reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
       refine prf_deduction (prf_to_prfH ?_ _)
       refine prf_or_intro_right ?_
       refine prf_ex_intro (.var 0) ?_
       simp only [substFormula, substTerm, substTerms, succ, Nat.reduceEqDiff, Nat.reduceGT,
-        reduceIte, if_true]
+        reduceIte, ite_true]
       exact prf_refl _
   have hn := prf_spec key n
   simpa only [substFormula, substTerm, substTerms, lor, zero, succ, Nat.reduceAdd, Nat.reduceLT,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hn
 
 end ROBINSON_PlusPlus.Meta.NatArithPrf

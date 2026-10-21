@@ -57,8 +57,8 @@ theorem sqrtN_le : ∀ n : Nat, sqrtN n * sqrtN n ≤ n
       have ih := sqrtN_le n
       simp only [sqrtN]
       by_cases h : (sqrtN n + 1) * (sqrtN n + 1) ≤ n + 1
-      · rw [if_pos h]; exact h
-      · rw [if_neg h]; omega
+      · rw [ite_eq_left h]; exact h
+      · rw [ite_eq_right h]; omega
 
 /-- `ax15_lt_succ_sqrt` en el modelo: `x < sq (σ (√x))`. -/
 theorem lt_sq_succ_sqrtN : ∀ n : Nat, n < (sqrtN n + 1) * (sqrtN n + 1)
@@ -68,10 +68,10 @@ theorem lt_sq_succ_sqrtN : ∀ n : Nat, n < (sqrtN n + 1) * (sqrtN n + 1)
       have ih2 := sqrtN_le n
       simp only [sqrtN]
       by_cases h : (sqrtN n + 1) * (sqrtN n + 1) ≤ n + 1
-      · rw [if_pos h]
+      · rw [ite_eq_left h]
         have hlt := sq_lt_sq_succ (sqrtN n)
         omega
-      · rw [if_neg h]; exact Nat.lt_of_not_le h
+      · rw [ite_eq_right h]; exact Nat.lt_of_not_le h
 
 /-! ## §1bis · Las LISTAS sobre `Nat` (2026‑10‑05)
 
@@ -291,34 +291,34 @@ end
 
 theorem substtcN_var (k s n : Nat) : substtcN k s (consN 0 (consN n 0)) =
     if k = n then s else if k < n then consN 0 (consN (n - 1) 0) else consN 0 (consN n 0) := by
-  rw [substtcN, dif_neg (consN_ne_zero _ _), nthN_cz, if_pos rfl, nthN_cs, nthN_cz]
+  rw [substtcN, dite_eq_right (consN_ne_zero _ _), nthN_cz, ite_eq_left rfl, nthN_cs, nthN_cz]
 
 theorem substtcN_func (k s a b : Nat) : substtcN k s (consN 1 (consN a (consN b 0))) =
     consN 1 (consN a (consN (substtscN k s b) 0)) := by
-  rw [substtcN, dif_neg (consN_ne_zero _ _), nthN_cz, if_neg (by decide), if_pos rfl,
+  rw [substtcN, dite_eq_right (consN_ne_zero _ _), nthN_cz, ite_eq_right (by decide), ite_eq_left rfl,
     nthN_cs, nthN_cz, nthN_cs, nthN_cs, nthN_cz]
 
 theorem substtscN_zero (k s : Nat) : substtscN k s 0 = 0 := by
-  rw [substtscN, dif_pos rfl]
+  rw [substtscN, dite_eq_left rfl]
 
 theorem substtscN_consN (k s a b : Nat) : substtscN k s (consN a b) =
     consN (substtcN k s a) (substtscN k s b) := by
-  rw [substtscN, dif_neg (consN_ne_zero _ _), carN_consN, cdrN_consN]
+  rw [substtscN, dite_eq_right (consN_ne_zero _ _), carN_consN, cdrN_consN]
 
 theorem liftcN_var (c n : Nat) : liftcN c (consN 0 (consN n 0)) =
     if n < c then consN 0 (consN n 0) else consN 0 (consN (n + 1) 0) := by
-  rw [liftcN, dif_neg (consN_ne_zero _ _), nthN_cz, if_pos rfl, nthN_cs, nthN_cz]
+  rw [liftcN, dite_eq_right (consN_ne_zero _ _), nthN_cz, ite_eq_left rfl, nthN_cs, nthN_cz]
 
 theorem liftcN_func (c a b : Nat) : liftcN c (consN 1 (consN a (consN b 0))) =
     consN 1 (consN a (consN (liftscN c b) 0)) := by
-  rw [liftcN, dif_neg (consN_ne_zero _ _), nthN_cz, if_neg (by decide), if_pos rfl,
+  rw [liftcN, dite_eq_right (consN_ne_zero _ _), nthN_cz, ite_eq_right (by decide), ite_eq_left rfl,
     nthN_cs, nthN_cz, nthN_cs, nthN_cs, nthN_cz]
 
 theorem liftscN_zero (c : Nat) : liftscN c 0 = 0 := by
-  rw [liftscN, dif_pos rfl]
+  rw [liftscN, dite_eq_left rfl]
 
 theorem liftscN_consN (c a b : Nat) : liftscN c (consN a b) = consN (liftcN c a) (liftscN c b) := by
-  rw [liftscN, dif_neg (consN_ne_zero _ _), carN_consN, cdrN_consN]
+  rw [liftscN, dite_eq_right (consN_ne_zero _ _), carN_consN, cdrN_consN]
 
 /-! ### La sustitución y el lift sobre códigos de FÓRMULA -/
 

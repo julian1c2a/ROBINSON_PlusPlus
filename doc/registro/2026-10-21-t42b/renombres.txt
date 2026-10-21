@@ -1,0 +1,69 @@
+# T42b (ADR-181): los RENOMBRES de la migración a v4.35.0 — v4.35.0 da por obsoletos (since 2026-07-21) seis lemas del
+# core, con el MISMO enunciado que sus sustitutos (que en v4.31.0 no existen: por eso no se pudo renombrar antes).
+# El script, migra_deprecados.py (en esta carpeta): una expresión regular por palabra entera, con el CRLF intacto.
+# ⛔ Los módulos CONGELADOS de FOL (frozen_files.txt de FOL) se migraron y se DEVOLVIERON a su estado: son inmutables
+#    sin un «thaw» (lo decide el propietario) y el hook de FOL rechaza el commit. Sus 19 apariciones compilan con aviso
+#    (v4.35.0 conserva los nombres) y check-warnings.bash las declara (clase deprecated).
+
+== en el ámbito de la migración (renombrados), en HEAD:
+  FOL FOL                             6 en   2 ficheros
+  RPP ROBINSON_PlusPlus             593 en  61 ficheros
+  RPP sondeos                        30 en   3 ficheros
+  total: 629 en 66 ficheros
+    if_pos      92
+    if_neg     162
+    dif_pos     11
+    dif_neg     21
+    if_true    326
+    if_false    17
+== FUERA del ámbito (sin tocar: compilan, con aviso, porque v4.35.0 los conserva obsoletos; 🧊 = congelado de FOL):
+  FOL FOL/Compacity0.lean 🧊                                             2
+  FOL FOL/Hauptsatz0.lean 🧊                                             2
+  FOL FOL/QFDecide0.lean 🧊                                              8
+  FOL FOL/Rename.lean 🧊                                                 2
+  FOL FOL/Skolem0.lean 🧊                                                3
+  FOL FOL/SkolemN0.lean 🧊                                               2
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-bnd-invOf/Exp.lean    2
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-bnd-invOf/ExpAll.lean    2
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-deceq/E5.lean    4
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-esceptico/Same.lean    4
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-esceptico/U2.lean    6
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-esencial/E6_Skolem.lean    1
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-juez/Comb.lean    4
+  FOL auditoria/constructividad-2026-09-27/experimentos/exp-string/E4.lean    2
+  FOL cuarentena/librerias-retiradas/FOLPure/Completeness.lean          5
+  FOL cuarentena/librerias-retiradas/FOLPure/Theorems/Quantifiers.lean    2
+  FOL cuarentena/librerias-retiradas/FOL_poli/Completeness.lean         5
+  FOL cuarentena/librerias-retiradas/FOL_poli/Theorems/Quantifiers.lean    2
+  FOL cuarentena/librerias-retiradas/PropLogic/Completeness.lean        5
+  RPP sondeos/A3IsFCBTracked.lean                                       6
+  RPP sondeos/AcotarEsLaMismaObligacion.lean                            4
+  RPP sondeos/CantorSobreyectivo.lean                                   4
+  RPP sondeos/ClausuraFormaEcuacional.lean                             11
+  RPP sondeos/EnumFormulaPorInyeccion.lean                              1
+  RPP sondeos/MergeTestigos.lean                                        1
+  RPP sondeos/ModeloDiscriminador.lean                                  1
+  RPP sondeos/ModeloNat.lean                                           29
+  total: 120 en 27 ficheros (de ellos, congelados: 19 en 6)
+
+== después: de los nombres nuevos en las líneas cambiadas, cuántos en CÓDIGO y cuántos en comentarios (strip-lean.awk)
+#  (los de comentario son todos de sondeos/IteSimboloNucleo.lean: la prosa que describe sus réplicas y los mensajes
+#   fijados del núcleo, que nombran el lema; el «mensaje de julio» lleva su nota: en julio era if_neg)
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:31: 2 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:38: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:44: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:63: 2 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:244: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:274: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:648: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:668: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:722: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:742: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:805: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:832: 1 fuera del código
+ROBINSON_PlusPlus/sondeos/IteSimboloNucleo.lean:873: 1 fuera del código
+ficheros .lean modificados: 67
+nombres nuevos en líneas cambiadas — en CÓDIGO: 616; en comentarios o cadenas: 15
+#  De los de comentario, 13 son de la migración; los 2 de la línea 63 son de la nota «✏️ T42b» añadida después a la
+#  cabecera del sondeo, que cita los dos nombres nuevos. Los de código son los 629 menos los 13: 616. (Los ficheros
+#  .lean modificados cuentan también PremsBdAllPrf, ya en la cuenta de RPP, y ChoiceFrontera, que no tiene renombres.)

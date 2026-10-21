@@ -48,12 +48,12 @@ Todos con el mismo molde: `intro` de los binders, `abre`, y el lema de §1ter qu
 /-! ### Sustitución y lift sobre códigos de término (11) -/
 
 theorem v_substtc_var_eq : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_var_eq := by
-  intro v k s n; abre; intro h; rw [substtcN_var, if_pos h]
+  intro v k s n; abre; intro h; rw [substtcN_var, ite_eq_left h]
 theorem v_substtc_var_gt : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_var_gt := by
-  intro v k s n; abre; intro h; rw [substtcN_var, if_neg (Nat.ne_of_lt h), if_pos h]
+  intro v k s n; abre; intro h; rw [substtcN_var, ite_eq_right (Nat.ne_of_lt h), ite_eq_left h]
 theorem v_substtc_var_lt : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_var_lt := by
   intro v k s n; abre; intro h
-  rw [substtcN_var, if_neg (by omega), if_neg (by omega)]
+  rw [substtcN_var, ite_eq_right (by omega), ite_eq_right (by omega)]
 theorem v_substtc_func : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_func := by
   intro v k s a b; abre; exact substtcN_func k s a b
 theorem v_substtsc_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtsc_nil := by
@@ -61,9 +61,9 @@ theorem v_substtsc_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtsc_
 theorem v_substtsc_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtsc_cons := by
   intro v k s a b; abre; exact substtscN_consN k s a b
 theorem v_liftc_var_lt : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftc_var_lt := by
-  intro v c n; abre; intro h; rw [liftcN_var, if_pos h]
+  intro v c n; abre; intro h; rw [liftcN_var, ite_eq_left h]
 theorem v_liftc_var_ge : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftc_var_ge := by
-  intro v c n; abre; intro h; rw [liftcN_var, if_neg (by omega)]
+  intro v c n; abre; intro h; rw [liftcN_var, ite_eq_right (by omega)]
 theorem v_liftc_func : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftc_func := by
   intro v c a b; abre; exact liftcN_func c a b
 theorem v_liftsc_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftsc_nil := by

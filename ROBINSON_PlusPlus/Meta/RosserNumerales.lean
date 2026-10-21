@@ -69,14 +69,14 @@ theorem prf_numeral_cons {m : Nat} (h : m ≠ 0) :
 theorem prf_congr_carc {x y : Term} (h : Prf (x =eq y)) : Prf (carc x =eq carc y) := by
   let f : Formula := Formula.eq (carc (liftTerm 0 x)) (carc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (carc x) (carc s) := by
-    intro s; simp only [f, substFormula, carc, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, carc, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS y) ▸ prf_leibniz_subst (A := f) h ((hS x) ▸ prf_refl (carc x))
 
 /-- La congruencia de `cdrc` en `Prf`. -/
 theorem prf_congr_cdrc {x y : Term} (h : Prf (x =eq y)) : Prf (cdrc x =eq cdrc y) := by
   let f : Formula := Formula.eq (cdrc (liftTerm 0 x)) (cdrc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (cdrc x) (cdrc s) := by
-    intro s; simp only [f, substFormula, cdrc, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, cdrc, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS y) ▸ prf_leibniz_subst (A := f) h ((hS x) ▸ prf_refl (cdrc x))
 
 /-- La etiqueta de `⟨k, r⟩‾` (la forma de `sondeos/RosserBasura.lean`). -/

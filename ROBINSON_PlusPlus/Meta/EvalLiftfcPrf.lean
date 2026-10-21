@@ -382,7 +382,7 @@ theorem deuda_of_isFC1 (h : DEUDA_evalLiftfc_isFC1) : DEUDA_evalLiftfc := by
   refine prf_ex_elim_imp ?_
   refine PrfH.mp _ _ _ ?_ (prfH_hyp_self _)
   simpa only [liftFormula, liftF_targetLiftfc, liftF_isFC1, liftTerm, Nat.reduceAdd,
-    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true]
+    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true]
     using prf_to_prfH (h (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 v))
       (liftTerm 0 (liftTerm 0 X))) _
 
@@ -432,7 +432,7 @@ theorem PHIliftfc_at (t : Term) :
           (BODYliftfc (.var 2) (.var 1) (.var 0)
             (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
   simp only [PHIliftfc, PHIliftfcBody, substFormula, substF_BODYliftfc, substTerm, Nat.reduceAdd,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 theorem PHIl_spec1 (t wF : Term) :
     substFormula 0 wF (Formula.forall (Formula.forall
@@ -441,19 +441,19 @@ theorem PHIl_spec1 (t wF : Term) :
           (BODYliftfc (liftTerm 0 (liftTerm 0 wF)) (.var 1) (.var 0)
             (liftTerm 0 (liftTerm 0 t)))) := by
   simp only [substFormula, substF_BODYliftfc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift]
 
 theorem PHIl_spec2 (t wF wT : Term) :
     substFormula 0 wT (Formula.forall
         (BODYliftfc (liftTerm 0 (liftTerm 0 wF)) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
       = Formula.forall (BODYliftfc (liftTerm 0 wF) (liftTerm 0 wT) (.var 0) (liftTerm 0 t)) := by
   simp only [substFormula, substF_BODYliftfc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftLift]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftLift]
 
 theorem PHIl_spec3 (t wF wT c : Term) :
     substFormula 0 c (BODYliftfc (liftTerm 0 wF) (liftTerm 0 wT) (.var 0) (liftTerm 0 t))
       = BODYliftfc wF wT c t := by
-  simp only [substF_BODYliftfc, substTerm, FOL.substTerm_liftTerm, if_true]
+  simp only [substF_BODYliftfc, substTerm, FOL.substTerm_liftTerm, ite_true]
 
 theorem PHIliftfc_use {Γ : List Formula} (t wF wT c : Term)
     (h : PrfH Γ (substFormula 0 t PHIliftfc)) : PrfH Γ (BODYliftfc wF wT c t) := by
@@ -475,7 +475,7 @@ theorem PSIatL_inst {Γ : List Formula} {X : Term} (h : PrfH Γ (PSIatL X)) (z :
   have hi := PrfH_spec h z
   have e : substFormula 0 z (Formula.impl (lt (.var 0) (liftTerm 0 X)) PHIliftfc)
       = Formula.impl (lt z X) (substFormula 0 z PHIliftfc) := by
-    simp only [substFormula, lt, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [substFormula, lt, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   rwa [e] at hi
 
 /-- **LA HIPÓTESIS DE INDUCCIÓN, ya instanciada**: si `z < X` y `z` tiene testigo de fórmula,
@@ -720,7 +720,7 @@ theorem pcc_congr_liftfcT_arg2_code (A X Y : Term)
 /-- El transporte de Leibniz del objetivo (espeja `PrfH_congr_targetSubstfc`). -/
 theorem substF_targetLiftfc_hole (c t : Term) :
     substFormula 0 t (targetLiftfc (liftTerm 0 c) (.var 0)) = targetLiftfc c t := by
-  simp only [substF_targetLiftfc, FOL.substTerm_liftTerm, substTerm, if_true]
+  simp only [substF_targetLiftfc, FOL.substTerm_liftTerm, substTerm, ite_true]
 
 theorem PrfH_congr_targetLiftfc {Γ : List Formula} (c : Term) {X X' : Term}
     (h : PrfH Γ (X =eq X')) (ha : PrfH Γ (targetLiftfc c X)) : PrfH Γ (targetLiftfc c X') :=

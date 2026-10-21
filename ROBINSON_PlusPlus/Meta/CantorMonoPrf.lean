@@ -87,7 +87,7 @@ theorem prf_lt_subst2_cm {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hlt : P
     Prf (lt a b₂) := by
   let f : Formula := lt (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b₂) ▸ prf_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
 
 /-! ### Paso 3 — aritmética de `one` y `two`
@@ -206,11 +206,11 @@ theorem prf_le_self_mul_self_all (a : Term) : Prf (le a (mul a a)) := by
     · refine Prf.gen _ ?_
       simp only [le, lt, substFormula, substTerm, substTerms, zero, succ, mul, liftFormula, liftTerm,
         liftTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-        reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+        reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
       exact prf_deduction (prf_to_prfH (prf_le_mul_succ (succ (.var 0)) (.var 0)) _)
   have ha := prf_spec key a
   simpa only [le, lt, substFormula, substTerm, substTerms, mul, Nat.reduceEqDiff, reduceIte,
-    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using ha
+    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using ha
 
 /-- **`a + a ≤ a·σa`** para TODO `a`. -/
 theorem prf_le_double_self_mul_succ_all (a : Term) : Prf (le (add a a) (mul a (succ a))) :=

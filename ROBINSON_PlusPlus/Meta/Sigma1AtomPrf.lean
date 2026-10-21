@@ -254,7 +254,7 @@ theorem PrfH_congr_tcFn {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (t�
   let f : Formula := Formula.eq (tcFn (liftTerm 0 t₁)) (tcFn (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (tcFn t₁) (tcFn s) := by
     intro s
-    simp only [f, tcFn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, tcFn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (tcFn t₁)) Γ)
 
 /-- Congruencia de `eqCodeFn` en ambos argumentos, en `PrfH`. -/

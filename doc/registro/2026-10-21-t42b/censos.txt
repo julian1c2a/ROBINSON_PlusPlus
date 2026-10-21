@@ -1,0 +1,55 @@
+# T42b (ADR-181): los dos censos por entorno con v4.35.0, en el estado final de la subida (2026-10-21).
+# RPP: `bash check-estratos.bash` (salida 43 líneas; aquí, de «sorry EN EL ENTORNO» al final).
+# FOL: `bash check-axioms.bash` desde ../FOL (entera). Los dos, con exit 0.
+# Lo que cambió para v4.35.0: el señuelo AJENO es `lcUnreachable` (no existe «Lean.ofReduceBool»), `let mut … : Nat`,
+# y en RPP «NO PUDE MEDIR» ante un error de Lean en el fichero del censo (antes no paraba).
+
+════════ RPP · check-estratos.bash
+════ sorry EN EL ENTORNO (constantes cuyo tipo o valor nombra sorryAx) ════
+  ✓ ninguna usa sorryAx  (de 10572 constantes de RPP, FOL y TheoryFramework)
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✓ las 9 marcas del señuelo, exactas: el censo ve axiomas, constructores, partial, sorry, confianza y nativo
+════ ESCALERA DE BINDERS ════
+  ✓ forall_            peldaño máximo 5
+  ✓ pcc_thm_inst       peldaño máximo 4
+  ✓ pcc_axiom_inst     peldaño máximo 4
+  ✓ PSI_inst           peldaño máximo 4
+  ✓ psi_lift_form      peldaño máximo 4
+  ⚠️  DESFASE DECLARADO: el uso llega a forall_5 y la maquinaria a 4.
+      Es real y conocido — hay axiomas de aridad 5 sin instanciador de código.
+      ⚠️ La maquinaria crece SUPERLINEALMENTE: medido 6 → 13 → 34 → 64 líneas
+         (pcc_thm_inst · inst2 · inst3 · inst4). El peldaño 5 NO es una tarde.
+      ⭐ El nivel de las DEFINICIONES sí está cerrado: `forallN` + los cinco puentes.
+✅ LOS 10 ESTRATOS CUADRAN.
+   ⚠️  Recordatorio: `#print axioms` es CIEGO a esto. El footprint de un teorema probado por
+       inducción no lleva los axiomas que habitan el inductivo, y el teorema es válido: lo que
+       puede ser falso es el AXIOMA (ADR-115). Por eso se cuentan aquí.
+
+════════ FOL · check-axioms.bash
+════ AXIOMAS DE LEAN, por librería — medidos en el ENTORNO de Lean ════
+  ✓ FOL                 0 axiom en el entorno
+  ✓ TheoryFramework     0 axiom en el entorno
+      (entorno de Lean: 2429 módulos cargados, core incluido, del build de la subida; contraste: grep sobre el código sin comentarios)
+════ sorry EN EL ENTORNO (constantes cuyo tipo o valor nombra sorryAx) ════
+  ✓ ninguna usa sorryAx  (de 2980 constantes de FOL y 86 de TheoryFramework)
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 4 declarados, y ninguno más
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✓ las 8 marcas del señuelo, exactas: el censo ve axiomas, partial, sorry, confianza y nativo
+════ CUARENTENA (fuera del build, pero con cifra publicada) ════
+  ✓ cuarentena          0 axiom  (+15 en librerias-retiradas, muertas)
+════ ¿los cita AXIOMS.md? ════
+  ✓ todos los axiomas del árbol están documentados
+════ librerías RETIRADAS: no deben estar en el lakefile ════
+  ✓ ninguna librería retirada está en el build
+✅ CENSO DE AXIOMAS CORRECTO.

@@ -69,7 +69,7 @@ theorem liftFormula_provFromCode (k : Nat) (c : Term) (hc : ∀ lvl, liftTerm lv
     liftFormula k (provFromCode c) = provFromCode c := by
   simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftFormula,
     liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, hc]
 
 /-- **Versión para códigos ABIERTOS**: sin exigir `c` cerrado, el `liftFormula` sobre
@@ -83,7 +83,7 @@ theorem liftFormula_provFromCode_open (k : Nat) (c : Term) :
     liftFormula k (provFromCode c) = provFromCode (liftTerm k c) := by
   simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftFormula,
     liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, ← FOL.liftTerm_comm_zero]
 
 /-- **`substFormula` atraviesa `provFromCode`** y cae sobre el código:
@@ -95,9 +95,9 @@ theorem substFormula_provFromCode_open (v : Nat) (s c : Term) :
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
   simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftTerm,
-    liftTerms, land, chainOk, In, runFn, nil, zero, hz, hz2, if_false, Nat.reduceAdd,
+    liftTerms, land, chainOk, In, runFn, nil, zero, hz, hz2, ite_false, Nat.reduceAdd,
     Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
-    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, FOL.substTerm_lift_comm_zero]
+    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, FOL.substTerm_lift_comm_zero]
 
 /-!
 ### Constructores de código `tcFn`‑based para átomos binarios (§10.2, paso 1)

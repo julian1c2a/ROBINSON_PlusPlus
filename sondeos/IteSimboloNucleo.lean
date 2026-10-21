@@ -12,34 +12,36 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 `Meta/CodeDecode.lean`, el docstring de `decodeTerm` («con `=` el núcleo rechaza el `split`; con `==` es
 limpio») frente a la nota de la §B («el `if s == sym` sobre `DecidableEq String` es kernel‑frágil bajo
 `split`/`rw`/`simp` manuales; se sortea con inducción funcional y `unfold`»). Nacieron en el mismo commit
-(`9b178ae`, 2026‑07‑14) y se contradicen. Lean v4.31.0. Cada mensaje de error está FIJADO con `#guard_msgs`:
-el sondeo compila, y deja de compilar si una versión de Lean cambia lo medido.
+(`9b178ae`, 2026‑07‑14) y se contradicen. Lean v4.31.0 (✏️ re‑medido con v4.35.0, T42b: lo mismo, teorema a
+teorema; ver el ✏️ del punto 4). Cada mensaje de error está FIJADO con `#guard_msgs`: el sondeo compila, y deja de
+compilar si una versión de Lean cambia lo medido.
 
 ✏️ **2026‑10‑18 (ADR‑160, T66):** `Meta/CodeDecode.lean` salió del build. El decodificador real va copiado TAL CUAL
 en §0, en el mismo espacio de nombres (`ROBINSON_PlusPlus.Meta.CodeDecode`). Los rechazos y las aceptaciones son los
 mismos, teorema a teorema. Pero en cinco de los 23 bloques el núcleo ya no puede imprimir los tipos que nombran
 `decodeTerm.match_1` («Unknown constant», con `pp.rawOnError`): el `match` se compila ahora en este mismo fichero. Esos
 cinco mensajes fijados dicen «failed to pretty print expression» donde antes iba el término; los de antes están en la
-etiqueta `archivo/t66-2026-10-18`.
+etiqueta `archivo/t66-2026-10-18`. (✏️ Con v4.35.0 vuelven a imprimirse: el ✏️ del punto 4.)
 
 ## Veredicto (MEDIDO: 59 teoremas; 24 mensajes fijados en 23 bloques `#guard_msgs`)
 
 **Ninguna de las dos notas acierta en la causa.**
 
 1. **El `if` sobre un símbolo NO es frágil** (§1, §2): 16 de 16 réplicas sin recursión —`String` o `List Char`
-   × `==` o `=` × `split at h`, `rw [if_neg] at h`, `simp only [f, if_neg] at h`, `simp only [f]` + `split`—
+   × `==` o `=` × `split at h`, `rw [ite_eq_right] at h`, `simp only [f, ite_eq_right] at h`, `simp only [f]` + `split`—
    y 4 de 4 mutuas con llamadas a subtérminos DIRECTOS pasan el núcleo.
 2. **Lo que el núcleo rechaza** (§3) es desplegar POR DEFEQ (`dsimp only [f] at h`, y `simp only [f] at h`)
    una recursión estructural MUTUA cuya llamada recursiva va a un subtérmino que sólo aparece tras un `match`
    interior sobre una VARIABLE. El elaborador lo acepta; el núcleo, no: `h` conserva su tipo original y el
    núcleo no lo reconoce igual al desplegado. 6 de 6 rechazadas: con `String` y con `List Char`, con `==`,
    con `=` y SIN comparar ningún símbolo (`mhNS_dsimp`, `mhNL_dsimp`: el `match` envuelto en `id`). El
-   mensaje es el de julio: `Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some _)) h`. Con `unfold f at h`
+   mensaje es el de julio: `Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some _)) h` (en julio, con `if_neg`:
+   el nombre que 4.35.0 retira, T42b). Con `unfold f at h`
    (reescribe con `f.eq_def`, que es una PRUEBA) se aceptan las 12 variantes que lo usan (§3 y §4). Sin
    recursión mutua (`hondo*`, `h2*`), `dsimp` no despliega («`dsimp` made no progress») y no fabrica el
    término malo.
 3. **En el decodificador real** (§4): `dsimp only [decodeTerm]` o `simp only [decodeTerm]`, y después
-   `split at h` o `rw [if_neg] at h` → rechazadas (3 de 3); `unfold decodeTerm at h` y lo mismo → aceptadas
+   `split at h` o `rw [ite_eq_right] at h` → rechazadas (3 de 3); `unfold decodeTerm at h` y lo mismo → aceptadas
    (2 de 2); `decodeTerms` y `decodeChars` (llamadas a subtérminos DIRECTOS) con `dsimp` → aceptadas;
    `decodeForm` (no mutua): `dsimp`/`simp only` no lo despliegan, `unfold` sí y se acepta. Y con las formas
    CONCRETAS que da la inducción funcional (§4.2, el contexto de `decodeTerm_inj`), igual: `simp only
@@ -55,6 +57,11 @@ etiqueta `archivo/t66-2026-10-18`.
    arregla, los `#guard_msgs` de §3 y §4 de este sondeo, que es de control, romperán: entonces la receta «`unfold`, no
    `dsimp`» deja de ser obligatoria. ⚠️ Romperán también si sólo cambia el MENSAJE: desde 4.35.0 el tipo esperado se
    imprime en vez de «failed to pretty print expression»; al subir de toolchain hay que distinguir los dos casos.
+   ✏️ 2026‑10‑21 (T42b, ADR‑181): **al subir a 4.35.0 fue el segundo caso.** 12 de los 23 bloques rompieron SÓLO en
+   eso —las 14 líneas «failed to pretty print expression» pasan a ser el tipo (165 líneas)—, con las MISMAS cabeceras
+   de error, bloque a bloque (las 12 «(kernel)» de antes, y ni una más); se regeneraron del propio diff que
+   imprime `#guard_msgs` (`doc/registro/2026-10-21-t42b/`). Las réplicas citan `ite_eq_right`/`ite_eq_left`: los
+   `if_neg`/`if_pos` de antes, renombrados con todo el árbol (4.35.0 los da por obsoletos; el enunciado es el mismo).
 
 ⇒ Con `decodeTerm` (mutua, llamada a `decodeTerms hts` bajo el `match` interior), `dsimp`/`simp only` sobre la
 función, NUNCA: 5 de 5 formas rechazadas; `unfold`, sí. (`decodeTerms`, su pareja, llama a subtérminos directos y
@@ -234,64 +241,64 @@ theorem pL_split (cs : List Char) (a b : Term) (n : Nat) (h : pL (.func cs [a, b
   · exact ‹cs = cons_sym›
   · simp at h
 
-/-! ### 1.2 · `rw [if_neg] at h` -/
+/-! ### 1.2 · `rw [ite_eq_right] at h` -/
 
 theorem bS_rw (cs : String) (a b : TS) (n : Nat) (h : bS (.func cs [a, b]) = some n) :
     cs = consS := by
   dsimp only [bS] at h
   by_cases hc : (cs == consS) = true
   · exact eq_of_beq hc
-  · rw [if_neg hc] at h; simp at h
+  · rw [ite_eq_right hc] at h; simp at h
 
 theorem pS_rw (cs : String) (a b : TS) (n : Nat) (h : pS (.func cs [a, b]) = some n) :
     cs = consS := by
   dsimp only [pS] at h
   by_cases hc : cs = consS
   · exact hc
-  · rw [if_neg hc] at h; simp at h
+  · rw [ite_eq_right hc] at h; simp at h
 
 theorem bL_rw (cs : List Char) (a b : Term) (n : Nat) (h : bL (.func cs [a, b]) = some n) :
     cs = cons_sym := by
   dsimp only [bL] at h
   by_cases hc : (cs == cons_sym) = true
   · exact eq_of_beq hc
-  · rw [if_neg hc] at h; simp at h
+  · rw [ite_eq_right hc] at h; simp at h
 
 theorem pL_rw (cs : List Char) (a b : Term) (n : Nat) (h : pL (.func cs [a, b]) = some n) :
     cs = cons_sym := by
   dsimp only [pL] at h
   by_cases hc : cs = cons_sym
   · exact hc
-  · rw [if_neg hc] at h; simp at h
+  · rw [ite_eq_right hc] at h; simp at h
 
-/-! ### 1.3 · `simp only [f, if_neg hc] at h` -/
+/-! ### 1.3 · `simp only [f, ite_eq_right hc] at h` -/
 
 theorem bS_simpneg (cs : String) (a b : TS) (n : Nat) (h : bS (.func cs [a, b]) = some n) :
     cs = consS := by
   by_cases hc : (cs == consS) = true
   · exact eq_of_beq hc
-  · simp only [bS, if_neg hc] at h
+  · simp only [bS, ite_eq_right hc] at h
     all_goals simp at h
 
 theorem pS_simpneg (cs : String) (a b : TS) (n : Nat) (h : pS (.func cs [a, b]) = some n) :
     cs = consS := by
   by_cases hc : cs = consS
   · exact hc
-  · simp only [pS, if_neg hc] at h
+  · simp only [pS, ite_eq_right hc] at h
     all_goals simp at h
 
 theorem bL_simpneg (cs : List Char) (a b : Term) (n : Nat) (h : bL (.func cs [a, b]) = some n) :
     cs = cons_sym := by
   by_cases hc : (cs == cons_sym) = true
   · exact eq_of_beq hc
-  · simp only [bL, if_neg hc] at h
+  · simp only [bL, ite_eq_right hc] at h
     all_goals simp at h
 
 theorem pL_simpneg (cs : List Char) (a b : Term) (n : Nat) (h : pL (.func cs [a, b]) = some n) :
     cs = cons_sym := by
   by_cases hc : cs = cons_sym
   · exact hc
-  · simp only [pL, if_neg hc] at h
+  · simp only [pL, ite_eq_right hc] at h
     all_goals simp at h
 
 /-! ### 1.4 · `simp only [f] at h` y `split at h` -/
@@ -638,11 +645,17 @@ def h2L : Term → Option Nat
 
 /--
 error: (kernel) application type mismatch
-  Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
 argument has type
   mhS (TermG.func cs [a, t]) = some n
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if (cs == consS) = true then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsS u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
 -/
 #guard_msgs in
 theorem mhS_dsimp (cs : String) (a t : TS) (n : Nat) (h : mhS (.func cs [a, t]) = some n) : cs = consS := by
@@ -652,11 +665,17 @@ theorem mhS_dsimp (cs : String) (a t : TS) (n : Nat) (h : mhS (.func cs [a, t]) 
   · simp at h
 /--
 error: (kernel) application type mismatch
-  Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
 argument has type
   mhL (TermG.func cs [a, t]) = some n
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if (cs == cons_sym) = true then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsL u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
 -/
 #guard_msgs in
 theorem mhL_dsimp (cs : List Char) (a t : Term) (n : Nat) (h : mhL (.func cs [a, t]) = some n) :
@@ -700,11 +719,17 @@ theorem h2L_unfold (cs : List Char) (a t : Term) (n : Nat) (h : h2L (.func cs [a
 
 /--
 error: (kernel) application type mismatch
-  Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
 argument has type
   mhPS (TermG.func cs [a, t]) = some n
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if cs = consS then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPS u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
 -/
 #guard_msgs in
 theorem mhPS_dsimp (cs : String) (a t : TS) (n : Nat) (h : mhPS (.func cs [a, t]) = some n) : cs = consS := by
@@ -714,11 +739,17 @@ theorem mhPS_dsimp (cs : String) (a t : TS) (n : Nat) (h : mhPS (.func cs [a, t]
   · simp at h
 /--
 error: (kernel) application type mismatch
-  Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
 argument has type
   mhPL (TermG.func cs [a, t]) = some n
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if cs = cons_sym then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPL u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
 -/
 #guard_msgs in
 theorem mhPL_dsimp (cs : List Char) (a t : Term) (n : Nat) (h : mhPL (.func cs [a, t]) = some n) :
@@ -731,7 +762,13 @@ theorem mhPL_dsimp (cs : List Char) (a t : Term) (n : Nat) (h : mhPL (.func cs [
 error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNS_dsimp' has type
   ∀ (cs : String) (a t : TS) (n : Nat), mhNS (TermG.func cs [a, t]) = some n → mhNS (TermG.func cs [a, t]) = some n
 but it is expected to have type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  ∀ (cs : String) (a t : TS) (n : Nat),
+    mhNS (TermG.func cs [a, t]) = some n →
+      id
+          (match t with
+          | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNS u)
+          | x => none) =
+        some n
 -/
 #guard_msgs in
 /-- Sin `if` y sin comparar símbolos: el `match` interior, envuelto en `id`. -/
@@ -743,7 +780,13 @@ theorem mhNS_dsimp (cs : String) (a t : TS) (n : Nat) (h : mhNS (.func cs [a, t]
 error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNL_dsimp' has type
   ∀ (cs : List Char) (a t : Term) (n : Nat), mhNL (TermG.func cs [a, t]) = some n → mhNL (TermG.func cs [a, t]) = some n
 but it is expected to have type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  ∀ (cs : List Char) (a t : Term) (n : Nat),
+    mhNL (TermG.func cs [a, t]) = some n →
+      id
+          (match t with
+          | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNL u)
+          | x => none) =
+        some n
 -/
 #guard_msgs in
 theorem mhNL_dsimp (cs : List Char) (a t : Term) (n : Nat) (h : mhNL (.func cs [a, t]) = some n) :
@@ -759,11 +802,22 @@ theorem mhNL_unfold (cs : List Char) (a t : Term) (n : Nat) (h : mhNL (.func cs 
 
 /--
 error: (kernel) application type mismatch
-  Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some x)) h
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
 argument has type
   decodeTerm (TermG.func cs [hd, tl]) = some x
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
 -/
 #guard_msgs in
 theorem real_dsimp_split (cs : List Char) (hd tl : Term) (x : Term)
@@ -775,11 +829,22 @@ theorem real_dsimp_split (cs : List Char) (hd tl : Term) (x : Term)
 
 /--
 error: (kernel) application type mismatch
-  Eq.mp (congrArg (fun _a => _a = some x) (if_neg hc)) h
+  Eq.mp (congrArg (fun _a => _a = some x) (ite_eq_right hc)) h
 argument has type
   decodeTerm (TermG.func cs [hd, tl]) = some x
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
 -/
 #guard_msgs in
 theorem real_dsimp_rw (cs : List Char) (hd tl : Term) (x : Term)
@@ -787,7 +852,7 @@ theorem real_dsimp_rw (cs : List Char) (hd tl : Term) (x : Term)
   dsimp only [decodeTerm] at h
   by_cases hc : (cs == cons_sym) = true
   · exact eq_of_beq hc
-  · rw [if_neg hc] at h; simp at h
+  · rw [ite_eq_right hc] at h; simp at h
 
 theorem real_unfold_split (cs : List Char) (hd tl : Term) (x : Term)
     (h : decodeTerm (.func cs [hd, tl]) = some x) : cs = cons_sym := by
@@ -801,15 +866,26 @@ theorem real_unfold_rw (cs : List Char) (hd tl : Term) (x : Term)
   unfold decodeTerm at h
   by_cases hc : (cs == cons_sym) = true
   · exact eq_of_beq hc
-  · rw [if_neg hc] at h; simp at h
+  · rw [ite_eq_right hc] at h; simp at h
 
 /--
 error: (kernel) application type mismatch
-  Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some x)) h
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
 argument has type
   decodeTerm (TermG.func cs [hd, tl]) = some x
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
 -/
 #guard_msgs in
 theorem real_simp_split (cs : List Char) (hd tl : Term) (x : Term)
@@ -891,7 +967,18 @@ is not definitionally equal to the right-hand side
 error: (kernel) declaration type mismatch, 'IteSimboloNucleo.real_rfl' has type
   ∀ (cs : List Char) (hd tl : Term), decodeTerm (TermG.func cs [hd, tl]) = decodeTerm (TermG.func cs [hd, tl])
 but it is expected to have type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  ∀ (cs : List Char) (hd tl : Term),
+    decodeTerm (TermG.func cs [hd, tl]) =
+      if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none
 -/
 #guard_msgs in
 theorem real_rfl (cs : List Char) (hd tl : Term) :
@@ -911,9 +998,44 @@ theorem real_rfl (cs : List Char) (hd tl : Term) :
 
 /--
 error: (kernel) application type mismatch
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  congrArg Eq
+    (ite_congr (Eq.refl ((cs == cons_sym) = true))
+      (fun a =>
+        Eq.trans
+          (congrArg
+            (fun x =>
+              match x, TermG.func c2 [hn, TermG.func c3 []] with
+              | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+                if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+              | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+                if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                  (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+                else none
+              | x, x_1 => none)
+            hnat)
+          (decodeTerm.match_1.eq_1 (fun x t => Option Term) c2 hn c3
+            (fun c2 hn c3 =>
+              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none)
+            (fun c2 hs c3 hts c4 =>
+              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+              else none)
+            fun x x_1 => none))
+      fun a => Eq.refl none)
 argument has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if (cs == cons_sym) = true then
+      match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
+      | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+      | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+        if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+          (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+        else none
+      | x, x_1 => none
+    else none) =
+    if (cs == cons_sym) = true then
+      if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+    else none
 but function has type
   (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) =
       if (cs == cons_sym) = true then
@@ -935,11 +1057,47 @@ theorem real_simp_concreto (cs c2 c3 : List Char) (hd hn : Term) (x : Term) (hna
 
 /--
 error: (kernel) application type mismatch
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  Eq.mp
+    (congrArg
+      (fun _a =>
+        (if (cs == cons_sym) = true then
+            match _a, TermG.func c2 [hn, TermG.func c3 []] with
+            | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+            | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+              else none
+            | x, x_1 => none
+          else none) =
+          some x)
+      hnat)
+    h
 argument has type
   decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) = some x
 but function has type
-  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    (if (cs == cons_sym) = true then
+        match some 0, TermG.func c2 [hn, TermG.func c3 []] with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x
 -/
 #guard_msgs in
 theorem real_dsimp_concreto (cs c2 c3 : List Char) (hd hn : Term) (x : Term) (hnat : decodeNat hd = some 0)

@@ -76,7 +76,8 @@ inductive I : Type where
 axiom habita : I
 def conSorry : Nat := sorry
 theorem conNativo : (2 + 2 : Nat) = 4 := by native_decide
-theorem conOfReduceBool : ∀ (a b : Bool), Lean.reduceBool a = b → a = b := Lean.ofReduceBool
+-- (✏️ v4.35, T42b: `Lean.ofReduceBool` ya no existe; el axioma AJENO del señuelo es `lcUnreachable`, del core)
+noncomputable unsafe def conAjeno : Nat := lcUnreachable
 def implReal (n : Nat) : Nat := n
 @[implemented_by implReal] def conImplementedBy (n : Nat) : Nat := n
 @[extern "senuelo_c"] opaque conExtern : Nat → Nat
@@ -106,7 +107,7 @@ def cabeza (e : Expr) : Name :=
     `Lean.trustCompiler`…), y —aunque sea del propio módulo— el auxiliar que fabrica `native_decide`
     (`…._native.native_decide.ax_…`): en v4.31 `native_decide` ya no nombra `Lean.ofReduceBool`, sino un axioma
     NUEVO en el módulo que lo usa, que `esNuestro` absolvía (lo destapó el señuelo, 2026-10-21, ADR-179). Las del
-    señuelo cuentan aquí como nuestras: así `conNativo` prueba la segunda cláusula, y `conOfReduceBool`, la primera. -/
+    señuelo cuentan aquí como nuestras: así `conNativo` prueba la segunda cláusula, y `conAjeno`, la primera. -/
 def esConfianza (env : Environment) (estandar : NameSet) (u : Name) : Bool :=
   match env.find? u with
   | some (.axiomInfo _) =>
@@ -116,8 +117,8 @@ def esConfianza (env : Environment) (estandar : NameSet) (u : Name) : Bool :=
 
 run_cmd do
   let env ← Lean.getEnv
-  let mut tf := 0
-  let mut nuestras := 0
+  let mut tf : Nat := 0
+  let mut nuestras : Nat := 0
   -- los tres axiomas de Lean que el proyecto acepta; cualquier OTRO axioma ajeno que use una constante
   -- nuestra (`Lean.ofReduceBool`, `Lean.ofReduceNat`, `Lean.trustCompiler`, …) es @TRUST
   let estandar : NameSet := ((({} : NameSet).insert ``propext).insert ``Classical.choice).insert ``Quot.sound
@@ -178,8 +179,17 @@ if ! command -v lake >/dev/null 2>&1; then
 fi
 
 SALIDA=$(lake env lean "$LEANFILE" 2>&1)
+RC=$?
 PLANA=$(printf '%s' "$SALIDA" | tr '\n' ' ' | tr -s ' ')
 rm -rf "$TMP"
+# ✏️ 2026-10-21 (T42b, ADR-181): un ERROR de Lean en el fichero generado no paraba el censo: medía lo que llegara a
+# elaborarse, y sólo lo delataba, de rebote, alguna marca ausente. Al subir a v4.35.0 dio errores (una constante del
+# señuelo que ya no existe, un `let mut` sin tipo). Ahora es «NO PUDE MEDIR», como en `../FOL/check-axioms.bash`.
+if [ "$RC" != "0" ] || printf '%s\n' "$SALIDA" | grep -qE ': error'; then
+  echo "  ❌ NO PUDE MEDIR: 'lake env lean' sobre el fichero del censo dio error (código $RC). ¿Está construido el árbol?"
+  printf '%s\n' "$SALIDA" | grep -m3 -E 'error' | sed 's/^/      /' | cut -c1-160
+  exit 1
+fi
 
 FAIL=0
 N=0
@@ -314,7 +324,8 @@ fi
 # Las marcas que el señuelo del fichero (namespace `Senuelo`) TIENE que dar, una por clase de las que el censo busca.
 # Si falta una, el censo ya no sabe ver esa clase (y daría «✓ ninguno» sin mirar); si sale otra, algo cambió en
 # cómo Lean fabrica lo que el señuelo usa: se mira y se actualiza esta tabla, con su ADR. MEDIDAS con v4.31.0
-# (2026-10-21). ⚠️ El nombre del auxiliar de `native_decide` y su cabeza son de Lean, no nuestros.
+# (2026-10-21) y RE‑MEDIDAS con v4.35.0 (T42b, ADR-181: el axioma ajeno pasa a ser `lcUnreachable`). ⚠️ El nombre
+# del auxiliar de `native_decide` y su cabeza son de Lean, no nuestros.
 read -r -d '' SENUELOS <<'EOF'
 @SENUELO CTORS Senuelo.I 1
 @SENUELO HAB Senuelo.I Senuelo.habita
@@ -322,7 +333,7 @@ read -r -d '' SENUELOS <<'EOF'
 @SENUELO PARCIAL Senuelo.conPartial
 @SENUELO SORRY Senuelo.conSorry
 @SENUELO TRUST Senuelo.conNativo Senuelo.conNativo._native.native_decide.ax_1_1
-@SENUELO TRUST Senuelo.conOfReduceBool Lean.ofReduceBool
+@SENUELO TRUST Senuelo.conAjeno lcUnreachable
 @SENUELO NATIVO Senuelo.conImplementedBy
 @SENUELO NATIVO Senuelo.conExtern
 EOF

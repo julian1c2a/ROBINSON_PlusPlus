@@ -10,7 +10,7 @@
 > 2026-08-22 (había crecido a ~20 KB en una sola línea, ilegible y sistemáticamente desfasada).
 
 **Author**: Julián Calderón Almendros
-**Lean version**: v4.31.0
+**Lean version**: v4.35.0 (ADR‑181, T42b, 2026‑10‑21; antes, v4.31.0)
 
 ---
 

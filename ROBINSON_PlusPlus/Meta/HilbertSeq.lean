@@ -166,8 +166,8 @@ theorem mpConcl_eq {fi fj f : Formula} (h : mpConcl fi fj = some f) : fi = (fj �
   | impl a b =>
       simp only [mpConcl] at h
       by_cases hab : a = fj
-      · rw [if_pos hab, Option.some.injEq] at h; subst h; rw [hab]
-      · rw [if_neg hab] at h; exact absurd h (by simp)
+      · rw [ite_eq_left hab, Option.some.injEq] at h; subst h; rw [hab]
+      · rw [ite_eq_right hab] at h; exact absurd h (by simp)
   | bottom => simp [mpConcl] at h
   | atom p ts => simp [mpConcl] at h
   | eq t u => simp [mpConcl] at h

@@ -86,7 +86,7 @@ theorem prf_substtc_arith_open (v : Nat) (w : Term) : ∀ (t : Term),
       show Prf (substtc (numeral v) w (varc (numeral n)) =eq substCodeT v w (.var n))
       rcases Nat.lt_trichotomy n v with hlt | heq | hgt
       · have hsub : substCodeT v w (.var n) = varc (numeral n) := by
-          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+          simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         exact prf_mp (prf_substtc_var_lt (numeral v) w (numeral n)) (prf_gnum_lt hlt)
       · subst heq
@@ -94,7 +94,7 @@ theorem prf_substtc_arith_open (v : Nat) (w : Term) : ∀ (t : Term),
         rw [hsub]
         exact prf_mp (prf_substtc_var_eq (numeral n) w (numeral n)) (prf_refl _)
       · have hsub : substCodeT v w (.var n) = varc (numeral (n - 1)) := by
-          simp only [substCodeT]; rw [if_neg (by omega), if_pos (by omega)]
+          simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
         rw [hsub]
         have hax := prf_mp (prf_substtc_var_gt (numeral v) w (numeral n)) (prf_gnum_lt hgt)
         have hpred : Prf (varc (pred (numeral n)) =eq varc (numeral (n - 1))) := by
@@ -181,11 +181,11 @@ theorem substCodeT_termCode (v : Nat) (s : Term) : ∀ t : Term,
   | .var n => by
       rcases Nat.lt_trichotomy n v with hlt | heq | hgt
       · simp only [substCodeT, substTerm]
-        rw [if_neg (by omega), if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+        rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
         rfl
       · subst heq; simp [substCodeT, substTerm]
       · simp only [substCodeT, substTerm]
-        rw [if_neg (by omega), if_pos (by omega), if_neg (by omega), if_pos (by omega)]
+        rw [ite_eq_right (by omega), ite_eq_left (by omega), ite_eq_right (by omega), ite_eq_left (by omega)]
         rfl
   | .func sym ts => by
       simp only [substCodeT, substTerm, termCode, funcc, substCodeTs_termsCode v s ts]
@@ -215,7 +215,7 @@ theorem substCodeT_closed (v : Nat) (w : Term) :
   | .var n, ht => by
       have h := ht 0
       simp only [liftTerm] at h
-      rw [if_neg (by omega)] at h
+      rw [ite_eq_right (by omega)] at h
       injection h with hn
       omega
   | .func s ts, ht => by
@@ -271,18 +271,18 @@ theorem substtc_inv_substCodeT (v : Nat) (W : Term)
         rcases Nat.lt_or_ge n (v + 2) with h | h
         · exact Nat.le_of_lt_succ h
         · have hne : ¬ (n < v + 2) := Nat.not_lt.mpr h
-          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          simp only [liftTerm, ite_eq_right hne, Term.var.injEq] at hfv
           exact absurd hfv (Nat.succ_ne_self n)
       rcases Nat.lt_trichotomy n v with hlt | heq | hgt
       · have hsub : substCodeT v W (.var n) = varc (numeral n) := by
-          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+          simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         exact prf_mp (prf_substtc_var_lt (numeral (v+1)) u (numeral n)) (prf_gnum_lt (by omega))
       · subst heq
         have hsub : substCodeT n W (.var n) = W := by simp [substCodeT]
         rw [hsub]; exact hW u
       · have hsub : substCodeT v W (.var n) = varc (numeral (n - 1)) := by
-          simp only [substCodeT]; rw [if_neg (by omega), if_pos (by omega)]
+          simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
         rw [hsub]
         have hnv : n = v + 1 := Nat.le_antisymm hn hgt
         subst hnv
@@ -350,11 +350,11 @@ theorem substtc_inv_substCodeT_at (v : Nat) (W : Term)
         rcases Nat.lt_or_ge n (v + 1) with h | h
         · exact Nat.le_of_lt_succ h
         · have hne : ¬ (n < v + 1) := Nat.not_lt.mpr h
-          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          simp only [liftTerm, ite_eq_right hne, Term.var.injEq] at hfv
           exact absurd hfv (Nat.succ_ne_self n)
       rcases Nat.lt_or_ge n v with hlt | hge
       · have hsub : substCodeT v W (.var n) = varc (numeral n) := by
-          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+          simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
       · have hnv : n = v := Nat.le_antisymm hn hge
@@ -438,12 +438,12 @@ theorem substtc_id_substCodeT (v : Nat) (W : Term)
         rcases Nat.lt_or_ge n (v + 2) with h | h
         · exact Nat.le_of_lt_succ h
         · have hne : ¬ (n < v + 2) := Nat.not_lt.mpr h
-          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          simp only [liftTerm, ite_eq_right hne, Term.var.injEq] at hfv
           exact absurd hfv (Nat.succ_ne_self n)
       rcases Nat.lt_or_ge n (v + 1) with hlt | hge
       · -- n ≤ v : la casilla es una variable de código CERRADA
         have hsub : substCodeT (v + 1) W (.var n) = varc (numeral n) := by
-          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+          simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         rcases Nat.lt_or_ge n v with hlt2 | hge2
         · -- n < v : `substtc` no la toca
@@ -544,22 +544,22 @@ theorem substtc_comp_substCodeT (v : Nat) (u W : Term)
         rcases Nat.lt_or_ge n (v + 2) with h | h
         · exact Nat.le_of_lt_succ h
         · have hne : ¬ (n < v + 2) := Nat.not_lt.mpr h
-          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          simp only [liftTerm, ite_eq_right hne, Term.var.injEq] at hfv
           exact absurd hfv (Nat.succ_ne_self n)
       rcases Nat.lt_or_ge n (v + 1) with hlt | hge
       · have hsub : substCodeT (v + 1) W (.var n) = varc (numeral n) := by
-          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+          simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         rcases Nat.lt_or_ge n v with hlt2 | hge2
         · have h2 : substCodeT2 v u W (.var n) = varc (numeral n) := by
             simp only [substCodeT2]
-            rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+            rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
           rw [h2]
           exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
         · have hnv : n = v := by omega
           subst hnv
           have h2 : substCodeT2 n u W (.var n) = u := by
-            simp only [substCodeT2]; rw [if_neg (by omega)]; simp
+            simp only [substCodeT2]; rw [ite_eq_right (by omega)]; simp
           rw [h2]
           exact prf_mp (prf_substtc_var_eq (numeral n) u (numeral n)) (prf_refl (numeral n))
       · have hnv : n = v + 1 := Nat.le_antisymm hn hge

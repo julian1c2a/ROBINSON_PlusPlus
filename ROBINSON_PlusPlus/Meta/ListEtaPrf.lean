@@ -60,7 +60,7 @@ theorem prf_nil_of_lenc_zero (L : Term) : Prf ((lenc L =eq zero) ⇒ (L =eq nil)
         = Formula.eq (lenc s) (succ (lenc (cdrc L))) := by
       intro s
       simp only [A, lenc, cdrc, cons, nil, succ, zero, substFormula, substTerm, substTerms,
-        FOL.substTerm_liftTerm, if_true]
+        FOL.substTerm_liftTerm, ite_true]
     have hlc : PrfH [consOk L, lenc L =eq zero] (lenc L =eq succ (lenc (cdrc L))) :=
       (hS L) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm hcons)
         ((hS (cons (carc L) (cdrc L))) ▸ prf_to_prfH (prf_lenc_cons (carc L) (cdrc L)) _)
@@ -82,7 +82,7 @@ theorem prf_eta_of_lenc_succ (L n : Term) :
     have hS : ∀ s : Term, substFormula 0 s A = Formula.eq (lenc s) zero := by
       intro s
       simp only [A, lenc, cons, nil, zero, substFormula, substTerm, substTerms,
-        FOL.substTerm_liftTerm, if_true]
+        FOL.substTerm_liftTerm, ite_true]
     have hlz : PrfH [Formula.eq L nil, lenc L =eq succ n] (lenc L =eq zero) :=
       (hS L) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm hnil)
         ((hS nil) ▸ prf_to_prfH prf_lenc_nil _)
@@ -103,7 +103,7 @@ theorem prf_lenc_cdrc (L n : Term) :
       = Formula.eq (lenc s) (succ (lenc (cdrc L))) := by
     intro s
     simp only [A, lenc, cdrc, cons, nil, succ, zero, substFormula, substTerm, substTerms,
-      FOL.substTerm_liftTerm, if_true]
+      FOL.substTerm_liftTerm, ite_true]
   have hlc : PrfH [lenc L =eq succ n] (lenc L =eq succ (lenc (cdrc L))) :=
     (hS L) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm hcons)
       ((hS (cons (carc L) (cdrc L))) ▸ prf_to_prfH (prf_lenc_cons (carc L) (cdrc L)) _)
@@ -169,7 +169,7 @@ theorem prf_nthc1_carc_cdrc (L : Term) (n : Nat) :
       = Formula.eq (nthc s (numeralM 1)) (nthc (cdrc L) zero) := by
     intro s
     simp only [A, nthc, cdrc, cons, nil, succ, zero, numeralM, substFormula, substTerm,
-      substTerms, FOL.substTerm_liftTerm, if_true]
+      substTerms, FOL.substTerm_liftTerm, ite_true]
   have hstep1 : PrfH [lenc L =eq numeralM (n + 2)]
       (nthc L (numeralM 1) =eq nthc (cdrc L) zero) :=
     (hS L) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm hcons)
@@ -182,7 +182,7 @@ theorem prf_nthc1_carc_cdrc (L : Term) (n : Nat) :
       = Formula.eq (nthc s zero) (carc (cdrc L)) := by
     intro s
     simp only [B, nthc, carc, cdrc, cons, nil, zero, substFormula, substTerm,
-      substTerms, FOL.substTerm_liftTerm, if_true]
+      substTerms, FOL.substTerm_liftTerm, ite_true]
   have hstep2 : PrfH [lenc L =eq numeralM (n + 2)]
       (nthc (cdrc L) zero =eq carc (cdrc L)) :=
     (hSB (cdrc L)) ▸ PrfH_leibniz_subst (A := B) (PrfH_eq_symm hcons2)

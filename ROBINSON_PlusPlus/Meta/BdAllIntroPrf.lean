@@ -330,7 +330,7 @@ theorem pcc_bdAll_intro
               (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn zero)) (PsiF p)))) := by
         simp only [bdAllPred, substFormula, substTerm, substTerms,
           substFormula_provFromCode_open, lt, tcFn, ltCodeFn, atom2CodeFn, varc, implc, cons, nil,
-          zero, succ, substTerm_strCode, substTerm_numeral, reduceIte, if_true,
+          zero, succ, substTerm_strCode, substTerm_numeral, reduceIte, ite_true,
           hCs, hbs, hPs, FOL.substTerm_liftTerm]
       rw [heq]
       exact prf_deduction (prf_to_prfH
@@ -344,7 +344,7 @@ theorem pcc_bdAll_intro
           liftFormula_provFromCode_open, substFormula_provFromCode_open,
           lt, tcFn, ltCodeFn, atom2CodeFn, varc, implc, cons, nil, zero, succ,
           substTerm_strCode, substTerm_numeral, liftTerm_strCode, liftTerm_numeral,
-          reduceIte, if_true, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, Nat.reduceAdd,
+          reduceIte, ite_true, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, Nat.reduceAdd,
           Nat.reduceLT, ← FOL.liftTerm_comm_zero,
           hCl, hCs, hbl, hbs, hPl, hPs, FOL.substTerm_liftTerm]
       rw [heq]
@@ -394,7 +394,7 @@ theorem pcc_bdAll_intro
           (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (bndF p))) (PsiF p)))) := by
     simp only [bdAllPred, substFormula, substTerm, substTerms,
       substFormula_provFromCode_open, lt, tcFn, ltCodeFn, atom2CodeFn, varc, implc, cons, nil,
-      zero, succ, substTerm_strCode, substTerm_numeral, reduceIte, if_true,
+      zero, succ, substTerm_strCode, substTerm_numeral, reduceIte, ite_true,
       hCs, hbs, hPs, FOL.substTerm_liftTerm]
   rw [heq2] at hspec
   refine prf_deduction ?_

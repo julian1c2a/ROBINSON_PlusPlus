@@ -104,7 +104,7 @@ theorem liftFormula_provCodeC' (c : Nat) (φ : Formula) :
     liftFormula c (provCodeC' φ) = provCodeC' φ := by
   simp only [provCodeC', provFormulaC', substFormula, substTerm, substTerms, liftFormula, liftTerm,
     liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
+    Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode]
 
 theorem d2_prf (A B : Formula) :
@@ -123,7 +123,7 @@ theorem d2_prf (A B : Formula) :
   simp only [List.map_cons, List.map_nil, liftFormula, liftTerm, liftTerms, liftFormula_provCodeC',
     substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
     Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
-    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode]
+    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode]
   -- ctx: [A_A (q=#0), provCodeC' A, P_AB (p=#1)] ; goal: provCodeC' B
   -- testigo `r = p ++ q ++ [mpline]`,  mpline = ⌜B⌝ :: 16 :: ⌜A⌝ :: nil
   refine PrfH_ex_intro

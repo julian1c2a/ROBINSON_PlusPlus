@@ -64,7 +64,7 @@ theorem substFormula_condEfq : substFormula 0 (.var 0) condEfq = condEfq := rfl
 theorem substFormula_condEfq_at (t : Term) :
     substFormula 0 t condEfq = (carc t =eq implc botc (nthc t (numeralM 2))) := by
   simp only [condEfq, carc, nthc, implc, botc, numeralM, succ, zero, cons, nil,
-    substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
 
 /-! ### La parte propia del tag (1): el código punteado, EVALUADO
 

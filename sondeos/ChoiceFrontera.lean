@@ -92,7 +92,9 @@ def filasConChoice : IO (Array Name) := do
   let txt ← IO.FS.readFile "check-footprints.bash"
   let mut out := #[]
   for l in txt.splitOn "\n" do
-    let l := l.trimRight
+    -- (✏️ 2026-10-21, T42b: `String.trimRight`, obsoleto en v4.31.0, ya no existe en v4.35.0; `trimAsciiEnd` da un
+    -- `String.Slice`, de ahí el `toString`. Las líneas del script son ASCII al final: quita lo mismo)
+    let l := l.trimAsciiEnd.toString
     if l.startsWith "ROBINSON_PlusPlus." && (l.splitOn "|").length == 2 then
       let partes := l.splitOn "|"
       let conChoice := ((partes.getD 1 "").splitOn "Classical.choice").length > 1

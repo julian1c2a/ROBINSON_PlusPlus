@@ -49,7 +49,7 @@ theorem prf_chainOk_lineWF (p i : Term) :
     PrfH_iff_mp (prf_chainOk_iff_chainOkB nil p) hchain
   have hspec := PrfH_spec hB i
   simp only [chainOkB, lineOkB, land, substFormula_boundedPremsIn, substFormula, substTerm,
-    substTerms, lt, lenc, nthc, lineWF, premsOf, nil, zero, Nat.reduceEqDiff, reduceIte, if_true,
+    substTerms, lt, lenc, nthc, lineWF, premsOf, nil, zero, Nat.reduceEqDiff, reduceIte, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hspec
   exact PrfH_and_elim_left (PrfH.mp _ _ _ hspec hlt)
 

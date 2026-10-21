@@ -1,0 +1,43 @@
+# T42b (ADR-181): los controles con v4.35.0 en el estado final de la subida, y leanchecker en las dos versiones.
+# Todos con `lake env lean --version` = 4.35.0 (salvo las filas de v4.31.0, en master); 2026-10-21.
+
+== RPP (en el worktree de la subida)
+  check-footprints.bash: ✅ LOS 533 FOOTPRINTS CUADRAN.
+  check-warnings.bash:   ✅ LOS 28 WARNINGS CUADRAN.  (los 9 de v4.31 y los 19 de los congelados de FOL)
+  check-sorry.bash:      ✅ NI `sorry` NI AGUJEROS DE CONFIANZA.
+  check-estratos.bash:   ✅ LOS 10 ESTRATOS CUADRAN.  (censos.txt)
+  check-sondeos.bash --controles: ✅ los 11 sondeos de control compilan
+      ✓ AnclaEqInconsistente.lean (6 s)
+      ✓ AnclaSoundness.lean (5 s)
+      ✓ CraigEqVacuo.lean (5 s)
+      ✓ D3ReduccionesNoVacuas.lean (4 s)
+      ✓ IteSimboloNucleo.lean (11 s)
+      ✓ ListInductionAxiomRefutable.lean (5 s)
+      ✓ MetaReglasRefutables.lean (3 s)
+      ✓ OmegaConsistentRefutable.lean (4 s)
+      ✓ PrfBotCodificacionVieja.lean (4 s)
+      ✓ RosserBasura.lean (4 s)
+      ✓ RosserReflexion.lean (4 s)
+  probar-controles (a mano: validar_strip, lineWFT_generar, mutantes_strip):
+      ✓ corpus: 333 ficheros versionados de RPP y FOL, 0 líneas distintas
+      ✓ fixtures: 182, y difieren sólo las 0 líneas conocidas (las del oráculo)
+    ✅ strip-lean.awk cuadra con el oráculo
+      ✓ las 21, idénticas (con el espacio colapsado): `lineWFT` es la traducción mecánica de `ax_lineWF_*`
+    ✅ lineWFT cuadra con su generador
+      mutantes=76 · sobreviven al humo=21 (inocuos en los 182 fixtures, salvo los peligrosos) · peligrosos=0
+    ✅ ningún mutante peligroso: todo fallo de una sentencia que cambia un `sorry` de un fixture, el humo lo ve
+
+== FOL (en el worktree de la subida, desde ../FOL)
+  check-axioms.bash: ✅ CENSO DE AXIOMAS CORRECTO.  (censos.txt)
+  check-sorry.bash:  ✅ No sorry found.
+
+== leanchecker ROBINSON_PlusPlus FOL TheoryFramework (`lake env leanchecker …`; el pico de memoria, del proceso, con pico.ps1)
+  versión  hilos                     salida  tiempo  pico de memoria
+  v4.31.0  16 (uno por procesador)   1       382 s   24,7 GB · «failed to read file '…/Lean/Elab/StructInst.olean.private'» (en master)
+  v4.35.0  16 (uno por procesador)   1       455 s   25,0 GB · «failed to read file '…/Grind/Arith/Cutsat/Types.olean'»
+  v4.31.0  4 (LEAN_NUM_THREADS=4)    0       144 s    8,9 GB (en master)
+  v4.35.0  4 (LEAN_NUM_THREADS=4)    0       157 s    8,8 GB (antes de devolver los congelados de FOL)
+  v4.35.0  4 (LEAN_NUM_THREADS=4)    0       158 s    8,8 GB (el estado FINAL)
+  # Con 16 hilos replaya todos los módulos a la vez, cada uno sobre su entorno de imports entero (~1,6 GB del core,
+  # por FOL.Tactics, que importa Lean): no cabe en 32 GB con lo demás abierto, en ninguna de las dos versiones. El
+  # runner de la CI tiene 4 vCPU y 16 GB (repos públicos). update-toolchain.bash lo lanza ahora con 4 hilos.

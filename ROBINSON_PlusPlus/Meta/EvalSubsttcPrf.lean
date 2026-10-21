@@ -885,13 +885,13 @@ theorem substF_hole_tc (v s u : Term) :
     substFormula 0 u (targetSubsttc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
       = targetSubsttc v s u := by
   rw [substF_targetSubsttc]
-  simp only [substTerm, FOL.substTerm_liftTerm, if_true]
+  simp only [substTerm, FOL.substTerm_liftTerm, ite_true]
 
 theorem substF_hole_tsc (v s u : Term) :
     substFormula 0 u (targetSubsttsc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
       = targetSubsttsc v s u := by
   rw [substF_targetSubsttsc]
-  simp only [substTerm, FOL.substTerm_liftTerm, if_true]
+  simp only [substTerm, FOL.substTerm_liftTerm, ite_true]
 
 theorem PrfH_congr_targetSubsttc {Γ : List Formula} {v s X X' : Term} (h : PrfH Γ (X =eq X'))
     (ha : PrfH Γ (targetSubsttc v s X)) : PrfH Γ (targetSubsttc v s X') :=
@@ -1072,7 +1072,7 @@ theorem PHIsubsttc_at (t : Term) :
           (CONJsubsttc (.var 2) (.var 1) (.var 0)
             (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
   simp only [PHIsubsttc, PHIsubsttcBody, substFormula, substF_CONJsubsttc, substTerm, Nat.reduceAdd,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
 theorem PHIsubsttc_spec1 (t w : Term) :
     substFormula 0 w (Formula.forall (Formula.forall
@@ -1081,7 +1081,7 @@ theorem PHIsubsttc_spec1 (t w : Term) :
           (CONJsubsttc (liftTerm 0 (liftTerm 0 w)) (.var 1) (.var 0)
             (liftTerm 0 (liftTerm 0 t)))) := by
   simp only [substFormula, substF_CONJsubsttc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
     ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift]
 
 theorem PHIsubsttc_spec2 (t w v : Term) :
@@ -1089,12 +1089,12 @@ theorem PHIsubsttc_spec2 (t w v : Term) :
         (CONJsubsttc (liftTerm 0 (liftTerm 0 w)) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
       = Formula.forall (CONJsubsttc (liftTerm 0 w) (liftTerm 0 v) (.var 0) (liftTerm 0 t)) := by
   simp only [substFormula, substF_CONJsubsttc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftLift]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftLift]
 
 theorem PHIsubsttc_spec3 (t w v s : Term) :
     substFormula 0 s (CONJsubsttc (liftTerm 0 w) (liftTerm 0 v) (.var 0) (liftTerm 0 t))
       = CONJsubsttc w v s t := by
-  simp only [substF_CONJsubsttc, substTerm, FOL.substTerm_liftTerm, if_true]
+  simp only [substF_CONJsubsttc, substTerm, FOL.substTerm_liftTerm, ite_true]
 
 /-- Instanciacion de las DOS mitades a `w`, `v`, `s` concretos. -/
 theorem PHIsubsttc_use {Γ : List Formula} (t w v s : Term) (h : PrfH Γ (substFormula 0 t PHIsubsttc)) :

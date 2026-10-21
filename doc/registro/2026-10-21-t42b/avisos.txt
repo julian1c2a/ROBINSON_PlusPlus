@@ -1,0 +1,78 @@
+# T42b (ADR-181): los AVISOS del build con v4.35.0, antes y después de renombrar los nombres obsoletos.
+# De los registros de `lake build` del par en los árboles de prueba (FOL: `lake build "@FOL/FOL" "@FOL/TheoryFramework"`
+# desde RPP, M-3; RPP: `lake build`), 2026-10-21. «antes» = con la única corrección de fuente (PremsBdAllPrf) y sin
+# renombrar; «después» = con los 648 renombres de la primera pasada, que tocaban también seis módulos CONGELADOS de
+# FOL; el estado FINAL, con esos seis devueltos a su estado (629 renombres), al final. ADR-176 contó 419 con el build
+# de RPP ROTO a medias (PremsBdAllPrf no compilaba y los módulos que dependen de él no se elaboraron): la cifra entera
+# es la de aquí.
+
+== FOL antes (Build completed successfully (59 jobs).)
+  avisos: 29; de deprecación: 25
+        12 if_pos → ite_eq_left
+        12 if_neg → ite_eq_right
+         1 dif_pos → dite_eq_left
+   · TheoryFramework/Relations.lean:70:6: Variable name `f` is not explicitly referenced.
+   · TheoryFramework/Relations.lean:73:6: Variable name `f` is not explicitly referenced.
+   · TheoryFramework/Relations.lean:76:6: Variable name `f` is not explicitly referenced.
+   · TheoryFramework/Relations.lean:79:6: Variable name `f` is not explicitly referenced.
+
+== RPP antes (Build completed successfully (134 jobs).)
+  avisos: 604; de deprecación: 599
+       322 if_true → ite_true
+       139 if_neg → ite_eq_right
+        92 if_pos → ite_eq_left
+        21 dif_neg → dite_eq_right
+        14 if_false → ite_false
+        11 dif_pos → dite_eq_left
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1395:57: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1473:43: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1479:71: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1543:22: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2048:9: Variable name `p` is not explicitly referenced.
+
+== FOL después (Build completed successfully (59 jobs).)
+  avisos: 4; de deprecación: 0
+   · TheoryFramework/Relations.lean:70:6: Variable name `f` is not explicitly referenced.
+   · TheoryFramework/Relations.lean:73:6: Variable name `f` is not explicitly referenced.
+   · TheoryFramework/Relations.lean:76:6: Variable name `f` is not explicitly referenced.
+   · TheoryFramework/Relations.lean:79:6: Variable name `f` is not explicitly referenced.
+
+== RPP después (Build completed successfully (134 jobs).)
+  avisos: 5; de deprecación: 0
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1395:57: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1473:43: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1479:71: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1543:22: This simp argument is unused:
+   · ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2048:9: Variable name `p` is not explicitly referenced.
+
+
+== FOL, estado FINAL: los seis módulos CONGELADOS devueltos a su estado (inmutables sin «thaw»; Build completed successfully (59 jobs).)
+  avisos: 23; de deprecación: 19 (todos de los congelados)
+         1 FOL/Compacity0.lean if_neg
+         1 FOL/Compacity0.lean if_pos
+         1 FOL/Hauptsatz0.lean if_neg
+         1 FOL/Hauptsatz0.lean if_pos
+         4 FOL/QFDecide0.lean if_neg
+         4 FOL/QFDecide0.lean if_pos
+         1 FOL/Rename.lean if_neg
+         1 FOL/Rename.lean if_pos
+         1 FOL/Skolem0.lean if_neg
+         2 FOL/Skolem0.lean if_pos
+         1 FOL/SkolemN0.lean dif_pos
+         1 FOL/SkolemN0.lean if_pos
+
+== check-warnings.bash en el estado final (RPP 5 + TheoryFramework 4 + los 19 de los congelados, clase deprecated):
+  ════ CONTRA LA TABLA DECLARADA ════
+    ✓ ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean           simp-unused  4
+    ✓ ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean        var-unref    1
+    ✓ TheoryFramework/Relations.lean                       var-unref    4
+    ✓ FOL/Compacity0.lean                                  deprecated   2
+    ✓ FOL/Hauptsatz0.lean                                  deprecated   2
+    ✓ FOL/QFDecide0.lean                                   deprecated   8
+    ✓ FOL/Rename.lean                                      deprecated   2
+    ✓ FOL/Skolem0.lean                                     deprecated   3
+    ✓ FOL/SkolemN0.lean                                    deprecated   2
+  ════ WARNINGS NO DECLARADOS ════
+    ✓ ninguno
+    declarados: 28   ·   medidos: 28
+  ✅ LOS 28 WARNINGS CUADRAN.

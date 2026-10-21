@@ -1,0 +1,23 @@
+T42b (ADR-181, 2026-10-21): la subida del par (RPP y FOL) de Lean v4.31.0 a v4.35.0, medida ENTERA.
+
+Medido en dos git worktree hermanos (RPP y FOL, rama ci/2026-10-21-bump-v4.35), con los proxies de elan delante del
+PATH y la versión que corre comprobada en cada paso (lake env lean --version: 4.35.0; ADR-176 §2). Las cifras de
+v4.31.0, en master (RPP 6a54c8c, FOL 5206c40), el mismo día y en la misma máquina (16 procesadores lógicos, 32 GB).
+
+  avisos.txt        los avisos del build con v4.35.0: antes de renombrar (624 de deprecación), después, y en el estado
+                    final (los 19 de seis módulos CONGELADOS de FOL, que no se tocan; check-warnings: 28 = 9 + 19).
+  renombres.txt     los 629 renombres (por repo, zona y nombre), los 120 que quedan fuera del ámbito (19 de ellos, en
+                    los congelados de FOL), y cuántos cayeron en comentarios (13, todos de sondeos/IteSimboloNucleo.lean).
+                    Scripts: migra_deprecados.py (la migración), renombres_en_head.py y renombres_en_comentarios.py (los
+                    recuentos; se lanzan desde la carpeta que contiene los dos worktrees).
+  itesimbolo.txt    sondeos/IteSimboloNucleo.lean con v4.35.0: los 12 bloques #guard_msgs que rompen, qué cambia (sólo
+                    la impresión del tipo) y cómo se regeneraron. IteSimboloNucleo-v4.35.0-sin-regenerar.salida.txt, la
+                    salida entera antes de regenerar; regenera_guard.py, el script.
+  sondeos.txt       los 44 sondeos con v4.31.0 y con v4.35.0 (sondeos-tabla-v4.31.0.tsv y sondeos-tabla-v4.35.0.tsv),
+                    lo que escriben los que escriben, y ChoiceFrontera, corregido.
+  lexer.txt         el lexer de Lean en las dos versiones: las 25 funciones que siguen strip-lean.awk y leanlex.py
+                    (lexdiff.py) y la tabla de tokens del core (Tokens.lean.txt, con el lean de cada toolchain).
+  censos.txt        check-estratos.bash (RPP) y check-axioms.bash (FOL) con v4.35.0: las marcas del señuelo.
+  mutantes-t13.txt  scripts/pruebas/t13/t13_mutantes.bash con v4.35.0: los ocho de T13 y los tres nuevos (error-lean*).
+  controles.txt     el resto de los controles con v4.35.0 (footprints, warnings, sorry, sondeos de control,
+                    probar-controles, los de FOL) y leanchecker, con v4.31.0 y con v4.35.0, con 16 y con 4 hilos.

@@ -119,7 +119,7 @@ open CTree
 theorem substTerm_objAt :
     ∀ (T : CTree) (t : Term), substTerm 0 t (T.objAt (.var 0)) = T.objAt t
   | .leaf i, t => by
-      simp only [objAt, nthc, substTerm, substTerms, substTerm_numeralM, if_true]
+      simp only [objAt, nthc, substTerm, substTerms, substTerm_numeralM, ite_true]
   | .nul m, t => by
       simp only [objAt, cons, nil, zero, substTerm, substTerms, substTerm_numeralM]
   | .un m a, t => by
@@ -320,13 +320,13 @@ def condOf (T : CTree) : Formula := carc (.var 0) =eq T.objAt (.var 0)
 
 /-- La obligación administrativa del chasis, resuelta para todo árbol. -/
 theorem substFormula_condOf (T : CTree) : substFormula 0 (.var 0) (condOf T) = condOf T := by
-  simp only [condOf, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true,
+  simp only [condOf, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true,
     substTerm_objAt_var0 T]
 
 /-- La condición instanciada en una línea concreta. -/
 theorem substFormula_condOf_at (T : CTree) (t : Term) :
     substFormula 0 t (condOf T) = (carc t =eq T.objAt t) := by
-  simp only [condOf, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true,
+  simp only [condOf, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true,
     substTerm_objAt T t]
 
 /-- **`COND_dot` evaluado**, genérico en el árbol. -/

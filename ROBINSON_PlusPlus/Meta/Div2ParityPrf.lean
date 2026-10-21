@@ -70,7 +70,7 @@ theorem PrfH_eq_congr_mul2 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
   let f : Formula := Formula.eq (mul (liftTerm 0 c) (liftTerm 0 t₁)) (mul (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul c t₁) (mul c s) := by
     intro s
-    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (mul c t₁)) Γ)
 
 /-! ### Homomorfismo del producto sobre numerales
@@ -234,7 +234,7 @@ theorem prf_eq_congr_div2 {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) :
   let f : Formula := Formula.eq (div2 (liftTerm 0 t₁)) (div2 (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (div2 t₁) (div2 s) := by
     intro s
-    simp only [f, substFormula, div2, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, div2, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (div2 t₁))
 
 /-! ### L4 — `div2` deshace el doble
@@ -307,7 +307,7 @@ theorem prf_eq_congr_mod2 {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) :
   let f : Formula := Formula.eq (mod2 (liftTerm 0 t₁)) (mod2 (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mod2 t₁) (mod2 s) := by
     intro s
-    simp only [f, substFormula, mod2, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, mod2, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (mod2 t₁))
 
 /-- Congruencia de `mod2`, en contexto. -/
@@ -316,7 +316,7 @@ theorem PrfH_eq_congr_mod2 {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (
   let f : Formula := Formula.eq (mod2 (liftTerm 0 t₁)) (mod2 (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mod2 t₁) (mod2 s) := by
     intro s
-    simp only [f, substFormula, mod2, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, mod2, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (mod2 t₁)) Γ)
 
 /-! ### De la paridad de `n` a su mitad EXPLÍCITA (en contexto) -/

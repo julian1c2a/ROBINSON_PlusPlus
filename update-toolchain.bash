@@ -158,8 +158,12 @@ if [ "$BUILD_OK" -eq 1 ]; then
     paso "build de RPP" "$SALIDA/build-rpp.log" lake build || BUILD_OK=0
 fi
 if [ "$BUILD_OK" -eq 1 ]; then
+    # ✏️ 2026-10-21 (T42b, ADR-181): con un hilo por procesador lógico (16 en la máquina del propietario) `leanchecker`
+    # replaya todos los módulos a la vez, cada uno sobre su entorno de imports entero (~1,6 GB del core, por
+    # `FOL.Tactics`), y agota la memoria: 25 GB de pico y «failed to read file '…/Cutsat/Types.olean'». Con cuatro
+    # hilos, los del runner de la CI, ~9 GB. `LEAN_NUM_THREADS` lo respeta el runtime de Lean.
     paso "leanchecker (el núcleo, otra vez, sobre los tres)" "$SALIDA/leanchecker.log" \
-        lake env leanchecker ROBINSON_PlusPlus FOL TheoryFramework || true
+        env LEAN_NUM_THREADS="${LEAN_NUM_THREADS:-4}" lake env leanchecker ROBINSON_PlusPlus FOL TheoryFramework || true
 fi
 
 if [ "$BUILD_OK" -eq 1 ]; then

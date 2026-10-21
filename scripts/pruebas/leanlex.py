@@ -6,6 +6,8 @@
 # fuera, cada literal sustituido por un espacio (las interpolaciones: espacio en `{` y en `}`).
 # La única parte que depende del PARSER (no del lexer) es qué cadenas son interpoladas: se decide
 # por el token anterior (s! m! f! println! throwError dbg_trace trace[..] …), como en el core.
+# ✏️ 2026-10-21 (T42b, ADR-181): en v4.35.0 esas funciones (y las demás que lee, 25) son idénticas en el texto, y de la
+# tabla de tokens no cambia ninguno con `/` ni `-` (doc/registro/2026-10-21-t42b/lexer.txt): el lexer de referencia vale.
 import sys
 
 def letterlike(o):

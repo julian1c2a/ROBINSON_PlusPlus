@@ -53,7 +53,7 @@ theorem prf_ex_intro {A : Formula} (t : Term) (h : Prf (substFormula 0 t A)) :
 theorem prf_eq_congr_succ {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (succ t₁ =eq succ t₂) := by
   let f : Formula := Formula.eq (succ (liftTerm 0 t₁)) (succ (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (succ t₁) (succ s) := by
-    intro s; simp only [f, substFormula, succ, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, succ, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (succ t₁))
 
 /-! ### Congruencias de constructor en `Prf` (vía `cons`) y `substfc` -/
@@ -67,7 +67,7 @@ theorem prf_congr_substfc_arg2 {x z a b : Term} (h : Prf (a =eq b)) :
   let f : Formula := Formula.eq (substfc (liftTerm 0 x) (liftTerm 0 a) (liftTerm 0 z))
                                  (substfc (liftTerm 0 x) (.var 0) (liftTerm 0 z))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (substfc x a z) (substfc x s z) := by
-    intro s; simp only [f, substFormula, substfc, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substFormula, substfc, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (substfc x a z))
 
 /-- Congruencia de `substfc` en el 3er argumento (la fórmula sustituida). -/
@@ -76,7 +76,7 @@ theorem prf_congr_substfc_arg3 {x t a b : Term} (h : Prf (a =eq b)) :
   let f : Formula := Formula.eq (substfc (liftTerm 0 x) (liftTerm 0 t) (liftTerm 0 a))
                                  (substfc (liftTerm 0 x) (liftTerm 0 t) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (substfc x t a) (substfc x t s) := by
-    intro s; simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (substfc x t a))
 
 /-! ### Numerales en `Prf`: `pred`, `add`, orden -/
@@ -185,7 +185,7 @@ theorem prf_substTerm_arith (v : Nat) (s : Term) : ∀ (t : Term),
         (substtc (numeral v) (termCode s) (varc (numeral n)) =eq termCode (substTerm v s (.var n)))
       rcases Nat.lt_trichotomy n v with hlt | heq | hgt
       · have hsub : (substTerm v s (.var n) : Term) = .var n := by
-          simp only [substTerm]; rw [if_neg (by omega), if_neg (by omega)]
+          simp only [substTerm]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         exact prf_mp (prf_substtc_var_lt (numeral v) (termCode s) (numeral n)) (prf_gnum_lt hlt)
       · subst heq
@@ -193,7 +193,7 @@ theorem prf_substTerm_arith (v : Nat) (s : Term) : ∀ (t : Term),
         rw [hsub]
         exact prf_mp (prf_substtc_var_eq (numeral n) (termCode s) (numeral n)) (prf_refl _)
       · have hsub : (substTerm v s (.var n) : Term) = .var (n - 1) := by
-          simp only [substTerm]; rw [if_neg (by omega), if_pos (by omega)]
+          simp only [substTerm]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
         rw [hsub]
         have hax := prf_mp (prf_substtc_var_gt (numeral v) (termCode s) (numeral n)) (prf_gnum_lt hgt)
         have hpred : Prf (varc (pred (numeral n)) =eq varc (numeral (n - 1))) := by
@@ -517,7 +517,7 @@ theorem prf_congr_liftfc_arg2 {c a b : Term} (h : Prf (a =eq b)) :
     Prf (liftfc c a =eq liftfc c b) := by
   let f : Formula := Formula.eq (liftfc (liftTerm 0 c) (liftTerm 0 a)) (liftfc (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftfc c a) (liftfc c s) := by
-    intro s; simp only [f, liftfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, liftfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftfc c a))
 
 /-- Reconstrucción del código de la inducción de listas para `A`, en `Prf`. -/

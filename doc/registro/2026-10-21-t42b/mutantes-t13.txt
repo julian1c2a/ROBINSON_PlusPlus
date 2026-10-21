@@ -1,0 +1,136 @@
+# t13_mutantes.bash, 2026-10-21T14:11Z, RPP 6a54c8c, FOL 5206c40 (más los árboles de trabajo)
+
+== RPP control (salida 0): CONTROL: sin mutar (verde)
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✓ las 9 marcas del señuelo, exactas: el censo ve axiomas, constructores, partial, sorry, confianza y nativo
+
+== RPP nativo-ciego (salida 1): el censo deja de ver implemented_by/extern (una API que cambia de nombre o de sentido)
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @SENUELO NATIVO Senuelo.conExtern
+      · falta @SENUELO NATIVO Senuelo.conImplementedBy
+
+== RPP trust-como-antes (salida 1): el TRUST de antes de ADR-179: sin el auxiliar de native_decide
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @SENUELO TRUST Senuelo.conNativo Senuelo.conNativo._native.native_decide.ax_1_1
+
+== RPP trust-ajeno-ciego (salida 1): el TRUST deja de ver los axiomas AJENOS que no son de los tres de Lean (lcUnreachable en v4.35; Lean.ofReduceBool en v4.31)
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @SENUELO TRUST Senuelo.conAjeno lcUnreachable
+
+== RPP partial-ciego (salida 1): el censo deja de reconocer un partial
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✗ los `partial` del entorno no son los declarados:
+      · falta ROBINSON_PlusPlus.Minimal.Axioms.termToString
+      · falta getAllPositions
+      · falta instBEqTermG.beq
+      · falta instReprTermG.repr
+      · falta tryMem
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @SENUELO PARCIAL Senuelo.conPartial
+
+== RPP sorry-ciego (salida 1): el censo deja de ver sorryAx
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @SENUELO SORRY Senuelo.conSorry
+
+== RPP error-lean (salida 1): un error de Lean en el fichero del censo, que no quita ninguna marca (ADR-181)
+  ❌ NO PUDE MEDIR: 'lake env lean' sobre el fichero del censo dio error (código 1). ¿Está construido el árbol?
+      C:/msys64/tmp/tmp.TJDybAPFFT/Estratos.lean:96:7: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+
+== RPP error-lean-sin-control (salida 0): el mismo error, SIN la comprobación de ADR-181 (lo que había): se espera VERDE
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✓ las 9 marcas del señuelo, exactas: el censo ve axiomas, constructores, partial, sorry, confianza y nativo
+
+== FOL control (salida 0): CONTROL: sin mutar (verde)
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 4 declarados, y ninguno más
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✓ las 8 marcas del señuelo, exactas: el censo ve axiomas, partial, sorry, confianza y nativo
+
+== FOL nativo-ciego (salida 1): el censo deja de ver implemented_by/extern
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 4 declarados, y ninguno más
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @NATIVO SEN Senuelo.conExtern
+      · falta @NATIVO SEN Senuelo.conImplementedBy
+
+== FOL trust-como-antes (salida 1): el TRUST de antes: sin el auxiliar de native_decide
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 4 declarados, y ninguno más
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @TRUST SEN Senuelo.conNativo Senuelo.conNativo._native.native_decide.ax_1_1
+
+== FOL trust-ajeno-ciego (salida 1): el TRUST deja de ver los axiomas AJENOS
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 4 declarados, y ninguno más
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @TRUST SEN Senuelo.conAjeno lcUnreachable
+
+== FOL error-lean (salida 1): un error de Lean en el fichero del censo, que no quita ninguna marca
+  ❌ NO PUDE MEDIR: 'lake env lean' no llegó al final (código 1). ¿Está construido el árbol?
+      C:/msys64/tmp/tmp.mfiR93QSlR/Axiomas.lean:78:7: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+      (construir antes: desde ../ROBINSON_PlusPlus, lake build "@FOL/FOL" "@FOL/TheoryFramework")
+

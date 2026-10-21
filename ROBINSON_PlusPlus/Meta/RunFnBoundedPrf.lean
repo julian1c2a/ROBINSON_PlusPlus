@@ -46,7 +46,7 @@ acumulador se sustituye por «∃ k < i» (la conclusión de una línea anterior
 theorem prf_eq_congr_lenc {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (lenc t₁ =eq lenc t₂) := by
   let f : Formula := Formula.eq (lenc (liftTerm 0 t₁)) (lenc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (lenc t₁) (lenc s) := by
-    intro s; simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (lenc t₁))
 
 /-- Congruencia de `lenc` en `PrfH`. -/
@@ -54,7 +54,7 @@ theorem PrfH_eq_congr_lenc {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (
     PrfH Γ (lenc t₁ =eq lenc t₂) := by
   let f : Formula := Formula.eq (lenc (liftTerm 0 t₁)) (lenc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (lenc t₁) (lenc s) := by
-    intro s; simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (lenc t₁)) Γ)
 
 /-! ### El lema decisivo: `runFn nil` es un `map carc` estructural -/
@@ -88,7 +88,7 @@ theorem prf_lenc_runFn (p : Term) : Prf (lenc (runFn nil p) =eq lenc p) := by
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         lenc, runFn, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-        Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
       refine prf_deduction ?_
       -- IH : lenc (runFn nil #0) =eq lenc #0
@@ -101,7 +101,7 @@ theorem prf_lenc_runFn (p : Term) : Prf (lenc (runFn nil p) =eq lenc p) := by
         (prf_to_prfH (prf_eq_symm (prf_lenc_cons (.var 1) (.var 0))) _)
   have hp := prf_spec key p
   simpa only [substFormula, substTerm, substTerms, lenc, runFn, nil, zero,
-    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] using hp
+    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm] using hp
 
 /-! ### Congruencias de `carc` y `nthc` (1er arg) -/
 
@@ -110,7 +110,7 @@ theorem PrfH_eq_congr_carc {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (
     PrfH Γ (carc t₁ =eq carc t₂) := by
   let f : Formula := Formula.eq (carc (liftTerm 0 t₁)) (carc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (carc t₁) (carc s) := by
-    intro s; simp only [f, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (carc t₁)) Γ)
 
 /-- Congruencia de `nthc` en la lista (1er argumento), en `PrfH`. -/
@@ -118,7 +118,7 @@ theorem PrfH_eq_congr_nthc1 {Γ : List Formula} {L₁ L₂ i : Term} (h : PrfH �
     PrfH Γ (nthc L₁ i =eq nthc L₂ i) := by
   let f : Formula := Formula.eq (nthc (liftTerm 0 L₁) (liftTerm 0 i)) (nthc (.var 0) (liftTerm 0 i))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (nthc L₁ i) (nthc s i) := by
-    intro s; simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    intro s; simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS L₂) ▸ PrfH_leibniz_subst (A := f) h ((hS L₁) ▸ prf_to_prfH (prf_refl (nthc L₁ i)) Γ)
 
 /-! ### `nthc (runFn nil p) i = carc (nthc p i)` — inducción con `∀i` INTERNO
@@ -138,7 +138,7 @@ def nthRunPred : Formula :=
 theorem nthRunPred_base : Prf (substFormula 0 nil nthRunPred) := by
   refine Prf.gen _ ?_
   simp only [nthRunPred, substFormula, substTerm, substTerms, lt, lenc, nthc, runFn, carc,
-    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true,
+    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
@@ -153,7 +153,7 @@ theorem nthRunPred_step :
   refine Prf.gen _ (Prf.gen _ ?_)
   simp only [nthRunPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
     lt, lenc, nthc, runFn, carc, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
   refine prf_deduction (deduction_aux ?_ (lt (.var 0) (lenc (cons (.var 2) (.var 1)))) _ rfl)
@@ -181,7 +181,7 @@ theorem nthRunPred_step :
     have ihj := PrfH_spec hP (pred (.var 0))
     simp only [P0, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
       lt, lenc, nthc, runFn, carc, pred, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT,
-      Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+      Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
       FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at ihj
     -- cota: i < lenc (cons h t) = σ(lenc t) e i = σ(pred i) ⇒ pred i < lenc t
     have hltJ : PrfH [S0, A0, P0] (lt (pred (.var 0)) (lenc (.var 1))) :=
@@ -207,7 +207,7 @@ theorem prf_nthc_runFn (p i : Term) :
   have hi := prf_spec hp i
   simpa only [nthRunPred, substFormula, substTerm, substTerms, lt, lenc, nthc, runFn, carc,
     nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-    reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hi
+    reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hi
 
 /-! ### Forma acotada de «pertenecer a las conclusiones de `p`»
 
@@ -224,7 +224,7 @@ def boundedCarcIn (y p : Term) : Formula :=
 theorem liftFormula_boundedCarcIn (y p : Term) :
     liftFormula 0 (boundedCarcIn y p) = boundedCarcIn (liftTerm 0 y) (liftTerm 0 p) := by
   simp only [boundedCarcIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc, carc,
-    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+    Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
 
 /-- ⇐ : `(∃ i < lenc p. carc (nthc p i) =eq y) ⇒ In y (runFn nil p)`. -/
 theorem prf_In_runFn_of_boundedCarcIn (y p : Term) :
@@ -241,7 +241,7 @@ theorem prf_In_runFn_of_boundedCarcIn (y p : Term) :
     (prf_to_prfH (prf_In_of_boundedIn (liftTerm 0 y) (runFn nil (liftTerm 0 p))) _) ?_
   refine PrfH_ex_intro (.var 0) ?_
   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, carc, runFn,
-    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro ?_ ?_
   · exact PrfH_lt_subst2 (prf_to_prfH (prf_eq_symm (prf_lenc_runFn (liftTerm 0 p))) _) hlt
   · exact PrfH_eq_trans
@@ -268,7 +268,7 @@ theorem prf_boundedCarcIn_of_In_runFn (y p : Term) :
     PrfH_lt_subst2 (prf_to_prfH (prf_lenc_runFn (liftTerm 0 p)) _) hlt
   refine PrfH_ex_intro (.var 0) ?_
   simp only [boundedCarcIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, carc, runFn,
-    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro hltp ?_
   exact PrfH_eq_trans
     (PrfH_eq_symm (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_runFn (liftTerm 0 p) (.var 0)) _) hltp))

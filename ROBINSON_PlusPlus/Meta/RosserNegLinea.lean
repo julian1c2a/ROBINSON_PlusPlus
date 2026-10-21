@@ -86,7 +86,7 @@ theorem prf_lineWF_rhs {k : Nat} {D : Formula} (X : Term)
   have hh := prf_spec hax X
   have e : substFormula 0 X (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM k) (lineWF (.var 0) ⇔ D)) =
       Formula.impl (nthc X (succ zero) =eq numeralM k) (lineWF X ⇔ substFormula 0 X D) := by
-    simp only [substFormula, iff, nthc, succ, zero, lineWF, substTerm, substTerms, substTerm_numeralM, if_true]
+    simp only [substFormula, iff, nthc, succ, zero, lineWF, substTerm, substTerms, substTerm_numeralM, ite_true]
   rw [e] at hh
   exact impT hh (Prf.incl (Prfᵢ.c2 _ _))
 

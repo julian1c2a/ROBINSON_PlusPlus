@@ -224,7 +224,7 @@ theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
   refine Prf.gen _ ?_
   simp only [nthcEvalPred, substFormula_provFromCode_open, substTerm_evalNthcCode,
     substFormula, substTerm, substTerms, lt, lenc, nil, zero, Nat.reduceEqDiff,
-    reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
@@ -302,7 +302,7 @@ theorem nthcEvalPred_step :
   simp only [nthcEvalPred, liftFormula_provFromCode_open, substFormula_provFromCode_open,
     liftTerm_evalNthcCode, substTerm_evalNthcCode, liftFormula, liftTerm, liftTerms,
     substFormula, substTerm, substTerms, lt, lenc, cons, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
   refine prf_deduction (deduction_aux ?_ (lt (.var 0) (lenc (cons (.var 2) (.var 1)))) _ rfl)
@@ -338,7 +338,7 @@ theorem nthcEvalPred_step :
     simp only [P0, liftFormula_provFromCode_open, substFormula_provFromCode_open,
       substTerm_evalNthcCode, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
       lt, lenc, pred, cons, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-      Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm,
+      Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm,
       FOL.substTerm_liftLift] at ihj
     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (lt (pred (.var 0)) (lenc (.var 1))) :=
@@ -380,7 +380,7 @@ theorem pcc_eval_nthc (p i : Term) :
   have hi := prf_spec (prf_spec key p) i
   simpa only [nthcEvalPred, substFormula_provFromCode_open, substTerm_evalNthcCode,
     substFormula, substTerm, substTerms, lt, lenc, nil, zero, Nat.reduceAdd, Nat.reduceGT,
-    Nat.reduceSub, Nat.reduceEqDiff, reduceIte, if_true, FOL.substTerm_liftTerm,
+    Nat.reduceSub, Nat.reduceEqDiff, reduceIte, ite_true, FOL.substTerm_liftTerm,
     FOL.substTerm_liftLift] using hi
 
 end ROBINSON_PlusPlus.Meta.EvalNthcPrf

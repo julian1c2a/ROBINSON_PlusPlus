@@ -180,7 +180,7 @@ theorem MB_func {s : List Char} (h1 : (s != sym!"substfc") = true) (h2 : (s != s
     (args : List Nat) : (MNB V).func s args = (MNV V).func s args := by
   have e1 : ¬ s = sym!"substfc" := by simpa using h1
   have e2 : ¬ s = sym!"validProofFn" := by simpa using h2
-  simp only [MNB, if_neg e1, if_neg e2]
+  simp only [MNB, ite_eq_right e1, ite_eq_right e2]
 
 theorem MB_substfc (k t f : Nat) : (MNB V).func sym!"substfc" [k, t, f] = substfcB k t f := rfl
 theorem MB_vpf (c r : Nat) : (MNB V).func sym!"validProofFn" [c, r] = vpfNB c r := rfl

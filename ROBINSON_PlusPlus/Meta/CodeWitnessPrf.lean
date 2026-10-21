@@ -105,7 +105,7 @@ theorem prf_congr_lenc {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (lenc 
   let f : Formula := Formula.eq (lenc (liftTerm 0 t₁)) (lenc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (lenc t₁) (lenc s) := by
     intro s
-    simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact prfH_nil_to_prf
     ((hS t₂) ▸ PrfH_leibniz_subst (A := f) (prf_to_prfH h [])
       ((hS t₁) ▸ prf_to_prfH (prf_refl (lenc t₁)) [])) rfl
@@ -142,7 +142,7 @@ theorem prf_congr_nthc_lst {w₁ w₂ : Term} (i : Term) (h : Prf (w₁ =eq w₂
   let f : Formula := Formula.eq (nthc (liftTerm 0 w₁) (liftTerm 0 i)) (nthc (.var 0) (liftTerm 0 i))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (nthc w₁ i) (nthc s i) := by
     intro s
-    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact prfH_nil_to_prf
     ((hS w₂) ▸ PrfH_leibniz_subst (A := f) (prf_to_prfH h [])
       ((hS w₁) ▸ prf_to_prfH (prf_refl (nthc w₁ i)) [])) rfl
@@ -264,7 +264,7 @@ theorem prf_shape_strengthens (X C : Term) (k n : Nat)
                             (Formula.eq (lenc s) (numeralM n))) := by
     intro s
     simp only [f, consOk, land, carc, cdrc, lenc, cons, substFormula, substTerm, substTerms,
-      substTerm_numeralM, if_true]
+      substTerm_numeralM, ite_true]
   have hbase : PrfH [Formula.eq X C] (substFormula 0 C f) := by
     rw [hS]
     exact prf_to_prfH (prf_and_intro hcons (prf_and_intro hcarc hlenc)) _
@@ -343,7 +343,7 @@ theorem PrfH_congr_succ {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b))
   let f : Formula := Formula.eq (succ (liftTerm 0 a)) (succ (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (succ a) (succ s) := by
     intro s
-    simp only [f, succ, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, succ, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (succ a)) Γ)
 
 theorem PrfH_congr_lenc {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b)) :
@@ -351,7 +351,7 @@ theorem PrfH_congr_lenc {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b))
   let f : Formula := Formula.eq (lenc (liftTerm 0 a)) (lenc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (lenc a) (lenc s) := by
     intro s
-    simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (lenc a)) Γ)
 
 /-! ⛔ **`PrfH_congr_liftc` BAJÓ a `Meta/ChainPrf.lean` (2026‑09‑09d).** Estaba declarado aquí
@@ -366,7 +366,7 @@ theorem PrfH_congr_nthc_lst {Γ : List Formula} {a b : Term} (i : Term) (h : Prf
   let f : Formula := Formula.eq (nthc (liftTerm 0 a) (liftTerm 0 i)) (nthc (.var 0) (liftTerm 0 i))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (nthc a i) (nthc s i) := by
     intro s
-    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (nthc a i)) Γ)
 
 theorem PrfH_congr_nthc_idx {Γ : List Formula} {i j : Term} (L : Term) (h : PrfH Γ (i =eq j)) :
@@ -374,7 +374,7 @@ theorem PrfH_congr_nthc_idx {Γ : List Formula} {i j : Term} (L : Term) (h : Prf
   let f : Formula := Formula.eq (nthc (liftTerm 0 L) (liftTerm 0 i)) (nthc (liftTerm 0 L) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (nthc L i) (nthc L s) := by
     intro s
-    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS j) ▸ PrfH_leibniz_subst (A := f) h ((hS i) ▸ prf_to_prfH (prf_refl (nthc L i)) Γ)
 
 /-! ### G1 · `lenc (liftsc 0 L) ≐ lenc L`, para `L` ARBITRARIO -/
@@ -383,7 +383,7 @@ def lencLiftPred : Formula := Formula.eq (lenc (liftsc zero (.var 0))) (lenc (.v
 
 theorem lencLiftPred_at (L : Term) :
     substFormula 0 L lencLiftPred = Formula.eq (lenc (liftsc zero L)) (lenc L) := by
-  simp only [lencLiftPred, lenc, liftsc, zero, substFormula, substTerm, substTerms, if_true]
+  simp only [lencLiftPred, lenc, liftsc, zero, substFormula, substTerm, substTerms, ite_true]
 
 theorem prf_lenc_liftsc_step (h t : Term) :
     Prf (Formula.impl (Formula.eq (lenc (liftsc zero t)) (lenc t))
@@ -431,7 +431,7 @@ theorem nthLiftPred_at (L : Term) :
                       (liftc zero (nthc (liftTerm 0 L) (.var 0))))) := by
   simp only [nthLiftPred, lt, lenc, nthc, liftsc, liftc, zero, substFormula, substTerm,
     substTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceGT, Nat.reduceSub, Nat.reduceEqDiff,
-    reduceIte, if_true]
+    reduceIte, ite_true]
 
 theorem nthLiftPred_base : Prf (substFormula 0 nil nthLiftPred) := by
   rw [nthLiftPred_at]
@@ -450,7 +450,7 @@ theorem nthLiftPred_step :
   refine Prf.gen _ (Prf.gen _ ?_)
   simp only [nthLiftPred, lt, lenc, nthc, liftsc, liftc, cons, zero, liftFormula, substFormula,
     liftTerm, liftTerms, substTerm, substTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
   refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
   refine prf_deduction (deduction_aux ?_ (lt (.var 0) (lenc (cons (.var 2) (.var 1)))) _ rfl)
   let P0 : Formula := Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 2)))
@@ -484,7 +484,7 @@ theorem nthLiftPred_step :
     have ihj := PrfH_spec hP (pred (.var 0))
     simp only [P0, lt, lenc, nthc, liftsc, liftc, pred, cons, zero, substFormula, substTerm,
       substTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-      reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at ihj
+      reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at ihj
     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (lt (pred (.var 0)) (lenc (.var 1))) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
@@ -510,7 +510,7 @@ theorem prf_nthc_liftsc (L i : Term) :
   have hi := prf_spec (prf_spec key L) i
   simpa only [nthLiftPred, lt, lenc, nthc, liftsc, liftc, zero, substFormula, substTerm,
     substTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-    reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hi
+    reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hi
 
 /-! ### G3 · `In x w ⇒ In (liftc 0 x) (liftsc 0 w)` -/
 
@@ -518,7 +518,7 @@ theorem PrfH_congr_In_left {Γ : List Formula} {u v w : Term} (h : PrfH Γ (u =e
     (hin : PrfH Γ (In u w)) : PrfH Γ (In v w) := by
   have hS : ∀ s : Term, substFormula 0 s (In (.var 0) (liftTerm 0 w)) = In s w := by
     intro s
-    simp only [In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS v) ▸ PrfH_leibniz_subst (A := In (.var 0) (liftTerm 0 w)) h ((hS u) ▸ hin)
 
 theorem liftT_liftsc (k : Nat) (t : Term) :
@@ -547,7 +547,7 @@ theorem prf_boundedIn_liftsc (x w : Term) :
       (Formula.eq (nthc W (.var 0)) X) := PrfH_and_elim_right (prfH_hyp_self _)
   refine PrfH_ex_intro (.var 0) ?_
   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
-    zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+    zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro ?_ ?_
   · exact PrfH_lt_subst2
       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
@@ -565,7 +565,7 @@ theorem prf_In_liftsc (x w : Term) :
 theorem liftF_argsIn (k : Nat) (wT Y : Term) :
     liftFormula k (argsIn wT Y) = argsIn (liftTerm k wT) (liftTerm k Y) := by
   simp only [argsIn, argsInBody, liftFormula, lt, lenc, nthc, In, liftTerm, liftTerms,
-    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+    Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
 
 
 
@@ -578,14 +578,14 @@ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
 theorem liftF_wfAll1 (k : Nat) (w : Term) :
     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
   simp only [wfAll1, wfAll1Body, liftFormula, liftF_isTermCodeE1, lt, lenc, nthc,
-    liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+    liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
 
 /-- Leibniz en el 2º argumento de `argsIn` (la lista de argumentos). -/
 theorem PrfH_congr_argsIn {Γ : List Formula} {wT Y₁ Y₂ : Term} (h : PrfH Γ (Y₁ =eq Y₂))
     (ha : PrfH Γ (argsIn wT Y₁)) : PrfH Γ (argsIn wT Y₂) := by
   have hS : ∀ s : Term, substFormula 0 s (argsIn (liftTerm 0 wT) (.var 0)) = argsIn wT s := by
     intro s
-    simp only [substF_argsIn, substTerm, FOL.substTerm_liftTerm, if_true]
+    simp only [substF_argsIn, substTerm, FOL.substTerm_liftTerm, ite_true]
   exact (hS Y₂) ▸ PrfH_leibniz_subst (A := argsIn (liftTerm 0 wT) (.var 0)) h ((hS Y₁) ▸ ha)
 
 /-- Leibniz en el 2º argumento de `isTermCodeE1` (el nodo). **Una** Leibniz cubre las
@@ -595,7 +595,7 @@ theorem PrfH_congr_isTermCodeE1 {Γ : List Formula} {wT X₁ X₂ : Term} (h : P
   have hS : ∀ s : Term,
       substFormula 0 s (isTermCodeE1 (liftTerm 0 wT) (.var 0)) = isTermCodeE1 wT s := by
     intro s
-    simp only [substF_isTermCodeE1, substTerm, FOL.substTerm_liftTerm, if_true]
+    simp only [substF_isTermCodeE1, substTerm, FOL.substTerm_liftTerm, ite_true]
   exact (hS X₂) ▸ PrfH_leibniz_subst (A := isTermCodeE1 (liftTerm 0 wT) (.var 0)) h ((hS X₁) ▸ ha)
 
 /-- Instanciacion de `argsIn` en un indice CUALQUIERA (el testigo puede ser ABIERTO). -/
@@ -603,7 +603,7 @@ theorem PrfH_inst_argsIn {Γ : List Formula} (wT Y i : Term) (h : PrfH Γ (argsI
     PrfH Γ (Formula.impl (lt i (lenc Y)) (In (nthc Y i) wT)) := by
   have hi := PrfH_spec h i
   simpa only [argsInBody, lt, lenc, nthc, In, substFormula, substTerm, substTerms,
-    FOL.substTerm_liftTerm, if_true] using hi
+    FOL.substTerm_liftTerm, ite_true] using hi
 
 theorem PrfH_inst_wfAll1 {Γ : List Formula} (w i : Term) (h : PrfH Γ (wfAll1 w)) :
     PrfH Γ (Formula.impl (lt i (lenc w)) (isTermCodeE1 w (nthc w i))) := by
@@ -611,7 +611,7 @@ theorem PrfH_inst_wfAll1 {Γ : List Formula} (w i : Term) (h : PrfH Γ (wfAll1 w
   simpa only [wfAll1Body, isTermCodeE1, shapeUn, shapeBin, argsIn, argsInBody, lor, land,
     lt, lenc, nthc, In, cons, nil, zero, substFormula, substTerm, substTerms,
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceGT, Nat.reduceSub, Nat.reduceEqDiff, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_lift_comm_zero, substTerm_numeralM, if_true] using hi
+    FOL.substTerm_liftTerm, FOL.substTerm_lift_comm_zero, substTerm_numeralM, ite_true] using hi
 
 /-! ### `argsIn` se parte en CABEZA y COLA (posicion 0 / posiciones desplazadas)
 
@@ -881,7 +881,7 @@ theorem prf_bdAll_numeral (Φ : Formula) (hΦ : substFormula 0 (.var 0) Φ = Φ)
       have ih := prf_bdAll_numeral Φ hΦ n (fun k hk => h k (Nat.lt_succ_of_lt hk))
       have hself : substFormula 0 (.var 0) (Formula.impl (lt (.var 0) (numeralM n)) Φ)
           = Formula.impl (lt (.var 0) (numeralM n)) Φ := by
-        simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+        simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, ite_true]
       refine Prf.gen _ (prf_deduction ?_)
       have hsplit : PrfH [lt (.var 0) (numeralM (n + 1))]
           (lor (lt (.var 0) (numeralM n)) (Formula.eq (.var 0) (numeralM n))) :=
@@ -908,7 +908,7 @@ theorem prf_bdAll_of_bound (Φ : Formula) (b : Term) (n : Nat)
     prf_bdAll_numeral Φ hΦ n h
   have hself : substFormula 0 (.var 0) (Formula.impl (lt (.var 0) (numeralM n)) Φ)
       = Formula.impl (lt (.var 0) (numeralM n)) Φ := by
-    simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+    simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, ite_true]
   refine Prf.gen _ (prf_deduction ?_)
   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
     (PrfH_lt_subst2
@@ -941,11 +941,11 @@ theorem prf_argsIn_of_closed (W C : Term) (n : Nat)
     simp only [argsIn, argsInBody, lt, lenc, nthc, In, liftTerm, liftTerms, hWl, hCl]
   rw [hAI]
   refine prf_bdAll_of_bound _ (lenc C) n ?_ hlen ?_
-  · simp only [In, nthc, substFormula, substTerm, substTerms, hWs, hCs, if_true]
+  · simp only [In, nthc, substFormula, substTerm, substTerms, hWs, hCs, ite_true]
   · intro k hk
     have hk' := h k hk
     simpa only [In, nthc, substFormula, substTerm, substTerms, hWs, hCs,
-      substTerm_numeralM, if_true, reduceIte] using hk'
+      substTerm_numeralM, ite_true, reduceIte] using hk'
 
 /-! ### `lenc`/`nthc` de `termsCodeM` (la lista de argumentos REAL) -/
 
@@ -1132,7 +1132,7 @@ theorem prf_isTC1_tcodes (t : Term) : Prf (isTC1 (objList (tcodes1 t)) (termCode
     simp only [wfAll1, wfAll1Body, lt, lenc, nthc, liftF_isTermCodeE1, liftTerm, liftTerms, hWl]
   rw [hAI]
   refine prf_bdAll_of_bound _ (lenc W) L.length ?_ (prf_lenc_objList L) ?_
-  · simp only [substF_isTermCodeE1, nthc, substTerm, substTerms, hWs, if_true]
+  · simp only [substF_isTermCodeE1, nthc, substTerm, substTerms, hWs, ite_true]
   · intro k hk
     obtain ⟨x, hx⟩ : ∃ x, L[k]? = some x := ⟨L[k], getElem?_pos L k hk⟩
     have hnode : Prf (isTermCodeE1 W x) :=
@@ -1142,7 +1142,7 @@ theorem prf_isTC1_tcodes (t : Term) : Prf (isTC1 (objList (tcodes1 t)) (termCode
         (prf_to_prfH (prf_eq_symm (prf_nthc_objList L k x hx)) [])
         (prf_to_prfH hnode [])) rfl
     simpa only [substF_isTermCodeE1, nthc, substTerm, substTerms, hWs,
-      substTerm_numeralM, if_true, reduceIte] using this
+      substTerm_numeralM, ite_true, reduceIte] using this
 
 /-! ## 6 · LA DISCRIMINACION CON TESTIGO **ABIERTO** (sin ninguna hipotesis sobre `w`)
 
@@ -1418,7 +1418,7 @@ theorem CRIT_hasWit_lift (c : Term) :
       (isTC1 (.var 0) (liftTerm 1 (liftTerm 0 (liftc zero c))))
       = isTC1 (liftsc zero (.var 0)) (liftc zero (liftTerm 0 c)) := by
     have hv : substTerm 0 (liftsc zero (Term.var 0)) (Term.var 0) = liftsc zero (.var 0) := by
-      simp only [substTerm, if_true]
+      simp only [substTerm, ite_true]
     rw [← FOL.liftTerm_comm_zero, substF_isTC1, FOL.substTerm_liftTerm, hv, liftT_liftc]
   rw [hsub]
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_isTC1_lift (.var 0) (liftTerm 0 c)) _)
@@ -1429,7 +1429,7 @@ theorem CRIT_hasWit_real (t : Term) : Prf (hasWit (termCodeM t)) := by
   refine prf_ex_intro (objList (tcodes1 t)) ?_
   have h : substFormula 0 (objList (tcodes1 t)) (isTC1 (.var 0) (liftTerm 0 (termCodeM t)))
       = isTC1 (objList (tcodes1 t)) (termCodeM t) := by
-    simp only [substF_isTC1, substTerm, if_true, FOL.substTerm_liftTerm]
+    simp only [substF_isTC1, substTerm, ite_true, FOL.substTerm_liftTerm]
   rw [h]
   exact prf_isTC1_tcodes t
 
@@ -1470,7 +1470,7 @@ theorem liftF_isFormCodeE2 (k : Nat) (wF wT X : Term) :
 theorem liftF_wfAllF (k : Nat) (wF wT : Term) :
     liftFormula k (wfAllF wF wT) = wfAllF (liftTerm k wF) (liftTerm k wT) := by
   simp only [wfAllF, wfAllFBody, liftFormula, liftF_isFormCodeE2, lt, lenc, nthc,
-    liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+    liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
 
 
 theorem liftF_isFC1 (k : Nat) (wF wT c : Term) :
@@ -1488,7 +1488,7 @@ theorem PrfH_congr_isFormCodeE2 {Γ : List Formula} {wF wT X₁ X₂ : Term}
       substFormula 0 s (isFormCodeE2 (liftTerm 0 wF) (liftTerm 0 wT) (.var 0))
         = isFormCodeE2 wF wT s := by
     intro s
-    simp only [substF_isFormCodeE2, substTerm, FOL.substTerm_liftTerm, if_true]
+    simp only [substF_isFormCodeE2, substTerm, FOL.substTerm_liftTerm, ite_true]
   exact (hS X₂) ▸
     PrfH_leibniz_subst (A := isFormCodeE2 (liftTerm 0 wF) (liftTerm 0 wT) (.var 0)) h
       ((hS X₁) ▸ ha)
@@ -1500,7 +1500,7 @@ theorem PrfH_inst_wfAllF {Γ : List Formula} (wF wT i : Term) (h : PrfH Γ (wfAl
     shapeNul, shapeUn, shapeBin, argsIn, argsInBody, lor, land, lt, lenc, nthc, In,
     cons, nil, zero, substFormula, substTerm, substTerms,
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceGT, Nat.reduceSub, Nat.reduceEqDiff, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_lift_comm_zero, substTerm_numeralM, if_true] using hi
+    FOL.substTerm_liftTerm, FOL.substTerm_lift_comm_zero, substTerm_numeralM, ite_true] using hi
 
 theorem prf_isFormCodeE2_of_boundedIn (wF wT c : Term) :
     Prf (Formula.impl (boundedIn c wF)
@@ -1539,7 +1539,7 @@ theorem prf_isFormCodeE2_of_In (wF wT c : Term) :
 theorem liftF_hasWitF (k : Nat) (c : Term) :
     liftFormula k (hasWitF c) = hasWitF (liftTerm k c) := by
   have h1 : (1 < k + 1 + 1) = True := eq_true (by omega)
-  simp only [hasWitF, liftFormula, liftF_isFC1, liftTerm, Nat.reduceAdd, h1, if_true,
+  simp only [hasWitF, liftFormula, liftF_isFC1, liftTerm, Nat.reduceAdd, h1, ite_true,
     Nat.zero_lt_succ, reduceIte, ← FOL.liftTerm_comm_zero]
 
 
@@ -2065,7 +2065,7 @@ theorem prf_wfAll1_of_list (L : List Term)
   rw [hAI]
   refine SinWTs.prf_bdAll_of_bound _ (lenc (objList L)) L.length ?_
     (SinWTs.prf_lenc_objList L) ?_
-  · simp only [SinWTs.substF_isTermCodeE1, nthc, substTerm, substTerms, hWs, if_true]
+  · simp only [SinWTs.substF_isTermCodeE1, nthc, substTerm, substTerms, hWs, ite_true]
   · intro k hk
     obtain ⟨x, hx⟩ : ∃ x, L[k]? = some x := ⟨L[k], getElem?_pos L k hk⟩
     have hnd : Prf (SinWTs.isTermCodeE1 (objList L) x) :=
@@ -2075,7 +2075,7 @@ theorem prf_wfAll1_of_list (L : List Term)
         (prf_to_prfH (prf_eq_symm (SinWTs.prf_nthc_objList L k x hx)) [])
         (prf_to_prfH hnd [])) rfl
     simpa only [SinWTs.substF_isTermCodeE1, nthc, substTerm, substTerms, hWs,
-      substTerm_numeralM, if_true, reduceIte] using h2
+      substTerm_numeralM, ite_true, reduceIte] using h2
 
 theorem prf_wfAllF_of_list (LF : List Term) (WT : Term)
     (hWTl : ∀ c : Nat, liftTerm c WT = WT)
@@ -2096,7 +2096,7 @@ theorem prf_wfAllF_of_list (LF : List Term) (WT : Term)
   rw [hAI]
   refine SinWTs.prf_bdAll_of_bound _ (lenc (objList LF)) LF.length ?_
     (SinWTs.prf_lenc_objList LF) ?_
-  · simp only [ENS.substF_isFormCodeE2, nthc, substTerm, substTerms, hWs, hWTs, if_true]
+  · simp only [ENS.substF_isFormCodeE2, nthc, substTerm, substTerms, hWs, hWTs, ite_true]
   · intro k hk
     obtain ⟨x, hx⟩ : ∃ x, LF[k]? = some x := ⟨LF[k], getElem?_pos LF k hk⟩
     have hn : Prf (ENS.isFormCodeE2 (objList LF) WT x) :=
@@ -2106,7 +2106,7 @@ theorem prf_wfAllF_of_list (LF : List Term) (WT : Term)
         (prf_to_prfH (prf_eq_symm (SinWTs.prf_nthc_objList LF k x hx)) [])
         (prf_to_prfH hn [])) rfl
     simpa only [ENS.substF_isFormCodeE2, nthc, substTerm, substTerms, hWs, hWTs,
-      substTerm_numeralM, if_true, reduceIte] using h2
+      substTerm_numeralM, ite_true, reduceIte] using h2
 
 /-! ## §HW.8 · EL ENSAMBLAJE. -/
 
@@ -2155,7 +2155,7 @@ theorem prf_hasWitF_real (phi : Formula) : Prf (ENS.hasWitF (formCodeM phi)) := 
   have key := prf_isFC1_real phi
   have step2 : Prf (substFormula 0 (objList (tcodesF phi))
       (ENS.isFC1 (objList (fcodesF phi)) (.var 0) (formCodeM phi))) := by
-    simpa only [ENS.substF_isFC1, substTerm, hWFs, substTerm_formCodeM, if_true,
+    simpa only [ENS.substF_isFC1, substTerm, hWFs, substTerm_formCodeM, ite_true,
       reduceIte] using key
   have step1 : Prf (Formula.ex
       (ENS.isFC1 (objList (fcodesF phi)) (.var 0) (formCodeM phi))) :=
@@ -2164,7 +2164,7 @@ theorem prf_hasWitF_real (phi : Formula) : Prf (ENS.hasWitF (formCodeM phi)) := 
       (Formula.ex (ENS.isFC1 (.var 1) (.var 0) (formCodeM phi)))) := by
     simpa only [substFormula, ENS.substF_isFC1, substTerm, hWFl, hWFs,
       substTerm_formCodeM, Nat.zero_add, Nat.reduceAdd, Nat.reduceLT, Nat.reduceGT,
-      Nat.reduceSub, Nat.reduceEqDiff, reduceIte, if_true] using step1
+      Nat.reduceSub, Nat.reduceEqDiff, reduceIte, ite_true] using step1
   have hfin : Prf (Formula.ex (Formula.ex
       (ENS.isFC1 (.var 1) (.var 0) (formCodeM phi)))) := prf_ex_intro _ step0
   simpa only [ENS.hasWitF, liftTerm_formCodeM] using hfin

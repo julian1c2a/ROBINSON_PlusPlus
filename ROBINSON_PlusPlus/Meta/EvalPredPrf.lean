@@ -169,14 +169,14 @@ def evalPredPred : Formula := provFromCode (evalPredCode (.var 0))
 theorem substFormula_evalPredPred (b : Term) :
     substFormula 0 b evalPredPred = provFromCode (evalPredCode b) := by
   simp only [evalPredPred, substFormula_provFromCode_open, substTerm_evalPredCode, substTerm,
-    if_true]
+    ite_true]
 
 theorem step_evalPredPred :
     substFormula 0 (succ (.var 0)) (liftFormula 1 (provFromCode (evalPredCode (.var 0))))
       = provFromCode (evalPredCode (succ (.var 0))) := by
   rw [liftFormula_provFromCode_open, liftTerm_evalPredCode, substFormula_provFromCode_open,
     substTerm_evalPredCode]
-  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, if_true]
+  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, ite_true]
 
 /-- **EVALUACION PROVABLE DE `pred` (∀ object)**: `⊢ ∀n. Prov(⌜τ(ṅ) = (pred n)˙⌝)`. -/
 theorem prf_eval_pred_all : Prf (Formula.forall evalPredPred) := by

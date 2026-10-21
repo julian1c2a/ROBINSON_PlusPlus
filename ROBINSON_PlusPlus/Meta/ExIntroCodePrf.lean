@@ -45,7 +45,7 @@ theorem liftFormula_provFromCode_exc (Ac : Term) (hAc : ∀ c, liftTerm c Ac = A
     liftFormula 0 (provFromCode (exc Ac)) = provFromCode (exc Ac) := by
   simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftFormula, liftTerm,
     liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_exc Ac hAc]
 
 /-- `liftTerm` es identidad sobre `substfc zero w Ac` a cualquier nivel (para `Ac`,`w` cerrados). -/

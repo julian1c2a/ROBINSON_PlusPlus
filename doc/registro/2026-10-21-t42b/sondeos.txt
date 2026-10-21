@@ -1,0 +1,38 @@
+# T42b (ADR-181): los 44 sondeos de sondeos/*.lean, con `bash check-sondeos.bash` (todos, con `lake lean`, -j 2), en
+# master (6a54c8c, v4.31.0) y en el árbol de la subida (v4.35.0, con la migración), 2026-10-21. Las dos tablas, en esta
+# carpeta (sondeos-tabla-v4.31.0.tsv y sondeos-tabla-v4.35.0.tsv).
+
+== lo que compila: v4.31.0 43 de 44; v4.35.0 42 de 44
+== los que cambian de una a otra (sondeo · rc en v4.31.0 · rc en v4.35.0 · primer error en v4.35.0):
+  ChoiceFrontera.lean · 0 · 1 · ChoiceFrontera.lean:95:15: error(lean.invalidField): Invalid field `trimRight`: The environment does not contain `String.trimRight`, so it is not possible to project the field `trimRight` from an expr
+== los que fallan en las dos: A3IsFCBTracked.lean (el mismo primer error: A3IsFCBTracked.lean:358:4: error: Type mismatch)
+
+== los sondeos que ESCRIBEN en doc/registro/ (ConoTitulares y otros): lo que escriben con v4.31.0 frente a v4.35.0
+#  (escriben sobre el registro de su fecha; los ficheros se restauraron después con `git checkout`: un registro no se
+#   reescribe. Con v4.31.0 tampoco reproducen los del registro: el árbol cambió desde su fecha, p. ej. ADR-180 añadió
+#   dos líneas a Meta/ModeloCodigo.lean. Lo que importa aquí es v4.31.0 frente a v4.35.0, sobre el mismo árbol.)
+  = doc/registro/2026-10-16-negnum-posnum/pureza.txt
+  = doc/registro/2026-10-16-t62-alcance/resumen.txt
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G1.txt
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G2.txt
+  ≠ doc/registro/2026-10-16-t62-alcance/usuarios-G3.txt (22 líneas: 0 que no son de Meta/PremsBdAllPrf)
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G4.txt
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G4b.txt
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G5.txt
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G6.txt
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G7.txt
+  = doc/registro/2026-10-16-t62-alcance/usuarios-G8.txt
+  ≠ doc/registro/2026-10-21-cono/fuera-del-cono.txt (12 líneas: 0 que no son de Meta/PremsBdAllPrf)
+  ≠ doc/registro/2026-10-21-cono/por-modulo.csv (2 líneas: 0 que no son de Meta/PremsBdAllPrf)
+  ≠ doc/registro/2026-10-21-cono/resumen.txt (22 líneas: 20 que no son de Meta/PremsBdAllPrf)
+#  Todas las diferencias son de Meta/PremsBdAllPrf.lean, que crece 4 líneas con la corrección (by_cases): sus
+#  números de línea y sus recuentos de líneas. Las mismas declaraciones, los mismos conos, las mismas clases.
+#  cono/resumen.txt no nombra el módulo en esas líneas (son totales de líneas): de sus 11 parejas de líneas distintas,
+#  cada número que cambia crece EXACTAMENTE 4 (las líneas que gana PremsBdAllPrf), y ninguna cuenta de declaraciones
+#  cambia («los 29: 3291 declaraciones» en las dos; las líneas, 31921 → 31925).
+
+== ChoiceFrontera.lean, corregido (una línea: `l.trimRight` → `l.trimAsciiEnd.toString`; `String.trimRight` era OBSOLETO
+#  ya en v4.31.0 —un aviso que nadie miraba: los sondeos que no son de control son informe— y v4.35.0 lo retira).
+#  Re-ejecutado con v4.35.0 (`bash check-sondeos.bash ChoiceFrontera.lean`): compila, y su RESULTADO —la frontera de
+#  `Classical.choice` de los titulares y el censo de las 209 filas con choice— es IDÉNTICO al de v4.31.0 en master:
+#  37 líneas de 37 (comparadas sin el prefijo «fichero:línea:col:»). Con él, 43 de 44 en v4.35.0, como en v4.31.0.

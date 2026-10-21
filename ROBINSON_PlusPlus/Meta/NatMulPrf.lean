@@ -70,7 +70,7 @@ theorem prf_eq_congr_mul1 {t₁ t₂ : Term} (c : Term) (h : Prf (t₁ =eq t₂)
   let f : Formula := Formula.eq (mul (liftTerm 0 t₁) (liftTerm 0 c)) (mul (.var 0) (liftTerm 0 c))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul t₁ c) (mul s c) := by
     intro s
-    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (mul t₁ c))
 
 /-- Congruencia de `·` en el **segundo** argumento. -/
@@ -79,7 +79,7 @@ theorem prf_eq_congr_mul2 {t₁ t₂ : Term} (c : Term) (h : Prf (t₁ =eq t₂)
   let f : Formula := Formula.eq (mul (liftTerm 0 c) (liftTerm 0 t₁)) (mul (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul c t₁) (mul c s) := by
     intro s
-    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (mul c t₁))
 
 /-- Congruencia de `·` en el primer argumento, en contexto. -/
@@ -88,7 +88,7 @@ theorem PrfH_eq_congr_mul1 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
   let f : Formula := Formula.eq (mul (liftTerm 0 t₁) (liftTerm 0 c)) (mul (.var 0) (liftTerm 0 c))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul t₁ c) (mul s c) := by
     intro s
-    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (mul t₁ c)) Γ)
 
 /-! ### Identidad izquierda del producto
@@ -250,7 +250,7 @@ theorem prf_mul_le_mono_right (x y c : Term) : Prf (le x y ⇒ le (mul x c) (mul
     refine prf_nat_induction _ ?base ?step
     · -- `x·0 = 0 = y·0`
       simp only [substFormula, substTerm, substTerms, le, lt, lor, mul, zero,
-        Nat.reduceEqDiff, reduceIte, if_true, FOL.substTerm_liftTerm]
+        Nat.reduceEqDiff, reduceIte, ite_true, FOL.substTerm_liftTerm]
       refine prf_mp (Prf.incl (Prfᵢ.p1 _ (le x y))) ?_
       exact prf_le_subst2 (prf_eq_symm (prf_mul_zero y))
         (prf_le_subst1 (prf_eq_symm (prf_mul_zero x)) (prf_le_refl zero))
@@ -276,7 +276,7 @@ theorem prf_mul_le_mono_right (x y c : Term) : Prf (le x y ⇒ le (mul x c) (mul
         (PrfH_le_subst1 (prf_to_prfH (prf_eq_symm (prf_mul_succ (liftTerm 0 x) (.var 0))) _) hsum)
   have hc := prf_spec key c
   simpa only [substFormula, substTerm, substTerms, le, lt, lor, mul, Nat.reduceEqDiff, reduceIte,
-    if_true, FOL.substTerm_liftTerm] using hc
+    ite_true, FOL.substTerm_liftTerm] using hc
 
 /-! ### Irreflexividad, tricotomía y CANCELACIÓN multiplicativa
 

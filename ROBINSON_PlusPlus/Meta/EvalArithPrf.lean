@@ -518,7 +518,7 @@ theorem step_evalAddPred (a : Term) :
       = provFromCode (evalAddCode (liftTerm 0 a) (succ (.var 0))) := by
   rw [liftFormula_provFromCode_open, liftTerm_evalAddCode, substFormula_provFromCode_open,
     substTerm_evalAddCode, ← FOL.liftTerm_comm_zero a 0, FOL.substTerm_liftTerm]
-  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, if_true]
+  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, ite_true]
 
 /-- **EVALUACIÓN PROVABLE DE `+` (∀ object)**: `⊢ ∀b. Prov(⌜ȧ + ḃ = (a+b)˙⌝)`.
 

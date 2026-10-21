@@ -56,7 +56,7 @@ theorem prf_eq_congr_add1 {t₁ t₂ : Term} (c : Term) (h : Prf (t₁ =eq t₂)
   let f : Formula := Formula.eq (add (liftTerm 0 t₁) (liftTerm 0 c)) (add (.var 0) (liftTerm 0 c))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add t₁ c) (add s c) := by
     intro s
-    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (add t₁ c))
 
 /-- Congruencia de `+` en el **segundo** argumento. -/
@@ -65,7 +65,7 @@ theorem prf_eq_congr_add2 {t₁ t₂ : Term} (c : Term) (h : Prf (t₁ =eq t₂)
   let f : Formula := Formula.eq (add (liftTerm 0 c) (liftTerm 0 t₁)) (add (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add c t₁) (add c s) := by
     intro s
-    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (add c t₁))
 
 /-- Congruencia de `+` en el segundo argumento, en contexto. -/
@@ -74,7 +74,7 @@ theorem PrfH_eq_congr_add2 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
   let f : Formula := Formula.eq (add (liftTerm 0 c) (liftTerm 0 t₁)) (add (liftTerm 0 c) (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add c t₁) (add c s) := by
     intro s
-    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (add c t₁)) Γ)
 
 /-! ### Asociatividad de `+`
@@ -135,7 +135,7 @@ theorem PrfH_eq_congr_add1 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
   let f : Formula := Formula.eq (add (liftTerm 0 t₁) (liftTerm 0 c)) (add (.var 0) (liftTerm 0 c))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add t₁ c) (add s c) := by
     intro s
-    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (add t₁ c)) Γ)
 
 /-- Sustitución en el primer argumento de `≤`, en contexto. -/
@@ -144,7 +144,7 @@ theorem PrfH_le_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a�
   let f : Formula := le (.var 0) (liftTerm 0 b)
   have hS : ∀ s : Term, substFormula 0 s f = le s b := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
 
 /-- Sustitución en el 1er argumento de `≤`, a nivel `Prf`. -/
@@ -153,7 +153,7 @@ theorem prf_le_subst1 {a₁ a₂ b : Term} (h : Prf (a₁ =eq a₂)) (hle : Prf 
   let f : Formula := le (.var 0) (liftTerm 0 b)
   have hS : ∀ s : Term, substFormula 0 s f = le s b := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS a₂) ▸ prf_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
 
 /-- Sustitución en el 2º argumento de `≤`, a nivel `Prf`. -/
@@ -162,7 +162,7 @@ theorem prf_le_subst2 {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hle : Prf 
   let f : Formula := le (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = le a s := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b₂) ▸ prf_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
 
 /-- Sustitución en el segundo argumento de `≤`, en contexto. -/
@@ -171,7 +171,7 @@ theorem PrfH_le_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b�
   let f : Formula := le (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = le a s := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
 
 /-! ⛔ **Las dos `PrfH_lt_subst*` bajaron a `Meta/ChainPrf.lean`** (2026‑09‑09d, ADR‑019).

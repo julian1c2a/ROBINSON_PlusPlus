@@ -181,7 +181,7 @@ theorem prf_tc_termCodeM (x : Term) :
 theorem substTerm_objAt :
     ∀ (T : STree) (t : Term), substTerm 0 t (T.objAt (.var 0)) = T.objAt t
   | .leaf i, t => by
-      simp only [objAt, nthc, substTerm, substTerms, substTerm_numeralM, if_true]
+      simp only [objAt, nthc, substTerm, substTerms, substTerm_numeralM, ite_true]
   | .nul m, t => by
       simp only [objAt, cons, nil, zero, substTerm, substTerms, substTerm_numeralM]
   | .un m a, t => by
@@ -306,12 +306,12 @@ def condOfS (T : STree) : Formula := carc (.var 0) =eq T.objAt (.var 0)
 theorem substFormula_condOfS (T : STree) :
     substFormula 0 (.var 0) (condOfS T) = condOfS T := by
   simp only [condOfS, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
-    if_true, substTerm_objAt_var0 T]
+    ite_true, substTerm_objAt_var0 T]
 
 theorem substFormula_condOfS_at (T : STree) (t : Term) :
     substFormula 0 t (condOfS T) = (carc t =eq T.objAt t) := by
   simp only [condOfS, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
-    if_true, substTerm_objAt T t]
+    ite_true, substTerm_objAt T t]
 
 /-- ⭐ **`condD` de una condición‑árbol CON sustituciones, evaluado.** Idéntico a
     `prf_condD_of_tree_eq` (`Meta/CodeTreeReflect.lean`), y por la misma razón: el `substfc`
@@ -726,10 +726,10 @@ theorem substFormula_guardedCond_var0 :
         cases g with
         | wit i =>
             simp only [GuardSlot.toF, substF_hasWit, nthc, substTerm, substTerms,
-              substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
+              substTerm_numeralM, FOL.substTerm_liftTerm, ite_true]
         | witF i =>
             simp only [GuardSlot.toF, substF_hasWitF, nthc, substTerm, substTerms,
-              substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
+              substTerm_numeralM, FOL.substTerm_liftTerm, ite_true]
       simp only [guardedCond, substFormula, hg, substFormula_guardedCond_var0 gs C h]
 
 /-- ⭐ **EL CIERRE DE UN TAG DE SUSTITUCIÓN**, genérico: basta declarar su árbol, su lista de
@@ -755,12 +755,12 @@ y la cascada del tag 9 es `[witF 2, wit 3]` — la `witF` sobre la casilla 2 (el
 theorem substF_wit_slot (t : Term) (i : Nat) :
     substFormula 0 t (GuardSlot.wit i).toF = hasWit (nthc t (numeralM i)) := by
   simp only [GuardSlot.toF, substF_hasWit, nthc, substTerm, substTerms, substTerm_numeralM,
-    FOL.substTerm_liftTerm, if_true]
+    FOL.substTerm_liftTerm, ite_true]
 
 theorem substF_witF_slot (t : Term) (i : Nat) :
     substFormula 0 t (GuardSlot.witF i).toF = hasWitF (nthc t (numeralM i)) := by
   simp only [GuardSlot.toF, substF_hasWitF, nthc, substTerm, substTerms, substTerm_numeralM,
-    FOL.substTerm_liftTerm, if_true]
+    FOL.substTerm_liftTerm, ite_true]
 
 /-- El núcleo estructural de **q1**, con la fórmula guardada entera a la vista. -/
 theorem pcc_core_q1 (t : Term) :
@@ -1131,7 +1131,7 @@ theorem prf_tag_absurd (t : Term) (C : Formula) (j k : Nat) (h : j < k) :
   let A : Formula := lt (.var 0) (liftTerm 0 (numeralM k))
   have hS : ∀ s : Term, substFormula 0 s A = lt s (numeralM k) := by
     intro s
-    simp only [A, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    simp only [A, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   have hlt' : PrfH [lineTag t =eq numeralM k, lineTag t =eq numeralM j]
       (lt (numeralM k) (numeralM k)) :=
     (hS (numeralM k)) ▸ PrfH_leibniz_subst (A := A) hjk ((hS (numeralM j)) ▸ hlt)

@@ -387,15 +387,15 @@ theorem M_substtc (hM : Estandar M) {c : Nat} (h : CodT c) (k s : Nat) :
       · have h := ax_de hM (φ := ax_substtc_var_gt) (by simp [axioms]) (fun _ => 0) k s n
         simp [ax_substtc_var_gt, forall_3, substtc, varc, cons, nil, zero, pred, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, M_lt hM, M_pred hM] at h
-        rw [h hkn, if_neg (by omega), if_pos hkn]
+        rw [h hkn, ite_eq_right (by omega), ite_eq_left hkn]
       · have h := ax_de hM (φ := ax_substtc_var_eq) (by simp [axioms]) (fun _ => 0) k s k
         simp [ax_substtc_var_eq, forall_3, substtc, varc, cons, nil, zero, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero] at h
-        rw [h, if_pos rfl]
+        rw [h, ite_eq_left rfl]
       · have h := ax_de hM (φ := ax_substtc_var_lt) (by simp [axioms]) (fun _ => 0) k s n
         simp [ax_substtc_var_lt, forall_3, substtc, varc, cons, nil, zero, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, M_lt hM] at h
-        rw [h hkn, if_neg (by omega), if_neg (by omega)]
+        rw [h hkn, ite_eq_right (by omega), ite_eq_right (by omega)]
   | .func sc ts hts => by
       have h := ax_de hM (φ := ax_substtc_func) (by simp [axioms]) (fun _ => 0) k s sc ts
       simp [ax_substtc_func, forall_4, substtc, substtsc, funcc, cons, nil, zero, succ, evalFormula, evalTerm,
@@ -426,11 +426,11 @@ theorem M_liftc (hM : Estandar M) {t : Nat} (h : CodT t) (c : Nat) :
       · have h := ax_de hM (φ := ax_liftc_var_lt) (by simp [axioms]) (fun _ => 0) c n
         simp [ax_liftc_var_lt, forall_2, liftc, varc, cons, nil, zero, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, M_lt hM] at h
-        rw [h hn, if_pos hn]
+        rw [h hn, ite_eq_left hn]
       · have h := ax_de hM (φ := ax_liftc_var_ge) (by simp [axioms]) (fun _ => 0) c n
         simp [ax_liftc_var_ge, forall_2, liftc, varc, cons, nil, zero, succ, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc, M_lt hM] at h
-        rw [h (by omega), if_neg hn]
+        rw [h (by omega), ite_eq_right hn]
   | .func sc ts hts => by
       have h := ax_de hM (φ := ax_liftc_func) (by simp [axioms]) (fun _ => 0) c sc ts
       simp [ax_liftc_func, forall_3, liftc, liftsc, funcc, cons, nil, zero, succ, evalFormula, evalTerm,
@@ -926,7 +926,7 @@ theorem M_allIn_prems (hM : Estandar M) {V c x : Nat} (hwf : lineWFN V x)
         shiftEnv, hM.hcons, hM.hzero, hM.hsucc, M_numeral hM] at hp
       rw [hp] at h
       simpa [premsOfN, nthN_cs, nthN_cz] using h
-    · rw [premsOfN, if_neg h16, if_neg h17]; exact allInN_zero c
+    · rw [premsOfN, ite_eq_right h16, ite_eq_right h17]; exact allInN_zero c
 
 /-- 🏁 **Si `M` cree que `p` es una cadena válida desde `c`, lo es**, y `runFn` vale lo mismo. -/
 theorem M_cadena (hM : Estandar M) : ∀ (p c : Nat), M.rel sym!"chainOk" [c, p] →
@@ -1040,7 +1040,7 @@ theorem chain_thy {V a : Nat} (h : memN a V) : chainOkN V 0 (consN (lineaThy a) 
   refine ⟨⟨(lineWFN_of_tag h1 (by decide)).2 ⟨?_, ?_⟩, ?_⟩, chainOkN_zero _ _⟩
   · rw [lineaThy, lenN_consN, lenN_consN, lenN_zero]
   · rw [lineaThy, carN_consN]; exact h
-  · rw [premsOfN, if_neg (by rw [h1]; decide), if_neg (by rw [h1]; decide)]
+  · rw [premsOfN, ite_eq_right (by rw [h1]; decide), ite_eq_right (by rw [h1]; decide)]
     exact allInN_zero 0
 
 theorem run_thy (a : Nat) : memN a (runFnN 0 (consN (lineaThy a) 0)) := by
