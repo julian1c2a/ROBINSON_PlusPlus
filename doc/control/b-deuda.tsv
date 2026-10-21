@@ -9,7 +9,7 @@ B	A3ConsOkRefuta	sondeos/README.md	1
 B	AnclaEq	AXIOMS.md	6
 B	AnclaEq	DECISIONS.md	5
 B	AnclaEq	NEXT-STEPS.md	1
-B	AnclaEq	REFERENCE.md	7
+B	AnclaEq	REFERENCE.md	2
 B	AnclaEq	TEOREMAS-E-HIPOTESIS.md	6
 B	AnclaEq	doc/REFERENCE-Godelization.md	1
 B	AnclaEq	doc/REFERENCE-Incompleteness.md	5
@@ -84,15 +84,14 @@ B	Consistent	GODEL-STATUS.md	1
 B	ConsistentOmega	AXIOMS.md	1
 B	ConsistentOmega	DECISIONS.md	2
 B	ConsistentOmega	GODEL-STATUS.md	2
-B	ConsistentOmega	REFERENCE.md	1
 B	ConsistentOmega	TEOREMAS-E-HIPOTESIS.md	1
 B	ConsistentOmega	doc/REFERENCE-Incompleteness.md	2
 B	Ctor_desdec	sondeos/README.md	1
 B	Ctor_generico	sondeos/README.md	1
 B	C₀	doc/REFERENCE-Incompleteness.md	1
 B	DEUDA_chainNeg	DECISIONS.md	1
-B	DEUDA_chainNeg	REFERENCE.md	5
-B	DEUDA_inNeg	REFERENCE.md	4
+B	DEUDA_chainNeg	REFERENCE.md	4
+B	DEUDA_inNeg	REFERENCE.md	3
 B	DerivCond	DEPENDENCIES.md	2
 B	DerivCond	doc/REFERENCE-Incompleteness.md	2
 B	DerivesW	sondeos/README.md	1
@@ -136,7 +135,6 @@ B	IsCodeShaped	doc/REFERENCE-Incompleteness.md	2
 B	IsCodeShaped	sondeos/README.md	2
 B	IsFactorization	AXIOMS.md	1
 B	IsFactorization	doc/REFERENCE-Arithmetic.md	2
-B	IsFunction	REFERENCE.md	1
 B	IsFunction	doc/REFERENCE-Arithmetic.md	1
 B	IsPrime	doc/REFERENCE-Arithmetic.md	3
 B	KitPayoff	cuarentena/README.md	1
@@ -163,7 +161,6 @@ B	Meta.ReflectionPrf	doc/REFERENCE-Incompleteness.md	1
 B	Meta.Sigma1BoundedPrf	doc/REFERENCE-Incompleteness.md	1
 B	Meta.Sigma1TrackedPrf	doc/REFERENCE-Incompleteness.md	1
 B	Meta.StepArith	doc/REFERENCE-Incompleteness.md	1
-B	MetaRules	REFERENCE.md	1
 B	MetaRules	doc/REFERENCE-Incompleteness.md	1
 B	MetaRules	sondeos/README.md	3
 B	Mod2	doc/REFERENCE-Full.md	1
@@ -173,7 +170,7 @@ B	Necessitation	doc/REFERENCE-Incompleteness.md	1
 B	NegVerifier	DECISIONS.md	1
 B	NegVerifier	DEPENDENCIES.md	1
 B	NegVerifier	GODEL-STATUS.md	2
-B	NegVerifier	REFERENCE.md	11
+B	NegVerifier	REFERENCE.md	9
 B	NegVerifier	TEOREMAS-E-HIPOTESIS.md	3
 B	NegVerifier	doc/REFERENCE-Incompleteness.md	14
 B	NegVerifier	sondeos/README.md	2
@@ -280,7 +277,6 @@ B	StdChain	DECISIONS.md	1
 B	StdChain	DEPENDENCIES.md	1
 B	StdChain	doc/REFERENCE-Incompleteness.md	2
 B	StdChain	sondeos/README.md	2
-B	StdLine	REFERENCE.md	1
 B	StepArith	DEPENDENCIES.md	2
 B	StepArith	doc/REFERENCE-Incompleteness.md	1
 B	StrongInduction	DEPENDENCIES.md	1
@@ -424,16 +420,15 @@ B	axNN_descriptor	REFERENCE.md	1
 B	ax_L1	doc/REFERENCE-Incompleteness.md	1
 B	ax_L2	doc/REFERENCE-Incompleteness.md	1
 B	ax_axiomsCodeT_eq	AXIOMS.md	4
-B	ax_axiomsCodeT_eq	REFERENCE.md	2
+B	ax_axiomsCodeT_eq	REFERENCE.md	1
 B	ax_axiomsCodeT_eq	doc/REFERENCE-Incompleteness.md	3
 B	ax_inAxC	AXIOMS.md	3
 B	ax_inAxC	doc/REFERENCE-Incompleteness.md	1
 B	ax_induction	AXIOMS.md	3
-B	ax_induction	REFERENCE.md	2
+B	ax_induction	REFERENCE.md	1
 B	ax_induction	doc/REFERENCE-Full.md	3
 B	ax_induction	doc/REFERENCE-Incompleteness.md	2
 B	ax_induction_prim	AXIOMS.md	2
-B	ax_induction_prim	REFERENCE.md	1
 B	ax_induction_prim	doc/REFERENCE-Full.md	2
 B	ax_list_induction	AXIOMS.md	6
 B	ax_list_induction	DECISIONS.md	1
@@ -443,7 +438,6 @@ B	ax_list_induction	doc/REFERENCE-Full.md	4
 B	ax_list_induction	doc/REFERENCE-Incompleteness.md	2
 B	ax_list_induction	sondeos/README.md	2
 B	ax_mod2_alternation	AXIOMS.md	3
-B	ax_mod2_alternation	REFERENCE.md	1
 B	ax_mod2_alternation	doc/REFERENCE-Full.md	6
 B	ax_notInAxC	doc/REFERENCE-Incompleteness.md	1
 B	ax_p_tfa	AXIOMS.md	1
@@ -467,10 +461,9 @@ B	bridge_isTC1	doc/REFERENCE-Incompleteness.md	1
 B	bridge_wfAll1	doc/REFERENCE-Incompleteness.md	1
 B	by_cases	DECISIONS.md	2
 B	by_contra	sondeos/README.md	1
-B	canon_ne	REFERENCE.md	2
+B	canon_ne	REFERENCE.md	1
 B	canon_ne	doc/REFERENCE-Incompleteness.md	1
 B	canon_ne	sondeos/README.md	5
-B	cantor_uniqueness	REFERENCE.md	1
 B	cantor_uniqueness	doc/REFERENCE-Kernel.md	1
 B	censoFrontera	sondeos/README.md	1
 B	chainOkG	DECISIONS.md	3
@@ -503,7 +496,7 @@ B	d3_prf_of_sigma1	DECISIONS.md	2
 B	d3_prf_of_sigma1	REFERENCE.md	1
 B	d3_prf_of_sigma1	sondeos/README.md	2
 B	decodeChain	doc/REFERENCE-Incompleteness.md	2
-B	decodeChain_prf	REFERENCE.md	3
+B	decodeChain_prf	REFERENCE.md	2
 B	decodeChain_prf	sondeos/README.md	1
 B	decodeChars	doc/REFERENCE-Incompleteness.md	1
 B	decodeForm	DECISIONS.md	2
@@ -567,7 +560,6 @@ B	godelC'_fixedpoint	AXIOMS.md	1
 B	godelC'_fixedpoint	doc/REFERENCE-Incompleteness.md	1
 B	godelCN_fixedpoint	AXIOMS.md	1
 B	godelCN_fixedpoint	GODEL-STATUS.md	1
-B	godelCN_fixedpoint	REFERENCE.md	1
 B	godelCN_fixedpoint	doc/REFERENCE-Incompleteness.md	1
 B	goedelSentence	AXIOMS.md	1
 B	goedelSentence	GODEL-STATUS.md	2
@@ -577,7 +569,7 @@ B	goedelSentence_fixedpoint	GODEL-STATUS.md	1
 B	goedelSentence_fixedpoint	doc/REFERENCE-Incompleteness.md	1
 B	goedel_first_numeral	AXIOMS.md	2
 B	goedel_first_numeral	GODEL-STATUS.md	1
-B	goedel_first_numeral	REFERENCE.md	2
+B	goedel_first_numeral	REFERENCE.md	1
 B	goedel_first_numeral	TEOREMAS-E-HIPOTESIS.md	1
 B	goedel_first_numeral	doc/REFERENCE-Incompleteness.md	5
 B	goedel_first_real'	AXIOMS.md	3
@@ -594,7 +586,7 @@ B	goedel_first_unrefutable	doc/REFERENCE-Incompleteness.md	1
 B	goedel_second	GODEL-STATUS.md	1
 B	goedel_second'	AXIOMS.md	3
 B	goedel_second'	GODEL-STATUS.md	2
-B	goedel_second'	REFERENCE.md	2
+B	goedel_second'	REFERENCE.md	1
 B	goedel_second'	TEOREMAS-E-HIPOTESIS.md	1
 B	goedel_second'	doc/REFERENCE-Incompleteness.md	3
 B	guardQ1_se_paga	doc/REFERENCE-Incompleteness.md	1
@@ -631,7 +623,6 @@ B	inst3	REFERENCE.md	1
 B	inst3	doc/REFERENCE-Incompleteness.md	2
 B	inst4	REFERENCE.md	1
 B	inst4	doc/REFERENCE-Incompleteness.md	2
-B	instAnclaEq	REFERENCE.md	1
 B	instAnclaEq	TEOREMAS-E-HIPOTESIS.md	1
 B	instAnclaEq	sondeos/README.md	1
 B	isFCB	REFERENCE.md	1
@@ -681,7 +672,6 @@ B	mul_comm_thm	doc/REFERENCE-Full.md	1
 B	mul_distrib	doc/REFERENCE-Full.md	1
 B	mul_distrib_thm	doc/REFERENCE-Full.md	1
 B	mul_two_lt_mono	DEPENDENCIES.md	1
-B	mul_two_lt_mono	REFERENCE.md	1
 B	mul_two_lt_mono	doc/REFERENCE-Arithmetic.md	2
 B	mul_two_succ_ne_zero	doc/REFERENCE-Arithmetic.md	2
 B	m̄	DECISIONS.md	1
@@ -823,7 +813,6 @@ B	succ_le_of_lt	DEPENDENCIES.md	1
 B	succ_loc	doc/REFERENCE-Incompleteness.md	1
 B	sym!	DECISIONS.md	2
 B	tc_arith	doc/REFERENCE-Incompleteness.md	1
-B	tc_cons	REFERENCE.md	1
 B	tc_cons	doc/REFERENCE-Incompleteness.md	2
 B	tc_cons	sondeos/README.md	3
 B	tc_objAt	REFERENCE.md	1
@@ -849,7 +838,6 @@ B	teo_2_3	doc/REFERENCE-Arithmetic.md	1
 B	teo_2_4	doc/REFERENCE-Arithmetic.md	1
 B	teo_2_5	doc/REFERENCE-Arithmetic.md	1
 B	teo_2_6	doc/REFERENCE-Arithmetic.md	1
-B	teo_2_7	REFERENCE.md	1
 B	teo_2_7	doc/REFERENCE-Arithmetic.md	1
 B	teo_2_8	doc/REFERENCE-Arithmetic.md	1
 B	teo_2_9	AXIOMS.md	1
@@ -863,10 +851,9 @@ B	three	doc/REFERENCE-Arithmetic.md	1
 B	two_mul_consN	doc/REFERENCE-Incompleteness.md	1
 B	v_k	REFERENCE.md	1
 B	v_k	doc/REFERENCE-Incompleteness.md	1
-B	verifier_sound	REFERENCE.md	3
+B	verifier_sound	REFERENCE.md	2
 B	wTs	doc/REFERENCE-Incompleteness.md	3
 B	wTs	sondeos/README.md	3
-B	w_candidate	REFERENCE.md	1
 B	wfAllT	doc/REFERENCE-Incompleteness.md	1
 B	wfAllT_closed	sondeos/README.md	1
 B	wf_1f61bc0d	DECISIONS.md	2
@@ -990,7 +977,7 @@ B2	Meta/Sigma1BoundedPrf.lean	doc/REFERENCE-Incompleteness.md	2
 B2	Meta/Sigma1TrackedPrf.lean	doc/REFERENCE-Incompleteness.md	1
 B2	Meta/StepArith.lean	doc/REFERENCE-Incompleteness.md	1
 B2	Meta/VerifierSound.lean	GODEL-STATUS.md	1
-B2	Meta/VerifierSound.lean	REFERENCE.md	2
+B2	Meta/VerifierSound.lean	REFERENCE.md	1
 B2	Minimal/**/*.lean	DECISIONS.md	1
 B2	Minimal/Theorems/Block1-8	DEPENDENCIES.md	1
 B2	Minimal/Theorems/Block1-8	REFERENCE.md	1

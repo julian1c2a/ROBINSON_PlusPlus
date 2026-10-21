@@ -69,8 +69,8 @@ lo que ya se probó por inducción sobre él, porque si lo contradice, el axioma
 
 El proyecto está estratificado **también por número de cuantificadores**, y esa capa **existía de
 facto sin declarar**: **188 usos**, con los peldaños creados a reculones —cada uno cuando
-bloqueaba, y en sitios distintos del fichero (`forall_2`/`forall_3` en la línea 154, `forall_4` en
-la 441, `forall_5` en la 833)—.
+bloqueaba, y en sitios distintos de `Minimal/Axioms.lean` (`forall_2` y `forall_3` juntos, `forall_4` cientos de
+líneas más abajo y `forall_5` más abajo todavía)—. *(✏️ 2026‑10‑21, ADR‑184: daba los números de línea de entonces.)*
 
 | escalera | peldaño máximo |
 |---|---:|
@@ -79,7 +79,7 @@ la 441, `forall_5` en la 833)—.
 | maquinaria `PSI_inst_k` · `psi_lift_form_k` | 4 |
 
 ⚠️ **El desfase es REAL y está declarado**: hay **tres axiomas de aridad 5** en `axioms`
-(`ax_vpf_p2`, `ax_vpf_j3` y `ax_vpf_leibniz`, sobre `validProofFn`: `Minimal/Axioms.lean:967,970,974`) y **ningún instanciador de código** para
+(`ax_vpf_p2`, `ax_vpf_j3` y `ax_vpf_leibniz`, sobre `validProofFn`, en `Minimal/Axioms.lean`) y **ningún instanciador de código** para
 ellos. `check-estratos.bash` §escalera lo imprime y **rompe si la cifra cambia** en cualquiera de
 las dos escaleras.
 
@@ -106,10 +106,12 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 
 ### 0.1 Capitalization
 
-- **Theorems/lemmas** (Prop): `snake_case` — `teo_2_7`, `mul_two_lt_mono`, `cantor_uniqueness`
-- **Prop definitions** (predicates): `UpperCamelCase` — `IsFunction` (planned in Block7)
-- **Functions/values**: `lowerCamelCase` — `pair`, `cantor_func`, `w_candidate`
-- **Axioms**: `axNN_descriptor` or `ax_TagDescriptor` — `ax13_lt_def`, `ax_L0_cons_def`
+- **Theorems/lemmas** (Prop): `snake_case` — `goedel_first_prf`, `prf_sound`, `prf_cantor_mono_left`
+- **Prop definitions** (predicates): `UpperCamelCase` — `ConsistentH`, `Estandar`
+- **Functions/values**: `lowerCamelCase` — `codeNat`, `consN`, `formCode`
+- **Axioms** (axiomas OBJETO: `def … : Formula`): `axNN_descriptor` or `ax_TagDescriptor` — `ax13_lt_def`, `ax_L0_cons_def`
+
+*(✏️ 2026‑10‑21, ADR‑184: los ejemplos eran de los `Block`, retirados con ADR‑115.)*
 
 ### 0.2 Symbol-to-Word Dictionary
 
@@ -133,8 +135,11 @@ temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo 
 REFERENCE, `AI-GUIDE.md` §0.5).
 
 **118 módulos activos** (Minimal 2 + Meta 114 + Full 2) + barrel `Meta.lean` + raíz
-`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **43 en `sondeos/`**
-(experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
+`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **44** `sondeos/`
+(experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)). ✏️ 2026‑10‑21
+([ADR‑184](DECISIONS.md), T27): es la ÚNICA línea de cifras del documento, y `[A]` de `check-doc-sync.bash` la
+compara con el árbol en cada push; las que había en §1.5, §2 y §5 se quitaron o son registro con fecha. Las
+demás cifras de hoy, cada una con su control, en [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md).
 
 ### 1.1 Núcleo → [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md)
 
@@ -167,8 +172,9 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
-Los **88 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
-Detalle en el nodo §3.15–§3.32.
+Los módulos de `Meta/` (cuántos, en la línea de cifras de §1), en el orden del barrel
+[`Meta.lean`](ROBINSON_PlusPlus/Meta.lean); las filas tachadas, de módulos que salieron del build. Detalle en el
+nodo, desde §3.15. *(✏️ 2026‑10‑21, ADR‑184: decía «Los 88 módulos» y «§3.15–§3.32», cifras de agosto.)*
 
 | # | Module | Rol · Estado |
 |--:|--------|--------------|
@@ -179,7 +185,7 @@ Detalle en el nodo §3.15–§3.32.
 | 13–15 | ~~`CodeDistinct.lean`~~ (🗑️ retirado del build el 2026‑10‑18, ADR‑161: nada suyo en el cono) · ~~`Induction.lean`~~ · ~~`ListInductionArith.lean`~~ | aritmética negativa de códigos. 🗑️ Las reglas `ind`/`listInd` sobre `⊢` (los dos módulos tachados) y los `formCode_ne`/`strCode_ne` sobre `⊢`, retirados con ADR‑115 |
 | 16 | `ProofChain.lean` | verificador estructural `runFn`/`chainOk`/`lineOk`/`allIn` + `provCodeC'` |
 | 17–19 | ~~`DerivCond.lean`~~ · `Representability2.lean` · ~~`Reflection.lean`~~ | `lineJustif`, `proofCode'` y las guardas de ADR‑020. 🗑️ **D2** `d2` y **D1** `repr_pos'` sobre `⊢`, y los combinadores de la capa ω, retirados con ADR‑115 (D1/D2 viven en `Prf`: `repr_pos'_prf`, `d2_prf`) |
-| 20–26 | `ReprPrf` · ~~`LineWFDerives`~~ · `ArithPrf` · `Representability2Prf` · `ChainPrf` · `DerivCondPrf` · `ReflectionPrf` | re‑nivelación HBL a `Prf`: **D1** `repr_pos'_prf` ✅, **D2** `d2_prf` ✅ (D3: `d3_prf_real`, `Meta/PremsBdAllPrf.lean`). 🏁 ADR‑117: en `Representability2Prf`, **el ancla, TEOREMA** — `prf_deltaD` (el lema diagonal del axioma `ax_axiomsCodeT_def`), `prf_ancla`, la instancia `instAnclaEq` y el control `f1_traduccion_refutada`. 🗑️ `LineWFDerives` (sobre `⊢`) retirado con ADR‑115. ✏️ 2026‑10‑18 (ADR‑161): `ReflectionPrf`, retirado del build (su `d3_prf_of_sigma1` era vacuo: T05) |
+| 20–26 | `ReprPrf` · ~~`LineWFDerives`~~ · `ArithPrf` · `Representability2Prf` · `ChainPrf` · `DerivCondPrf` · `ReflectionPrf` | re‑nivelación HBL a `Prf`: **D1** `repr_pos'_prf` ✅, **D2** `d2_prf` ✅ (D3: `d3_prf_real`, `Meta/PremsBdAllPrf.lean`). 🏁 ADR‑117: en `Representability2Prf`, **el ancla, TEOREMA** — `prf_deltaD` (el lema diagonal del axioma `ax_axiomsCodeT_def`), `prf_ancla`, la instancia «instAnclaEq» (retirada con la clase `AnclaEq`, ADR‑118) y el control `f1_traduccion_refutada`. 🗑️ `LineWFDerives` (sobre `⊢`) retirado con ADR‑115. ✏️ 2026‑10‑18 (ADR‑161): `ReflectionPrf`, retirado del build (su `d3_prf_of_sigma1` era vacuo: T05) |
 | 27–29 | `Sigma1Prf` · `TcArithPrf` · `NumListPrf` | reflexión Σ₁; `tcFn` (`prf_tc_zero`/`_succ`/**`prf_tc_numeral`**); `lenc`/`nthc` |
 | 30–34 | `NatArithPrf` · `NatOrderPrf` · `NatMulPrf` · `CantorMonoPrf` · `Div2ParityPrf` | **aritmética en `Prf`**: `<` y `prf_nat_induction`; orden `≤`; producto y cancelación; **`prf_cantor_mono_left/right`**; **`prf_div2_numeral`**, **`prf_pair_double`** (§3.24.3–4) |
 | 35–36 | **`CodeNumeralPrf`** · **`DiagonalNumeral`** | **LA REPARACIÓN (ADR‑012)**: `consN` por números triangulares, `codeNat` (definidos en `Minimal/Axioms.lean` desde ADR‑117; aquí se reexportan), **`prf_formCode_numeral`**; lema diagonal numeral, **`goedel_first_numeral`** (Gödel I) (§3.24.2/§3.24.5) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
@@ -223,7 +229,7 @@ Detalle en el nodo §3.15–§3.32.
 | 84m | **`PremsBdAllPrf`** | 🆕 **B3 · el `pcc_bdAll_intro` INTERIOR de `boundedPremsIn`** (2026‑09‑10f, 580 l.): **ocho** de sus nueve obligaciones. ⭐⭐ **ADR‑021 se cumple SOLA aquí**, y eso **afina la regla**: en `premsPsi q i = substCodeF2 1 i̇' q̇' premsBodyF` el cuerpo es una fórmula **CERRADA** y los parámetros entran **sólo como TESTIGOS** ⇒ `hPl`/`hPs` son ciertas. En el exterior `q` viajaba **dentro** de la fórmula. 🔑 ⇒ lo que rompe la naturalidad **no es «ser un `substCodeF`»**, es que **el parámetro viaje dentro de la fórmula**. Piezas nuevas: `liftTerm_substCodeF2`/`substTerm_substCodeF2` (la naturalidad de `substCodeF2` en sus **dos** testigos, que no existía) y ⭐ **`substfc_id_substCodeF2`, la CUARTA variante** de la familia `substfc_inv_*` — nivel actuante uno por debajo del **más bajo** de los dos huecos. ⚠️ **El índice sigue sin ser cosmético** (van cinco): la guarda pasa de `liftFormula (v+2)` a **`(v+3)`**, porque entre el nivel actuante y el hueco alto hay **dos** casillas. `hwPsi` sale del par dotado/computable (cuarta vez que paga). 🏁🏁🏁 **2026‑09‑10g · LA NOVENA, PAGADA, Y `axiom d3` RETIRADO** (§9bis–§10, 1 392 l. en total): `DEUDA_premsBody` siguió la ruta medida —disyunto izquierdo **vacuo**, derecho por §5— y la **MONEDA de §3.55.2 pagó por cuarta vez**. Piezas nuevas: **`substfc_inv_substCodeF2`, la QUINTA variante** de la familia (nivel `v+1`, el hueco **bajo** de los dos — la más barata), `pcc_premsOfT_bridge`/`pcc_nthc_premsOf_bridge` y `prf_premsDisj_of_chainOk`. ⇒ **`d3_prf_real (φ)`** vive aquí (§10) y en `Meta/GodelTwo.lean` `axiom d3` pasó a **teorema** (**7 → 6 axiomas de Lean**). ⬆️ **2026‑09‑10h**: el genérico de §3 **bajó a `D3ChainDotPrf` §5bis** (ADR‑019); §3 conserva la **nota** de por qué hacía falta generalizar. |
 | 84n | **`VerifierSound`** | 🗑️ **2026‑10‑18 (ADR‑160, T66): RETIRADO del build, entero** (en `archivo/t66-2026-10-18`). Lo de antes: 🗑️ **2026‑10‑02 (ADR‑115)**: `NegVerifier`, la `def VerifierSound`, sus dos deudas y `negVerifier_of_deudas` eran sobre `⊢` y quedaron retirados; siguen `verifier_sound`, `not_decodes_of_not_prf` y el decisor META (`chainOkDec`, `conclsDec`) — base para Rosser. Registro: 🆕 🏁 **MÓDULO E de `NegVerifier` · LA SOLIDEZ ESTRUCTURAL, EN DIEZ LÍNEAS** (2026‑09‑10h). `PLAN-NEGVERIFIER.md` §8 lo llamaba **«el corazón»**, riesgo **ALTO**, 300–500 líneas, y exigía un sondeo previo. ⭐⭐ **El sondeo (`archivo/sondeos-2026-10:sondeos/NegVerifierModE.lean`) midió que el corazón no había que construirlo**: el decisor que E necesita **no tiene que ser el verificador OBJETO**, basta el **decodificador META**, y entonces la solidez **ya estaba probada** — `verifier_sound` **es** `decodeChain_prf`. 🔑 La pieza que lo hace gratis es **`decodeForm_inj`**: el decodificador es una **SECCIÓN** («si decodifica, el código era real»), que es exactamente la *realidad hereditaria* que §8 pedía demostrar caso por caso. ⭐ La forma de consumo es la **CONTRAPOSITIVA** (`not_decodes_of_not_prf`): con `¬Prf φ`, la rama «cadena aceptada» del ensamblaje es **IMPOSIBLE**. ⬜ Lo que queda, **enunciado y no postulado**: `DEUDA_chainNeg` y `DEUDA_inNeg` (la **completitud negativa**), que `negVerifier_of_deudas` convierte en `NegVerifier`. ⛔ **Y el riesgo estaba al revés de como el plan lo ponía**: E era «ALTO» y es una línea; los que hay que rediseñar son **C y D**, porque los esquemas objeto **aceptan más que el decodificador** y `IsCodeShaped` **NO SEPARA**. Footprint de `verifier_sound`: **net‑0 PURO**. |
 | 84o | ~~**`OmegaStrength`**~~ | 🗑️ **RETIRADO el 2026‑10‑02 con la capa `⊢`** ([ADR‑115](DECISIONS.md)); registro: 🆕 ⛔⛔ **LA FUERZA DE `axioms ⊢`, MEDIDA** (2026‑09‑11, auditoría F‑1). `derives_completo (A) : (axioms ⊢ A) ∨ (axioms ⊢ ¬A)` — **el cálculo ω es SINTÁCTICAMENTE COMPLETO**, y sin hipótesis. La causa **no es aritmética**: `raa` toma como premisa una **función de Lean**, así que si `axioms ⊬ A` la función existe **vacuamente** y el cálculo **refuta** `A`. ⇒ **`axioms ⊢` no es una relación de derivabilidad de primer orden**: es una noción metateórica de verdad. ⚠️ **Consecuencia**: `goedel_second'` **no es** el Segundo Teorema —la incompletitud habla de teorías que **no deciden** algo—, y su `hgi` no dice «`G` es indemostrable» sino «el cálculo **refuta** `G`». ⚠️ Y corrige a `FOL/MetaRules.lean`: **`gen` NO es la ω‑regla** (su premisa recorre **todo `Term`**, no los numerales ⇒ es **más débil**); la fuerza viene de `raa`/`imp_intro`. ✅ **Gödel I no está afectado**: concluye sobre `Prf` |
-| 84p | **`GodelTwoPrf`** | 🏁 **HOY (2026‑10‑04, ADR‑117)**: `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)`, footprint los tres de Lean y sin `[AnclaEq]`: el ancla es el teorema `prf_ancla`, y F1 ya no los hace vacuos. ⚠️ Siguen condicionales: no hay modelo de los 142 *(✏️ 2026‑10‑14, ADR‑134: desde ADR‑120 lo hay, y `consistencia` descarga `hcon`; `goedel_I` y `goedel_II` van sin hipótesis)*. Hasta ADR‑117 llevaban `[AnclaEq]`, que daba `Prf ⊥` (F1, ADR‑114), y eran **VACUOS**. El footprint con `prf_axiomsCodeT_eq` de abajo es de antes de ADR‑026. Registro: 🆕 🏁🏁 **GÖDEL II SOBRE EL CÁLCULO FINITARIO** (2026‑09‑11): **`goedel_first_prf`/`goedel_second_prf`, los dos con `ConsistentH := ¬ Prf ⊥`** — la hipótesis **MÍNIMA**, **ninguna suelta**, y ⭐⭐ footprint **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`**: **un solo axioma del proyecto** (P‑4, 2026‑09‑11 — las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja**). §1 la lógica proposicional que faltaba (`prf_subst_eq_iff` directo del axioma `Prfᵢ.leibniz`, `prf_iff_trans`, `prf_neg_congr_iff`); §2 ⭐ **`prf_godelCN_fixedpoint`, NET‑0 PURO** — el punto fijo sobre `Prf` no usa **ningún** axioma del proyecto—, puerto directo de `diag_arith_num` con el espejo `Prf` que ya existía; §3 `Con' ⇒ G` con `prf_deduction`/`deduction_aux` en lugar del meta‑axioma `imp_intro`, sobre **D2** (`d2_prf`) y **D3** (`d3_prf_real`); §4 el ensamblaje, con **D1** (`repr_pos'_prf`) descargando la necesitación. ⇒ **la cadena D1/D2/D3 no sólo está demostrada: está ENSAMBLADA** |
+| 84p | **`GodelTwoPrf`** | 🏁 **HOY (2026‑10‑04, ADR‑117)**: `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)`, footprint los tres de Lean y sin `[AnclaEq]`: el ancla es el teorema `prf_ancla`, y F1 ya no los hace vacuos. Desde ADR‑120 hay un modelo de los 142, y `consistencia` descarga `hcon`: `goedel_I` y `goedel_II` van sin hipótesis *(✏️ 2026‑10‑21, ADR‑184: esta fila decía «⚠️ Siguen condicionales: no hay modelo de los 142», lo del 2026‑10‑04)*. Hasta ADR‑117 llevaban `[AnclaEq]`, que daba `Prf ⊥` (F1, ADR‑114), y eran **VACUOS**. El footprint con `prf_axiomsCodeT_eq` de abajo es de antes de ADR‑026. Registro: 🆕 🏁🏁 **GÖDEL II SOBRE EL CÁLCULO FINITARIO** (2026‑09‑11): **`goedel_first_prf`/`goedel_second_prf`, los dos con `ConsistentH := ¬ Prf ⊥`** — la hipótesis **MÍNIMA**, **ninguna suelta**, y ⭐⭐ footprint **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`**: **un solo axioma del proyecto** (P‑4, 2026‑09‑11 — las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja**). §1 la lógica proposicional que faltaba (`prf_subst_eq_iff` directo del axioma `Prfᵢ.leibniz`, `prf_iff_trans`, `prf_neg_congr_iff`); §2 ⭐ **`prf_godelCN_fixedpoint`, NET‑0 PURO** — el punto fijo sobre `Prf` no usa **ningún** axioma del proyecto—, puerto directo de `diag_arith_num` con el espejo `Prf` que ya existía; §3 `Con' ⇒ G` con `prf_deduction`/`deduction_aux` en lugar del meta‑axioma `imp_intro`, sobre **D2** (`d2_prf`) y **D3** (`d3_prf_real`); §4 el ensamblaje, con **D1** (`repr_pos'_prf`) descargando la necesitación. ⇒ **la cadena D1/D2/D3 no sólo está demostrada: está ENSAMBLADA** |
 | 84q | **`ChainNegPrf`** | 🗑️ **2026‑10‑18 (ADR‑160, T66): RETIRADO del build, entero** (en `archivo/t66-2026-10-18`): Rosser no heredó nada suyo, medido con el cono. Lo de antes: 🗑️ **2026‑10‑02 (ADR‑115)**: lo que cerraba `NegVerifier` sobre `⊢` (`derives_chainOk_neg_of_line`, `deuda_inNeg`, `negVerifier_proved`…) quedó retirado; siguen **109** declaraciones sobre `Prf` y META (`decodeRuleTag_*`, `prf_lenc_*`, `stdArgs_*`…), la base para Rosser. Registro: 🆕 🏁 **MÓDULOS C/D: `DEUDA_inNeg` SALDADA y el puente de `DEUDA_chainNeg`** (2026‑09‑11). **§1 el PUENTE**: `derives_chainOk_neg_of_line` — de **una** línea cuyo `lineWF` la teoría refuta sale `⊢ ¬chainOk nil ⟦l⟧`, con piezas que ya estaban (`prf_lineWF_of_chainOk` —la de la mitad (a) de D3—, `prf_nthc_objList`, `prf_lenc_objList`, `gnum_lt`) ⇒ `DEUDA_chainNeg` queda reducida a «el decodificador rechaza ⟹ hay línea refutable». **§2** `decode_heads`: **las cabezas de una cadena aceptada SON los códigos de sus conclusiones** — 🔑 lo hace posible **`decodeForm_inj`**, que el decodificador sea una **SECCIÓN**, extraído en `decodeLine_stepConcl`/`decodeLine_carc`. **§3** 🏁 **`deuda_inNeg`**: `runFn nil ⟦l⟧ ≐ ⟦l.map carc⟧ ≐ listFormCodeM fs` y ahí manda `prf_not_In_listFormCodeM`, que ya existía y cuyo docstring decía *«la refutación que necesita `NegVerifier`»*. ⚠️ **Sin tocar el ancla**: el footprint no cita `prf_axiomsCodeT_eq`. ⬜ De las **cinco** causas de rechazo del decodificador, **cuatro tienen maquinaria**; la que falta es `mp`/`gen` sin premisas, que no va por `lineWF` sino por el conjunto `premsOf ⊆ conclusiones anteriores` |
 | 84r | **`ModeloCodigo`** | 🆕 🏁 **EL MODELO ESTÁNDAR, a nivel `Nat`** (2026‑10‑05, ADR‑120; de `sondeos/ModeloNat.lean`, ADR‑119): las listas por Cantor (`unpairN`, `decodeL`/`encodeL`), los accesores con `nthN_lt`, las funciones de codificación (`substtcN`…`chainOkN`, `stepT`), las guardas `hasWitN`/`hasWitFN`, `lineWFT` (las 21 RHS, generadas) y `V₀`, el valor del lado derecho del ancla, PLEGADO |
 | 84s | **`ModeloEstandar`** | 🆕 🏁 **`MNV V`, paramétrico en el valor de `axiomsCodeT`** (ADR‑120): un lema `rfl` por símbolo para `V` VARIABLE (⛔ ninguno contra `V₀`: altura de definición), la evaluación de los códigos cerrados por inducción (`ev_*`), las guardas para un término arbitrario, el `simp` `abre` (scoped) y los 34 `coreAxioms` (`MN_coreAxioms`) |
@@ -232,7 +238,7 @@ Detalle en el nodo §3.15–§3.32.
 | 84v | **`Consistencia`** | 🆕 🏁🏁 **`consistencia : ConsistentH`, `goedel_I : ¬ Prf godelCN`, `goedel_II : ¬ Prf consistencyFormula'`** (ADR‑120): Gödel I y II SIN HIPÓTESIS, footprint los tres de Lean; y (ADR‑121) `V₀_eq_codigo : V₀ = codeNatList axioms` |
 | 84w | **`TarskiPrf`** | 🆕 🏁 **TARSKI** (2026‑10‑05, ADR‑121): `prf_diagonal` (el lema diagonal para un predicado ARBITRARIO, por `FOL.subst_subst_lift_gen`), `liar`, `prf_tarski` y `tarski` (sin hipótesis: `Tr` falla en su propio mentiroso, una sentencia), y `tarski_semantico` (ni en `MNV V₀`); ✏️ 2026‑10‑20 (ADR‑175, T75a): `tarski_semantico_de`, en TODO modelo estándar, y `tarski_semantico` es su instancia; titular desde ADR‑178 |
 | 84x | **`SolidezVerificador`** | 🆕 🏁🏁 **W1 y GÖDEL I ENTERO** (ADR‑121): el decodificador TOTAL (`dec`, que conmuta con `substfcN`/`liftfcN` para todo número), `verificador_solido` (lo que `MNV V₀` acepta como prueba concluye, decodificado, teoremas de `Prf`), `goedel_I_neg : ¬ Prf ¬godelCN`, `godelCN_indecidible`, `modelo_prov_iff` y E10 (`godelCN_verdadera`, `con_verdadera`). ✏️ 2026‑10‑17 (ADR‑148): la cadena es PARAMÉTRICA en `V` (`cadena_buena (hV : Bueno V)`); `bueno_codeNatList` da `Bueno` para el código de los 142 sin el modelo, y `bueno_V₀` para `V₀`, por la solidez |
-| 84y | **`PurezaTitulares`** | 🆕 🔒 **T08, el CONTROL de pureza del cierre** (2026‑10‑16, ADR‑143): `#pureza_titulares` recorre el cierre de los 8 titulares de la clase (i) —D1, D2, D3, `prf_godelCN_fixedpoint`, `prf_con_imp_godel`, `goedel_first_prf`, `goedel_second_prf`, `prf_tarski`— y el BUILD FALLA si alguno nombra la semántica (`FOL.Metamath.Semantics` o `Meta.SolidezPrf`, por espacio de nombres y por módulo), o si los controles positivos `goedel_I` y `tarski` dejan de nombrarla. `#pureza a … \| x …`, el mismo control sobre listas dadas. Ninguna declaración nueva de la teoría. ✏️ 2026‑10‑17 (ADR‑149): el recorrido cuenta también las constantes del fichero en curso —sin ellas, un `#pureza` al final de un módulo no veía los lemas del propio módulo—, y lo vigila el control positivo `mutanteLocal`. ✏️ 2026‑10‑18 (ADR‑157): el recorrido, `#pureza` y `mutanteLocal`, a `PurezaComando` (84zh); aquí queda la lista, que importa `Rosser`: 9 PUROS, con `rosser_ext`, y 3 controles positivos, con `rosser`; y desde ADR‑159, `lob` (10 PUROS); y desde ADR‑162, los dos corolarios sintácticos de T78 (12). Y desde ADR‑165, T07: `#contrato_titulares`, el contrato de los enunciados de los 24 titulares contra `ContratoTabla` |
+| 84y | **`PurezaTitulares`** | 🆕 🔒 **T08, el CONTROL de pureza del cierre** (2026‑10‑16, ADR‑143): `#pureza_titulares` recorre el cierre de los 8 titulares de la clase (i) —D1, D2, D3, `prf_godelCN_fixedpoint`, `prf_con_imp_godel`, `goedel_first_prf`, `goedel_second_prf`, `prf_tarski`— y el BUILD FALLA si alguno nombra la semántica (`FOL.Metamath.Semantics` o `Meta.SolidezPrf`, por espacio de nombres y por módulo), o si los controles positivos `goedel_I` y `tarski` dejan de nombrarla. `#pureza a … \| x …`, el mismo control sobre listas dadas. Ninguna declaración nueva de la teoría. ✏️ 2026‑10‑17 (ADR‑149): el recorrido cuenta también las constantes del fichero en curso —sin ellas, un `#pureza` al final de un módulo no veía los lemas del propio módulo—, y lo vigila el control positivo `mutanteLocal`. ✏️ 2026‑10‑18 (ADR‑157): el recorrido, `#pureza` y `mutanteLocal`, a `PurezaComando` (84zh); aquí queda la lista, que importa `Rosser`: 9 PUROS, con `rosser_ext`, y 3 controles positivos, con `rosser`; y desde ADR‑159, `lob` (10 PUROS); y desde ADR‑162, los dos corolarios sintácticos de T78 (12). Y desde ADR‑165, T07: `#contrato_titulares`, el contrato de los enunciados de los 24 titulares contra `ContratoTabla` (29 desde ADR‑178) |
 | 84z | **`RosserW1`** | 🆕 **Rosser, etapa W1(ax)** (2026‑10‑17, ADR‑148; el plan, ADR‑146/147): `ProofN m y`, el espejo en ℕ del predicado de prueba de T con el CÓDIGO de los 142 (`codeNatList axioms`, no `V₀`), y `w1Ax : ProofN m y → Prf (dec y)`, W1 SIN el modelo: PURO por T08 (su `#pureza`, con `verificador_solido` como control positivo). Los controles: `proofN_axioma` (la hipótesis puede valer: una línea `thy`), `w1Ax_axioma` y `not_proofN_zero` (puede fallar: la cadena vacía) |
 | 84za | **`RosserPosNum`** | 🆕 **Rosser, etapa 6: PosNum** (2026‑10‑17, ADR‑149): el espejo en ℕ del codificador de pruebas (`codeNatJustif`, `codeNatLine`, `codeNatProof`); `prf_proofCode'_numeral`, el término de prueba de D1 es el numeral de su valor; `PfF y x`, el predicado de prueba de T con términos, y `posNum : Prf φ → ∃ m, Prf (PfF m̄ ⌜φ⌝)`, con el testigo explícito en `posNum_de`. PURO por T08 (su `#pureza`, con `modelo_prov_iff` como control positivo). Los controles: `prov_of_pfF` y `repr_pos_num` (D1 otra vez, por un numeral) |
 | 84zb | **`RosserNumerales`** | 🆕 **Rosser, etapa 1: la capa de listas sobre numerales** (2026‑10‑17, ADR‑150): `prf_cons_evalM` y `prf_numeral_cons` (un numeral no nulo es un `cons`); los accesores `prf_carc_numeral`, `prf_cdrc_numeral`, `prf_lenc_numeral`, `prf_nthc_numeral` (dentro de rango); los siete constructores de código de fórmula sobre numerales (`prf_implc_numeral`…); `In` decidido (`prf_In_numeral`, `prf_not_In_numeral`, el control `prf_In_decide`); `concat` y `runFn` evaluados (`prf_concat_numeral`, `prf_runFn_numeral`) y la pertenencia a las conclusiones de una cadena, decidida (`prf_In_runFn`, `prf_not_In_runFn`, `memN_runFnN_zero`). PURO por T08 (su `#pureza`, con `ev_numeralM` como control positivo). Tres lemas vienen de `sondeos/RosserBasura.lean` |
@@ -264,6 +270,8 @@ registro del episodio. Ver [`cuarentena/README.md`](cuarentena/README.md) y §3.
 > 2 anclas de codificación (`ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq`), y `d3` (único postulado 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > gödeliano vivo). Inventario en **[`AXIOMS.md`](AXIOMS.md)**. Ninguna es un `sorry` (ADR‑010).
 >
+> 🗄️ *Lo que sigue es registro del 2026‑09‑10h (✏️ ADR‑184): `NegVerifier` y `Meta/VerifierSound.lean` se retiraron
+> con la capa `⊢` (ADR‑115) y del build (ADR‑160).*
 > ⚠️ **La mitad `⊬¬G` de Gödel I sigue SIN cerrar** *(✏️ 2026‑10‑14, ADR‑134: registro; desde ADR‑121 la cierra `goedel_I_neg`, por la solidez en el modelo)*. `goedel_first_undecidable_numeral` toma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > `Reflects` como hipótesis META; descargarla exige **`NegVerifier`**.
 > 🏁 **Estado 2026‑09‑10h**: el **módulo E** está hecho (`Meta/VerifierSound.lean`) y `NegVerifier`
@@ -292,7 +300,7 @@ graph TD
         Axioms["Minimal/Axioms"]
         Induction["Full/Induction"]
         Numerals["Full/Numerals"]
-        Meta["Meta/ — 100 módulos: Prf, aritmetización, Gödel I/II"]
+        Meta["Meta/: Prf, aritmetización, D1–D3, el modelo y la solidez, los titulares"]
     end
 
     FOL_FOL --> Axioms
@@ -327,7 +335,9 @@ REFERENCE (`AI-GUIDE.md` §0.5): el índice raíz cataloga y navega; los nodos d
 
 **Navegación fuerte:** cada nodo enlaza de vuelta a este índice, a sus nodos hermanos relacionados y a
 los ficheros `.lean` que documenta. El subsistema **activo** es
-[Incompletitud](doc/REFERENCE-Incompleteness.md) — su **estado vivo** es **§3.28**: el frente
+[Incompletitud](doc/REFERENCE-Incompleteness.md). *(✏️ 2026‑10‑21, ADR‑184: lo que sigue, hasta «C3 y D3», es
+registro de agosto y septiembre; el estado de hoy, en [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) y en las
+secciones finales del nodo.)* Su estado vivo era **§3.28**: el frente
 `substfc` por la vía de **CERO AXIOMAS**, con la partición en tres predicados (que **discrimina**),
 el reflector completo, el testigo para toda fórmula, la clausura bajo `liftc` y —desde el
 2026‑08‑30— el **`DESCENSO` PROBADO**, que **es** `pcc_eval_liftc` (§3.28.1). El `PHI_guarded` del
@@ -355,80 +365,25 @@ borrado en F7a) y está marcado como tal.
 - 🗑️ *(registro: era de la capa `⊢`, retirada con ADR‑115)* **Patrón `spec + simp`**: cada axioma instanciado vía `spec h_axN t` requiere un `simp` con simp-set propio según los binders del axioma. Para axiomas `forall_2` se necesita `liftTerm`/`FOL.substTerm_liftTerm`; para `forall_3`, además `FOL.substTerm_liftLift`. Ver `THOUGHTS.md` y `feedback_build_cache` en memoria de Claude.
 - 🗑️ *(registro: los `Block` se retiraron con ADR‑115)* **`Γ` por módulo**: cada módulo definía `def Γ := axioms`. La unificación entre `Block2.Γ` y `Block4_C5.Γ` fallaba con `apply` pero pasaba con `exact` (defeq).
 - 🗑️ *(registro: retirado con la capa `⊢`, ADR‑115)* **`=eq` no-estándar `eq_trans`**: `eq_trans (h1:a=b)(h2:a=c):b=c`. Para `a=b, b=c → a=c` usar `FOL.derive_eq_trans`.
-- **Linter `unusedSimpArgs` desactivado** en todos los módulos (2026-06-06): `set_option linter.unusedSimpArgs false` global. Previamente se hizo un barrido a `true` (411 → 0 warnings), que confirmó qué args de `simp` eran innecesarios; tras ello se decidió dejar el linter en `false` (puede dar falsos positivos bajo binders existenciales y se prefiere libertad para conservar args de `simp` por robustez). El build permanece con 0 warnings.
+- **Linter `unusedSimpArgs` desactivado** (2026-06-06): `set_option linter.unusedSimpArgs false` global. Previamente se hizo un barrido a `true` (411 → 0 warnings), que confirmó qué args de `simp` eran innecesarios; tras ello se decidió dejar el linter en `false` (puede dar falsos positivos bajo binders existenciales y se prefiere libertad para conservar args de `simp` por robustez). ✏️ 2026‑10‑21 (ADR‑184): decía «en todos los módulos» y «el build permanece con 0 warnings»: hoy el linter se apaga fichero a fichero y no en todos, y el build da avisos, todos DECLARADOS en `check-warnings.bash` (entre ellos, los de `simp` que sobra en `CodeWitnessPrf`).
 
 ---
 
 ## 5 · Próximos pasos
 
-Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** (bloque del 2026‑10‑04, ADR‑117). Visión a largo plazo:
-[PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
+*(✏️ 2026‑10‑21, [ADR‑184](DECISIONS.md), T27: reescrita desde NEXT-STEPS. La de antes —el «Hoy» del 2026‑10‑04 y
+los registros del 2026‑10‑02 y del 2026‑09‑10h—, tal cual, en
+[doc/historia/REFERENCE-proximos-pasos-hasta-2026-10-21.md](doc/historia/REFERENCE-proximos-pasos-hasta-2026-10-21.md).)*
 
-### Hoy (2026‑10‑04, ADR‑117)
+La línea de llegada de RPP está completa en sus teoremas ([TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §0 y §1,
+[ADR‑140](DECISIONS.md)): Gödel I entero, Gödel II, Tarski, Rosser y Löb, con D1–D3 demostradas y la consistencia de
+la teoría como teorema. Lo que queda no es un teorema de esa lista sino el suelo: los trabajos que abrió la auditoría
+([doc/AUDITORIA-SUELO-2026-10-12.md](doc/AUDITORIA-SUELO-2026-10-12.md)), agrupados en [NEXT-STEPS.md](NEXT-STEPS.md)
+(«Lo que queda»), con la cola que decide el propietario. Fuera de este repositorio: Gentzen (T69, ADR‑140), y el libro
+(T49), en espera.
 
-🏁 **F1 reparado.** `axiomsCodeT` lo ancla el último de los **142** axiomas objeto, el axioma DIAGONAL
-`ax_axiomsCodeT_def` (`Minimal/Axioms.lean`), y `axiomsCodeT =eq listFormCodeM axioms` es el TEOREMA `prf_ancla`
-(`Meta/Representability2Prf.lean`); la clase `AnclaEq` se retiró (ADR‑118). Gödel I (`⊬G`) y Gödel II
-sobre `Prf` —`goedel_first_prf`, `goedel_second_prf (hcon : ConsistentH)`— ya no llevan `[AnclaEq]`, y su
-footprint es el de los tres de Lean: **F1 ya no los hace vacuos**. ⚠️ Siguen **CONDICIONALES**: `ConsistentH`
-sólo se cumple si los 142 son consistentes (✏️ desde ADR‑120 lo son: `consistencia`, `Meta/Consistencia.lean`); `f1_traduccion_refutada` bloquea el argumento de F1
-(si la traducción conservara el ancla, ya habría `Prf ⊥`; no prueba la consistencia). D1 (`repr_pos'_prf`), D2
-(`d2_prf`) y D3 (`d3_prf_real`) ya no llevan ninguna hipótesis de clase (ADR‑118). La mitad `⊬¬G` sigue sin existir
-en ningún cálculo. Lo que sigue, en orden: el modelo de los 142 (⇒ `ConsistentH`) ·
-`⊬¬G` por **Rosser** · D7 · y el horizonte declarado: Gentzen (ε₀) y Tarski.
-✏️ *2026‑10‑14 ([ADR‑134](DECISIONS.md)): este «Hoy» es el del 2026‑10‑04. Después llegaron el modelo y `consistencia`
-(ADR‑120), `⊬¬G` (`goedel_I_neg`, ADR‑121, sin Rosser), Tarski (ADR‑121) y D7 (ADR‑129); de esa lista queda Rosser, y
-su enunciado está por decidir (T01). La teoría de los titulares, en [AXIOMS.md](AXIOMS.md) §0.*
-
-### 🗄️ Registro del 2026‑10‑02 (ADR‑115; lo de F1, superado por ADR‑117)
-
-⛔ **No hay resultado de incompletitud publicable todavía.** Gödel I (`⊬G`) y Gödel II sobre `Prf`
-(`goedel_first_prf`, `goedel_second_prf [AnclaEq] (hcon : ConsistentH)`) están derivados con footprint
-de sólo los tres de Lean, pero son **VACUOS**: `[AnclaEq]` da `Prf ⊥` (F1, [ADR‑114](DECISIONS.md)), así
-que sus dos hipótesis no pueden valer a la vez. D1 (`repr_pos'_prf`) y D3 (`d3_prf_real`) llevan también
-`[AnclaEq]`; D2 (`d2_prf`) no. La mitad `⊬¬G` **no existe en ningún cálculo** desde que se retiró la capa
-`⊢` (iba por `NegVerifier`, sobre `⊢`). Lo que sigue, en orden: retirar `MetaRules` en FOL · reparar F1
-(L2‑3) · D7 · el modelo de los 141 (⇒ `ConsistentH`) · `⊬¬G` por **Rosser** · y el horizonte declarado:
-Gentzen (ε₀) y Tarski.
-
-### 🗄️ Registro del 2026‑09‑10h (superado: lo de abajo describe el árbol de entonces)
-
-**Estado 2026‑09‑10h.** Build **145 jobs**, **131 módulos activos**, **61 `sondeos/`**, 0 sorrys,
-**5** `axiom` de Lean (`d3` retirado el 2026‑09‑10g).
-
-### Lo que está cerrado
-
-1. **Gödel I — `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN`
-   (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-   sancionada **menos `tc_cons`**.
-2. **D1** ✅ `repr_pos'_prf` y **D2** ✅ `d2_prf` — reales, sobre el cálculo finitario `Prf`.
-3. **La ESCALERA (a.2)** ✅ **4 de 4** (§3.25): `pcc_eval_add`, `pcc_eval_mul`, el atajo de `div2`, y
-   **`pcc_dot_cons`**. Es la Σ₁‑completitud internalizada para argumentos abstractos.
-
-### Los frentes abiertos — **todos MEDIDOS** (actualizado 2026‑09‑10h)
-
-| # | frente | estado | qué lo bloquea |
-|--:|---|---|---|
-| ~~**1**~~ | ~~muro de `substfc` → `hC_dot` → **D3** → Gödel II → F7b~~ | 🏁🏁 **CERRADO** (2026‑09‑10e/g). Los **7 reflectores** probados ⇒ `pcc_lineWF_tracked` **incondicional** (C3); y **D3 DEMOSTRADA** (`d3_prf_real`) ⇒ `axiom d3` **retirado**, **7 → 6** | — |
-| **2** | **`NegVerifier`** → `⊬¬G` | 🏁 **módulo E hecho** (`Meta/VerifierSound.lean`): `verifier_sound` **es** `decodeChain_prf`. 🏁 **[ADR‑022](DECISIONS.md)**: la clase de testigos **estrechada** a `StdLine` ⇒ las comparaciones son **paralelas por tipo, sin evaluar Cantor**. ⚠️ El paso 1.1 del plan (`canon_ne`) sigue siendo **FALSO**, y el sustituto correcto es por **VALOR** (`numTree_ne` + las cotas `consN_ge`/`codeNat_ge`, `archivo/sondeos-2026-10:sondeos/MedirF_Censo.lean`) | **los módulos C y D** — las dos deudas enunciadas `DEUDA_chainNeg` y `DEUDA_inNeg` |
-| **3** | **`prf_axiomsCodeT_eq`** 🗑️ *(ese `axiom` quedó retirado el 2026‑09‑12, [ADR‑026](DECISIONS.md): el ancla pasó a la firma como `[AnclaEq]`; desde ADR‑117, 2026‑10‑04, es el teorema `prf_ancla`)* | el axioma que arrastra casi todo el árbol («net‑0 son CUATRO, no tres»). Es de otra naturaleza que los gödelianos: dice que el código de la lista de axiomas **es** la lista de códigos | no medido |
-| **4** | 🆕 **`primAxioms`** ([ADR‑023](DECISIONS.md)) | 🏁 **9 de 11 CERTIFICADOS** (2026‑09‑10h). El propietario **ratificó** el movimiento `axiom ax_induction_prim : primAxioms ⊢ inductionFormula φ` + `ax_induction` como **teorema** — **no añade axioma, lo mueve**: siguen **6** | ⬜ los 2 restantes (ax21, ax24) piden una **segunda** sanción sobre `ax_mod2_alternation`, **no pedida**. ⚠️ Antes conviene medir si ese axioma es **derivable** (bajaría a **5**) |
-| **5** | **recodificar símbolos por índice** | 📏 medido (`sondeos/RecodCoste.lean`): el **98‑99 %** del `formCode` de los axiomas del verificador son los nombres de símbolos (`ax_tc_zero`: 49 015 → ~708 nodos, **69×**). **Hoy no es cuello de botella** | nada. ⚠️ Una tabla pura **no es total** ⇒ codificación **etiquetada** |
-
-⚠️ **La frase «(1) cuesta axiomas, es decisión del autor» ya NO vale** (era de 2026‑08‑23): el
-frente 1 fue por la **vía de CERO axiomas** ([ADR‑015](DECISIONS.md)) y **está cerrado**. La razón
-de fondo sigue en §3.27.1: axiomatizar **no era más caro, era OTRO TEOREMA** — sus axiomas entrarían
-en `axioms`, `ax_axiomsCodeT_eq` los metería en `axiomsCodeT` y **G cambiaría**. Es la misma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-distinción que gobierna [ADR‑023](DECISIONS.md): **certificar sobre un subconjunto no mueve la
-frontera; cambiar `axioms` sí**.
-
-### Alternativa siempre disponible *(registro del 2026‑09‑10h; hoy, ver «Hoy» arriba)*
-
-⚠️ Esta sección decía «consolidar **Gödel II módulo el axioma D3**». **Ya no aplica**: `d3` es
-teorema desde el 2026‑09‑10g. Lo publicable entonces se creía **más**: Gödel I `⊬G` real sobre la teoría
-reparada, **D1, D2 y D3 las tres demostradas**, y Gödel II sin ningún postulado gödeliano —
-`goedel_second'` conserva tres hipótesis explícitas que **no** son condiciones de derivabilidad.
-Lo único que sigue abierto de Gödel I es la mitad **`⊬¬G`** (frente 2).
+Punto de reanudación: [NEXT-STEPS.md](NEXT-STEPS.md). Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro:
+[PLAN-LIBRO.md](PLAN-LIBRO.md).
 
 ---
 
