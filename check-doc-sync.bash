@@ -210,6 +210,8 @@ echo
 AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 # (2026-10-14, ADR-135; T09: TEOREMAS-E-HIPOTESIS.md entra en el universo: es normativo y nadie lo miraba)
 AUTHORITATIVE="$AUTHORITATIVE TEOREMAS-E-HIPOTESIS.md"
+# (2026-10-21, ADR-185; T28: PLAN-PRUEBAS.md entra también: dice qué comprueba cada control, y es normativo)
+AUTHORITATIVE="$AUTHORITATIVE PLAN-PRUEBAS.md"
 AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
 DOCS="$AUTHORITATIVE"
 FAIL=0
@@ -557,7 +559,7 @@ REFERENCE.md
 DEPENDENCIES.md
 # README.md — SALDADA el 2026-10-21 (ADR-183, T25): reescrito contra el árbol, con su marca.
 AXIOMS.md
-GODEL-STATUS.md
+# GODEL-STATUS.md — SALDADA el 2026-10-21 (ADR-185, T28): reescrito entero, con su marca.
 doc/REFERENCE-Arithmetic.md
 doc/REFERENCE-Full.md
 doc/REFERENCE-Incompleteness.md
@@ -579,7 +581,7 @@ PLAN-FRENTE-A.md
 PLAN-LIBRO.md
 PLAN-NEGVERIFIER.md
 PLANNING.md
-PLAN-PRUEBAS.md
+# PLAN-PRUEBAS.md — SALDADA el 2026-10-21 (ADR-185, T28): en AUTHORITATIVE, revisado, con su marca.
 PLAN-SORTES.md
 Sobre_el_libro.md
 # TEOREMAS-E-HIPOTESIS.md — SALDADA el 2026-10-02 (ADR-115): reescrito entero, con su marca.

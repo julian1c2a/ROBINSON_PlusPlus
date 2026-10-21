@@ -1,234 +1,87 @@
-# Frente Gödel — Estado y Roadmap
+# Frente Gödel — estado y mapa
 
 > **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
 > Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
-**Last updated:** 2026-07-20 — ⚠️ **DOCUMENTO HISTÓRICO/DIAGNÓSTICO.** El estado vivo está en [NEXT-STEPS.md](NEXT-STEPS.md) (bloque «🎯 LO QUE QUEDA»), [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [AXIOMS.md](AXIOMS.md) y [CHANGELOG.md](CHANGELOG.md); si algo de aquí discrepa, **mandan esos**. Resumen al día *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): es el del 2026‑07‑20, y es FALSO, en parte desde ADR‑115 (los «5 `axiom`», `goedel_second'`) y del todo desde ADR‑121 —Gödel I es ENTERO, `goedel_I_neg`, y Gödel I, Gödel II y Tarski van sin hipótesis: lo vigente, en el banner de arriba y en [AXIOMS.md](AXIOMS.md) §0—; y el bloque «LO QUE QUEDA» de NEXT‑STEPS que cita esta línea también es registro: lo vivo es su PUNTO DE REANUDACIÓN)*: **Gödel I da SÓLO `⊬G`** (hoy **`goedel_first_numeral`**, `Meta/DiagonalNumeral.lean`; ⚠️ `goedel_first_real'` **ya no existe** desde la reparación — real y sin postulado gödeliano alguno) — **la mitad `⊬¬G` NO está en la cadena real** (ver la corrección de auditoría 2026-07-13 en §N de abajo); su reducción existe (`reflects_of_omega`: `Reflects ⇐ ω‑consistencia + `NegVerifier`). 🆕 **Estado 2026‑09‑10h**: módulos **A**, **B** y **E** ✅ (`Meta/VerifierSound.lean`: `verifier_sound` **es** `decodeChain_prf`); `NegVerifier` queda reducido a **dos deudas enunciadas** —`DEUDA_chainNeg` y `DEUDA_inNeg`, los módulos **C** y **D**—, con la clase de testigos ya estrechada por [ADR‑022](DECISIONS.md). ⚠️ `PLAN-NEGVERIFIER.md` **se re‑mide, no se lee**: van tres afirmaciones falsas medidas. **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales sobre el cálculo finitario `Prf`. 🏁🏁🏁🏁 **Gödel II** (`goedel_second'`) **SIN NINGÚN postulado gödeliano desde el 2026‑09‑10g**: `d3` pasó de `axiom` a **teorema** (`d3_prf_real`, `Meta/PremsBdAllPrf.lean` §10) ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres**. **5 `axiom` de Lean** — el ancla de codificación es hoy `ax_axiomsCodeT_eq` (⊢) / `prf_axiomsCodeT_eq` (`Prf`); **el `ax_inAxC` que se cita más abajo ya NO es axioma, es teorema**. Build **145 jobs**, **131 módulos**, 0 sorrys, Lean v4.31.0 (2026‑09‑10h). — (previo 2026-06-24) **NIVEL D REAL muy avanzado** (este documento, escrito 2026-06-06, describía el Nivel C con meta-axiomas; el proyecto ha progresado mucho — el contenido §1–§N de abajo es histórico). Estado actual: **Gödel I REAL sin postulados gödelianos** sobre el cálculo de Hilbert **finitario `Prf`** (`goedel_first_real`/`goedel_first_real'`; `#print axioms` = ω-reglas ambiente + `Full.ax_induction` + `ax_inAxC`, **sin** `diagonal_lemma`/`provFormula`/D2/D3). **D1 real** a nivel ⊢ (`repr_pos'`) **y finitario** (`repr_pos'_prf : Prf φ → Prf (provCodeC' φ)`). **D2 real ⊢** (`d2`). **Teorema de deducción finitario** (`Meta/HilbertDeduction.lean`) + **regla de confinamiento ∀ `qconf`** integrada en el verificador. **Fix de solidez FOL**: `subst_lift_cancel_formula` (axioma falso) → teorema. La vía clásica/legacy (Gödel I/II con `Dem`/`provFormula`/D2/D3 postulados) coexiste como andamiaje. **Pendiente para Gödel II 100% real** (`goedel_second_prf : ConsistentH → ¬ Prf Con'`): lema de Barendregt → inducción de listas en `Prf` → `d2_prf`/`d3_prf`. Estado vivo: [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [NEXT-STEPS.md](NEXT-STEPS.md), [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md), [CHANGELOG.md](CHANGELOG.md). — (histórico, 2026-06-06) Niveles B y C implementados con meta-axiomas.
+**Last updated:** 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
+2026‑06‑06 para el Nivel C con meta‑axiomas, con su «Resumen al día» del 2026‑07‑20 y un §4 que declaraba fuera de
+alcance lo que hoy está demostrado— está, tal cual, en
+[doc/historia/GODEL-STATUS-hasta-2026-10-21.md](doc/historia/GODEL-STATUS-hasta-2026-10-21.md).
 **Author:** Julián Calderón Almendros
-**Nivel del documento**: A (diagnóstico documental; no contiene código Lean).
 
-Este documento responde a la pregunta: *¿qué relación tiene el sistema `Minimal/` con los teoremas de incompletitud de Gödel, y qué se va a formalizar al respecto en `Meta/`?*
+Este documento responde a tres preguntas: *¿de qué teoría hablan los teoremas de Gödel de este repositorio y qué
+hipótesis de Gödel cumple?, ¿qué está formalizado?, ¿cómo se encadenan las pruebas?* Lo vigente, con la hipótesis de
+cada teorema y quién la descarga, es [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §1: si algo de aquí discrepa,
+manda TEOREMAS.
 
 ---
 
-## 1 · ¿Satisface `Minimal` las hipótesis de Gödel I/II?
+## 1 · La teoría, y las hipótesis de Gödel
 
-> ✏️ **2026‑10‑12 · [ADR‑134](DECISIONS.md) (T02).** Esta sección, de junio de 2026, toma como sujeto `Minimal`, la
-> LISTA de axiomas. El sujeto de los titulares es otro: `T_Prf`, lo que deriva `Prf`, que añade a la lista la
-> inducción y la inducción de listas para TODA fórmula, y contiene a PA ([AXIOMS.md](AXIOMS.md) §0). Tres filas de la
-> tabla han cambiado: «Consistente: Asumido» es hoy el TEOREMA `consistencia` (ADR‑120: un modelo de los 142 y
-> `prf_sound`); la axiomatización de `T_Prf` es recursiva pero no finita (los 142 y las instancias de los esquemas); y
-> la «suficiente fuerza» no se discute: contiene a PA. Lo demás de §1 es registro.
+El sujeto no es la lista de `Minimal/` (sin esquema de inducción) sino **T_Prf**, lo que deriva el cálculo finitario
+`Prf` (`Meta/Hilbert.lean`): los 142 axiomas de la lista `axioms`, los esquemas lógicos (con DNE y el confinamiento),
+y la inducción y la inducción de listas para TODA fórmula, con MP y GEN. Contiene a PA. La descripción canónica, y lo
+que se supone, en [AXIOMS.md](AXIOMS.md) §0.
 
-El primer teorema de incompletitud de Gödel (Gödel I) se aplica a cualquier teoría `T` que cumpla:
-
-| Hipótesis | Significado | ¿La cumple `Minimal`? |
+| hipótesis de Gödel | cómo la cumple T_Prf | dónde |
 |---|---|---|
-| **Recursivamente axiomatizable** | El conjunto de axiomas es decidible algorítmicamente | ✅ `axioms : List Formula` es una lista finita y explícita |
-| **Consistente** | No deriva `⊥` | ✅ Asumido (no demostrable internamente — Gödel II) |
-| **Expresividad aritmética** | Captura `+`, `·`, `<` con sus propiedades | ✅ Tiene los 34 axiomas matemáticos descritos en `MINIMAL-AXIOMS.md` |
-| **Suficiente fuerza** | Representa todas las funciones recursivas primitivas (o al menos las necesarias para la β-función de Gödel) | ⚠️ Discusión: ver §1.1 |
-
-### 1.1 La cuestión de la "suficiente fuerza"
-
-Gödel I exige que `T` represente formalmente todas las funciones recursivas primitivas (o que existan **alternativas equivalentes**, como una versión más débil con codificación primorial). Análisis:
-
-- **Q (Robinson)** ya es suficiente. Es el ejemplo canónico de "teoría minimal con Gödel I". Como `Minimal ⊇ Q-núcleo` (compartimos 6 axiomas básicos) y añadimos más estructura, **Minimal es a fortiori suficiente**.
-- **El TFA (Ax-P) en `Minimal`** facilita aún más la codificación: la **función β de Gödel** (que codifica secuencias finitas como un único número) tiene una alternativa más directa usando primos: una secuencia `(a₁, …, aₖ)` se codifica como `Π pᵢ^aᵢ` con `pᵢ` el `i`-ésimo primo. Esta codificación primorial requiere **exactamente lo que añadimos**: `pow`, `prod_pairs` y `Ax-P` (para garantizar unicidad de descodificación).
-- **Sin TFA**, la codificación de secuencias en `Minimal` sería posible solo vía Cantor pairing (que ya está) o listas (también). La adición de TFA da una **tercera ruta más natural** para Gödel.
-
-**Conclusión**: ✅ `Minimal` cumple las hipótesis de Gödel I sin reservas.
-
-### 1.2 Gödel II en `Minimal`
-
-Gödel II dice que `T` no puede demostrar su propia consistencia (`Con(T)`) si `T` es consistente y satisface ciertas condiciones de demostrabilidad. Para `Minimal`:
-
-- **Aplica** si y sólo si se puede formalizar internamente la consistencia (`Con(Minimal)`) como una fórmula del lenguaje.
-- Eso requiere `IsFormula`, `Dem`, y la sentencia `¬∃p, Dem(p, ⌜⊥⌝)`.
-- Estos predicados pertenecen al **nivel B-C** del frente Gödel (ver §3 abajo); en `Minimal/` puro **no están**.
-
-**Conclusión**: Gödel II aplica **estructuralmente** a `Minimal`, pero su formulación requiere material que arrancará en `Meta/`.
+| **axiomatización recursiva** | los 142 son una lista explícita (`axioms_len : axioms.length = 142`, por `rfl`), y lo que es una prueba lo decide un verificador interno (`validProofFn` y `chainOk`) | `Minimal/Axioms.lean`, `Full/Induction.lean`, `Meta/ProofChain.lean` |
+| **la aritmetización** | los códigos son numerales (`codeNat`, `numeral`; la reparación de ADR‑012/013), `formCode` codifica las fórmulas y `provCodeC'` es el predicado de prueba | `Minimal/Axioms.lean`, `Meta/Provability.lean`, `Meta/CodeNumeralPrf.lean`, `Meta/ProofChain.lean` |
+| **las condiciones de derivabilidad** | D1 `repr_pos'_prf`, D2 `d2_prf` y D3 `d3_prf_real`: teoremas, ninguna postulada; D3 es la Σ₁‑completitud demostrable del verificador | `Meta/Representability2Prf.lean`, `Meta/DerivCondPrf.lean`, `Meta/PremsBdAllPrf.lean` |
+| **el punto fijo** | `prf_godelCN_fixedpoint` para la sentencia de Gödel `godelCN`, y `prf_diagonal` para un predicado cualquiera | `Meta/GodelTwoPrf.lean`, `Meta/TarskiPrf.lean` |
+| **la consistencia** | el TEOREMA `consistencia : ConsistentH`, por un modelo de los 142 (`MNV V₀`) y la solidez de `Prf` (`prf_sound`). Relativa a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) ([TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §4) | `Meta/Consistencia.lean`, `Meta/SolidezPrf.lean` |
+| **para `⊬¬G`, más que la consistencia** | la verdad en ℕ en vez de la ω‑consistencia: el verificador es sólido en el modelo (W1, `verificador_solido`) | `Meta/SolidezVerificador.lean` |
 
 ---
 
-## 2 · ¿Qué se formaliza en este proyecto sobre Gödel?
+## 2 · Lo formalizado
 
-La spec original (`TuplasFuncionesYListas.md §BLOQUE VIII Fases 18-19`) define:
+| resultado | teoremas | qué usa la prueba ([TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1) |
+|---|---|---|
+| **Gödel I** | `goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN`; sin hipótesis, `goedel_I`; la otra mitad, `goedel_I_neg : ¬ Prf ¬godelCN`; las dos juntas, `godelCN_indecidible` | (i) · (ii) · (iii) |
+| **Gödel II** | `goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'`; sin hipótesis, `goedel_II`; dentro de la teoría, `goedel_second_formalizado`; `prf_godel_iff_con` (G ⇔ Con') y `con_indecidible` | (i) · (ii) · (iii) |
+| **Rosser** | `rosser`: ni R ni ¬R, desde la consistencia simple; `rosser_ext`, para toda extensión finita consistente T+E, por reducción a T (`prfH_iff_prf_impChain`) | (ii) · (i) |
+| **Tarski** | `prf_tarski` y `tarski` (la teoría no define su verdad: el mentiroso, `liar`); `tarski_semantico` y `tarski_semantico_de`: ninguna fórmula define la verdad en ningún modelo estándar | (i) · (ii) · (iii) |
+| **Löb** | `lob : Prf (Prov⌜φ⌝ ⇒ φ) → Prf φ`; Gödel II sale de él (`goedel_second_de_lob`) | (i) |
+| **la verdad de G y de Con** | `godelCN_verdadera`, `con_verdadera` (E10), y en todo modelo estándar `godelCN_verdadera_de`, `con_verdadera_de`; los modelos estándar no son uno solo (`estandar_MN`, `estandar_MB`) | (iii) |
 
-- **Def 27**: Función de Gödel `G : Λ → ℕ` (asignación numérica inyectiva a los símbolos del lenguaje).
-- **Def 28**: Corner brackets `⌜s₁…sₖ⌝ := Cons(G(s₁), Cons(…Cons(G(sₖ), Nil)…))`.
-- **Teo G1**: Inyectividad de ⌜·⌝ — `⌜S⌝ = ⌜S'⌝ ⟹ S = S'`.
-- **Fase 19**: Predicados `IsFormula(x)`, `Dem(p, φ)`, lema del punto fijo (diagonalización), sentencia de Gödel.
+Lo que este frente declaraba fuera de alcance en junio —la demostración interna de Gödel II, Rosser y Tarski— está
+hecho. Fuera de este repositorio: Gentzen (ε₀), que nacerá en el suyo (ADR‑140, T69).
 
-Estos contenidos **se moverán a un módulo nuevo `Meta/`** del proyecto, que arrancará al cerrar `Minimal/`.
+---
 
-### 2.1 Por qué `Meta/` arranca al cerrar `Minimal/` (no después de `Intermediate/`)
-
-Hay dos consideraciones que apuntan al mismo lado:
-
-1. **Logística de spec**: las Fases 18-19 vienen inmediatamente después de la Fase 17 (Bloque VIII estándar). Mantener el orden de la spec ayuda a la trazabilidad.
-2. **Compromiso de scope**: lo que se formaliza en `Meta/` (G, ⌜·⌝, Teo G1) **no requiere inducción**. Es meta-codificación pura. Por tanto puede vivir sobre `Minimal/` sin esperar a `Intermediate/`.
-
-Lo que sí requiere `Intermediate/` o `Full/` es la **demostración** de Gödel I/II como teoremas internos. En `Minimal+Meta/` lo que tendremos es:
-
-- ✅ Codificación operativa.
-- ✅ Teo G1 (inyectividad de la asignación).
-- ✅ `IsFormula`, `Provable`, `Dem` definidos (`Meta/Provability.lean`); `provable_formCode_iff` demostrado. El lema del punto fijo (`diagonal_lemma`), la sentencia de Gödel `goedelSentence` y la representabilidad (`provFormula_repr`, `dem_iff_provable`) se adoptan como **meta-axiomas** (su demostración requiere Nivel D).
-
-Esta separación es **deliberada**: queremos tener los enunciados de Gödel disponibles tan pronto como sea posible (en `Minimal+Meta/`), incluso si las demostraciones esperan a sistemas más fuertes.
-
-### 2.2 Niveles de ambición para `Meta/`
-
-El frente Gödel se descompone en cuatro niveles (idénticos a la taxonomía discutida en el repaso 2026-06-06):
-
-| Nivel | Contenido | Ubicación | Estado |
-|---|---|---|---|
-| **A** | Discusión documental: hipótesis Gödel, scope, relación TFA ↔ Gödel | Este documento + `MINIMAL-AXIOMS.md` §5.5 | ✅ 2026-06-06 |
-| **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` ✅ | ✅ 2026-06-06 |
-| **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` ✅ | ✅ 2026-06-06 (props profundas como meta-axiomas) |
-| **D** | Teoremas de incompletitud | **cadena REAL** (`Meta/DiagonalTwo.lean`, `Meta/GodelTwo.lean`) | 🔶 **Gödel I: sólo `⊬G`** (`goedel_first_real'`, ω‑consistencia). 🏁 **Gödel II**: `goedel_second'`, **sin `axiom d3`** desde el 2026‑09‑10g (`d3` es teorema). ⚠ La mitad `⊬¬G` **NO está en la cadena real** — ver nota abajo |
-
-La **arquitectura propuesta** para `Meta/`:
+## 3 · Cómo se encadenan
 
 ```text
-Meta/
-├── Godel.lean              # Nivel B: G, ⌜·⌝, Teo G1  ✅ (2026-06-06)
-├── Provability.lean        # Nivel C: IsFormula, Dem, punto fijo, G_Min  ✅ (2026-06-06)
-└── Incompleteness.lean     # Nivel D: Gödel I mitad esencial  🟡 (2026-06-12)
+codificación (formCode, codeNat) ─► verificador interno (validProofFn, chainOk, provCodeC')
+        │                                   │
+        ▼                                   ▼
+punto fijo (prf_godelCN_fixedpoint)    D1 · D2 · D3  ───────────────► goedel_first_prf, goedel_second_prf,
+        │                                                              prf_godel_iff_con, lob
+        │                              W1(ax), PosNum, NegNum (los espejos en ℕ del verificador) ─► rosser_ext
+        ▼
+modelo MNV V₀ + solidez prf_sound ─► consistencia ─► goedel_I, goedel_II, tarski, rosser (sin hipótesis)
+        │
+        ├─► la verdad en el modelo: W1 (verificador_solido) y E10 ─► goedel_I_neg, con_indecidible
+        └─► la semántica del modelo ─► tarski_semantico, tarski_semantico_de
 ```
 
-### Nivel D — estado detallado (2026-06-12)
-
-`Meta/Incompleteness.lean` deriva la **mitad esencial del Primer Teorema** a
-partir de las condiciones de demostrabilidad postuladas en el Nivel C:
-
-- 🗑️ **`goedel_first_unprovable`** : *(capa LEGACY, **eliminada** en F7a)*
-  `Consistent → ¬(axioms ⊢ goedelSentence)`.
-  Si el sistema es consistente, la sentencia de Gödel `G` no es demostrable.
-  Prueba: `⊢ G` → (D1, `provFormula_repr`) `⊢ Prov(⌜G⌝)`; punto fijo
-  (`goedelSentence_fixedpoint`) da `⊢ ¬Prov(⌜G⌝)`; `mp` → `⊢ ⊥`.
-- 🗑️ **`goedel_first_true`** : *(capa LEGACY, **eliminada** en F7a — el símbolo ya no existe)*
-  `G` es verdadera-pero-indemostrable. Se apoyaba en el postulado **falso** `provFormula_repr`.
-- 🗑️ **`incompleteness`** : *(capa LEGACY, **eliminada** en F7a)* `Consistent → ∃ φ, ¬(axioms ⊢ φ)`.
-
-- ✅ **Gödel II** (`goedel_second`, 2026-06-12): `Consistent → ¬(axioms ⊢ Con)`
-  con `Con := ¬Prov(⌜⊥⌝)`. **Postulando D2 y D3** (condiciones de
-  Hilbert-Bernays-Löb; D1 ya estaba vía `provFormula_repr`). Lema crucial
-  `con_imp_goedelSentence : ⊢ (Con ⇒ G)` (Gödel I formalizado), derivado de
-  D1/D2/D3 + punto fijo. Notable: toda la cadena (incl. contrapositiva) se
-  construye con `imp_intro`/`mp`, **sin DNE object-level** — funciona en el FOL
-  intuicionista.
-
-- ⚠️ **CORRECCIÓN DE AUDITORÍA (2026-07-13, `repasa_y_proyecta`): la mitad `⊬¬G` NO está en la
-  cadena real.** Se demostró el 2026-06-13 (`goedel_first_unrefutable` / `goedel_first_undecidable`,
-  vía `dne` clásica), pero **en la capa LEGACY** (`Meta/Incompleteness.lean`, que postulaba D2 y D3),
-  y esa capa se **RETIRÓ en F7a** (commit `f03eacf`, 2026-07-09) junto con el módulo. Hoy **esos dos
-  teoremas no existen en el código**. La cadena real establece **sólo `⊬G`** (`goedel_first_real'`,
-  `Meta/DiagonalTwo.lean`).
-
-- 🚫 **NO recuperar F7a — fue un ARREGLO DE SOLIDEZ, no una limpieza.** La prueba legacy descansaba en
-  `provFormula_repr`, postulado como **bicondicional** `(axioms ⊢ Prov⌜φ⌝) ↔ (axioms ⊢ φ)`. La
-  dirección **`.mp`** (`⊢Prov⌜φ⌝ → ⊢φ`) es la **representabilidad NEGATIVA / reflexión**, que **NO se
-  sigue de la consistencia simple** — exige ω‑consistencia/soundness. Pero el teorema se enunciaba bajo
-  **`Consistent`** (consistencia simple) ⇒ **afirmaba MÁS de lo que Gödel permite** (por eso existe
-  **Rosser**: para obtener ambas mitades desde consistencia simple hay que **cambiar de sentencia**).
-  `provFormula_repr` era, pues, un **postulado falso en general** — misma familia que
-  `subst_lift_cancel_formula` (axioma FOL general FALSO) y `ax_lineWF_gen` (incondicional ⇒ `Prov`
-  total). Restaurarlo reintroduciría el postulado malo.
-
-- ⛔ **[RETIRADA — 2026‑09‑10h. `repr_neg` NO existe NI HACE FALTA.]** Lo de abajo se conserva
-  como registro de una ruta **abandonada**. La mitad `⊬¬G` **no** pasa por una representabilidad
-  negativa: pasa por `reflects_of_omega` (ω‑consistencia + **`NegVerifier`**), y `NegVerifier` está
-  hoy reducido a **dos deudas enunciadas** (`Meta/VerifierSound.lean`) sobre la clase de testigos
-  estrechada por [ADR‑022](DECISIONS.md). ⇒ **no abrir este frente.**
-  — *(texto de entonces)* «**TAREA ABIERTA (independiente de D3): construir `repr_neg`.** Para
-  re‑derivar `⊬¬G` **con la hipótesis honesta** falta la **representabilidad NEGATIVA**, que **no
-  existe** en la cadena real:
-  `repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ`. Con ella el argumento se porta tal cual
-  (~8 líneas): `⊢¬G` →(punto fijo) `⊢¬¬Prov⌜G⌝` →(`dne`) `⊢Prov⌜G⌝` →(**`repr_neg`**) `⊢G` →(con `⊢¬G`)
-  `⊥`. Ya están el **punto fijo real** —hoy **`godelCN_fixedpoint`**, el `godelC'_fixedpoint` de 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-  entonces murió con ADR‑012—, **D1** (`repr_pos'_prf`) y `dne`.
-  `repr_neg` debería salir de la **fidelidad del verificador** + `ConsistentOmega`; hay groundwork en
-  `Meta/CodeDistinct.lean` («aritmética negativa de códigos»).» — *(fin del texto de entonces)*
-- 📜 **(histórico, capa legacy retirada)** Lo que se probó el 2026-06-13 fue:
-  `Consistent → ⊬ ¬G`, luego `⊬ G ∧ ⊬ ¬G` (`G` **indecidible**).
-  Resuelto añadiendo **`dne`** (eliminación de doble negación clásica) a
-  `FOL/MetaRules.lean`. Diagnóstico: el obstáculo no era ω-consistencia sino el
-  **intuicionismo** del FOL (`¬¬Prov⌜G⌝ → Prov⌜G⌝` no es intuicionista); Rosser
-  habría sido peor (Muro 1 + comparación acotada de pruebas). `dne` es el
-  setting clásico estándar de Gödel, sólido para ℕ (coherente con la ω-lógica).
-  Prueba: `⊢ ¬G` → (punto fijo) `⊢ ¬¬Prov⌜G⌝` → (`dne`) `⊢ Prov⌜G⌝` →
-  (reflexión) `⊢ G` → `⊥`.
-
-**Pendiente** (documentado):
-
-**Sutileza ω-lógica** (honestidad): el sistema de RPP usa la meta-regla `gen`
-(ω-regla, `FOL/MetaRules.lean`), que hace `axioms ⊢` no finitariamente r.e. El
-Nivel D deriva la **lógica** de Gödel I *dadas* las condiciones de
-demostrabilidad como postulados — el ejercicio estándar de libro. La
-justificación de esos postulados para el sistema concreto (finitario vs
-ω-lógico) es una discusión meta-teórica separada.
-
-Los niveles B y C **pueden coexistir con `Minimal/`** porque sólo usan meta-codificación. El nivel D requerirá la maquinaria de `Intermediate/` o `Full/` (inducción para las propiedades de `Dem`).
+La clase de cada titular —(i) sin el modelo, (ii) el modelo sólo para la consistencia, (iii) la verdad en el modelo—
+la comprueba cada build para la (i) (`Meta/PurezaTitulares.lean`, T08), y los enunciados de los 29 titulares los fija el
+contrato (`Meta/ContratoTitulares.lean`, T07).
 
 ---
 
-## 3 · TFA (Ax-P) y la codificación de Gödel
+## 4 · La historia, en cuatro líneas
 
-Una observación clave del análisis 2026-06-06 (ver `MINIMAL-AXIOMS.md` §5.5.3): la extensión de `Minimal/` con `pow`, `prod_pairs` y TFA **prepara el terreno para Gödel** de manera natural.
+La reparación de los códigos (ADR‑012/013) y la retirada de la capa `⊢`, que era sintácticamente completa y no podía ser
+sujeto de incompletitud (ADR‑115); el ancla de la codificación, teorema (ADR‑117); el modelo y la consistencia, Gödel I y
+II sin hipótesis (ADR‑120); `⊬¬G` y Tarski (ADR‑121); Rosser (ADR‑157); Löb (ADR‑159); los corolarios de Gödel II
+(ADR‑162). El detalle, en [DECISIONS.md](DECISIONS.md) y en [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md).
 
-### 3.1 Codificación primorial de secuencias
-
-En la formalización clásica de Gödel, la codificación de secuencias usa la **función β** definida sobre el Teorema Chino del Resto. En `Minimal+Ax-P` tenemos una alternativa más limpia:
-
-> Una secuencia `(a₁, a₂, …, aₖ)` se codifica como `prod_pairs [(p₁, a₁), (p₂, a₂), …, (pₖ, aₖ)]`, donde `pᵢ` es el `i`-ésimo primo.
-
-La **descodificación** es única gracias al TFA (`ax_p_tfa`): dada una factorización, la lista de pares está determinada. Esto convierte la β-función en innecesaria para muchos propósitos de Gödelización. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-
-### 3.2 ¿Es Ax-P estrictamente necesario para Meta/Godel.lean?
-
-**No para el Nivel B** (G, ⌜·⌝, Teo G1). En la implementación (`Meta/Godel.lean`), la inyectividad plena `encode_injective` se establece a nivel **meta** (inducción estructural Lean + inyectividad de los constructores `cons`/`func`/`G` vía `injection`), sin TFA ni consistencia; la versión object-level `encode_cons_inj` reutiliza `cons_inj` (Block6.lean). Pasar de la object-level a la conclusión meta `S = S'` sí requeriría `Con(axioms)`, por lo que esa conexión interna se difiere al Nivel C/D.
-
-**Sí para usos avanzados** del Nivel C: si queremos demostrar propiedades sobre la decodificación de secuencias (longitud única, posiciones únicas), TFA es la herramienta natural.
-
-**Sí para conexión con la formalización clásica**: cualquier presentación moderna de Gödel I (por ejemplo Smullyan, Boolos) usa codificación primorial vía TFA.
-
-Decisión: **mantener TFA como meta-axioma en `Minimal/`** facilita Meta/ ahora y futuro.
-
----
-
-## 4 · Lo que NO está en scope
-
-Para mantener el proyecto manejable, los siguientes temas se **declaran fuera de scope** explícitamente:
-
-| Tema | Razón |
-|---|---|
-| **Demostración interna de Gödel II** | Requiere condiciones de demostrabilidad de Löb, inducción fuerte, y maquinaria que va más allá de `Full/`. Posible proyecto independiente futuro. |
-| **Teorema de Rosser** (versión sin ω-consistencia) | Variante técnica de Gödel I; no añade contenido conceptual al proyecto. |
-| **Teoremas de indefinibilidad de Tarski** (definibilidad de la verdad) | Relacionado con Gödel pero ortogonal al objetivo de `Meta/`. |
-| **Teorías más fuertes** (PA + Π₁-reflection, ZFC, etc.) | Fuera del alcance de un proyecto sobre aritmética minimal. |
-
----
-
-## 5 · Roadmap del frente Gödel
-
-| Fecha (planificada) | Hito | Módulo |
-|---|---|---|
-| **2026-06-06** | Cierre `Minimal/` con Ax-P y diagnóstico del frente Gödel (Nivel A) | `MINIMAL-AXIOMS.md` §5.5, este documento |
-| **2026-06-06** | ✅ `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) **completado** | `Meta/Godel.lean` |
-| **2026-06-06** | ✅ `Meta/Provability.lean` (Nivel C: IsFormula, Provable, Dem, punto fijo, G_Min) **completado** | `Meta/Provability.lean` |
-| **TBD** | `Intermediate/` paralelo: derivación de los 9+3 axiomas inductivos | `Intermediate/Axioms.lean` |
-| **TBD** | `Meta/Incompleteness.lean` (Nivel D: Gödel I formalmente) | requiere `Intermediate/` |
-
-Los plazos para el Nivel C y D dependen del ritmo del proyecto; con el **Nivel B completado** (2026-06-06, `Meta/Godel.lean`), el siguiente paso concreto es el **Nivel C** (`Meta/Provability.lean`: IsFormula, Dem, lema del punto fijo).
-
----
-
-## 6 · Referencias técnicas
+## 5 · Referencias
 
 - Gödel, K. (1931). *Über formal unentscheidbare Sätze der Principia Mathematica und verwandter Systeme I*.
-- Smullyan, R. (1992). *Gödel's Incompleteness Theorems*. Oxford University Press. — Tratamiento moderno con codificación primorial.
-- Boolos, G., Burgess, J., Jeffrey, R. (2007). *Computability and Logic* (5ª ed.). Cambridge. — Capítulos 17-18 sobre representabilidad y Gödel.
+- Smullyan, R. (1992). *Gödel's Incompleteness Theorems*. Oxford University Press.
+- Boolos, G., Burgess, J., Jeffrey, R. (2007). *Computability and Logic* (5ª ed.). Cambridge. — Capítulos 17‑18.
 - [Incompleteness theorems — Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/entries/goedel-incompleteness/)
-- [Gödel numbering — Wikipedia](https://en.wikipedia.org/wiki/G%C3%B6del_numbering)
-- Documentación interna: [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §5.5, [PLANNING.md](PLANNING.md) §6.3, [TuplasFuncionesYListas.md](TuplasFuncionesYListas.md) §BLOQUE VIII Fases 18-19.
