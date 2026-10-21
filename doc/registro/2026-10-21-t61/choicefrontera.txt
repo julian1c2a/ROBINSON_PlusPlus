@@ -1,0 +1,64 @@
+# T61 (ADR-189): sondeos/ChoiceFrontera.lean, el resultado ANTES y DESPUÉS de reescribir sin omega las dos cancelaciones
+# de lift (Meta/SubstArith.lean) y v_ax16 (Meta/ModeloEstandar.lean). Las dos, con v4.35.0, el 2026-10-21 (el ANTES es el
+# de la subida, idéntico al de v4.31.0: doc/registro/2026-10-21-t42b/sondeos.txt). `bash check-sondeos.bash ChoiceFrontera.lean`.
+
+== ANTES
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf: 2 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLiftLift._f  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia: 2 puntos de entrada
+  ROBINSON_PlusPlus.Meta.ModeloEstandar.v_ax16._proof_1_7  ←  [Classical.propDecidable]
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I: 3 puntos de entrada
+  ROBINSON_PlusPlus.Meta.ModeloEstandar.v_ax16._proof_1_7  ←  [Classical.propDecidable]
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II: 4 puntos de entrada
+  ROBINSON_PlusPlus.Meta.ModeloEstandar.v_ax16._proof_1_7  ←  [Classical.propDecidable]
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLiftLift._f  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg: 4 puntos de entrada
+  ROBINSON_PlusPlus.Meta.ModeloEstandar.v_ax16._proof_1_7  ←  [Classical.propDecidable]
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski: 3 puntos de entrada
+  ROBINSON_PlusPlus.Meta.ModeloEstandar.v_ax16._proof_1_7  ←  [Classical.propDecidable]
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f  ←  [Classical.byContradiction]
+filas con choice: 209 (no encontradas en el entorno: 0) · pasan por prf_sound: 23 · sólo por prf_sound: 2 · no pasan por prf_sound: 186 · toda su frontera en las dos cancelaciones de lift (SubstArith.substTerm_liftLiftLift y …LiftLiftLift): 182
+puntos de entrada (filas que pasan por cada uno):
+  202  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift._f
+  132  ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLiftLift._f
+  23  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
+  22  ROBINSON_PlusPlus.Meta.ModeloEstandar.v_ax16._proof_1_7
+  2  ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
+
+== DESPUÉS
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg: 2 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+  ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+filas con choice: 23 (no encontradas en el entorno: 0) · pasan por prf_sound: 23 · sólo por prf_sound: 21 · no pasan por prf_sound: 0 · toda su frontera en las dos cancelaciones de lift (SubstArith.substTerm_liftLiftLift y …LiftLiftLift): 0
+puntos de entrada (filas que pasan por cada uno):
+  23  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
+  2  ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg

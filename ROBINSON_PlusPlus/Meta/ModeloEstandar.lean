@@ -341,9 +341,18 @@ theorem v_ax12 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax12_mul_distrib := 
 /-! #### La paridad: `omega` conoce `/2` y `%2` por literales -/
 
 theorem v_ax16 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax16_mod2_succ := by
-  intro v d; simp [_root_.iff, mod2, succ, zero, one, mod2_sym, succ_sym, zero_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
-  omega
+  -- (✏️ 2026‑10‑21, T61, ADR‑189: sin `simp` a secas ni `omega`, que metían `Classical.propDecidable` en
+  -- `consistencia` y en lo que depende de ella; la paridad, por casos con `Nat.mod_two_eq_zero_or_one`.)
+  intro v d
+  simp only [_root_.iff, mod2, succ, zero, one, mod2_sym, succ_sym, zero_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_mod2]
+  have hm := Nat.add_mod d 1 2
+  rcases Nat.mod_two_eq_zero_or_one d with h | h
+  · refine ⟨fun _ => ?_, fun _ => h⟩
+    rw [hm, h]
+  · refine ⟨fun h0 => absurd (h.symm.trans h0) (by decide), fun h1 => ?_⟩
+    rw [hm, h] at h1
+    exact absurd h1 (by decide)
 
 theorem v_ax17 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax17_div_mod_eq := by
   intro v d; simp [add, mul, div2, mod2, two, one, succ, zero,

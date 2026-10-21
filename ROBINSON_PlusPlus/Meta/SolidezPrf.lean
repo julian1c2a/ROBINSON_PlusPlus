@@ -145,6 +145,9 @@ theorem prfI_sound (hM : Estandar M) {φ : Formula} (h : Prfᵢ φ) : ∀ v, eva
 theorem prf_sound (hM : Estandar M) {φ : Formula} (h : Prf φ) : ∀ v, evalFormula M v φ := by
   induction h with
   | incl h0 => exact prfI_sound hM h0
+  -- (✏️ 2026‑10‑21, T61, ADR‑189: éste es el `Classical.choice` de todos los titulares que lo llevan —los de las clases
+  -- (ii) y (iii), por la solidez—: la regla `p3`, ¬¬A ⇒ A, en una semántica en `Prop`. Quitarlo pide la semántica
+  -- doble‑negada; lo decide el propietario. Los de la clase (i) y D1–D3 ya no lo llevan.)
   | p3 A => intro v hnn; exact Classical.byContradiction hnn
   | ind A =>
       intro v

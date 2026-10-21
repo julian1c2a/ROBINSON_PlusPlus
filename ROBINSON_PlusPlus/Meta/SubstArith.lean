@@ -58,19 +58,26 @@ theorem substTerm_liftLiftLift (t : Term) (c : Nat) (s : Term) :
     substTerm (c + 2) s (liftTerm c (liftTerm c (liftTerm c t))) = liftTerm c (liftTerm c t) := by
   cases t with
   | var n =>
+      -- (✏️ 2026‑10‑21, T61, ADR‑189: sin `omega` ni `simp` a secas, que metían `Classical.byContradiction` en el
+      -- footprint de casi todos los titulares: la aritmética, con lemas de `Nat`, y `simp only`.)
       by_cases h1 : n < c
-      · simp [liftTerm, substTerm, h1, show ¬ n = c + 2 from by omega, show ¬ n > c + 2 from by omega]
-      · have h2 : ¬ n + 1 < c := by omega
-        have h3 : ¬ n + 1 + 1 < c := by omega
-        have hgt : n + 1 + 1 + 1 > c + 2 := by omega
-        simp [liftTerm, substTerm, h1, h2, h3, hgt]
-        omega
+      · have hlt : n < c + 2 := Nat.lt_of_lt_of_le h1 (Nat.le_add_right c 2)
+        have hne : ¬ n = c + 2 := Nat.ne_of_lt hlt
+        have hng : ¬ n > c + 2 := Nat.not_lt.mpr (Nat.le_of_lt hlt)
+        simp only [liftTerm, substTerm, h1, hne, hng, ite_true, ite_false]
+      · have hle : c ≤ n := Nat.not_lt.mp h1
+        have h2 : ¬ n + 1 < c := fun h => h1 (Nat.lt_of_succ_lt h)
+        have h3 : ¬ n + 1 + 1 < c := fun h => h2 (Nat.lt_of_succ_lt h)
+        have hgt : n + 1 + 1 + 1 > c + 2 := Nat.lt_succ_of_le (Nat.add_le_add_right hle 2)
+        have hne : ¬ n + 1 + 1 + 1 = c + 2 := Nat.ne_of_gt hgt
+        simp only [liftTerm, substTerm, h1, h2, h3, hne, hgt, ite_true, ite_false]
+        rfl
   | func f ts =>
       simp only [liftTerm, substTerm]; congr 1; exact substTerms_liftLiftLift ts c s
 theorem substTerms_liftLiftLift (ts : List Term) (c : Nat) (s : Term) :
     substTerms (c + 2) s (liftTerms c (liftTerms c (liftTerms c ts))) = liftTerms c (liftTerms c ts) := by
   cases ts with
-  | nil => simp [liftTerms, substTerms]
+  | nil => simp only [liftTerms, substTerms]
   | cons t ts' =>
       simp only [liftTerms, substTerms, List.cons.injEq]
       exact ⟨substTerm_liftLiftLift t c s, substTerms_liftLiftLift ts' c s⟩
@@ -85,20 +92,25 @@ theorem substTerm_liftLiftLiftLift (t : Term) (c : Nat) (s : Term) :
   cases t with
   | var n =>
       by_cases h1 : n < c
-      · simp [liftTerm, substTerm, h1, show ¬ n = c + 3 from by omega, show ¬ n > c + 3 from by omega]
-      · have h2 : ¬ n + 1 < c := by omega
-        have h3 : ¬ n + 1 + 1 < c := by omega
-        have h4 : ¬ n + 1 + 1 + 1 < c := by omega
-        have hgt : n + 1 + 1 + 1 + 1 > c + 3 := by omega
-        simp [liftTerm, substTerm, h1, h2, h3, h4, hgt]
-        omega
+      · have hlt : n < c + 3 := Nat.lt_of_lt_of_le h1 (Nat.le_add_right c 3)
+        have hne : ¬ n = c + 3 := Nat.ne_of_lt hlt
+        have hng : ¬ n > c + 3 := Nat.not_lt.mpr (Nat.le_of_lt hlt)
+        simp only [liftTerm, substTerm, h1, hne, hng, ite_true, ite_false]
+      · have hle : c ≤ n := Nat.not_lt.mp h1
+        have h2 : ¬ n + 1 < c := fun h => h1 (Nat.lt_of_succ_lt h)
+        have h3 : ¬ n + 1 + 1 < c := fun h => h2 (Nat.lt_of_succ_lt h)
+        have h4 : ¬ n + 1 + 1 + 1 < c := fun h => h3 (Nat.lt_of_succ_lt h)
+        have hgt : n + 1 + 1 + 1 + 1 > c + 3 := Nat.lt_succ_of_le (Nat.add_le_add_right hle 3)
+        have hne : ¬ n + 1 + 1 + 1 + 1 = c + 3 := Nat.ne_of_gt hgt
+        simp only [liftTerm, substTerm, h1, h2, h3, h4, hne, hgt, ite_true, ite_false]
+        rfl
   | func f ts =>
       simp only [liftTerm, substTerm]; congr 1; exact substTerms_liftLiftLiftLift ts c s
 theorem substTerms_liftLiftLiftLift (ts : List Term) (c : Nat) (s : Term) :
     substTerms (c + 3) s (liftTerms c (liftTerms c (liftTerms c (liftTerms c ts))))
       = liftTerms c (liftTerms c (liftTerms c ts)) := by
   cases ts with
-  | nil => simp [liftTerms, substTerms]
+  | nil => simp only [liftTerms, substTerms]
   | cons t ts' =>
       simp only [liftTerms, substTerms, List.cons.injEq]
       exact ⟨substTerm_liftLiftLiftLift t c s, substTerms_liftLiftLiftLift ts' c s⟩

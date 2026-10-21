@@ -84,8 +84,8 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
 ### 0.2 · Lo que se supone hoy
 
 1. **El núcleo de Lean** (v4.35.0, desde ADR‑181) **y sus tres axiomas**, `propext`, `Classical.choice` y `Quot.sound`: son, como
-   mucho, el footprint de los titulares (las filas de `check-footprints.bash`; D2 no lleva `Classical.choice`; D1, D2 y
-   `prf_con_imp_godel` tienen fila desde ADR‑188, T11b), y leanchecker re‑comprueba en la CI las declaraciones del
+   mucho, el footprint de los titulares (las filas de `check-footprints.bash`; desde ADR‑189, T61, los de la clase (i) y D1–D3 no llevan
+   `Classical.choice`: sólo lo llevan, por la regla `p3` en la solidez, los que usan el modelo), y leanchecker re‑comprueba en la CI las declaraciones del
    build con el núcleo (ADR‑116). **0 `axiom` de Lean** en los módulos del build, en RPP y en FOL (fuera del build, FOL guarda 15 en
    `cuarentena/`, T57, y RPP dos en `sondeos/`, en
    `lintlab/Uso.lean`, que prueban que un linter los detecta; el piloto `PilotoDiagonal.lean`, que suponía otros dos, está
@@ -391,7 +391,7 @@ teoremas (`goedel_first_unprovable`, `incompleteness`, `con_imp_goedelSentence`,
 
 > ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md)) · REGISTRO.** `goedel_first_real'` y `goedel_second'` ya no existen: el
 > primero se retiró con ADR‑012 y el segundo con ADR‑024 (iban sobre `⊢`, que se retiró con ADR‑115). Los titulares de hoy van sobre `Prf`, con footprint `[propext, Classical.choice,
-> Quot.sound]` (`check-footprints.bash`); su inducción no está en ningún footprint (§0.3). Y la mitad `⊬¬G` existe
+> Quot.sound]` como mucho (`check-footprints.bash`; ✏️ ADR‑189: los de la clase (i), sin `Classical.choice`); su inducción no está en ningún footprint (§0.3). Y la mitad `⊬¬G` existe
 > desde ADR‑121: `goedel_I_neg`, por la solidez en el modelo, sin ω‑consistencia.
 
 ```text
