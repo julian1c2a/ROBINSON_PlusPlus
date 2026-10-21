@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: footprints estratos warnings build clean rebuild sorry status lock unlock list init help
+.PHONY: footprints estratos warnings build clean rebuild sorry status lock unlock list init help probar-controles update-toolchain
 
 ## Build the project
 build:
@@ -71,6 +71,16 @@ init:
 
 # (2026-10-18, T15, ADR-163: `make new` y `make root` se retiraron con new-module.bash y gen-root.bash. Un modulo
 #  nuevo se crea a mano y se importa desde su barril; `make docsync` ([L]) dice si un fichero no esta importado.)
+
+## Probar los CONTROLES (T47, ADR-180): strip-lean.awk frente al oraculo (leanlex + oracle2 + oracle3), los
+## mutantes de strip-lean.awk frente al humo de check-sorry, y lineWFT frente a su generador. Python 3 y un awk:
+## make probar-controles [PYTHON=python3] [AWK=awk]  (en la CI, con mawk: la validacion y lineWFT; los mutantes, a mano)
+PYTHON ?= python3
+AWK ?= awk
+probar-controles:
+	@$(PYTHON) scripts/pruebas/validar_strip.py $(AWK)
+	@$(PYTHON) scripts/lineWFT_generar.py
+	@$(PYTHON) scripts/pruebas/mutantes_strip.py $(AWK)
 
 ## Probar el par con otra versión de Lean, sin commit (T42, ADR-176): make update-toolchain [VERSION=v4.35.0]
 update-toolchain:

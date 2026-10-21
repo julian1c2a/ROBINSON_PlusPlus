@@ -1,0 +1,13 @@
+La SONDA de `control_tc_cons` (ADR-124 y su auditoría, ADR-127), del 2026-10-05: rescatada el 2026-10-21 (T47,
+ADR-180) del scratchpad de la sesión 85b0df6c (`rosser/`), donde quedó sin versionar.
+
+`Control.lean.txt` y `CtlA…CtlN.lean.txt` son las variantes de la bisección: la forma de ADR-119 (`abre` sobre la
+hipótesis concreta), la de `simp only` con lemas ∀, y las que terminan en `sorry` en distintos puntos (las que dejan la
+hipótesis reescrita en el término final y las que no). `CtlO.lean.txt` es la forma que acabó en el build
+(`Meta/ModeloCodificacion.lean` §6: los códigos cerrados como TÉRMINOS variables de un lema `rfl`, y `rw`).
+Cada `X.out.txt` es lo que imprimió `lake env lean X.lean` entonces; VACÍO = no imprimió nada: o compiló sin mensajes,
+o el arnés lo paró antes de acabar (las que no acababan, ADR-124 §1 y ADR-127). Las cifras de memoria y tiempo están
+en ADR-124/127 (doc/historia/DECISIONS-001-130.md), no aquí.
+
+⚠️ Llevan `sorry` y `import ROBINSON_PlusPlus`; van en `.lean.txt` porque `check-sorry.bash` recorre todo `.lean` del
+árbol. No se han vuelto a compilar con el árbol de hoy.

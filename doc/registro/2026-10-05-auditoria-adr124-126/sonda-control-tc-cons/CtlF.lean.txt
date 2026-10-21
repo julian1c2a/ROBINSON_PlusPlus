@@ -1,0 +1,11 @@
+import ROBINSON_PlusPlus.Meta.CodeNatInjPrf
+
+set_option autoImplicit false
+open ROBINSON_PlusPlus.Minimal.Axioms
+
+theorem f1 (A B T : Nat) (h : consN 1 (consN A (consN (consN T 0) 0)) = consN 1 (consN B (consN (consN T (consN T 0)) 0))) :
+    consN A (consN (consN T 0) 0) = consN B (consN (consN T (consN T 0)) 0) :=
+  (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h).2
+
+theorem f2 (T : Nat) (h4 : consN T 0 = consN T (consN T 0)) : False :=
+  ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_ne_zero _ _ (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h4).2.symm

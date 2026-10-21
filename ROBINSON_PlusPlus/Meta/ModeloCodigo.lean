@@ -562,9 +562,11 @@ def V₀ : Nat :=
 
 /-! ### `lineWF`, por etiqueta -/
 
-/-- Las 21 RHS de `ax_lineWF_K`, traducidas a `Prop` sobre `Nat`: generadas del fuente por un script (en el
-    scratchpad de la sesión del 2026‑10‑05, no versionado) y después parametrizadas en `V` a mano (la firma y
-    el caso `thy`). La correspondencia la comprueba el núcleo: `v_lineWF_*` cierra por `Iff.rfl`. -/
+/-- Las 21 RHS de `ax_lineWF_K`, traducidas a `Prop` sobre `Nat`: generadas del fuente por un script y después
+    parametrizadas en `V` a mano (la firma y el caso `thy`). La correspondencia la comprueba el núcleo: `v_lineWF_*`
+    cierra por `Iff.rfl`. ✏️ 2026‑10‑21 (T47, ADR‑180): el script era del scratchpad de la sesión del 2026‑10‑05, no
+    versionado; reconstruido en `scripts/lineWFT_generar.py`, con la parametrización en `V` como una regla más, su
+    salida es ESTE texto, cláusula a cláusula (con el espacio colapsado), y la CI lo compara en cada push. -/
 def lineWFT (V : Nat) : Nat → Nat → Prop
   | 0, x => And (lenN x = 4)
       ((carN x) = implcN (nthN x (2))

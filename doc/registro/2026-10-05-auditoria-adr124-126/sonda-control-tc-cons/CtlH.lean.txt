@@ -1,0 +1,14 @@
+import ROBINSON_PlusPlus.Meta.CodeNatInjPrf
+
+set_option autoImplicit false
+open ROBINSON_PlusPlus.Minimal.Axioms
+
+theorem forma_distinta (A B T : Nat) :
+    consN 1 (consN A (consN (consN T 0) 0)) ≠ consN 1 (consN B (consN (consN T (consN T 0)) 0)) := by
+  intro h
+  have h2 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h).2
+  have h3 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h2).2
+  have h4 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h3).1
+  have h5 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h4).2
+  exact ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_ne_zero _ _ h5.symm
+

@@ -192,6 +192,16 @@ jobs:
       - name: Check sondeos de control
         run: bash check-sondeos.bash --controles
 
+      # ⭐ AÑADIDO el 2026-10-21 (T47, ADR-180). Las herramientas que VALIDAN los controles vivían en el scratchpad de una
+      # sesión: el oráculo léxico con el que se validó `strip-lean.awk` (y sus dos capas, rescatadas hoy) y el script
+      # que generó las 21 cláusulas de `lineWFT`. Ahora, en `scripts/`, y aquí en cada push: `strip-lean.awk` (con el
+      # mawk de la CI) frente al oráculo, sobre todo `.lean` versionado de RPP y FOL y los 182 fixtures; y `lineWFT`
+      # frente a su generador. Los mutantes de `strip-lean.awk` (`make probar-controles`, unos minutos) van a mano.
+      - name: Probar los controles (strip-lean frente al oráculo; lineWFT frente a su generador)
+        run: |
+          python3 scripts/pruebas/validar_strip.py awk
+          python3 scripts/lineWFT_generar.py
+
       # ⭐ Anadido el 2026-09-11 (auditoria, F-8): los controles del LIBRO solo corrian a mano,
       # asi que lo IMPRESO podia desviarse del arbol sin que nadie lo notara.
       #

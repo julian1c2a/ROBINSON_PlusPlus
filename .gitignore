@@ -38,3 +38,6 @@ Sugerencias.md
 
 # Salida de scripts/sondeos_todos.ps1 (las tablas que valen se copian a sondeos/pasadas/)
 sondeos/pasadas/salida/
+
+# Python (scripts/pruebas: validar_strip.py y compañía)
+__pycache__/

@@ -333,6 +333,7 @@ Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
 | `bash check-doc-sync.bash` | **Comprueba que la documentación cuadra con el código** (§27). `--quick` omite el build |
 | **`PLAN-PRUEBAS.md`** | 🆕 **qué garantiza cada control y qué NO garantiza ninguno** (auditoría F‑4). Léelo antes de fiarte de un verde |
 | `bash update-toolchain.bash [vX.Y.Z]` | PRUEBA el par (RPP, FOL) con otra versión de Lean —por defecto, la última estable— en worktrees aparte, SIN commit: builds, `leanchecker` y los controles, con la versión que corre comprobada (T42, ADR‑176). `--check`, sólo si hay otra; `--en-sitio`, en la CI. La vigilancia semanal, `.github/workflows/toolchain.yml` contra `doc/control/toolchain-vigilado.txt`. El bump, si se decide, por un ADR y a mano |
+| `make probar-controles [PYTHON=python3] [AWK=awk]` | Prueba las herramientas que VALIDAN los controles (T47, ADR‑180): `strip-lean.awk` frente al oráculo léxico (`scripts/pruebas/validar_strip.py`, sobre todo `.lean` versionado de RPP y FOL y 182 fixtures), `lineWFT` frente a su generador (`scripts/lineWFT_generar.py`) y los mutantes de `strip-lean.awk` frente al humo de `check-sorry` (`scripts/pruebas/mutantes_strip.py`, unos minutos). Las dos primeras corren también en la CI |
 | `make help` | Lista los targets del Makefile |
 
 ---

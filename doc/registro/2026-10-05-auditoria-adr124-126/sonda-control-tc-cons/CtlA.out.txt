@@ -1,0 +1,2 @@
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\scratchpad\rosser\CtlA.lean:15:8: warning: declaration uses `sorry`
+'ControlNeg.control_tc_cons' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

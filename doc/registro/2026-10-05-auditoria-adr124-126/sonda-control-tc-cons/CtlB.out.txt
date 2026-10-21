@@ -1,0 +1,14 @@
+V : Nat
+h : ∀ (v : Nat → Nat), evalFormula (MNV V) v ax_tc_cons
+h0 :
+  evalFormula (MNV V) (shiftEnv (shiftEnv (fun x => 0) 0) 0)
+    (tcFn (cons #1 #0) =eq
+      cons (numeralM 1) (cons (strCodeM cons_sym) (cons (cons (tcFn #1) (cons (tcFn #0) nil)) nil)))
+e1 : evalTerm (MNV V) (shiftEnv (shiftEnv (fun x => 0) 0) 0) #1 = 0
+e0 : evalTerm (MNV V) (shiftEnv (shiftEnv (fun x => 0) 0) 0) #0 = 0
+h1 :
+  consN 1 (consN (codeNatStr succ_sym) (consN (consN (tcFnN 0) 0) 0)) =
+    consN 1 (consN (codeNatStr cons_sym) (consN (consN (tcFnN 0) (consN (tcFnN 0) 0)) 0))
+⊢ False
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\scratchpad\rosser\CtlB.lean:15:8: warning: declaration uses `sorry`
+'ControlNeg.control_tc_cons' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
