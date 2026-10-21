@@ -553,7 +553,7 @@ echo "════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) �
 # rojo — *la deuda se saldó, quítala de la tabla*. Así la cifra sólo puede BAJAR.
 read -r -d '' E_DEUDA <<'EOF'
 REFERENCE.md
-CURRENT-STATUS-PROJECT.md
+# CURRENT-STATUS-PROJECT.md — SALDADA el 2026-10-21 (ADR-182, T26): reescrito entero, con su marca.
 DEPENDENCIES.md
 README.md
 AXIOMS.md
