@@ -6,7 +6,7 @@
 
 > ✏️ **2026‑10‑12 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es el análisis de junio de 2026 de la LISTA de
 > axiomas, y no se ha re‑medido: las meta‑reglas de FOL y Ax‑P se retiraron (ADR‑115; `ax_p_tfa`, el 2026‑09‑12), y
-> `axioms` tiene hoy 142 (los 34, 107 de codificación y el ancla). Lo que dice de la lista, que no tiene esquema de
+> `axioms` tiene hoy 120 (los 34, 85 de codificación y el ancla; 142 hasta ADR‑192, que retiró los 22 `ax_vpf_*`). Lo que dice de la lista, que no tiene esquema de
 > inducción, es cierto; la teoría de los titulares, `T_Prf`, sí lo tiene y contiene a PA ([AXIOMS.md](AXIOMS.md) §0). Y
 > §5 tenía frases falsas: ver su nota.
 

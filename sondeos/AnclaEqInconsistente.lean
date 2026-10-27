@@ -59,6 +59,9 @@ mismo fichero, sin cambios, recompila allí con el mismo resultado y el mismo fo
 🔑 *Una constante que la teoría sólo toca a través de `In` no tiene VALOR en la teoría, sólo
 EXTENSIÓN. Un ancla que fija su valor no es derivable, y si se deriva, lo que se deriva es `⊥`.*
 
+✏️ *(2026‑10‑27, ADR‑192)*: `ax_vpf_thy` salió de T con el verificador antiguo; de los axiomas que nombran
+`axiomsCodeT` quedan `ax_lineWF_thy` y el ancla (`filtro_occ'`, §8), y lo de arriba que habla de dos de 141 es registro.
+
 ## Controles (vistos fallar)
 
 * `filtro_occ` es cómputo real: mutado a `[ax_vpf_thy]`, el `rfl` FALLA (visto; el mutante se borró).
@@ -422,7 +425,6 @@ theorem rr_subst (v : Nat) (s : Term) : substTerm v s rr = rr := by
   simp only [rr, a0, cons, axiomsCodeT, substTerm, substTerms, substTerm_formCodeM]
 
 theorem ax18_mem : List.Mem ax18_lt_irrefl axioms := (show ax18_lt_irrefl ∈ axioms by simp [axioms])
-theorem vpf_mem : List.Mem ax_vpf_thy axioms := (show ax_vpf_thy ∈ axioms by simp [axioms])
 theorem lwt_mem : List.Mem ax_lineWF_thy axioms := (show ax_lineWF_thy ∈ axioms by simp [axioms])
 
 /-- Con el ancla, la pertenencia a `rr` implica la pertenencia a `axiomsCodeT` (término `c` libre). -/
@@ -439,27 +441,11 @@ theorem in_rr_imp (c : Term) : Prf (In c rr ⇒ In c axiomsCodeT) := by
 theorem in_imp_rr (c : Term) : Prf (In c axiomsCodeT ⇒ In c rr) :=
   prf_in_cons_tail_imp a0 c axiomsCodeT
 
-/-! ### Los dos axiomas que nombran `axiomsCodeT`, tras el reemplazo -/
+/-! ### Los axiomas que nombran `axiomsCodeT`, tras el reemplazo (✏️ desde ADR‑192, sólo `ax_lineWF_thy` y el ancla) -/
 
-def vpfE : Formula :=
-  validProofFn (.var 2) (cons (cons (numeralM 15) (cons (.var 1) nil)) (.var 0)) =eq
-    validProofFn (concat (.var 2) (cons (.var 1) nil)) (.var 0)
-
-theorem vpf_eq : ax_vpf_thy = forall_3 (In (.var 1) axiomsCodeT ⇒ vpfE) := rfl
-theorem vpfE_occ : occF vpfE = false := rfl
-
-theorem rep_vpf : repF rr ax_vpf_thy = forall_3 (In (.var 1) rr ⇒ vpfE) := by
-  rw [vpf_eq]
-  simp only [forall_3, repF, In, repTs, repT_axiomsCodeT, repF_of_occ rr vpfE vpfE_occ]
-  rfl
-
-theorem prf_rep_vpf : Prf (repF rr ax_vpf_thy) := by
-  rw [rep_vpf]
-  have hax : Prf (forall_3 (In (.var 1) axiomsCodeT ⇒ vpfE)) := vpf_eq ▸ prf_ax vpf_mem
-  -- abrir los tres `∀` instanciando con #2, #1, #0 devuelve el cuerpo tal cual
-  have hbody : Prf (In (.var 1) axiomsCodeT ⇒ vpfE) :=
-    prf_spec (prf_spec (prf_spec hax (.var 2)) (.var 1)) (.var 0)
-  exact Prf.gen _ (Prf.gen _ (Prf.gen _ (prf_imp_trans (in_rr_imp (.var 1)) hbody)))
+-- (✏️ 2026‑10‑27, ADR‑192: aquí iba la imagen de `ax_vpf_thy` por el reemplazo —`vpfE`, `rep_vpf`, `prf_rep_vpf`—;
+-- el verificador antiguo y sus 22 axiomas salieron de T, y de los que nombran `axiomsCodeT` quedan `ax_lineWF_thy` y
+-- el ancla.)
 
 def lwN : Formula := nthc (.var 0) (succ zero) =eq numeralM 15
 def lwL : Formula := lineWF (.var 0)
@@ -580,9 +566,10 @@ example : List.filter occF axioms ≠ ([ax_vpf_thy] : List Formula) := by
 open ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.GodelTwo
 open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf
 
-/-- Control 2 (el detector ve la constante): `occF` es `true` en los dos y `false` en `ax18`. -/
-example : And (occF ax_vpf_thy = true) (And (occF ax_lineWF_thy = true) (occF ax18_lt_irrefl = false)) :=
-  ⟨rfl, rfl, rfl⟩
+/-- Control 2 (el detector ve la constante): `occF` es `true` en `ax_lineWF_thy` y `false` en `ax18`. (✏️ ADR‑192:
+    `ax_vpf_thy`, el otro, salió de T.) -/
+example : And (occF ax_lineWF_thy = true) (occF ax18_lt_irrefl = false) :=
+  ⟨rfl, rfl⟩
 
 /-! ## §8 · Control (ADR‑117): el ancla es un AXIOMA de la teoría, y la ruta de F1 queda cerrada -/
 
@@ -601,9 +588,10 @@ example : ∀ G : Formula, Prf (neg (provCodeC' G) ⇒ G) → Prf (provCodeC' (G
     `true`, y `true || _` no mira lo de la derecha). -/
 theorem ancla_orientada : ∃ r, ax_axiomsCodeT_def = (axiomsCodeT =eq r) := ⟨_, rfl⟩
 
-/-- ✅ Medido por el núcleo: ahora son TRES los axiomas que nombran `axiomsCodeT`; el tercero, el ancla. -/
+/-- ✅ Medido por el núcleo: son DOS los axiomas que nombran `axiomsCodeT`, `ax_lineWF_thy` y el ancla (✏️ eran TRES,
+    con `ax_vpf_thy`, hasta ADR‑192, que retiró el verificador antiguo). -/
 theorem filtro_occ' :
-    List.filter occF axioms = ([ax_vpf_thy, ax_lineWF_thy, ax_axiomsCodeT_def] : List Formula) := by
+    List.filter occF axioms = ([ax_lineWF_thy, ax_axiomsCodeT_def] : List Formula) := by
   set_option maxRecDepth 20000 in rfl
 
 /-- El numeral del ancla no nombra `axiomsCodeT`: `occT_numeralM` vale para TODO `n`, así que no se despliega

@@ -175,10 +175,10 @@ theorem tfa_numeral (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p)
 `axiomsBase ++ [ax_axiomsCodeT_def]` —`axioms_split`; `axioms_eq`, retirado— = **142**, con el ancla diagonal,
 que no entra en el censo. Lo comprueba el núcleo, `axioms_len`/`axiomsBase_len`: evaluar `axioms` no acabaría).
 
-#### (a) Los **107** `codingAxioms` — **extensión definicional, irreducibles por diseño**
+#### (a) Los **85** `codingAxioms` (✏️ 107 hasta ADR‑192) — **extensión definicional, irreducibles por diseño**
 
-Las ecuaciones recursivas de `substtc`/`substtsc`/`liftc`/`liftsc`/`substfc`/`liftfc`, las 22
-cláusulas `ax_vpf_*` del verificador, `ax_tc_zero`/`ax_tc_succ`, `ax_carc`/`ax_cdrc`. **Definen**
+Las ecuaciones recursivas de `substtc`/`substtsc`/`liftc`/`liftsc`/`substfc`/`liftfc`, (hasta ADR‑192, las 22
+cláusulas «ax_vpf_*» del verificador antiguo), `ax_tc_zero`/`ax_tc_succ`, `ax_carc`/`ax_cdrc`. **Definen**
 los símbolos aritmetizados; no son enunciados matemáticos que la inducción pueda alcanzar. ⇒ fuera
 del censo.
 

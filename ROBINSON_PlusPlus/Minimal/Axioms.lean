@@ -27,7 +27,8 @@ system as described in `TuplasFuncionesYListas.md`. This system is strong
 enough to develop a theory of pairs (via Cantor's pairing function) and lists,
 but it lacks a general induction principle.
 
-✏️ **2026‑10‑12 (ADR‑134).** Hoy son 142 axiomas (`axioms`: 34 de `coreAxioms`, 107 de `codingAxioms` y el ancla)
+✏️ **2026‑10‑12 (ADR‑134).** Hoy son 120 axiomas (`axioms`: 34 de `coreAxioms`, 85 de `codingAxioms` y el ancla;
+✏️ 142 hasta ADR‑192, que retiró los 22 `ax_vpf_*`)
 sobre 33 símbolos (28 de función y 5 de relación; el módulo declara 35, pero `nil_sym` y `le_sym` no los nombra ningún
 axioma: `nil` es `zero`, y `le` una disyunción). «Lacks a general induction principle» es cierto de la LISTA, no
 de la teoría de los titulares: `Prf` le añade `ind` y `listInd` para TODA fórmula, y contiene a PA (`AXIOMS.md` §0).
@@ -179,7 +180,9 @@ es el peldaño genérico: `forall_k f = forallN k f` **por `rfl`** para todo `k`
 ⚠️ **Lo que esto NO cierra** es la escalera de la MAQUINARIA (`pcc_thm_inst_n`, `PSI_inst_n`),
 que crece **superlinealmente** —medido: **6 → 13 → 34 → 64** líneas para `inst`, `inst2`,
 `inst3`, `inst4`— y hoy va **un peldaño por detrás** del uso: hay **tres axiomas de aridad 5**
-(`validProofFn`) y la maquinaria llega a 4. Lo vigila `check-estratos.bash` §escalera. -/
+(`validProofFn`) y la maquinaria llega a 4. Lo vigila `check-estratos.bash` §escalera.
+✏️ *(2026‑10‑27, ADR‑192)*: esos tres axiomas eran del verificador antiguo y salieron de T con `forall_5`: el uso llega
+hoy a 4, como la maquinaria, y el desfase se cerró. -/
 def forallN : Nat → Formula → Formula
   | 0, f => f
   | n + 1, f => .forall (forallN n f)
@@ -929,97 +932,25 @@ def ax_tc_cons : Formula :=
     cons (numeralM 1) (cons (strCodeM cons_sym)
       (cons (cons (tcFn (.var 1)) (cons (tcFn (.var 0)) nil)) nil)))
 
-/-- Cuantificación universal quíntuple. -/
-def forall_5 (f : Formula) : Formula := .forall (forall_4 f)
-
 /-! ### Los puentes al peldaño genérico — los cuatro por `rfl`
 
 ⭐ Permiten escribir lo nuevo con `forallN` sin tocar ninguno de los **188 usos** de
-`forall_2..5`. -/
+`forall_2..4`. (✏️ 2026‑10‑27, ADR‑192: `forall_5` salió con los tres axiomas de aridad 5 del verificador
+antiguo, los únicos que lo usaban.) -/
 
 theorem forallN_1 (f : Formula) : forallN 1 f = forall_ f := rfl
 theorem forallN_2 (f : Formula) : forallN 2 f = forall_2 f := rfl
 theorem forallN_3 (f : Formula) : forallN 3 f = forall_3 f := rfl
 theorem forallN_4 (f : Formula) : forallN 4 f = forall_4 f := rfl
-theorem forallN_5 (f : Formula) : forallN 5 f = forall_5 f := rfl
 
 /-- Y el paso genérico, que es lo que hace que no haga falta un peldaño más. -/
 theorem forallN_succ (n : Nat) (f : Formula) :
     forallN (n + 1) f = Formula.forall (forallN n f) := rfl
 
-/-- Verificador de demostraciones-secuencia: `validProofFn checked rest` recorre
-    `rest` recomputando la conclusión de cada línea y acumulando en `checked`;
-    devuelve la lista final de conclusiones para una demostración válida. -/
-def validProofFn (checked rest : Term) : Term := Term.func sym!"validProofFn" [checked, rest]
+-- 🗑️ (2026‑10‑27, ADR‑192, T68) Aquí vivían `validProofFn`, el verificador antiguo (recomputaba la conclusión de
+-- cada línea), y sus ecuaciones `ax_vpf_*`: 22 axiomas de T que ninguna prueba nombraba. La cadena va sobre
+-- `chainOk`/`lineWF` desde ProofChain; los 22, sus validaciones en los modelos y el símbolo salieron de T.
 
--- Ecuaciones de `validProofFn`. Una línea es `cons (numeralM K) (cons p₁ (… nil)))`;
--- la etiqueta K (embebida en el patrón) distingue la regla (axiomas incondicionales
--- para los esquemas lógicos; MP/Gen condicionados por pertenencia `In`). Parámetros
--- directos por binders. Orden de binders: `checked` el más externo, `rest` el más
--- interno (`.var 0`).
-def ax_vpf_nil : Formula := forall_ (validProofFn (.var 0) nil =eq (.var 0))
-
--- 2 parámetros (a=.var 2, b=.var 1): checked=.var 3, rest=.var 0.
-def ax_vpf_p1 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 0) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (.var 2) (implc (.var 1) (.var 2))) nil)) (.var 0))
-def ax_vpf_c1 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 2) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (.var 2) (implc (.var 1) (andc (.var 2) (.var 1)))) nil)) (.var 0))
-def ax_vpf_c2 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 3) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (andc (.var 2) (.var 1)) (.var 2)) nil)) (.var 0))
-def ax_vpf_c3 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 4) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (andc (.var 2) (.var 1)) (.var 1)) nil)) (.var 0))
-def ax_vpf_j1 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 5) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (.var 2) (orc (.var 2) (.var 1))) nil)) (.var 0))
-def ax_vpf_j2 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 6) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (.var 1) (orc (.var 2) (.var 1))) nil)) (.var 0))
--- q1/q2/q3 (2 parámetros: A=.var 2, t/B=.var 1).
-def ax_vpf_q1 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 9) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (forallc (.var 2)) (substfc zero (.var 1) (.var 2))) nil)) (.var 0))
-def ax_vpf_q2 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 10) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (substfc zero (.var 1) (.var 2)) (exc (.var 2))) nil)) (.var 0))
-def ax_vpf_q3 : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 11) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3) (cons (implc (forallc (implc (.var 2) (liftfc zero (.var 1)))) (implc (exc (.var 2)) (.var 1))) nil)) (.var 0))
--- 3 parámetros (a=.var 3, b=.var 2, c=.var 1): checked=.var 4, rest=.var 0.
-def ax_vpf_p2 : Formula :=
-  forall_5 (validProofFn (.var 4) (cons (cons (numeralM 1) (cons (.var 3) (cons (.var 2) (cons (.var 1) nil)))) (.var 0)) =eq
-    validProofFn (concat (.var 4) (cons (implc (implc (.var 3) (implc (.var 2) (.var 1))) (implc (implc (.var 3) (.var 2)) (implc (.var 3) (.var 1)))) nil)) (.var 0))
-def ax_vpf_j3 : Formula :=
-  forall_5 (validProofFn (.var 4) (cons (cons (numeralM 7) (cons (.var 3) (cons (.var 2) (cons (.var 1) nil)))) (.var 0)) =eq
-    validProofFn (concat (.var 4) (cons (implc (orc (.var 3) (.var 2)) (implc (implc (.var 3) (.var 1)) (implc (implc (.var 2) (.var 1)) (.var 1)))) nil)) (.var 0))
--- leibniz (3 parámetros: A=.var 3, t₁=.var 2, t₂=.var 1).
-def ax_vpf_leibniz : Formula :=
-  forall_5 (validProofFn (.var 4) (cons (cons (numeralM 13) (cons (.var 3) (cons (.var 2) (cons (.var 1) nil)))) (.var 0)) =eq
-    validProofFn (concat (.var 4) (cons (implc (eqc (.var 2) (.var 1)) (implc (substfc zero (.var 2) (.var 3)) (substfc zero (.var 1) (.var 3)))) nil)) (.var 0))
--- 1 parámetro (a=.var 1): checked=.var 2, rest=.var 0.
-def ax_vpf_efq : Formula :=
-  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 8) (cons (.var 1) nil)) (.var 0)) =eq
-    validProofFn (concat (.var 2) (cons (implc botc (.var 1)) nil)) (.var 0))
-def ax_vpf_eqrefl : Formula :=
-  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 12) (cons (.var 1) nil)) (.var 0)) =eq
-    validProofFn (concat (.var 2) (cons (eqc (.var 1) (.var 1)) nil)) (.var 0))
-def ax_vpf_p3 : Formula :=
-  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 14) (cons (.var 1) nil)) (.var 0)) =eq
-    validProofFn (concat (.var 2) (cons (implc (implc (implc (.var 1) botc) botc) (.var 1)) nil)) (.var 0))
--- MP (conclB=.var 2, premiseA=.var 1): condicional por pertenencia.
-def ax_vpf_mp : Formula :=
-  forall_4 ((In (implc (.var 1) (.var 2)) (.var 3)) ⇒
-    ((In (.var 1) (.var 3)) ⇒
-      (validProofFn (.var 3) (cons (cons (numeralM 16) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-        validProofFn (concat (.var 3) (cons (.var 2) nil)) (.var 0))))
--- Gen (body=.var 1): condicional por pertenencia.
-def ax_vpf_gen : Formula :=
-  forall_3 ((In (.var 1) (.var 2)) ⇒
-    (validProofFn (.var 2) (cons (cons (numeralM 17) (cons (.var 1) nil)) (.var 0)) =eq
-      validProofFn (concat (.var 2) (cons (forallc (.var 1)) nil)) (.var 0)))
 /-! ### El código de la teoría, `axiomsCodeT`
 
 `axiomsCodeT` se declara **opaco** (símbolo `Term.func sym!"axiomsCodeT" []`) para que la
@@ -1063,7 +994,8 @@ Medido con `#eval ·.length`, no contado a ojo:
 `axiomsCodeT` es un símbolo **opaco**, así que no aparece dentro de la lista que codifica y
 **no se contiene a sí mismo**.
 (✏️ 2026‑10‑12, ADR‑134: el SÍMBOLO sí está en tres de los 142 —`ax_vpf_thy`, `ax_lineWF_thy` y el ancla— y su
-código va dentro de `listFormCodeM axioms`; lo que no aparece es su VALOR, el literal gigante.)
+código va dentro de `listFormCodeM axioms`; lo que no aparece es su VALOR, el literal gigante. ✏️ 2026‑10‑27, ADR‑192: hoy
+en dos de los 120, `ax_lineWF_thy` y el ancla: `ax_vpf_thy` salió con el verificador antiguo.)
 
 Detectado por la auditoría de verdad de docstrings (rama G, caso #5 de
 `doc/book/DOCSTRINGS-NO-FIABLES.md`). ⚠️ Se corrige **sólo la prosa**: ni un axioma, ni una
@@ -1161,51 +1093,6 @@ theorem liftTerm_deltaD (c : Nat) (L : List Formula) : liftTerm c (deltaD L) = d
 theorem axD_lift (c : Nat) (L : List Formula) : liftFormula c (axD L) = axD L := by
   rw [axD, liftFormula_eq_eq, liftTerm_axiomsCodeT, liftTerm_concat_eq, liftTerm_listFormCodeM,
     liftTerm_cons_eq, liftTerm_deltaD, liftTerm_nil]
-
--- Thy (c=.var 1, el código del axioma de teoría): **condicional** a que `c` pertenezca a
--- `axiomsCodeT` (el código de las 142 de `axioms` —la base y el ancla, ADR‑117—; decía «de `coreAxioms`», y era
--- falso: ver la corrección del 2026‑09‑05 en la sección de `axiomsCodeT`). Así el verificador solo
--- acepta como axioma de teoría los códigos de axiomas REALES → `provCodeC` es fiel
--- (no demostrable para `φ` arbitraria). `axiomsCodeT` es opaco ⟹ la sustitución
--- sobre él es trivial. (La dirección negativa plena —probar `¬In c …` para no
--- axiomas— sigue en 2.6.)
-def ax_vpf_thy : Formula :=
-  forall_3 ((In (.var 1) axiomsCodeT) ⇒
-    (validProofFn (.var 2) (cons (cons (numeralM 15) (cons (.var 1) nil)) (.var 0)) =eq
-      validProofFn (concat (.var 2) (cons (.var 1) nil)) (.var 0)))
-
--- Inducción (a = .var 1, código del predicado φ): **incondicional** (toda instancia
--- del esquema es axioma de la teoría; ✏️ 2026‑10‑12, ADR‑134: decía «IΣ₁», y `Prf.ind` vale para TODA
--- fórmula, no sólo Σ₁: es la inducción de PA, AXIOMS.md §0). El verificador
--- reconstruye el código de `inductionFormula φ` a partir de `⌜φ⌝` con
--- `substfc`/`liftfc` y los códigos cerrados de `O` (`termCodeM zero`) y de `σ#0`
--- (`termCodeM (succ #0)`). La **fidelidad** —la reconstrucción `=eq formCode (inductionFormula φ)`—
--- la da, en `Prf`, `prf_ind_concl_code` (`Meta/ArithPrf.lean`), y lo que el tag acepta es derivable
--- por el constructor `Prf.ind`. `ind_concl_code` y `Full.ax_induction`, sobre `⊢`, quedaron
--- retirados (ADR‑115). Tag 18. (`termCodeM (succ #0)` es un código CERRADO: `termCodeM`
--- consume el `Term.var 0` codificándolo, no es la variable ligada por `forall_3`.)
-def ax_vpf_ind : Formula :=
-  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 18) (cons (.var 1) nil)) (.var 0)) =eq
-    validProofFn (concat (.var 2)
-      (cons (implc (substfc zero (termCodeM zero) (.var 1))
-               (implc (forallc (implc (.var 1)
-                         (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) (.var 1)))))
-                      (forallc (.var 1)))) nil)) (.var 0))
--- QCONF (tag 19, [P,C]): concl ⇔ (∀(↑P ⇒ C)) ⇒ (P ⇒ ∀C)  (confinamiento ∀)
-def ax_vpf_qconf : Formula :=
-  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 19) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
-    validProofFn (concat (.var 3)
-      (cons (implc (forallc (implc (liftfc zero (.var 2)) (.var 1)))
-                   (implc (.var 2) (forallc (.var 1)))) nil)) (.var 0))
--- LISTIND (tag 20, [A]): concl ⇔ inducción de listas (códigos cerrados de nil y cons#1#0)
-def ax_vpf_listInd : Formula :=
-  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 20) (cons (.var 1) nil)) (.var 0)) =eq
-    validProofFn (concat (.var 2)
-      (cons (implc (substfc zero (termCodeM nil) (.var 1))
-               (implc (forallc (forallc (implc (liftfc (succ zero) (.var 1))
-                         (substfc zero (termCodeM (cons (.var 1) (.var 0)))
-                           (liftfc (succ (succ zero)) (liftfc (succ zero) (.var 1)))))))
-                      (forallc (.var 1)))) nil)) (.var 0))
 
 /-! ### Las guardas de BUENA FORMACIÓN de códigos (`hasWit` / `hasWitF`)
 
@@ -1634,10 +1521,7 @@ def codingAxioms : List Formula := [
   ax_liftsc_nil, ax_liftsc_cons, ax_substfc_bottom, ax_substfc_atom, ax_substfc_eq,
   ax_substfc_impl, ax_substfc_forall, ax_substfc_and, ax_substfc_or, ax_substfc_ex,
   ax_liftfc_bottom, ax_liftfc_atom, ax_liftfc_eq, ax_liftfc_impl, ax_liftfc_forall,
-  ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
-  ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
-  ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
-  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_vpf_qconf, ax_vpf_listInd,
+  ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc,
   ax_tc_zero, ax_tc_succ, ax_runFn_nil, ax_runFn_cons,   -- ax_tc_cons RETIRADO (ver arriba)
   ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
   ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
@@ -1653,8 +1537,8 @@ def codingAxioms : List Formula := [
   ax_lineWF_inv, ax_lineWF_cons
 ]
 
-/-- La lista BASE: los 141 axiomas de antes de ADR‑117, en su orden (34 de la teoría + 107 de
-    codificación). El ancla habla de ella, no de `axioms`, para no contenerse a sí misma. -/
+/-- La lista BASE: los 119 axiomas sin el ancla, en su orden (34 de la teoría + 85 de codificación; ✏️ eran 141 —107
+    de codificación— hasta ADR‑192, que retiró los 22 `ax_vpf_*`). El ancla habla de ella, no de `axioms`, para no contenerse a sí misma. -/
 def axiomsBase : List Formula := coreAxioms ++ codingAxioms
 
 /-- ⭐ **EL ANCLA de `axiomsCodeT`** (L2‑3, ADR‑117): el axioma diagonal sobre `axiomsBase`. Es el
@@ -1747,28 +1631,6 @@ def axioms : List Formula := [
   ax_liftfc_ex,
   ax_carc,
   ax_cdrc,
-  ax_vpf_nil,
-  ax_vpf_p1,
-  ax_vpf_p2,
-  ax_vpf_c1,
-  ax_vpf_c2,
-  ax_vpf_c3,
-  ax_vpf_j1,
-  ax_vpf_j2,
-  ax_vpf_j3,
-  ax_vpf_efq,
-  ax_vpf_q1,
-  ax_vpf_q2,
-  ax_vpf_q3,
-  ax_vpf_eqrefl,
-  ax_vpf_leibniz,
-  ax_vpf_p3,
-  ax_vpf_mp,
-  ax_vpf_gen,
-  ax_vpf_thy,
-  ax_vpf_ind,
-  ax_vpf_qconf,
-  ax_vpf_listInd,
   ax_tc_zero,
   ax_tc_succ,
   -- REPARACION (rama reparacion/c-godel-i-consistente): `ax_tc_cons` RETIRADO.

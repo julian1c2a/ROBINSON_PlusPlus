@@ -3,7 +3,7 @@
 > **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
 > Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
-**Last updated:** 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
+**Last updated:** 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): T_Prf, con 120 axiomas (el verificador antiguo, fuera de T); el resto, igual. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
 2026‑06‑06 para el Nivel C con meta‑axiomas, con su «Resumen al día» del 2026‑07‑20 y un §4 que declaraba fuera de
 alcance lo que hoy está demostrado— está, tal cual, en
 [doc/historia/GODEL-STATUS-hasta-2026-10-21.md](doc/historia/GODEL-STATUS-hasta-2026-10-21.md).
@@ -19,17 +19,17 @@ manda TEOREMAS.
 ## 1 · La teoría, y las hipótesis de Gödel
 
 El sujeto no es la lista de `Minimal/` (sin esquema de inducción) sino **T_Prf**, lo que deriva el cálculo finitario
-`Prf` (`Meta/Hilbert.lean`): los 142 axiomas de la lista `axioms`, los esquemas lógicos (con DNE y el confinamiento),
+`Prf` (`Meta/Hilbert.lean`): los 120 axiomas de la lista `axioms`, los esquemas lógicos (con DNE y el confinamiento),
 y la inducción y la inducción de listas para TODA fórmula, con MP y GEN. Contiene a PA. La descripción canónica, y lo
 que se supone, en [AXIOMS.md](AXIOMS.md) §0.
 
 | hipótesis de Gödel | cómo la cumple T_Prf | dónde |
 |---|---|---|
-| **axiomatización recursiva** | los 142 son una lista explícita (`axioms_len : axioms.length = 142`, por `rfl`), y lo que es una prueba lo decide un verificador interno (`validProofFn` y `chainOk`) | `Minimal/Axioms.lean`, `Full/Induction.lean`, `Meta/ProofChain.lean` |
+| **axiomatización recursiva** | los 120 son una lista explícita (`axioms_len : axioms.length = 120`, por `rfl`), y lo que es una prueba lo decide un verificador interno (`chainOk`) | `Minimal/Axioms.lean`, `Full/Induction.lean`, `Meta/ProofChain.lean` |
 | **la aritmetización** | los códigos son numerales (`codeNat`, `numeral`; la reparación de ADR‑012/013), `formCode` codifica las fórmulas y `provCodeC'` es el predicado de prueba | `Minimal/Axioms.lean`, `Meta/Provability.lean`, `Meta/CodeNumeralPrf.lean`, `Meta/ProofChain.lean` |
 | **las condiciones de derivabilidad** | D1 `repr_pos'_prf`, D2 `d2_prf` y D3 `d3_prf_real`: teoremas, ninguna postulada; D3 es la Σ₁‑completitud demostrable del verificador | `Meta/Representability2Prf.lean`, `Meta/DerivCondPrf.lean`, `Meta/PremsBdAllPrf.lean` |
 | **el punto fijo** | `prf_godelCN_fixedpoint` para la sentencia de Gödel `godelCN`, y `prf_diagonal` para un predicado cualquiera | `Meta/GodelTwoPrf.lean`, `Meta/TarskiPrf.lean` |
-| **la consistencia** | el TEOREMA `consistencia : ConsistentH`, por un modelo de los 142 (`MNV V₀`) y la solidez de `Prf` (`prf_sound`). Relativa a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) ([TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §4) | `Meta/Consistencia.lean`, `Meta/SolidezPrf.lean` |
+| **la consistencia** | el TEOREMA `consistencia : ConsistentH`, por un modelo de los 120 (`MNV V₀`) y la solidez de `Prf` (`prf_sound`). Relativa a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) ([TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §4) | `Meta/Consistencia.lean`, `Meta/SolidezPrf.lean` |
 | **para `⊬¬G`, más que la consistencia** | la verdad en ℕ en vez de la ω‑consistencia: el verificador es sólido en el modelo (W1, `verificador_solido`) | `Meta/SolidezVerificador.lean` |
 
 ---

@@ -7,17 +7,17 @@ import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 import ROBINSON_PlusPlus.Meta.CodeNatInjPrf
 
 /-!
-# `Meta/ModeloCodigo.lean` — el MODELO ESTÁNDAR de los 142, a nivel `Nat` (ADR‑119/120)
+# `Meta/ModeloCodigo.lean` — el MODELO ESTÁNDAR de los axiomas de T, a nivel `Nat` (ADR‑119/120)
 
 La parte de `Nat` del modelo `MNV V₀` (`Meta/ModeloEstandar.lean`): la raíz `sqrtN`; las LISTAS por la
 biyección de Cantor (`cons a b = consN a b = pairN a b + 1`, ADR‑113: todo `n` es una lista, y una sola;
 `unpairN`, `decodeL`/`encodeL`, `concatN`, `memN`, `prodpN`); los accesores (`carN`, `cdrN`, `nthN`, `lenN`) con
 `nthN_lt` —un componente es MENOR que su código—, que es lo que deja recurrir; y las funciones de codificación:
 `substtcN`/`substtscN`, `liftcN`/`liftscN`, `substfcN`, `liftfcN` (por la etiqueta de su argumento, una ecuación
-por constructor), `tcFnN`, `vpfN` (con `stepT`, la conclusión de cada etiqueta), `runFnN`, `premsOfN`, `allInN`,
+por constructor), `tcFnN`, `runFnN`, `premsOfN`, `allInN`,
 `chainOkN`, las guardas `hasWitN`/`hasWitFN` y `lineWFT`, las 21 RHS de `ax_lineWF_K` traducidas (generadas del
-fuente y parametrizadas en `V` a mano). `validProofFn`, `runFn` y `chainOk` recurren sobre `decodeL`; `tcFn`, sobre el
-número.
+fuente y parametrizadas en `V` a mano). `runFn` y `chainOk` recurren sobre `decodeL`; `tcFn`, sobre el número.
+(✏️ 2026‑10‑27, ADR‑192: `vpfN`/`stepT`, el `validProofFn` del verificador antiguo, salieron con sus 22 axiomas.)
 
 `V₀` es el valor del lado derecho del ancla `ax_axiomsCodeT_def`. ⛔ Nada lo evalúa: dentro lleva el numeral
 astronómico del ancla, PLEGADO (`codeNat (psiD axiomsBase)`), y todo lo que lo toca es PARAMÉTRICO en `V`
@@ -440,7 +440,7 @@ abbrev andcN (a b : Nat) : Nat := consN 7 (consN a (consN b 0))
 abbrev orcN (a b : Nat) : Nat := consN 8 (consN a (consN b 0))
 abbrev excN (a : Nat) : Nat := consN 9 (consN a 0)
 
-/-- Los códigos CERRADOS que incrustan `ax_vpf_ind`/`_listInd` y `ax_lineWF_ind`/`_listInd`: su valor se nombra,
+/-- Los códigos CERRADOS que incrustan `ax_lineWF_ind`/`_listInd` (y, hasta ADR‑192, los `ax_vpf_*` de lo mismo): su valor se nombra,
     nunca se calcula: `consN` va por `triN`, que es recursión UNARIA. -/
 def TC0 : Nat := codeNatTerm zero
 def TCS : Nat := codeNatTerm (succ (.var 0))
@@ -453,47 +453,8 @@ def tcFnN : Nat → Nat
   | 0 => consN 1 (consN (codeNatStr zero_sym) (consN 0 0))
   | n + 1 => consN 1 (consN (codeNatStr succ_sym) (consN (consN (tcFnN n) 0) 0))
 
-/-! ### `validProofFn`: la conclusión de una línea `⟨K, a, b, d⟩` según su etiqueta -/
-
-def stepT : Nat → Nat → Nat → Nat → Nat
-  | 0, a, b, _ => implcN a (implcN b a)
-  | 1, a, b, d => implcN (implcN a (implcN b d)) (implcN (implcN a b) (implcN a d))
-  | 2, a, b, _ => implcN a (implcN b (andcN a b))
-  | 3, a, b, _ => implcN (andcN a b) a
-  | 4, a, b, _ => implcN (andcN a b) b
-  | 5, a, b, _ => implcN a (orcN a b)
-  | 6, a, b, _ => implcN b (orcN a b)
-  | 7, a, b, d => implcN (orcN a b) (implcN (implcN a d) (implcN (implcN b d) d))
-  | 8, a, _, _ => implcN botcN a
-  | 9, a, b, _ => implcN (forallcN a) (substfcN 0 b a)
-  | 10, a, b, _ => implcN (substfcN 0 b a) (excN a)
-  | 11, a, b, _ => implcN (forallcN (implcN a (liftfcN 0 b))) (implcN (excN a) b)
-  | 12, a, _, _ => eqcN a a
-  | 13, a, b, d => implcN (eqcN b d) (implcN (substfcN 0 b a) (substfcN 0 d a))
-  | 14, a, _, _ => implcN (implcN (implcN a botcN) botcN) a
-  | 15, a, _, _ => a
-  | 16, a, _, _ => a
-  | 17, a, _, _ => forallcN a
-  | 18, a, _, _ => implcN (substfcN 0 TC0 a)
-      (implcN (forallcN (implcN a (substfcN 0 TCS (liftfcN 1 a)))) (forallcN a))
-  | 19, a, b, _ => implcN (forallcN (implcN (liftfcN 0 a) b)) (implcN a (forallcN b))
-  | 20, a, _, _ => implcN (substfcN 0 TNIL a)
-      (implcN (forallcN (forallcN (implcN (liftfcN 1 a) (substfcN 0 TCONS (liftfcN 2 (liftfcN 1 a))))))
-        (forallcN a))
-  | _, _, _, _ => 0
-
-def stepN (x : Nat) : Nat := stepT (nthN x 0) (nthN x 1) (nthN x 2) (nthN x 3)
-
-def vpfL : Nat → List Nat → Nat
-  | c, [] => c
-  | c, x :: r => vpfL (concatN c (consN (stepN x) 0)) r
-
-def vpfN (c r : Nat) : Nat := vpfL c (decodeL r)
-
-theorem vpfN_zero (c : Nat) : vpfN c 0 = c := by rw [vpfN, decodeL_zero]; rfl
-
-theorem vpfN_consN (c x r : Nat) : vpfN c (consN x r) = vpfN (concatN c (consN (stepN x) 0)) r := by
-  rw [vpfN, decodeL_consN]; rfl
+-- 🗑️ (2026‑10‑27, ADR‑192) Aquí vivían `stepT`, `stepN`, `vpfL` y `vpfN`, el `validProofFn` del modelo: el verificador
+-- antiguo y sus 22 axiomas salieron de T.
 
 /-! ### `runFn`, `premsOf`, `allIn`, `chainOk` -/
 

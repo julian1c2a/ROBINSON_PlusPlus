@@ -43,8 +43,8 @@ el **código del código** `termCode (formCode ψ)`. La función object `tcFn`
 retiró con la capa `⊢`. Sus versiones `Prf` son `prf_tc_zero`, `prf_tc_succ`, `prf_tc_numeral` y
 `prf_congr_tc2` (`Meta/TcArithPrf.lean`). La cadena `tc_arith` sobre TODO código (`tc_of_cons`,
 `tc_chars`/`tc_str`/`tc_term`/`tc_form`) se había retirado antes, con `ax_tc_cons`. **Hoy el módulo
-sólo define** `selfApp`, `diagTerm`, `godelPred`, `godelBeta` y `godelC`, y prueba `godel_comp` (una
-igualdad de sintaxis, sin cálculo).
+sólo define** `selfApp` y `diagTerm` (✏️ 2026‑10‑27, ADR‑192: `godelPred`, `godelBeta`, `godelC` y `godel_comp`, sobre el
+verificador antiguo, salieron con él).
 -/
 
 -- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
@@ -67,32 +67,9 @@ def diagTerm : Term := substfc (numeral 0) (tcFn (Term.var 0)) (Term.var 0)
 -- Sustituida por la via NUMERAL: `prf_formCode_numeral` (`Meta/CodeNumeralPrf.lean`) y, sobre
 -- `Prf`, `prf_diag_arith_num`/`prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`).
 
-/-! ### Predicado y sentencia de Gödel (`godelPred`, `godelBeta`, `godelC`)
-
-(Esta sección se llamaba «Punto fijo (lema diagonal) y Primer Teorema de Gödel real»: el punto fijo
-y Gödel I sobre `godelC` se retiraron con `ax_tc_cons`, y `subst_eq_iff` —Leibniz sobre `⊢`— con
-ADR‑115; su versión `Prf` es `prf_subst_eq_iff`, en `Meta/GodelTwoPrf.lean`.)
-
-Para el predicado concreto de Gödel `godelPred = ¬provFormulaC` (una variable
-libre, sin variables libres ≥ 1) la composición de sustituciones se reduce con un
-único `substTerm_lift_comm` (no hace falta el lema general De Bruijn). -/
-
-
-/-- Predicado de Gödel `¬Prov(·)` (variable libre 0). -/
-def godelPred : Formula := neg provFormulaC
-
-/-- Predicado diagonalizado `β` (variable libre 0). -/
-def godelBeta : Formula := substFormula 0 diagTerm godelPred
-
-/-- **Sentencia de Gödel real** `G = β(⌜β⌝)`. -/
-noncomputable def godelC : Formula := selfApp godelBeta
-
-/-- Composición de sustituciones para `godelPred` (sin var libre ≥ 1): se reduce
-    con `substTerm_lift_comm`. -/
-theorem godel_comp (s : Term) :
-    substFormula 0 s godelBeta = substFormula 0 (substTerm 0 s diagTerm) godelPred := by
-  simp [godelBeta, godelPred, neg, provFormulaC, substFormula, substTerm, substTerms,
-    In, validProofFn, nil, zero, FOL.substTerm_liftTerm, FOL.substTerm_lift_comm]
+-- 🗑️ (2026‑10‑27, ADR‑192, T68) Aquí vivían `godelPred`, `godelBeta`, `godelC` y `godel_comp`, la sentencia de Gödel
+-- sobre el `Prov` de `validProofFn` (`provFormulaC`): sin consumidor desde que Gödel va sobre `provFormulaC'`
+-- (`godelPred'`, `Meta/DiagonalTwo.lean`; `godelCN`, `Meta/DiagonalNumeral.lean`). Salieron con el verificador antiguo.
 
 -- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
 -- Sustituida por la via NUMERAL: `prf_formCode_numeral` (`Meta/CodeNumeralPrf.lean`) y, sobre
@@ -103,7 +80,4 @@ end ROBINSON_PlusPlus.Meta.Diagonal
 export ROBINSON_PlusPlus.Meta.Diagonal (
   selfApp
   diagTerm
-  godelPred
-  godelBeta
-  godelC
 )

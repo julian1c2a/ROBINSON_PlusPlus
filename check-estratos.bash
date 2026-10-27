@@ -355,12 +355,13 @@ fi
 # (188 usos), y se construyó a reculones — cada peldaño cuando bloqueaba.
 #
 # ⚠️ Lo que este bloque vigila es el DESFASE: que la escalera del USO no adelante a la de la
-# MAQUINARIA sin que nadie se entere. Hoy el desfase es REAL y está declarado: hay tres
-# axiomas `forall_5` (`validProofFn`) y la maquinaria llega a 4.
+# MAQUINARIA sin que nadie se entere. Hasta ADR‑192 era REAL y estaba declarado: tres axiomas
+# `forall_5` (los de `validProofFn`, el verificador antiguo) y la maquinaria en 4. Con ellos
+# salió `forall_5` (2026‑10‑27, T68), y hoy el uso y la maquinaria llegan a 4.
 #
 # prefijo | máximo peldaño DECLARADO
 read -r -d '' ESCALERA <<'EOF'
-forall_|5
+forall_|4
 pcc_thm_inst|4
 pcc_axiom_inst|4
 PSI_inst|4

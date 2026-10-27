@@ -873,10 +873,10 @@ theorem ev_hasWitF (v : Nat → Nat) (t : Term) : evalFormula (MNV V) v (hasWitF
 /-- El `simp` que ABRE un axioma de codificación: los conectivos, los constructores de código, la evaluación
     y un lema `rfl` por símbolo. ⛔ Sin `numeralM`, `termCodeM`, `strCodeM` ni ningún `codeNat*`: los códigos
     cerrados se evalúan por sus lemas ∀ (`ev_*`), nunca desplegándolos. -/
-local macro "abre" : tactic => `(tactic| simp only [forall_, forall_2, forall_3, forall_4, forall_5, _root_.iff,
+local macro "abre" : tactic => `(tactic| simp only [forall_, forall_2, forall_3, forall_4, _root_.iff,
     land, lor, cons, nil, zero, succ, pred, concat, lt, In, cons_sym, zero_sym, succ_sym, pred_sym,
     concat_sym, lt_sym, in_sym, substtc, substtsc, liftc, liftsc, substfc, liftfc, carc, cdrc, lenc, nthc,
-    runFn, validProofFn, tcFn, premsOf, allIn, lineWF, chainOk, lineOk, varc, funcc, botc, atomc, eqc,
+    runFn, tcFn, premsOf, allIn, lineWF, chainOk, lineOk, varc, funcc, botc, atomc, eqc,
     implc, forallc, andc, orc, exc, axiomsCodeT, lineTag, tagDisj,
     evalFormula, evalTerm, evalTerms, shiftEnv, ev_numeralM, ev_strCodeM, ev_termCodeM, ev_hasWit, ev_hasWitF,
     MN_zero, MN_succ, MN_pred, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc,
@@ -1211,55 +1211,7 @@ theorem v_chainOk_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_ni
 theorem v_chainOk_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_cons := by
   intro v c l r; abre; exact ⟨(chainOkN_consN _ c l r).mp, (chainOkN_consN _ c l r).mpr⟩
 
-/-! ### `validProofFn` (22): la conclusión la da `stepT`, sea cual sea la condición -/
-
-/-- La línea `⟨K, …⟩` se consume por `vpfN_consN` y `stepT` la decide por su etiqueta. -/
-local macro "vpf_paso" : tactic => `(tactic| (rw [vpfN_consN]; simp only [stepN, nthN_cz, nthN_cs, nthN_zero_l, stepT]))
-
-theorem v_vpf_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_nil := by
-  intro v c; abre; exact vpfN_zero c
-theorem v_vpf_p1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_p1 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_p2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_p2 := by
-  intro v c a b d r; abre; vpf_paso
-theorem v_vpf_c1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_c1 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_c2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_c2 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_c3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_c3 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_j1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_j1 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_j2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_j2 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_j3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_j3 := by
-  intro v c a b d r; abre; vpf_paso
-theorem v_vpf_efq : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_efq := by
-  intro v c a r; abre; vpf_paso
-theorem v_vpf_q1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_q1 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_q2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_q2 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_q3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_q3 := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_eqrefl : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_eqrefl := by
-  intro v c a r; abre; vpf_paso
-theorem v_vpf_leibniz : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_leibniz := by
-  intro v c a b d r; abre; vpf_paso
-theorem v_vpf_p3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_p3 := by
-  intro v c a r; abre; vpf_paso
-theorem v_vpf_mp : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_mp := by
-  intro v c b a r; abre; intro _ _; vpf_paso
-theorem v_vpf_gen : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_gen := by
-  intro v c a r; abre; intro _; vpf_paso
-theorem v_vpf_thy : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_thy := by
-  intro v c a r; abre; intro _; vpf_paso
-theorem v_vpf_ind : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_ind := by
-  intro v c a r; abre; vpf_paso; rfl
-theorem v_vpf_qconf : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_qconf := by
-  intro v c a b r; abre; vpf_paso
-theorem v_vpf_listInd : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_listInd := by
-  intro v c a r; abre; vpf_paso; rfl
+-- (✏️ 2026‑10‑27, ADR‑192: aquí iban las 22 validaciones de `validProofFn`; sus axiomas salieron de T.)
 
 /-! ### `premsOf` (21) -/
 
@@ -1406,7 +1358,7 @@ theorem v_ancla : ∀ v : Nat → Nat, evalFormula (MNV V₀) v ax_axiomsCodeT_d
 
 theorem MN_codingAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ codingAxioms → evalFormula (MNV V) v φ := by
   unfold codingAxioms
-  exact mem_cons_elim (v_substtc_var_eq v) (mem_cons_elim (v_substtc_var_gt v) (mem_cons_elim (v_substtc_var_lt v) (mem_cons_elim (v_substtc_func v) (mem_cons_elim (v_substtsc_nil v) (mem_cons_elim (v_substtsc_cons v) (mem_cons_elim (v_liftc_var_lt v) (mem_cons_elim (v_liftc_var_ge v) (mem_cons_elim (v_liftc_func v) (mem_cons_elim (v_liftsc_nil v) (mem_cons_elim (v_liftsc_cons v) (mem_cons_elim (v_substfc_bottom v) (mem_cons_elim (v_substfc_atom v) (mem_cons_elim (v_substfc_eq v) (mem_cons_elim (v_substfc_impl v) (mem_cons_elim (v_substfc_forall v) (mem_cons_elim (v_substfc_and v) (mem_cons_elim (v_substfc_or v) (mem_cons_elim (v_substfc_ex v) (mem_cons_elim (v_liftfc_bottom v) (mem_cons_elim (v_liftfc_atom v) (mem_cons_elim (v_liftfc_eq v) (mem_cons_elim (v_liftfc_impl v) (mem_cons_elim (v_liftfc_forall v) (mem_cons_elim (v_liftfc_and v) (mem_cons_elim (v_liftfc_or v) (mem_cons_elim (v_liftfc_ex v) (mem_cons_elim (v_carc v) (mem_cons_elim (v_cdrc v) (mem_cons_elim (v_vpf_nil v) (mem_cons_elim (v_vpf_p1 v) (mem_cons_elim (v_vpf_p2 v) (mem_cons_elim (v_vpf_c1 v) (mem_cons_elim (v_vpf_c2 v) (mem_cons_elim (v_vpf_c3 v) (mem_cons_elim (v_vpf_j1 v) (mem_cons_elim (v_vpf_j2 v) (mem_cons_elim (v_vpf_j3 v) (mem_cons_elim (v_vpf_efq v) (mem_cons_elim (v_vpf_q1 v) (mem_cons_elim (v_vpf_q2 v) (mem_cons_elim (v_vpf_q3 v) (mem_cons_elim (v_vpf_eqrefl v) (mem_cons_elim (v_vpf_leibniz v) (mem_cons_elim (v_vpf_p3 v) (mem_cons_elim (v_vpf_mp v) (mem_cons_elim (v_vpf_gen v) (mem_cons_elim (v_vpf_thy v) (mem_cons_elim (v_vpf_ind v) (mem_cons_elim (v_vpf_qconf v) (mem_cons_elim (v_vpf_listInd v) (mem_cons_elim (v_tc_zero v) (mem_cons_elim (v_tc_succ v) (mem_cons_elim (v_runFn_nil v) (mem_cons_elim (v_runFn_cons v) (mem_cons_elim (v_allIn_nil v) (mem_cons_elim (v_allIn_cons v) (mem_cons_elim (v_chainOk_nil v) (mem_cons_elim (v_chainOk_cons v) (mem_cons_elim (v_lineWF_mp v) (mem_cons_elim (v_premsOf_mp v) (mem_cons_elim (v_lineWF_gen v) (mem_cons_elim (v_premsOf_gen v) (mem_cons_elim (v_lineWF_thy v) (mem_cons_elim (v_premsOf_thy v) (mem_cons_elim (v_lineWF_p1 v) (mem_cons_elim (v_premsOf_p1 v) (mem_cons_elim (v_lineWF_p2 v) (mem_cons_elim (v_premsOf_p2 v) (mem_cons_elim (v_lineWF_c1 v) (mem_cons_elim (v_premsOf_c1 v) (mem_cons_elim (v_lineWF_c2 v) (mem_cons_elim (v_premsOf_c2 v) (mem_cons_elim (v_lineWF_c3 v) (mem_cons_elim (v_premsOf_c3 v) (mem_cons_elim (v_lineWF_j1 v) (mem_cons_elim (v_premsOf_j1 v) (mem_cons_elim (v_lineWF_j2 v) (mem_cons_elim (v_premsOf_j2 v) (mem_cons_elim (v_lineWF_j3 v) (mem_cons_elim (v_premsOf_j3 v) (mem_cons_elim (v_lineWF_efq v) (mem_cons_elim (v_premsOf_efq v) (mem_cons_elim (v_lineWF_eqrefl v) (mem_cons_elim (v_premsOf_eqrefl v) (mem_cons_elim (v_lineWF_p3 v) (mem_cons_elim (v_premsOf_p3 v) (mem_cons_elim (v_lineWF_q1 v) (mem_cons_elim (v_premsOf_q1 v) (mem_cons_elim (v_lineWF_q2 v) (mem_cons_elim (v_premsOf_q2 v) (mem_cons_elim (v_lineWF_q3 v) (mem_cons_elim (v_premsOf_q3 v) (mem_cons_elim (v_lineWF_leibniz v) (mem_cons_elim (v_premsOf_leibniz v) (mem_cons_elim (v_lineWF_ind v) (mem_cons_elim (v_premsOf_ind v) (mem_cons_elim (v_lineWF_qconf v) (mem_cons_elim (v_premsOf_qconf v) (mem_cons_elim (v_lineWF_listInd v) (mem_cons_elim (v_premsOf_listInd v) (mem_cons_elim (v_lenc_nil v) (mem_cons_elim (v_lenc_cons v) (mem_cons_elim (v_nthc_zero v) (mem_cons_elim (v_nthc_succ v) (mem_cons_elim (v_lineWF_inv v) (mem_cons_elim (v_lineWF_cons v) (mem_nil_elim)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+  exact mem_cons_elim (v_substtc_var_eq v) (mem_cons_elim (v_substtc_var_gt v) (mem_cons_elim (v_substtc_var_lt v) (mem_cons_elim (v_substtc_func v) (mem_cons_elim (v_substtsc_nil v) (mem_cons_elim (v_substtsc_cons v) (mem_cons_elim (v_liftc_var_lt v) (mem_cons_elim (v_liftc_var_ge v) (mem_cons_elim (v_liftc_func v) (mem_cons_elim (v_liftsc_nil v) (mem_cons_elim (v_liftsc_cons v) (mem_cons_elim (v_substfc_bottom v) (mem_cons_elim (v_substfc_atom v) (mem_cons_elim (v_substfc_eq v) (mem_cons_elim (v_substfc_impl v) (mem_cons_elim (v_substfc_forall v) (mem_cons_elim (v_substfc_and v) (mem_cons_elim (v_substfc_or v) (mem_cons_elim (v_substfc_ex v) (mem_cons_elim (v_liftfc_bottom v) (mem_cons_elim (v_liftfc_atom v) (mem_cons_elim (v_liftfc_eq v) (mem_cons_elim (v_liftfc_impl v) (mem_cons_elim (v_liftfc_forall v) (mem_cons_elim (v_liftfc_and v) (mem_cons_elim (v_liftfc_or v) (mem_cons_elim (v_liftfc_ex v) (mem_cons_elim (v_carc v) (mem_cons_elim (v_cdrc v) (mem_cons_elim (v_tc_zero v) (mem_cons_elim (v_tc_succ v) (mem_cons_elim (v_runFn_nil v) (mem_cons_elim (v_runFn_cons v) (mem_cons_elim (v_allIn_nil v) (mem_cons_elim (v_allIn_cons v) (mem_cons_elim (v_chainOk_nil v) (mem_cons_elim (v_chainOk_cons v) (mem_cons_elim (v_lineWF_mp v) (mem_cons_elim (v_premsOf_mp v) (mem_cons_elim (v_lineWF_gen v) (mem_cons_elim (v_premsOf_gen v) (mem_cons_elim (v_lineWF_thy v) (mem_cons_elim (v_premsOf_thy v) (mem_cons_elim (v_lineWF_p1 v) (mem_cons_elim (v_premsOf_p1 v) (mem_cons_elim (v_lineWF_p2 v) (mem_cons_elim (v_premsOf_p2 v) (mem_cons_elim (v_lineWF_c1 v) (mem_cons_elim (v_premsOf_c1 v) (mem_cons_elim (v_lineWF_c2 v) (mem_cons_elim (v_premsOf_c2 v) (mem_cons_elim (v_lineWF_c3 v) (mem_cons_elim (v_premsOf_c3 v) (mem_cons_elim (v_lineWF_j1 v) (mem_cons_elim (v_premsOf_j1 v) (mem_cons_elim (v_lineWF_j2 v) (mem_cons_elim (v_premsOf_j2 v) (mem_cons_elim (v_lineWF_j3 v) (mem_cons_elim (v_premsOf_j3 v) (mem_cons_elim (v_lineWF_efq v) (mem_cons_elim (v_premsOf_efq v) (mem_cons_elim (v_lineWF_eqrefl v) (mem_cons_elim (v_premsOf_eqrefl v) (mem_cons_elim (v_lineWF_p3 v) (mem_cons_elim (v_premsOf_p3 v) (mem_cons_elim (v_lineWF_q1 v) (mem_cons_elim (v_premsOf_q1 v) (mem_cons_elim (v_lineWF_q2 v) (mem_cons_elim (v_premsOf_q2 v) (mem_cons_elim (v_lineWF_q3 v) (mem_cons_elim (v_premsOf_q3 v) (mem_cons_elim (v_lineWF_leibniz v) (mem_cons_elim (v_premsOf_leibniz v) (mem_cons_elim (v_lineWF_ind v) (mem_cons_elim (v_premsOf_ind v) (mem_cons_elim (v_lineWF_qconf v) (mem_cons_elim (v_premsOf_qconf v) (mem_cons_elim (v_lineWF_listInd v) (mem_cons_elim (v_premsOf_listInd v) (mem_cons_elim (v_lenc_nil v) (mem_cons_elim (v_lenc_cons v) (mem_cons_elim (v_nthc_zero v) (mem_cons_elim (v_nthc_succ v) (mem_cons_elim (v_lineWF_inv v) (mem_cons_elim (v_lineWF_cons v) (mem_nil_elim)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
 theorem MN_axioms (v : Nat → Nat) : contextSatisfies (MNV V₀) v axioms := by
   intro φ hφ

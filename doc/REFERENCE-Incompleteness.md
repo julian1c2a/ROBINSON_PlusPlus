@@ -14,7 +14,7 @@
 > módulos, en la línea de cifras de abajo).
 
 **Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 115 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
-· 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
+· 0 `axiom` de Lean · 120 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
 
 **Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de
 Hilbert‑Bernays, las tres DEMOSTRADAS —D1 (`repr_pos'_prf`), D2 (`d2_prf`) y D3 (`d3_prf_real`)—; Gödel I y II con
@@ -154,7 +154,7 @@ theorem carc_cons / cdrc_cons   -- cómputo de los extractores cabeza/cola
 -- 17 step lemmas del verificador (re-derivadas de Minimal.axioms):
 theorem vpf_nil/p1/p2/c1/c2/c3/j1/j2/j3/efq/q1/q2/q3/eqrefl/leibniz/p3   -- incondicionales
 theorem vpf_mp (… h1 h2) / vpf_gen (… h1)   -- condicionales por pertenencia In
-def provFormulaC : Formula := Formula.ex (In (var 1) (validProofFn nil (var 0)))   -- demostrabilidad Σ₁
+-- (provFormulaC, la demostrabilidad Σ₁ sobre validProofFn: retirada con el verificador antiguo, ADR‑192)
 noncomputable def provCodeC (φ) := substFormula 0 (formCode φ) provFormulaC
 ```
 
@@ -1272,8 +1272,8 @@ cálculo finitario `Prf` y construyen encima.
 | Gödel I — indecidibilidad | `theorem goedel_first_undecidable_numeral (hcon : ConsistentOmega) (hrefl : Reflects godelCN) : (¬ Prf godelCN) ∧ (¬ Prf (neg godelCN))` |
 
 **Por qué la refundación fue barata (~30 líneas):** `substFormula_arith (v) (s) (f)` toma **`s`
-arbitrario**, luego traga un numeral sin más; y `godelPred`, `godelBeta`, `diagTerm` y `godel_comp`
-**no cambian** — ninguno menciona la representación. Y **`provCode_transfer` es literalmente
+arbitrario**, luego traga un numeral sin más; y «godelPred», «godelBeta», `diagTerm` y «godel_comp»
+**no cambian** (✏️ los tres entre comillas, retirados con ADR‑192) — ninguno menciona la representación. Y **`provCode_transfer` es literalmente
 `subst_eq_iff provFormulaC' (hFN φ)`** ⇒ D1 y la cadena existente se transfieren **componiendo con
 ese bicondicional, sin re‑demostrarse**.
 
@@ -5515,7 +5515,7 @@ y `OmegaConsistent` **falsa**.
 
 > ✏️ **2026‑10‑21 · [ADR‑186](../DECISIONS.md) (T29).** Las secciones §3.69–§3.77 documentan lo que este nodo no tenía:
 > los módulos de ADR‑120 en adelante. El orden es el de las dependencias: el modelo a nivel `Nat` (§3.70), el modelo de
-> FOL (§3.71), los 142 en él (§3.72), la solidez (§3.73), la consistencia (§3.74), W1 y la mitad `⊬¬G` (§3.75),
+> FOL (§3.71), los 120 en él (§3.72), la solidez (§3.73), la consistencia (§3.74), W1 y la mitad `⊬¬G` (§3.75),
 > Tarski (§3.76), y W1 y E10 en todo modelo estándar, con el segundo modelo (§3.77). Firmas abreviadas; las exactas,
 > en los ficheros. Qué usa cada titular (las clases (i)–(iii)), en [TEOREMAS-E-HIPOTESIS.md](../TEOREMAS-E-HIPOTESIS.md) §1.
 
@@ -5538,12 +5538,11 @@ def nthN (l : Nat) : Nat → Nat             -- nthN_cz, nthN_cs; nthN_lt
 def lenN (l : Nat) : Nat                   -- lenN_zero, lenN_consN
 def memN (x l : Nat) : Prop                -- x ∈ decodeL l
 def substtcN, liftcN, substfcN, liftfcN …  -- la sustitución y el lift sobre códigos, con sus ecuaciones por constructor
-def vpfN (c r : Nat) : Nat                 -- el validProofFn en ℕ
 def lineWFT (V : Nat) : Nat → Nat → Prop   -- las 21 cláusulas de lineWF, una por etiqueta (traducción de ax_lineWF_*)
 def lineWFN (V x : Nat) : Prop             -- nthN x 1 < 21 ∧ lineWFT V (nthN x 1) x
 def chainOkN (V c p : Nat) : Prop          -- el chainOk en ℕ, paramétrico en V (el valor de axiomsCodeT)
 def codeNatList : List Formula → Nat
-def V₀ : Nat                               -- el valor de axiomsCodeT: los 141 de axiomsBase y el diagonal
+def V₀ : Nat                               -- el valor de axiomsCodeT: los 119 de axiomsBase y el diagonal
 ```
 
 `lineWFT` es la traducción mecánica de los `ax_lineWF_*`, cláusula a cláusula: lo comprueba
@@ -5562,14 +5561,14 @@ theorem MN_coreAxioms (v) : ∀ φ, List.Mem φ coreAxioms → evalFormula (MNV 
 
 ⚠️ Los lemas son para `V` variable a propósito: contra `V₀` concreto, la altura de definición los hace caros.
 
-## §3.72 · `Meta/ModeloCodificacion.lean` — los 107 de codificación, el ancla y los 142 (ADR‑120)
+## §3.72 · `Meta/ModeloCodificacion.lean` — los 85 de codificación, el ancla y los 120 (ADR‑120; 107 y 142 hasta ADR‑192)
 
 ```lean
 theorem v_substtc_var_eq … v_vpf_thy        -- cada axioma de codificación, verdadero en MNV V
 theorem v_lineWF_*                         -- por Iff.rfl entre el axioma abierto y su cláusula de lineWFT
 theorem MN_codingAxioms (v) : ∀ φ, List.Mem φ codingAxioms → evalFormula (MNV V) v φ
 theorem v_ancla : ∀ v, evalFormula (MNV V₀) v ax_axiomsCodeT_def   -- por rw con lemas ∀, sin lema diagonal semántico
-theorem MN_axioms (v) : contextSatisfies (MNV V₀) v axioms          -- los 142
+theorem MN_axioms (v) : contextSatisfies (MNV V₀) v axioms          -- los 120
 ```
 
 ## §3.73 · `Meta/SolidezPrf.lean` — la solidez de `Prf` (ADR‑120)
@@ -5655,7 +5654,7 @@ theorem con_verdadera_de     (hM : Estandar M) (v) : evalFormula M v consistency
 theorem control_instancia (φ v) : …          -- la hipótesis no es vacía: la cumple MNV V₀ (estandar_MN)
 ```
 
-Y su control del ancla (§12 del fichero, ADR‑175): sin el ancla, Prov puede mentir —`MNV Vbot` satisface los 141 de
+Y su control del ancla (§12 del fichero, ADR‑175): sin el ancla, Prov puede mentir —`MNV Vbot` satisface los 119 de
 la base y cree demostrable `⊥` (`control_ancla`)—.
 
 `SegundoModelo` construye `MNB V₀`: `MNV V₀` con otra `substfc` sobre la basura (`substfcB`) y el verificador
@@ -5681,7 +5680,7 @@ toda fórmula, y con eso `p3` es sólido sin lógica clásica.
 ```lean
 def gg : Formula → Formula                                   -- la traducción
 theorem gg_estable (M) : ∀ φ v, ¬¬ evalFormula M v (gg φ) → evalFormula M v (gg φ)
-structure EstandarDN (M : Model Nat) : Prop                  -- 0, σ, :: estándar y los 142 leídos por gg
+structure EstandarDN (M : Model Nat) : Prop                  -- 0, σ, :: estándar y los 120 leídos por gg
 theorem prf_sound_dn (hM : EstandarDN M) {φ} (h : Prf φ) : ∀ v, evalFormula M v (gg φ)
 theorem consistentH_dn (hM : EstandarDN M) : ConsistentH
 def clas (D) : Formula → Bool × Bool × Bool                  -- la polaridad (P, N, S)
@@ -5694,7 +5693,8 @@ theorem no_refuta (hM : EstandarDN M) (D hD) (hP) (v) (hφ : evalFormula M v φ)
 ```
 
 Sólo `S` (de `gg φ` a `φ`) pide algo del modelo: que sean decidibles los átomos en su posición y la disyunción que
-decide; `∃` en posición `S` no pasa (sería Markov). De los 141 de la base pasan 134 sin decidir nada, y los 141 con `∈`
+decide; `∃` en posición `S` no pasa (sería Markov). De los 141 de entonces pasaban 134 sin decidir nada, y los 141 con `∈` (hoy, de 119, 112 y los 119: los siete que fallan
+sin decidir son `lineWF` de la sustitución, ninguno de los retirados por ADR‑192)
 de aridad 2 decidible (los siete restantes son los `lineWF` de la sustitución, por las guardas); el ancla es un átomo.
 
 ## §3.79 · `Meta/ProvFiel.lean` — Prov es fiel, con el testigo (ADR‑191)

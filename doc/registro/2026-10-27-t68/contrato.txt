@@ -1,0 +1,41 @@
+# T68 (ADR-192): las 38 diferencias del contrato T07 al retirar los 22 ax_vpf_* y el verificador antiguo (la salida de
+# #contrato_titulares con la tabla vieja, lake build, 2026-10-27; después, scripts/ContratoGenerar.lean regeneró la tabla: 514).
+
+CAMBIA: def ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkL._f
+CAMBIA: def ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL._f
+NUEVA en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL.match_1
+CAMBIA: def ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV
+CAMBIA: def ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV.match_1
+CAMBIA: def ROBINSON_PlusPlus.Minimal.Axioms.axioms
+CAMBIA: def ROBINSON_PlusPlus.Minimal.Axioms.codingAxioms
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_c1
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_j1
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_q2
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_p1
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_thy
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_ind
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_c2
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.forall_5
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_leibniz
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_nil
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfN
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_q3
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_q1
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_mp
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfL._f
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfL.match_1
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_j2
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_j3
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.stepT
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_c3
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_gen
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_p2
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_listInd
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfL
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_p3
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_qconf
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_efq
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.validProofFn
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.stepT.match_1
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_eqrefl
+YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.ModeloCodigo.stepN

@@ -28,7 +28,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 > - **Dos cálculos.** `Derives` (`⊢`) y `Prf` necesitan cada uno su ancla de
 >   codificación (`ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq`); no son un duplicado a fusionar. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   ✏️ **2026‑10‑04 ([ADR‑117](DECISIONS.md))**: hoy sólo queda `Prf`, y su ancla no es un `axiom` de Lean sino el
->   axioma OBJETO `ax_axiomsCodeT_def`, el 142.º de `axioms` (ver «Anclas de codificación», más abajo).
+>   axioma OBJETO `ax_axiomsCodeT_def`, el 120.º de `axioms` (ver «Anclas de codificación», más abajo).
 >
 > Este fichero es el «sitio único» **documental**: la fuente de verdad sobre el
 > inventario, aunque el código mantenga cada axioma en su capa correcta.
@@ -48,8 +48,8 @@ de Hilbert propio de RPP, o sobre la verdad en su modelo. **`T_Prf`** es el conj
 
 | | qué es | dónde |
 |---|---|---|
-| **lenguaje** | TODAS las `Formula` de FOL (`FormulaG (List Char)`): variables de De Bruijn, `⊥`, `=`, `⇒`, `∧`, `∨`, `∀`, `∃`, y átomos y términos con cualquier símbolo y cualquier número de argumentos. El tipo no fija una signatura. Los 142 axiomas nombran **33** símbolos, cada uno con una sola aridad: 28 de función y 5 de relación (`<`, `∈`, `allIn`, `lineWF`, `chainOk`); los demás entran en los esquemas como parámetros libres | `../FOL/FOL/FOL.lean` (`TermG`, `FormulaG`) |
-| **axiomas propios** (`thy`) | las **142** sentencias de `axioms`: 34 de `coreAxioms` —entre ellos los seis axiomas de Peano de primer orden: `ax2`, `ax3`, `ax4`, `ax5`, `ax8` y `ax9`—; 107 de `codingAxioms`, las ecuaciones de la aritmetización (sustitución y desplazamiento de códigos, accesores de listas, el código del numeral, el verificador, y los 22 `ax_vpf_*` del verificador antiguo, que sólo nombra la validación del modelo: T68); y el ancla diagonal `ax_axiomsCodeT_def` (ADR‑117) | `Minimal/Axioms.lean` |
+| **lenguaje** | TODAS las `Formula` de FOL (`FormulaG (List Char)`): variables de De Bruijn, `⊥`, `=`, `⇒`, `∧`, `∨`, `∀`, `∃`, y átomos y términos con cualquier símbolo y cualquier número de argumentos. El tipo no fija una signatura. Los 120 axiomas nombran **33** símbolos, cada uno con una sola aridad: 28 de función y 5 de relación (`<`, `∈`, `allIn`, `lineWF`, `chainOk`); los demás entran en los esquemas como parámetros libres | `../FOL/FOL/FOL.lean` (`TermG`, `FormulaG`) |
+| **axiomas propios** (`thy`) | las **120** sentencias de `axioms` (142 hasta ADR‑192): 34 de `coreAxioms` —entre ellos los seis axiomas de Peano de primer orden: `ax2`, `ax3`, `ax4`, `ax5`, `ax8` y `ax9`—; 85 de `codingAxioms`, las ecuaciones de la aritmetización (sustitución y desplazamiento de códigos, accesores de listas, el código del numeral y el verificador; ✏️ 107 hasta ADR‑192, que retiró los 22 «ax_vpf_*» del verificador antiguo: T68); y el ancla diagonal `ax_axiomsCodeT_def` (ADR‑117) | `Minimal/Axioms.lean` |
 | **esquemas lógicos** | los de `Prfᵢ` —P1, P2, C1–C3, J1–J3, EFQ, Q1–Q3, reflexividad e igualdad de Leibniz—, DNE (`p3`) y el confinamiento (`qconf`) | `Meta/Hilbert.lean` |
 | **esquemas no lógicos** | la **inducción** (`ind`, `Full.inductionFormula`: `Φ[0] ⇒ ∀x(Φ ⇒ Φ[σx]) ⇒ ∀x Φ`) y la **inducción de listas** (`listInd`: `Φ[nil] ⇒ ∀h∀t(Φ[t] ⇒ Φ[h :: t]) ⇒ ∀L Φ`), las dos para TODA fórmula, con parámetros | `Meta/Hilbert.lean`, `Full/Induction.lean` |
 | **reglas** | MP y GEN, sin restricción: `Prf` no tiene hipótesis, y su solidez es para toda valoración | `Meta/Hilbert.lean` |
@@ -69,10 +69,10 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
   argumento estándar, interpretando cada símbolo por una función definible en PA, pero no está hecho; y ADR‑054 §4 la
   descartó como metateorema general porque `ax_tc_cons`, retirado en ADR‑012, había dado `axioms ⊢ ⊥`—. Y tampoco es
   «definicional»: las ecuaciones de
-  `substtc`, `liftc`, `substfc`, `liftfc`, `carc`, `cdrc`, `nthc`, `premsOf` y `validProofFn`, y la de la resta, sólo fijan el símbolo
+  `substtc`, `liftc`, `substfc`, `liftfc`, `carc`, `cdrc`, `nthc`, `premsOf` y (hasta ADR‑192) «validProofFn», y la de la resta, sólo fijan el símbolo
   sobre los argumentos de la forma prevista; sobre lo demás —la «basura»— el valor queda libre (el modelo elige uno:
   0, o el que da su análisis por la etiqueta). Es una especificación PARCIAL por ecuaciones;
-* si `listInd` se deriva de `ind` y los 142. Es lo esperable: `σ ∘ pair` es una biyección de ℕ² en los positivos
+* si `listInd` se deriva de `ind` y los 120. Es lo esperable: `σ ∘ pair` es una biyección de ℕ² en los positivos
   (ADR‑113), así que todo número es `nil` o un `::`, y `t < h :: t`, con inducción fuerte. No basta `t < h :: t`: con la
   codificación vieja también valía, y `listInd` daba `Prf ⊥`. En el árbol, que todo `L` sea `nil` o un `::`
   (`prf_nil_or_cons_all`) se prueba precisamente con `listInd`. No está medido;
@@ -95,10 +95,10 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
    (Gödel II, aplicado a Lean): todo lo demostrado vale relativo a ella. Para la de los titulares, PRA ⊢ Con(Lean) →
    Con(T_Prf); y no puede ser de otro modo, porque `T_Prf` contiene a PA (§0.1) y ninguna teoría contenida en ella
    demuestra su consistencia. El detalle, en `TEOREMAS-E-HIPOTESIS.md` §4.
-2. **Nada sobre la teoría.** Los 142 axiomas y los esquemas no se suponen: DEFINEN `Prf`, y su verdad está
-   DEMOSTRADA. Los 142, en el modelo `MNV V₀` (dominio ℕ, con 0, σ, + y · los de siempre: `MN_axioms`); los esquemas y
+2. **Nada sobre la teoría.** Los 120 axiomas y los esquemas no se suponen: DEFINEN `Prf`, y su verdad está
+   DEMOSTRADA. Los 120, en el modelo `MNV V₀` (dominio ℕ, con 0, σ, + y · los de siempre: `MN_axioms`); los esquemas y
    las reglas, en todo modelo `Estandar` —dominio ℕ, 0 y σ los de siempre, `::` el `consN` de ADR‑113 (σ del par de Cantor), y
-   los 142 verdaderos— (`prf_sound`: la
+   los 120 verdaderos— (`prf_sound`: la
    inducción, por la de ℕ; la de listas, porque todo `m + 1` es un `::` de dos menores; DNE, por
    `Classical.byContradiction`). De ahí `consistencia : ConsistentH` (ADR‑120) y Gödel I y II sin hipótesis; y todo lo
    que deriva `Prf` es verdadero en `MNV V₀`. No hay solidez respecto de TODO modelo de la teoría (sólo la de `Prfᵢ`, en
@@ -130,7 +130,7 @@ construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de var
 | `lob`, `lob_iff` (ADR‑159) | **sí** (por D1) | **sí** (por D2) | no |
 | `prf_godel_iff_con`, `goedel_second_formalizado` (ADR‑162) | **sí** | **sí** | no |
 | `con_indecidible` (ADR‑162) | **sí** | **sí** | sólo al decodificar con `linea_p3` las líneas que el verificador acepta en el modelo (por `con_verdadera`) |
-| `rosser_ext`, `rosser` (ADR‑157) | **sí** (por el ∀ acotado: `prf_bdAll_numeral` ⟶ … ⟶ `prf_zero_or_succ`) | **sí** (por NegNum: `chainOk_decide` ⟶ … ⟶ `prf_list_induction`) | sólo al decodificar con `linea_p3` las líneas de una prueba con el código de los 142 (W1(ax), `w1Ax`), en el caso que NegNum′ descarta |
+| `rosser_ext`, `rosser` (ADR‑157) | **sí** (por el ∀ acotado: `prf_bdAll_numeral` ⟶ … ⟶ `prf_zero_or_succ`) | **sí** (por NegNum: `chainOk_decide` ⟶ … ⟶ `prf_list_induction`) | sólo al decodificar con `linea_p3` las líneas de una prueba con el código de los 120 (W1(ax), `w1Ax`), en el caso que NegNum′ descarta |
 
 ⚠️ «Sí» quiere decir que el término de prueba nombra, por valores, una regla derivada que construye el paso
 (`prf_nat_induction`, `prf_list_induction`); no que el paso sea imprescindible: otra prueba podría evitarlo. «No», que
@@ -141,7 +141,7 @@ sobre los `axiom` de `⊢`, y sobre `Prf` no vale. Y por lectura los CUATRO usos
 de `ax13`, `ax10`, `ax12`, Q3 y `ax4`. Que D1 compile sin `ind` no está comprobado. Por último, ningún titular construye
 un paso clásico salvo `goedel_I_neg` y, desde ADR‑157 y ADR‑162 (2026‑10‑18), `rosser_ext`, `rosser` y `con_indecidible`,
 que lo hacen al decodificar con `linea_p3`: `goedel_I_neg` y `con_indecidible`, las líneas que el verificador acepta en
-el modelo; los de Rosser, las de una prueba con el código de los 142 (W1(ax)). En los demás, sus derivaciones sólo
+el modelo; los de Rosser, las de una prueba con el código de los 120 (W1(ax)). En los demás, sus derivaciones sólo
 llevan los `p3` que traducen de otra que reciben.
 
 ---
@@ -155,7 +155,7 @@ llevan los `p3` que traducen de otra que reciben.
 > son (L1‑3, `sondeos/MetaReglasRefutables.lean`). La tabla de abajo es el **REGISTRO** de lo que hubo.
 > ⛔ Lo único postulado que quedaba en el proyecto era la **clase `AnclaEq`** (hipótesis de instancia, no
 > `axiom`), y **daba `Prf ⊥`** (F1, ADR‑114). 🏁 Desde el 2026‑10‑04 ([ADR‑117](DECISIONS.md)) el ancla es un
-> TEOREMA (`prf_ancla`), que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`, el 142.º de `axioms` (ver
+> TEOREMA (`prf_ancla`), que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`, el 120.º de `axioms` (ver
 > «Anclas de codificación», más abajo); y la clase se RETIRÓ el 2026‑10‑05 ([ADR‑118](DECISIONS.md)).
 
 
@@ -325,7 +325,7 @@ con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`)
   `In`‑reflect de `axiomsCodeT` (`Meta/InAxiomsCodePrf.lean`), que necesita las **dos**
   direcciones dentro de `Prf`.
   ⭐ **2026‑10‑04 · [ADR‑117](DECISIONS.md) — el ancla de hoy es un axioma OBJETO**, no un `axiom` de Lean: el último
-  de los **142** de `axioms` (los 141 de `axiomsBase` = 34 de `coreAxioms` + 107 de `codingAxioms`, y él).
+  de los **120** de `axioms` (los 119 de `axiomsBase` = 34 de `coreAxioms` + 85 de `codingAxioms`, y él; ✏️ 142 —141 de la base, 107 de codificación— hasta ADR‑192).
   `ax_axiomsCodeT_def := axD axiomsBase` (`Minimal/Axioms.lean`) es el axioma DIAGONAL
   `axiomsCodeT =eq ⌜axiomsBase⌝ ++ [δ]`, con δ = `deltaD` = `substfc 0 (tcFn N̄) N̄` y N̄ = `nD`, el numeral (plegado)
   del código de la plantilla `psiD`. No se contiene a sí mismo —habla de la base—, y δ es, PROBADAMENTE, el código
@@ -333,7 +333,7 @@ con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`)
   (`Meta/Representability2Prf.lean`), y `axioms_split : axioms = axiomsBase ++ [ax_axiomsCodeT_def]` (por `rfl`)
   sustituye a `axioms_eq`, retirado. ⛔ Nada puede EJECUTAR `axioms`: construiría el numeral entero (`check-sorry`
   vigila las órdenes que lo harían; las reducciones del núcleo recorren la espina y no despliegan el numeral).
-  ⚠️ Lo que NO dice: que los 142 sean consistentes (✏️ hasta ADR‑120, que da un modelo: `consistencia`); `f1_traduccion_refutada` sólo prueba que,
+  ⚠️ Lo que NO dice: que los 120 sean consistentes (✏️ hasta ADR‑120, que da un modelo: `consistencia`); `f1_traduccion_refutada` sólo prueba que,
   si la traducción de F1 conservara el ancla —si su imagen fuera teorema—, ya habría `Prf ⊥`: el argumento de F1 no da `⊥` sin partir de él.
 - 🏁🏁🏁 **NINGÚN postulado gödeliano vivo desde el 2026‑09‑10g.** `d3` era la última condición de derivabilidad
   aún postulada. Su prueba real (Σ₁-completitud provable del verificador) es el

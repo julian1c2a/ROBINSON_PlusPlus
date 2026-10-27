@@ -428,6 +428,9 @@ B	ax_p_tfa	doc/REFERENCE-Full.md	1
 B	ax_tc_'	DECISIONS.md	1
 B	ax_tc_substfc	DECISIONS.md	1
 B	ax_tc_substfc	sondeos/README.md	1
+B	ax_vpf_*	DECISIONS.md	3
+B	ax_vpf_ind	DECISIONS.md	1
+B	ax_vpf_thy	DECISIONS.md	1
 B	axioms_eq	doc/REFERENCE-Full.md	2
 B	axioms_eq	doc/REFERENCE-Incompleteness.md	1
 B	axioms_eq	sondeos/README.md	2
@@ -730,6 +733,7 @@ B	proj_is_cantor	doc/REFERENCE-Kernel.md	1
 B	provBody	REFERENCE.md	1
 B	provBody	doc/REFERENCE-Incompleteness.md	1
 B	provBody	sondeos/README.md	1
+B	provCodeC	DECISIONS.md	1
 B	provCode_transfer	doc/REFERENCE-Incompleteness.md	2
 B	provFormula	AXIOMS.md	1
 B	provFormula_repr	AXIOMS.md	2
@@ -764,6 +768,7 @@ B	stdArgs_*	REFERENCE.md	1
 B	stdChain_proofCode'	DECISIONS.md	1
 B	stdChain_proofCode'	doc/REFERENCE-Incompleteness.md	2
 B	stdLine_lineCode'	doc/REFERENCE-Incompleteness.md	1
+B	stepTB	DECISIONS.md	1
 B	strCode_ne	REFERENCE.md	1
 B	substF_hole_hasWitF	doc/REFERENCE-Incompleteness.md	2
 B	substFormula_arith	doc/REFERENCE-Incompleteness.md	1
@@ -810,6 +815,7 @@ B	three	doc/REFERENCE-Arithmetic.md	1
 B	two_mul_consN	doc/REFERENCE-Incompleteness.md	1
 B	v_k	REFERENCE.md	1
 B	v_k	doc/REFERENCE-Incompleteness.md	1
+B	validProofFn	DECISIONS.md	9
 B	verifier_sound	REFERENCE.md	2
 B	wTs	doc/REFERENCE-Incompleteness.md	3
 B	wTs	sondeos/README.md	3

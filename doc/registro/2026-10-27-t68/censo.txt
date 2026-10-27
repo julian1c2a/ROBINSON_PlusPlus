@@ -1,0 +1,37 @@
+# T68 (ADR-192): el censo por NOMBRE de los 32 axiomas que la auditoría daba por no nombrados (22 ax_vpf_* y 10 del núcleo),
+# medido el 2026-10-27 sobre master 9435196: cada .lean de ROBINSON_PlusPlus/ con los comentarios quitados por strip-lean.awk,
+# y grep -lw. Fuera de su declaración (Minimal_Axioms), sólo los nombran las validaciones de los modelos y las listas de
+# Full/Induction.lean: ninguna prueba. Decisión del propietario: retirar los 22 ax_vpf_*, mantener los 10.
+
+ax14_sqrt_le               Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax15_lt_succ_sqrt          Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax16_mod2_succ             Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax24_mod2_of_even          Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax29_sub_witness           Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax_C3_concat_assoc         Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax_pow_zero                Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax_pow_succ                Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax_prodp_nil               Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax_prodp_cons              Full_Induction Meta_ModeloEstandar Minimal_Axioms
+ax_vpf_nil                 Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_p1                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_c1                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_c2                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_c3                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_j1                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_j2                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_q1                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_q2                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_q3                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_p2                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_j3                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_leibniz             Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_efq                 Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_eqrefl              Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_p3                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_mp                  Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_gen                 Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_thy                 Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_ind                 Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_qconf               Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms
+ax_vpf_listInd             Meta_ModeloCodificacion Meta_SegundoModelo Minimal_Axioms

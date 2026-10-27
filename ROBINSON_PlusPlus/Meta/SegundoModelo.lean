@@ -10,29 +10,28 @@ import ROBINSON_PlusPlus.Meta.ProvFiel
 
 `Meta/RigidezEstandar.lean` demuestra W1 y E10 para todo `Estandar M`, y advierte que sobre la basura `M` puede no
 ser `MNV V₀`. Aquí está el testigo. `MNB V₀` es `MNV V₀` con OTRA `substfc` —sobre un código que no tiene forma de
-fórmula lo deja como está, donde `substfcN` da `0`— y con `validProofFn` recalculada con ella. Valida los 142, es
-estándar (`estandar_MB`) y no es `MNV V₀` (`MNB_ne_MNV`).
+fórmula lo deja como está, donde `substfcN` da `0`—. Valida los 120, es estándar (`estandar_MB`) y no es `MNV V₀`
+(`MNB_ne_MNV`). (✏️ 2026‑10‑27, ADR‑192: hasta entonces cambiaba también `validProofFn`, recalculada con `substfcB`;
+el verificador antiguo y sus 22 axiomas salieron de T.)
 
 **Ningún axioma fija `substfc` sobre la basura** (la pregunta (d) de T75): las ocho ecuaciones de `substfc` hablan de
 códigos con forma; las cinco reglas de `lineWF` que sustituyen (`q1`, `q2`, `leibniz`, `ind`, `listInd`) piden
 `hasWitF`/`hasWit` de sus argumentos —las guardas de ADR‑020—, y sobre los códigos buenos `substfcB` es `substfcN`
-(`substfcB_codF`); las 22 de `validProofFn` no tienen guarda, pero `validProofFn` no la usa nadie más y se
-reinterpreta con `stepTB`. Ningún axioma lo impide, así que las guardas no se abaratan.
+(`substfcB_codF`). Ningún axioma lo impide, así que las guardas no se abaratan.
 
 * **§1 · `substfcB`**: la de `substfcN` con otra rama de basura; sus ocho ecuaciones, y `substfcB_codF`.
-* **§2 · `vpfNB`**: `validProofFn` con `substfcB` en las cinco etiquetas que sustituyen.
-* **§3 · `MNB V`**: `substfc` y `validProofFn` cambiadas, todo lo demás de `MNV V`; `MB_ne_MN`, la diferencia.
-* **§4 · `agreeF`**: donde no aparecen `substfc` ni `validProofFn` (`libreF`), los dos modelos evalúan IGUAL.
+* **§3 · `MNB V`**: `substfc` cambiada, todo lo demás de `MNV V`; `MB_ne_MN`, la diferencia.
+* **§4 · `agreeF`**: donde no aparece `substfc` (`libreF`), los dos modelos evalúan IGUAL.
 * **§5 · Los códigos cerrados y las guardas** en `MNB V`: los cerrados, por `agreeF`; las guardas, como en `MNV`.
-* **§6 · Los 35 que nombran `substfc` o `validProofFn`**, uno a uno (las cinco de `lineWF`, por las guardas).
+* **§6 · Los 13 que nombran `substfc`**, uno a uno (las cinco de `lineWF`, por las guardas).
 * **§7 · El ancla**, por `rw` con lemas ∀ (`substfcB_codF` sobre el código de `ψ`, que es bueno).
-* **§8 · Los 142** —los otros 106, transportados por `agreeF`—, `estandar_MB`, `segundo_modelo` y
+* **§8 · Los 120** —los otros 106, transportados por `agreeF`—, `estandar_MB`, `segundo_modelo` y
   `modelo_prov_iff_MB`: las generalizaciones de T75e tienen ahora DOS instancias distintas.
 
 ⚙️ **`decide +kernel`** (la primera vez en el proyecto): `libreF φ = true` de los 106 axiomas libres lo evalúa el
 NÚCLEO; no añade axiomas (`#print axioms` no cambia), a diferencia del `decide` nativo. El `decide` del elaborador
 agota su recursión en `ax_tc_succ` (el numeral 963 del carácter `σ`). Ninguno de los 106 lleva un numeral grande: los
-códigos cerrados `TC0`…`TCONS` sólo salen en axiomas que nombran `substfc` o `validProofFn` (medido: los 106 cierran y
+códigos cerrados `TC0`…`TCONS` sólo salen en axiomas que nombran `substfc` (medido: los 106 cierran y
 el módulo compila en 15 s).
 ⛔ El ancla, como `v_ancla`, por `rw`: un `show` que escribía su evaluación entera hizo que el núcleo recursara hasta
 agotarse (2 min), y la declaración quedó como AXIOMA en `#print axioms` de lo que la usaba (medido, en el sondeo).
@@ -117,49 +116,10 @@ theorem substfcN_basura : substfcN 0 0 (consN 10 0) = 0 := by
 theorem substfcB_basura : substfcB 0 0 (consN 10 0) = consN 10 0 := by
   rw [substfcB]; simp only [consN_ne_zero, nthN_cz, dite_false]; rfl
 
-/-! ## §2 · `validProofFn` con `substfcB` -/
+-- 🗑️ (2026‑10‑27, ADR‑192) §2 era `vpfNB`, `validProofFn` recalculada con `substfcB`: el verificador antiguo y sus 22
+-- axiomas salieron de T, y `MNB V` cambia ya sólo `substfc`.
 
-def stepTB : Nat → Nat → Nat → Nat → Nat
-  | 0, a, b, _ => implcN a (implcN b a)
-  | 1, a, b, d => implcN (implcN a (implcN b d)) (implcN (implcN a b) (implcN a d))
-  | 2, a, b, _ => implcN a (implcN b (andcN a b))
-  | 3, a, b, _ => implcN (andcN a b) a
-  | 4, a, b, _ => implcN (andcN a b) b
-  | 5, a, b, _ => implcN a (orcN a b)
-  | 6, a, b, _ => implcN b (orcN a b)
-  | 7, a, b, d => implcN (orcN a b) (implcN (implcN a d) (implcN (implcN b d) d))
-  | 8, a, _, _ => implcN botcN a
-  | 9, a, b, _ => implcN (forallcN a) (substfcB 0 b a)
-  | 10, a, b, _ => implcN (substfcB 0 b a) (excN a)
-  | 11, a, b, _ => implcN (forallcN (implcN a (liftfcN 0 b))) (implcN (excN a) b)
-  | 12, a, _, _ => eqcN a a
-  | 13, a, b, d => implcN (eqcN b d) (implcN (substfcB 0 b a) (substfcB 0 d a))
-  | 14, a, _, _ => implcN (implcN (implcN a botcN) botcN) a
-  | 15, a, _, _ => a
-  | 16, a, _, _ => a
-  | 17, a, _, _ => forallcN a
-  | 18, a, _, _ => implcN (substfcB 0 TC0 a)
-      (implcN (forallcN (implcN a (substfcB 0 TCS (liftfcN 1 a)))) (forallcN a))
-  | 19, a, b, _ => implcN (forallcN (implcN (liftfcN 0 a) b)) (implcN a (forallcN b))
-  | 20, a, _, _ => implcN (substfcB 0 TNIL a)
-      (implcN (forallcN (forallcN (implcN (liftfcN 1 a) (substfcB 0 TCONS (liftfcN 2 (liftfcN 1 a))))))
-        (forallcN a))
-  | _, _, _, _ => 0
-
-def stepNB (x : Nat) : Nat := stepTB (nthN x 0) (nthN x 1) (nthN x 2) (nthN x 3)
-
-def vpfLB : Nat → List Nat → Nat
-  | c, [] => c
-  | c, x :: r => vpfLB (concatN c (consN (stepNB x) 0)) r
-
-def vpfNB (c r : Nat) : Nat := vpfLB c (decodeL r)
-
-theorem vpfNB_zero (c : Nat) : vpfNB c 0 = c := by rw [vpfNB, decodeL_zero]; rfl
-
-theorem vpfNB_consN (c x r : Nat) : vpfNB c (consN x r) = vpfNB (concatN c (consN (stepNB x) 0)) r := by
-  rw [vpfNB, decodeL_consN]; rfl
-
-/-! ## §3 · El modelo `MNB V`: `MNV V` con `substfcB` y `vpfNB` -/
+/-! ## §3 · El modelo `MNB V`: `MNV V` con `substfcB` -/
 
 def MNB (V : Nat) : Model Nat where
   func := fun s args =>
@@ -167,52 +127,46 @@ def MNB (V : Nat) : Model Nat where
       (match args with
        | [k, t, f] => substfcB k t f
        | _ => 0)
-    else if s = sym!"validProofFn" then
-      (match args with
-       | [c, r] => vpfNB c r
-       | _ => 0)
     else (MNV V).func s args
   rel := (MNV V).rel
 
 variable {V : Nat}
 
-theorem MB_func {s : List Char} (h1 : (s != sym!"substfc") = true) (h2 : (s != sym!"validProofFn") = true)
+theorem MB_func {s : List Char} (h1 : (s != sym!"substfc") = true)
     (args : List Nat) : (MNB V).func s args = (MNV V).func s args := by
   have e1 : ¬ s = sym!"substfc" := by simpa using h1
-  have e2 : ¬ s = sym!"validProofFn" := by simpa using h2
-  simp only [MNB, ite_eq_right e1, ite_eq_right e2]
+  simp only [MNB, ite_eq_right e1]
 
 theorem MB_substfc (k t f : Nat) : (MNB V).func sym!"substfc" [k, t, f] = substfcB k t f := rfl
-theorem MB_vpf (c r : Nat) : (MNB V).func sym!"validProofFn" [c, r] = vpfNB c r := rfl
-theorem MB_zero : (MNB V).func sym!"0" [] = 0 := (MB_func (by decide) (by decide) _).trans MN_zero
-theorem MB_succ (a : Nat) : (MNB V).func sym!"σ" [a] = a + 1 := (MB_func (by decide) (by decide) _).trans (MN_succ a)
-theorem MB_pred (a : Nat) : (MNB V).func sym!"τ" [a] = a - 1 := (MB_func (by decide) (by decide) _).trans (MN_pred a)
+theorem MB_zero : (MNB V).func sym!"0" [] = 0 := (MB_func (by decide) _).trans MN_zero
+theorem MB_succ (a : Nat) : (MNB V).func sym!"σ" [a] = a + 1 := (MB_func (by decide) _).trans (MN_succ a)
+theorem MB_pred (a : Nat) : (MNB V).func sym!"τ" [a] = a - 1 := (MB_func (by decide) _).trans (MN_pred a)
 theorem MB_cons (a b : Nat) : (MNB V).func sym!"::" [a, b] = consN a b :=
-  (MB_func (by decide) (by decide) _).trans (MN_cons a b)
+  (MB_func (by decide) _).trans (MN_cons a b)
 theorem MB_concat (a b : Nat) : (MNB V).func sym!"##" [a, b] = concatN a b :=
-  (MB_func (by decide) (by decide) _).trans (MN_concat a b)
+  (MB_func (by decide) _).trans (MN_concat a b)
 theorem MB_substtc (k s c : Nat) : (MNB V).func sym!"substtc" [k, s, c] = substtcN k s c :=
-  (MB_func (by decide) (by decide) _).trans (MN_substtc k s c)
+  (MB_func (by decide) _).trans (MN_substtc k s c)
 theorem MB_substtsc (k s c : Nat) : (MNB V).func sym!"substtsc" [k, s, c] = substtscN k s c :=
-  (MB_func (by decide) (by decide) _).trans (MN_substtsc k s c)
+  (MB_func (by decide) _).trans (MN_substtsc k s c)
 theorem MB_liftc (c t : Nat) : (MNB V).func sym!"liftc" [c, t] = liftcN c t :=
-  (MB_func (by decide) (by decide) _).trans (MN_liftc c t)
+  (MB_func (by decide) _).trans (MN_liftc c t)
 theorem MB_liftsc (c t : Nat) : (MNB V).func sym!"liftsc" [c, t] = liftscN c t :=
-  (MB_func (by decide) (by decide) _).trans (MN_liftsc c t)
+  (MB_func (by decide) _).trans (MN_liftsc c t)
 theorem MB_liftfc (c f : Nat) : (MNB V).func sym!"liftfc" [c, f] = liftfcN c f :=
-  (MB_func (by decide) (by decide) _).trans (MN_liftfc c f)
-theorem MB_carc (l : Nat) : (MNB V).func sym!"carc" [l] = carN l := (MB_func (by decide) (by decide) _).trans (MN_carc l)
-theorem MB_cdrc (l : Nat) : (MNB V).func sym!"cdrc" [l] = cdrN l := (MB_func (by decide) (by decide) _).trans (MN_cdrc l)
-theorem MB_lenc (l : Nat) : (MNB V).func sym!"lenc" [l] = lenN l := (MB_func (by decide) (by decide) _).trans (MN_lenc l)
+  (MB_func (by decide) _).trans (MN_liftfc c f)
+theorem MB_carc (l : Nat) : (MNB V).func sym!"carc" [l] = carN l := (MB_func (by decide) _).trans (MN_carc l)
+theorem MB_cdrc (l : Nat) : (MNB V).func sym!"cdrc" [l] = cdrN l := (MB_func (by decide) _).trans (MN_cdrc l)
+theorem MB_lenc (l : Nat) : (MNB V).func sym!"lenc" [l] = lenN l := (MB_func (by decide) _).trans (MN_lenc l)
 theorem MB_nthc (l i : Nat) : (MNB V).func sym!"nthc" [l, i] = nthN l i :=
-  (MB_func (by decide) (by decide) _).trans (MN_nthc l i)
+  (MB_func (by decide) _).trans (MN_nthc l i)
 theorem MB_runFn (c r : Nat) : (MNB V).func sym!"runFn" [c, r] = runFnN c r :=
-  (MB_func (by decide) (by decide) _).trans (MN_runFn c r)
-theorem MB_tcFn (t : Nat) : (MNB V).func sym!"tcFn" [t] = tcFnN t := (MB_func (by decide) (by decide) _).trans (MN_tcFn t)
+  (MB_func (by decide) _).trans (MN_runFn c r)
+theorem MB_tcFn (t : Nat) : (MNB V).func sym!"tcFn" [t] = tcFnN t := (MB_func (by decide) _).trans (MN_tcFn t)
 theorem MB_premsOf (l : Nat) : (MNB V).func sym!"premsOf" [l] = premsOfN l :=
-  (MB_func (by decide) (by decide) _).trans (MN_premsOf l)
+  (MB_func (by decide) _).trans (MN_premsOf l)
 theorem MB_axiomsCodeT : (MNB V).func sym!"axiomsCodeT" [] = V :=
-  (MB_func (by decide) (by decide) _).trans MN_axiomsCodeT
+  (MB_func (by decide) _).trans MN_axiomsCodeT
 theorem MB_lt (a b : Nat) : (MNB V).rel sym!"<" [a, b] = (a < b) := MN_lt (V := V) a b
 theorem MB_mem (x l : Nat) : (MNB V).rel sym!"∈" [x, l] = memN x l := MN_mem (V := V) x l
 theorem MB_allIn (c l : Nat) : (MNB V).rel sym!"allIn" [c, l] = allInN c l := MN_allIn (V := V) c l
@@ -224,12 +178,12 @@ theorem MB_ne_MN : (MNB V).func sym!"substfc" [0, 0, consN 10 0] ≠ (MNV V).fun
   rw [MB_substfc, MN_substfc, substfcB_basura, substfcN_basura]
   exact consN_ne_zero _ _
 
-/-! ## §4 · Donde no aparecen `substfc` ni `validProofFn`, los dos modelos evalúan IGUAL -/
+/-! ## §4 · Donde no aparece `substfc`, los dos modelos evalúan IGUAL -/
 
 mutual
 def libreT : Term → Bool
   | .var _ => true
-  | .func f ts => (f != sym!"substfc" && f != sym!"validProofFn") && libreTs ts
+  | .func f ts => f != sym!"substfc" && libreTs ts
 def libreTs : List Term → Bool
   | [] => true
   | t :: ts => libreT t && libreTs ts
@@ -251,7 +205,7 @@ theorem agreeT (v : Nat → Nat) : ∀ t : Term, libreT t = true → evalTerm (M
   | .func f ts, h => by
       simp only [libreT, Bool.and_eq_true] at h
       show (MNB V).func f (evalTerms (MNB V) v ts) = (MNV V).func f (evalTerms (MNV V) v ts)
-      rw [agreeTs v ts h.2, MB_func h.1.1 h.1.2]
+      rw [agreeTs v ts h.2, MB_func h.1]
 theorem agreeTs (v : Nat → Nat) : ∀ ts : List Term, libreTs ts = true →
     evalTerms (MNB V) v ts = evalTerms (MNV V) v ts
   | [], _ => rfl
@@ -283,7 +237,7 @@ theorem agreeF : ∀ (φ : Formula) (v : Nat → Nat), libreF φ = true →
       exact or_congr (agreeF a v h.1) (agreeF b v h.2)
   | .ex a, v, h => exists_congr fun d => agreeF a (shiftEnv v d) h
 
-/-- Lo validado en `MNV V` sin `substfc` ni `validProofFn` vale en `MNB V`. -/
+/-- Lo validado en `MNV V` sin `substfc` vale en `MNB V`. -/
 theorem lib {φ : Formula} (h : libreF φ = true) {v : Nat → Nat} (hv : evalFormula (MNV V) v φ) :
     evalFormula (MNB V) v φ :=
   (agreeF φ v h).2 hv
@@ -349,17 +303,17 @@ theorem evB_hasWitF (v : Nat → Nat) (t : Term) : evalFormula (MNB V) v (hasWit
     hasWitFN, wfAll1N, wfAllFN, isTermCodeE1N, isFormCodeE2N, shapeUnN, shapeBinN, argsInN,
     clBotN, clAtomN, clEqN, clBinN, clUnN]
 
-local macro "abreB" : tactic => `(tactic| simp only [forall_, forall_2, forall_3, forall_4, forall_5, _root_.iff,
+local macro "abreB" : tactic => `(tactic| simp only [forall_, forall_2, forall_3, forall_4, _root_.iff,
     land, lor, cons, nil, zero, succ, pred, concat, lt, In, cons_sym, zero_sym, succ_sym, pred_sym,
     concat_sym, lt_sym, in_sym, substtc, substtsc, liftc, liftsc, substfc, liftfc, carc, cdrc, lenc, nthc,
-    runFn, validProofFn, tcFn, premsOf, allIn, lineWF, chainOk, lineOk, varc, funcc, botc, atomc, eqc,
+    runFn, tcFn, premsOf, allIn, lineWF, chainOk, lineOk, varc, funcc, botc, atomc, eqc,
     implc, forallc, andc, orc, exc, axiomsCodeT, lineTag, tagDisj,
     evalFormula, evalTerm, evalTerms, shiftEnv, evB_numeralM, evB_strCodeM, evB_termCodeM, evB_hasWit, evB_hasWitF,
     MB_zero, MB_succ, MB_pred, MB_cons, MB_concat, MB_substtc, MB_substtsc, MB_liftc, MB_liftsc, MB_substfc,
-    MB_liftfc, MB_carc, MB_cdrc, MB_lenc, MB_nthc, MB_runFn, MB_vpf, MB_tcFn, MB_premsOf, MB_axiomsCodeT,
+    MB_liftfc, MB_carc, MB_cdrc, MB_lenc, MB_nthc, MB_runFn, MB_tcFn, MB_premsOf, MB_axiomsCodeT,
     MB_lt, MB_mem, MB_allIn, MB_lineWF, MB_chainOk])
 
-/-! ## §6 · Los 35 que nombran `substfc` o `validProofFn` -/
+/-! ## §6 · Los 13 que nombran `substfc` (✏️ 35 con los 22 de `validProofFn`, hasta ADR‑192) -/
 
 theorem vB_substfc_bottom : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_substfc_bottom := by
   intro v x t; abreB; exact substfcB_bot x t
@@ -377,53 +331,6 @@ theorem vB_substfc_or : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_substfc_or
   intro v x t a b; abreB; exact substfcB_or x t a b
 theorem vB_substfc_ex : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_substfc_ex := by
   intro v x t a; abreB; exact substfcB_ex x t a
-
-local macro "vpf_pasoB" : tactic => `(tactic| (rw [vpfNB_consN]; simp only [stepNB, nthN_cz, nthN_cs, nthN_zero_l, stepTB]))
-
-theorem vB_vpf_nil : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_nil := by
-  intro v c; abreB; exact vpfNB_zero c
-theorem vB_vpf_p1 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_p1 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_p2 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_p2 := by
-  intro v c a b d r; abreB; vpf_pasoB
-theorem vB_vpf_c1 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_c1 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_c2 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_c2 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_c3 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_c3 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_j1 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_j1 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_j2 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_j2 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_j3 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_j3 := by
-  intro v c a b d r; abreB; vpf_pasoB
-theorem vB_vpf_efq : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_efq := by
-  intro v c a r; abreB; vpf_pasoB
-theorem vB_vpf_q1 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_q1 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_q2 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_q2 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_q3 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_q3 := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_eqrefl : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_eqrefl := by
-  intro v c a r; abreB; vpf_pasoB
-theorem vB_vpf_leibniz : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_leibniz := by
-  intro v c a b d r; abreB; vpf_pasoB
-theorem vB_vpf_p3 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_p3 := by
-  intro v c a r; abreB; vpf_pasoB
-theorem vB_vpf_mp : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_mp := by
-  intro v c b a r; abreB; intro _ _; vpf_pasoB
-theorem vB_vpf_gen : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_gen := by
-  intro v c a r; abreB; intro _; vpf_pasoB
-theorem vB_vpf_thy : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_thy := by
-  intro v c a r; abreB; intro _; vpf_pasoB
-theorem vB_vpf_ind : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_ind := by
-  intro v c a r; abreB; vpf_pasoB; rfl
-theorem vB_vpf_qconf : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_qconf := by
-  intro v c a b r; abreB; vpf_pasoB
-theorem vB_vpf_listInd : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_vpf_listInd := by
-  intro v c a r; abreB; vpf_pasoB; rfl
 
 theorem vB_lineWF_q1 : ∀ v : Nat → Nat, evalFormula (MNB V) v ax_lineWF_q1 := by
   intro v x; abreB; intro h
@@ -531,10 +438,10 @@ theorem vB_ancla : ∀ v : Nat → Nat, evalFormula (MNB V₀) v ax_axiomsCodeT_
     evB_numeralM, substfcB_codF (codF_codeNat _)]
   exact V₀_def
 
-/-! ## §8 · LOS 142 en `MNB V₀`, y `Estandar`
+/-! ## §8 · LOS 120 en `MNB V₀`, y `Estandar`
 
-Los 34 de la teoría y los 72 de codificación que no nombran `substfc` ni `validProofFn`, por `lib` sobre su
-validación en `MNV V` (`libreF`, por `decide +kernel`); los 35 que sí, por §6; el ancla, por §7. -/
+Los 34 de la teoría y los 72 de codificación que no nombran `substfc`, por `lib` sobre su validación en `MNV V`
+(`libreF`, por `decide +kernel`); los 13 que sí, por §6; el ancla, por §7. -/
 
 theorem MB_coreAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ coreAxioms → evalFormula (MNB V) v φ := by
   unfold coreAxioms
@@ -542,7 +449,7 @@ theorem MB_coreAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ coreAxioms → eva
 
 theorem MB_codingAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ codingAxioms → evalFormula (MNB V) v φ := by
   unfold codingAxioms
-  exact mem_cons_elim (lib (by decide +kernel) (v_substtc_var_eq v)) (mem_cons_elim (lib (by decide +kernel) (v_substtc_var_gt v)) (mem_cons_elim (lib (by decide +kernel) (v_substtc_var_lt v)) (mem_cons_elim (lib (by decide +kernel) (v_substtc_func v)) (mem_cons_elim (lib (by decide +kernel) (v_substtsc_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_substtsc_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_liftc_var_lt v)) (mem_cons_elim (lib (by decide +kernel) (v_liftc_var_ge v)) (mem_cons_elim (lib (by decide +kernel) (v_liftc_func v)) (mem_cons_elim (lib (by decide +kernel) (v_liftsc_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_liftsc_cons v)) (mem_cons_elim (vB_substfc_bottom v) (mem_cons_elim (vB_substfc_atom v) (mem_cons_elim (vB_substfc_eq v) (mem_cons_elim (vB_substfc_impl v) (mem_cons_elim (vB_substfc_forall v) (mem_cons_elim (vB_substfc_and v) (mem_cons_elim (vB_substfc_or v) (mem_cons_elim (vB_substfc_ex v) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_bottom v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_atom v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_eq v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_impl v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_forall v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_and v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_or v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_ex v)) (mem_cons_elim (lib (by decide +kernel) (v_carc v)) (mem_cons_elim (lib (by decide +kernel) (v_cdrc v)) (mem_cons_elim (vB_vpf_nil v) (mem_cons_elim (vB_vpf_p1 v) (mem_cons_elim (vB_vpf_p2 v) (mem_cons_elim (vB_vpf_c1 v) (mem_cons_elim (vB_vpf_c2 v) (mem_cons_elim (vB_vpf_c3 v) (mem_cons_elim (vB_vpf_j1 v) (mem_cons_elim (vB_vpf_j2 v) (mem_cons_elim (vB_vpf_j3 v) (mem_cons_elim (vB_vpf_efq v) (mem_cons_elim (vB_vpf_q1 v) (mem_cons_elim (vB_vpf_q2 v) (mem_cons_elim (vB_vpf_q3 v) (mem_cons_elim (vB_vpf_eqrefl v) (mem_cons_elim (vB_vpf_leibniz v) (mem_cons_elim (vB_vpf_p3 v) (mem_cons_elim (vB_vpf_mp v) (mem_cons_elim (vB_vpf_gen v) (mem_cons_elim (vB_vpf_thy v) (mem_cons_elim (vB_vpf_ind v) (mem_cons_elim (vB_vpf_qconf v) (mem_cons_elim (vB_vpf_listInd v) (mem_cons_elim (lib (by decide +kernel) (v_tc_zero v)) (mem_cons_elim (lib (by decide +kernel) (v_tc_succ v)) (mem_cons_elim (lib (by decide +kernel) (v_runFn_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_runFn_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_allIn_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_allIn_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_chainOk_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_chainOk_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_mp v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_mp v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_gen v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_gen v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_thy v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_thy v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_p1 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_p1 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_p2 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_p2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_c1 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_c1 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_c2 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_c2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_c3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_c3 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_j1 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_j1 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_j2 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_j2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_j3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_j3 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_efq v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_efq v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_eqrefl v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_eqrefl v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_p3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_p3 v)) (mem_cons_elim (vB_lineWF_q1 v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_q1 v)) (mem_cons_elim (vB_lineWF_q2 v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_q2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_q3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_q3 v)) (mem_cons_elim (vB_lineWF_leibniz v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_leibniz v)) (mem_cons_elim (vB_lineWF_ind v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_ind v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_qconf v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_qconf v)) (mem_cons_elim (vB_lineWF_listInd v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_listInd v)) (mem_cons_elim (lib (by decide +kernel) (v_lenc_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_lenc_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_nthc_zero v)) (mem_cons_elim (lib (by decide +kernel) (v_nthc_succ v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_inv v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_cons v)) (mem_nil_elim)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+  exact mem_cons_elim (lib (by decide +kernel) (v_substtc_var_eq v)) (mem_cons_elim (lib (by decide +kernel) (v_substtc_var_gt v)) (mem_cons_elim (lib (by decide +kernel) (v_substtc_var_lt v)) (mem_cons_elim (lib (by decide +kernel) (v_substtc_func v)) (mem_cons_elim (lib (by decide +kernel) (v_substtsc_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_substtsc_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_liftc_var_lt v)) (mem_cons_elim (lib (by decide +kernel) (v_liftc_var_ge v)) (mem_cons_elim (lib (by decide +kernel) (v_liftc_func v)) (mem_cons_elim (lib (by decide +kernel) (v_liftsc_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_liftsc_cons v)) (mem_cons_elim (vB_substfc_bottom v) (mem_cons_elim (vB_substfc_atom v) (mem_cons_elim (vB_substfc_eq v) (mem_cons_elim (vB_substfc_impl v) (mem_cons_elim (vB_substfc_forall v) (mem_cons_elim (vB_substfc_and v) (mem_cons_elim (vB_substfc_or v) (mem_cons_elim (vB_substfc_ex v) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_bottom v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_atom v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_eq v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_impl v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_forall v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_and v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_or v)) (mem_cons_elim (lib (by decide +kernel) (v_liftfc_ex v)) (mem_cons_elim (lib (by decide +kernel) (v_carc v)) (mem_cons_elim (lib (by decide +kernel) (v_cdrc v)) (mem_cons_elim (lib (by decide +kernel) (v_tc_zero v)) (mem_cons_elim (lib (by decide +kernel) (v_tc_succ v)) (mem_cons_elim (lib (by decide +kernel) (v_runFn_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_runFn_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_allIn_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_allIn_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_chainOk_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_chainOk_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_mp v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_mp v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_gen v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_gen v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_thy v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_thy v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_p1 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_p1 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_p2 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_p2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_c1 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_c1 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_c2 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_c2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_c3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_c3 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_j1 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_j1 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_j2 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_j2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_j3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_j3 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_efq v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_efq v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_eqrefl v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_eqrefl v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_p3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_p3 v)) (mem_cons_elim (vB_lineWF_q1 v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_q1 v)) (mem_cons_elim (vB_lineWF_q2 v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_q2 v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_q3 v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_q3 v)) (mem_cons_elim (vB_lineWF_leibniz v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_leibniz v)) (mem_cons_elim (vB_lineWF_ind v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_ind v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_qconf v)) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_qconf v)) (mem_cons_elim (vB_lineWF_listInd v) (mem_cons_elim (lib (by decide +kernel) (v_premsOf_listInd v)) (mem_cons_elim (lib (by decide +kernel) (v_lenc_nil v)) (mem_cons_elim (lib (by decide +kernel) (v_lenc_cons v)) (mem_cons_elim (lib (by decide +kernel) (v_nthc_zero v)) (mem_cons_elim (lib (by decide +kernel) (v_nthc_succ v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_inv v)) (mem_cons_elim (lib (by decide +kernel) (v_lineWF_cons v)) (mem_nil_elim)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
 theorem MB_axioms (v : Nat → Nat) : contextSatisfies (MNB V₀) v axioms := by
   intro φ hφ
@@ -556,7 +463,7 @@ theorem MB_axioms (v : Nat → Nat) : contextSatisfies (MNB V₀) v axioms := by
     have e : φ = ax_axiomsCodeT_def := List.mem_singleton.mp h
     rw [e]; exact vB_ancla v
 
-/-- `MNB V₀` es estándar: `0`, `σ` y `::` los de `MNV`, y los 142. -/
+/-- `MNB V₀` es estándar: `0`, `σ` y `::` los de `MNV`, y los 120. -/
 theorem estandar_MB : Estandar (MNB V₀) where
   hzero := MB_zero
   hsucc := MB_succ

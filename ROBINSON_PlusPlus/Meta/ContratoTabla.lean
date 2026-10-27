@@ -14,7 +14,7 @@ clase, su huella y su nombre. La comprueba `#contrato_titulares`, en `Meta/Purez
 
 namespace ROBINSON_PlusPlus.Meta.ContratoTabla
 
-/-- 544 constantes del cierre de los tipos de 29 titulares. -/
+/-- 514 constantes del cierre de los tipos de 29 titulares. -/
 def tabla : String := "
 def 3606628684449333096 FOL.Metamath.Semantics.Model
 ind 887465114820704127 FOL.Metamath.Semantics.ModelG
@@ -120,7 +120,7 @@ def 1073995463550856107 ROBINSON_PlusPlus.Meta.ModeloCodigo.botcN
 def 14333243114693937099 ROBINSON_PlusPlus.Meta.ModeloCodigo.carN
 def 10207722171266230916 ROBINSON_PlusPlus.Meta.ModeloCodigo.cdrN
 def 384851612244794632 ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkL
-def 16241632923125965337 ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkL._f
+def 2841046414577261636 ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkL._f
 def 2690424882866697396 ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkN
 def 14423716367581872232 ROBINSON_PlusPlus.Meta.ModeloCodigo.clAtomN
 def 12190362018717122307 ROBINSON_PlusPlus.Meta.ModeloCodigo.clBinN
@@ -166,16 +166,14 @@ def 14063856908014559538 ROBINSON_PlusPlus.Meta.ModeloCodigo.orcN
 def 7720023927109420300 ROBINSON_PlusPlus.Meta.ModeloCodigo.premsOfN
 def 12677001102455104276 ROBINSON_PlusPlus.Meta.ModeloCodigo.prodpN
 def 9646755557707026005 ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL
-def 15399031347072737186 ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL._f
+def 18176032548933355900 ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL._f
+def 16298679511601174868 ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL.match_1
 def 9419091630699911129 ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnN
 def 13646493664174929557 ROBINSON_PlusPlus.Meta.ModeloCodigo.shapeBinN
 def 5194766732279512987 ROBINSON_PlusPlus.Meta.ModeloCodigo.shapeUnN
 def 1273652214057284914 ROBINSON_PlusPlus.Meta.ModeloCodigo.sqrtN
 def 12054182722350406396 ROBINSON_PlusPlus.Meta.ModeloCodigo.sqrtN._f
 def 17830781580792491215 ROBINSON_PlusPlus.Meta.ModeloCodigo.sqrtN.match_1
-def 4111209148219519962 ROBINSON_PlusPlus.Meta.ModeloCodigo.stepN
-def 6098943056730113506 ROBINSON_PlusPlus.Meta.ModeloCodigo.stepT
-def 11295166840127080734 ROBINSON_PlusPlus.Meta.ModeloCodigo.stepT.match_1
 def 12785647552359787393 ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN
 def 17554546135438158021 ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN._unary
 thm 2499559813 ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN._unary._proof_1
@@ -192,16 +190,12 @@ def 5416270986323710903 ROBINSON_PlusPlus.Meta.ModeloCodigo.tcFnN._f
 def 7348798451823581713 ROBINSON_PlusPlus.Meta.ModeloCodigo.unpairN
 def 10819188590205194886 ROBINSON_PlusPlus.Meta.ModeloCodigo.unpairN._f
 def 18352618883345042899 ROBINSON_PlusPlus.Meta.ModeloCodigo.unpairN.match_1
-def 5340518035024449754 ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfL
-def 13391501468128687563 ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfL._f
-def 16298679511601174868 ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfL.match_1
-def 3549738618563240730 ROBINSON_PlusPlus.Meta.ModeloCodigo.vpfN
 def 517878239900765299 ROBINSON_PlusPlus.Meta.ModeloCodigo.wfAll1N
 def 14713094908034369244 ROBINSON_PlusPlus.Meta.ModeloCodigo.wfAllFN
-def 9844212574613043229 ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV
+def 12369066838736859768 ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV
 def 16926720736584672822 ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV._sparseCasesOn_1
 def 8053240399280998920 ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV._sparseCasesOn_2
-def 16637500893682323306 ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV.match_1
+def 5151450133006923754 ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV.match_1
 def 5849443250161835528 ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV.match_5
 thm 3720823077 ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real
 def 1124561569137888680 ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'
@@ -376,29 +370,7 @@ def 8891298507599793705 ROBINSON_PlusPlus.Minimal.Axioms.ax_substtsc_cons
 def 7887485984293912973 ROBINSON_PlusPlus.Minimal.Axioms.ax_substtsc_nil
 def 11071903875752775894 ROBINSON_PlusPlus.Minimal.Axioms.ax_tc_succ
 def 15688005452530392355 ROBINSON_PlusPlus.Minimal.Axioms.ax_tc_zero
-def 16223898426307386150 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_c1
-def 12478160501096738172 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_c2
-def 10274103180988731847 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_c3
-def 9485249114978052451 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_efq
-def 8820072384521263905 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_eqrefl
-def 15636875730553409214 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_gen
-def 17573099674017372287 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_ind
-def 12088987623744290605 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_j1
-def 9608055336100567602 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_j2
-def 15318621396439004090 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_j3
-def 3239398531992257340 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_leibniz
-def 10002864189666919141 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_listInd
-def 4188520201490793267 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_mp
-def 785191253056472229 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_nil
-def 15906743688516471877 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_p1
-def 6558000351068528761 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_p2
-def 16756735395090102532 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_p3
-def 2866996243443975912 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_q1
-def 2478020858489574308 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_q2
-def 17444747105047298435 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_q3
-def 1186468366294724754 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_qconf
-def 12829055121205209294 ROBINSON_PlusPlus.Minimal.Axioms.ax_vpf_thy
-def 10764082144233616470 ROBINSON_PlusPlus.Minimal.Axioms.axioms
+def 8968340445066640942 ROBINSON_PlusPlus.Minimal.Axioms.axioms
 def 14856398224725302457 ROBINSON_PlusPlus.Minimal.Axioms.axiomsBase
 def 11403018884457336064 ROBINSON_PlusPlus.Minimal.Axioms.axiomsCodeT
 def 8153206347552200254 ROBINSON_PlusPlus.Minimal.Axioms.botc
@@ -424,7 +396,7 @@ def 17137034060429325229 ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerm
 def 7379819907962755571 ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerm._f
 def 16250672811538238095 ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerms
 def 3968634467032860884 ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerms._f
-def 10167623523863300617 ROBINSON_PlusPlus.Minimal.Axioms.codingAxioms
+def 14887349515423418706 ROBINSON_PlusPlus.Minimal.Axioms.codingAxioms
 def 11563724913553548159 ROBINSON_PlusPlus.Minimal.Axioms.concat
 def 11352684310061063232 ROBINSON_PlusPlus.Minimal.Axioms.concat_sym
 def 8981919520826809921 ROBINSON_PlusPlus.Minimal.Axioms.cons
@@ -442,7 +414,6 @@ def 14584440298737911725 ROBINSON_PlusPlus.Minimal.Axioms.forall_
 def 7350668872838509547 ROBINSON_PlusPlus.Minimal.Axioms.forall_2
 def 6030577637494853122 ROBINSON_PlusPlus.Minimal.Axioms.forall_3
 def 7948864098507316496 ROBINSON_PlusPlus.Minimal.Axioms.forall_4
-def 12068674520091029935 ROBINSON_PlusPlus.Minimal.Axioms.forall_5
 def 2814872404909532027 ROBINSON_PlusPlus.Minimal.Axioms.forallc
 def 7561238250598341300 ROBINSON_PlusPlus.Minimal.Axioms.formCodeM
 def 10347798630791405966 ROBINSON_PlusPlus.Minimal.Axioms.formCodeM._f
@@ -522,7 +493,6 @@ def 14401384849228394516 ROBINSON_PlusPlus.Minimal.Axioms.termsCodeM.match_1
 def 9713015298987183604 ROBINSON_PlusPlus.Minimal.Axioms.triN
 def 12490558664514725414 ROBINSON_PlusPlus.Minimal.Axioms.triN._f
 def 4174462489136354196 ROBINSON_PlusPlus.Minimal.Axioms.two
-def 13233428403353826665 ROBINSON_PlusPlus.Minimal.Axioms.validProofFn
 def 11445773092659147137 ROBINSON_PlusPlus.Minimal.Axioms.varc
 def 7737997565245169567 ROBINSON_PlusPlus.Minimal.Axioms.wfAll1
 def 5747793606890969872 ROBINSON_PlusPlus.Minimal.Axioms.wfAll1Body

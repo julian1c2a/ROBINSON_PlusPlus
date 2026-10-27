@@ -38,9 +38,9 @@ parámetros; el verificador
 esquemas Q usan `substfc`/`liftfc`, ya hechos) y, para MP/Gen, comprueba la
 pertenencia de las premisas vía `In`.
 
-Este archivo define la fórmula Σ₁ concreta `provFormulaC`/`provCodeC` sobre `validProofFn`
-(cuyas ecuaciones son entradas de `Minimal.axioms`) y el puente `numeralM_eq`
-(`numeralM = Godel.numeral`).
+Este archivo define el puente `numeralM_eq` (`numeralM = Godel.numeral`). ✏️ *(2026‑10‑27, ADR‑192, T68)*: definía
+también la fórmula Σ₁ `provFormulaC`/`provCodeC` sobre `validProofFn`; el verificador antiguo y sus 22 axiomas
+salieron de T, y todo lo de abajo que lo nombra es REGISTRO.
 
 🗑️ **2026‑10‑02 (ADR‑115) — registro.** El módulo demostraba además, sobre `⊢`, el cómputo de los
 **extractores** `carc`/`cdrc` (cabeza/cola de `cons`) y los pasos de `validProofFn`, re‑derivados
@@ -60,22 +60,11 @@ theorem numeralM_eq (n : Nat) : numeralM n = ROBINSON_PlusPlus.Meta.Godel.numera
 -- (Aquí vivían, sobre `⊢`, `carc_cons`/`cdrc_cons` y los pasos de `validProofFn`; retirados con
 -- ADR‑115.)
 
-/-! ### Fórmula de demostrabilidad object Σ₁ -/
-
-/-- **Predicado de demostrabilidad object** (Σ₁): `∃ p, In x (validProofFn nil p)`
-    — "existe una demostración-secuencia `p` cuyas conclusiones contienen `x`".
-    `x` ocupa la variable libre 0 (convención de `substFormula 0 ⌜φ⌝ ·`). Versión
-    **concreta** del `provFormula` que postulaba `Meta/Provability.lean` (capa legacy, retirada
-    en F7a, 2026‑07‑09). -/
-def provFormulaC : Formula := Formula.ex (In (Term.var 1) (validProofFn nil (Term.var 0)))
-
-/-- `Prov(⌜φ⌝)` concreto. -/
-noncomputable def provCodeC (φ : Formula) : Formula := substFormula 0 (formCode φ) provFormulaC
+-- 🗑️ (2026‑10‑27, ADR‑192, T68) Aquí vivían `provFormulaC` y `provCodeC`, el `Prov` sobre `validProofFn`, sin
+-- consumidor desde que la cadena usa `provFormulaC'` (`Meta/ProofChain.lean`): salieron con el verificador antiguo.
 
 end ROBINSON_PlusPlus.Meta.CheckArith
 
 export ROBINSON_PlusPlus.Meta.CheckArith (
-  provFormulaC
-  provCodeC
   numeralM_eq
 )

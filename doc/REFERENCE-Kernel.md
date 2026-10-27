@@ -127,7 +127,7 @@ abbrev ex := @Formula.ex
 
 #### 3.1.5 Axiomas matemáticos (30 axiomas en la lista `axioms`: 23 aritméticos + 7 listas)
 
-> ✏️ 2026‑10‑12 (ADR‑134): son **34** (`coreAxioms`), y la tabla los lista todos; `axioms` tiene 142. La fila de
+> ✏️ 2026‑10‑12 (ADR‑134): son **34** (`coreAxioms`), y la tabla los lista todos; `axioms` tiene 142 (✏️ 120 desde ADR‑192, que retiró los 22 «ax_vpf_*»). La fila de
 > `ax_L0_cons_def` daba la codificación de antes de ADR‑113.
 
 | # | Nombre | Enunciado matemático |

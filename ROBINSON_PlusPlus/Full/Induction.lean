@@ -85,16 +85,17 @@ def primAxioms : List Formula :=
 ⚠️ «**141 axiomas objeto** = 34 core + 107 coding» aparece en **siete banners** y **ningún control
 lo comprobaba**: `check-doc-sync` `[A]` mira jobs, módulos, `axiom` de Lean y `sorry`, no esto. Era
 cierto **por suerte**, no por control. Aquí deja de serlo: si alguna lista cambia, **el build rompe**.
-✏️ Desde ADR‑117 son **142** = 141 de la base (`axiomsBase` = 34 + 107) y el ancla diagonal. -/
+✏️ Desde ADR‑117 eran **142** = 141 de la base (`axiomsBase` = 34 + 107) y el ancla diagonal; desde ADR‑192 (T68)
+son **120** = 119 de la base (34 + 85: los 22 `ax_vpf_*` del verificador antiguo, fuera) y el ancla. -/
 
 set_option maxRecDepth 8000 in
-theorem axioms_len : axioms.length = 142 := rfl
+theorem axioms_len : axioms.length = 120 := rfl
 set_option maxRecDepth 8000 in
-theorem axiomsBase_len : axiomsBase.length = 141 := rfl
+theorem axiomsBase_len : axiomsBase.length = 119 := rfl
 set_option maxRecDepth 4000 in
 theorem coreAxioms_len : coreAxioms.length = 34 := rfl
 set_option maxRecDepth 8000 in
-theorem codingAxioms_len : codingAxioms.length = 107 := rfl
+theorem codingAxioms_len : codingAxioms.length = 85 := rfl
 
 /-- El censo, comprobado por el kernel: **24 + 10 = 34 = `coreAxioms`**.
 

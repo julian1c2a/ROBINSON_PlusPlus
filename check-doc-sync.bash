@@ -706,7 +706,7 @@ B_BASE_REF="${B_BASE_REF:-refs/remotes/origin/master}"
 # (un objeto reemplazado con `git replace` no engaña a las entradas de [B], que salen de git: ni a las rutas ni a los
 # sondeos archivados)
 export GIT_NO_REPLACE_OBJECTS=1
-B_SUBE_ADR=""   # sólo si un ADR NUEVO (que no está en la base) deja subir la tabla: «ADR-NNN», con «`clave` · documento · citas»
+B_SUBE_ADR="ADR-192"   # (T68: las citas de la historia de lo retirado; vacío en el commit siguiente) sólo si un ADR NUEVO (que no está en la base) deja subir la tabla: «ADR-NNN», con «`clave` · documento · citas»
 b_adr_texto() { awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en' DECISIONS.md; }
 b_adr_texto_base() { git show "$B_BASE:DECISIONS.md" 2>/dev/null | awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en'; }
 B_DOCS_LISTA="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
