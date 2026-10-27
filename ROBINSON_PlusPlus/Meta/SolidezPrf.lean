@@ -14,7 +14,9 @@ import FOL.Semantics
 `Prf` demuestra es verdadero en `M`, por inducción sobre los 7 constructores de `Prf` y los 17 de `Prfᵢ`
 (`prfI_sound`): `ind` pide `hzero`/`hsucc` y la inducción de `Nat`; `listInd`, `hcons`, `descompone` —todo `m + 1` es
 un `cons` con cabeza y cola menores, sin basura desde ADR‑113— y la inducción fuerte `fuerte`; `qconf` es lógica pura.
-`consistentH_de : Estandar M → ConsistentH`.
+La consistencia ya no se saca de aquí: `consistentH_de` vive desde ADR‑191 en `Meta/SolidezDobleNegacion.lean`, con la
+solidez doble‑negada, que no pasa por `p3` en `Prop`. `prf_sound` se queda: es la solidez para la lectura en `Prop`, y
+ésa pide la lógica clásica.
 
 Viene de la sonda R2‑1‑2 de la ronda 2 de la auditoría (2026‑10‑02), corregida: un `∧` que se leía como
 `Formula.and`, y fuera la obligación de `AnclaEq`, que ADR‑118 retiró.
@@ -145,9 +147,9 @@ theorem prfI_sound (hM : Estandar M) {φ : Formula} (h : Prfᵢ φ) : ∀ v, eva
 theorem prf_sound (hM : Estandar M) {φ : Formula} (h : Prf φ) : ∀ v, evalFormula M v φ := by
   induction h with
   | incl h0 => exact prfI_sound hM h0
-  -- (✏️ 2026‑10‑21, T61, ADR‑189: éste es el `Classical.choice` de todos los titulares que lo llevan —los de las clases
-  -- (ii) y (iii), por la solidez—: la regla `p3`, ¬¬A ⇒ A, en una semántica en `Prop`. Quitarlo pide la semántica
-  -- doble‑negada; lo decide el propietario. Los de la clase (i) y D1–D3 ya no lo llevan.)
+  -- (✏️ 2026‑10‑21, T61, ADR‑189: éste era el `Classical.choice` de los titulares de las clases (ii) y (iii): la regla
+  -- `p3`, ¬¬A ⇒ A, en una semántica en `Prop`. ✏️ ADR‑191: ya no lo es; los titulares van por la solidez
+  -- doble‑negada, `prf_sound_dn` (`Meta/SolidezDobleNegacion.lean`), y aquí queda la lectura en `Prop`, que lo pide.)
   | p3 A => intro v hnn; exact Classical.byContradiction hnn
   | ind A =>
       intro v
@@ -192,13 +194,8 @@ theorem prf_sound (hM : Estandar M) {φ : Formula} (h : Prf φ) : ∀ v, evalFor
   | mp A B _ _ ih1 ih2 => intro v; exact ih1 v (ih2 v)
   | gen A _ ih => intro v d; exact ih (shiftEnv v d)
 
-/-- `ConsistentH` a partir de CUALQUIER modelo estándar; `estandar_MN` lo instancia en `MNV V₀`. -/
-theorem consistentH_de (hM : Estandar M) : ConsistentH :=
-  fun h => prf_sound hM h (fun _ => 0)
-
 end ROBINSON_PlusPlus.Meta.SolidezPrf
 end Modelo
 
 #print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
-#print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de
 #print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound

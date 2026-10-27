@@ -13,7 +13,7 @@
 > **Ficheros `.lean`:** la cadena `Meta/` (barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean); cuántos
 > módulos, en la línea de cifras de abajo).
 
-**Build 132 jobs · 116 módulos activos** (Minimal 2 + Meta 113 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
+**Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 115 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
 · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
 
 **Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de
@@ -5582,8 +5582,10 @@ structure Estandar (M : Model Nat) : Prop where
   haxs  : ∀ v, contextSatisfies M v axioms
 theorem prfI_sound (hM : Estandar M) {φ} (h : Prfᵢ φ) : ∀ v, evalFormula M v φ
 theorem prf_sound  (hM : Estandar M) {φ} (h : Prf φ)  : ∀ v, evalFormula M v φ   -- los 7 constructores de Prf
-theorem consistentH_de (hM : Estandar M) : ConsistentH
 ```
+
+`prf_sound` es la lectura en `Prop`, y por la regla `p3` lleva `Classical.choice`. ✏️ ADR‑191: ningún titular la usa;
+`consistentH_de` se mudó a `Meta/SolidezDobleNegacion.lean` (§3.78), con la solidez doble‑negada.
 
 La inducción de `Prf` (`ind`, `listInd`) es sólida porque el dominio es ℕ de verdad: `0`, `σ` y `::` son los de
 verdad (`hzero`, `hsucc`, `hcons`), y toda lista es `nil` o un `cons` (ADR‑113; la inducción fuerte, `fuerte`).
@@ -5596,6 +5598,7 @@ theorem consistencia : ConsistentH                         -- consistentH_de est
 theorem goedel_I  : ¬ Prf godelCN                          -- goedel_first_prf consistencia
 theorem goedel_II : ¬ Prf consistencyFormula'              -- goedel_second_prf consistencia
 theorem V₀_eq_codigo : V₀ = codeNatList axioms             -- por la solidez: el ancla es teorema (prf_ancla)
+theorem estandarDN_MN : EstandarDN (MNV V₀)                -- ADR‑191: con él, V₀_eq_codigo por eq_de_prf
 ```
 
 `consistencia` es RELATIVA a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) (TEOREMAS §4, ADR‑138).
@@ -5611,7 +5614,7 @@ def Bueno (c : Nat) : Prop                 -- todo lo que c contiene decodifica 
 theorem bueno_V₀ : Bueno V₀                -- por V₀_eq_codigo: el único paso de W1 por el modelo
 theorem verificador_solido {p y} (h : chainOkN V₀ 0 p) (hy : memN y (runFnN 0 p)) : Prf (dec y)   -- W1
 theorem prf_of_prov (φ v) : evalFormula (MNV V₀) v (provCodeC' φ) → Prf φ
-theorem modelo_prov_iff (φ v) : evalFormula (MNV V₀) v (provCodeC' φ) ↔ Prf φ
+theorem gg_godelCN {M} (hM : EstandarDN M) (hW1) (v) : evalFormula M v (gg godelCN)   -- ADR‑191
 theorem goedel_I_neg : ¬ Prf (neg godelCN)                                  -- ⊬¬G
 theorem godelCN_indecidible : And (¬ Prf godelCN) (¬ Prf (neg godelCN))
 theorem godelCN_verdadera (v) : evalFormula (MNV V₀) v godelCN              -- E10
@@ -5619,7 +5622,9 @@ theorem con_verdadera     (v) : evalFormula (MNV V₀) v consistencyFormula'  --
 ```
 
 W1 se prueba etiqueta por etiqueta (las 21 líneas de `lineWFT`: `linea_p1`…), por inducción sobre la cadena. La mitad
-`⊬¬G` no usa ω‑consistencia ni Rosser: usa la verdad de T_Prf en ℕ, que es más que su consistencia.
+`⊬¬G` no usa ω‑consistencia ni Rosser: usa la verdad de T_Prf en ℕ, que es más que su consistencia. ✏️ ADR‑191: desde
+entonces, leída por la traducción doble‑negada (`gg_godelCN`: el punto fijo, W1 y `goedel_I`), sin el
+`Classical.byContradiction` de antes; `modelo_prov_iff` se mudó a `Meta/ProvFiel.lean` (§3.79).
 
 ## §3.76 · `Meta/TarskiPrf.lean` — Tarski (ADR‑121; el semántico en todo modelo estándar, ADR‑175)
 
@@ -5645,7 +5650,6 @@ ancla, que fija `axiomsCodeT` en `M`.
 ```lean
 theorem M_lt  (hM : Estandar M) (a b) : M.rel lt_sym [a, b] ↔ a < b        -- y M_mem, M_lenc, M_nthc (en rango)…
 theorem prf_of_prov_de     (hM : Estandar M) (φ v) : evalFormula M v (provCodeC' φ) → Prf φ
-theorem modelo_prov_iff_de (hM : Estandar M) (φ v) : evalFormula M v (provCodeC' φ) ↔ Prf φ
 theorem godelCN_verdadera_de (hM : Estandar M) (v) : evalFormula M v godelCN
 theorem con_verdadera_de     (hM : Estandar M) (v) : evalFormula M v consistencyFormula'
 theorem control_instancia (φ v) : …          -- la hipótesis no es vacía: la cumple MNV V₀ (estandar_MN)
@@ -5666,4 +5670,44 @@ theorem modelo_prov_iff_MB (φ v) : …           -- Prov, fiel también en el s
 ```
 
 Ningún axioma fija la basura, y las guardas no se abaratan: por eso los titulares semánticos se enuncian para todo
-`Estandar M` y no para un modelo (TEOREMAS §1).
+`Estandar M` y no para un modelo (TEOREMAS §1). (✏️ ADR‑191: `modelo_prov_iff_de` se mudó a `Meta/ProvFiel.lean`,
+§3.79; `M_mem` bajó a `Meta/SolidezDobleNegacion.lean`, §3.78.)
+
+## §3.78 · `Meta/SolidezDobleNegacion.lean` — la solidez de `Prf` sin lógica clásica (ADR‑191)
+
+La traducción de Gödel–Gentzen —átomos e igualdad doblemente negados, `∨` y `∃` por sus duales negativos— hace estable
+toda fórmula, y con eso `p3` es sólido sin lógica clásica.
+
+```lean
+def gg : Formula → Formula                                   -- la traducción
+theorem gg_estable (M) : ∀ φ v, ¬¬ evalFormula M v (gg φ) → evalFormula M v (gg φ)
+structure EstandarDN (M : Model Nat) : Prop                  -- 0, σ, :: estándar y los 142 leídos por gg
+theorem prf_sound_dn (hM : EstandarDN M) {φ} (h : Prf φ) : ∀ v, evalFormula M v (gg φ)
+theorem consistentH_dn (hM : EstandarDN M) : ConsistentH
+def clas (D) : Formula → Bool × Bool × Bool                  -- la polaridad (P, N, S)
+theorem transfer (D) (hD) : ∀ φ v, …                         -- de la lectura clásica a la doble‑negada, y vuelta
+theorem axiomas_clas : ∀ a, List.Mem a axioms → (clas Dmem a).1 = true   -- por el núcleo, sin axiomas
+theorem estandarDN_de (hM : Estandar M) : EstandarDN M       -- con M_mem: en M, ∈ es memN
+theorem consistentH_de (hM : Estandar M) : ConsistentH       -- el de SolidezPrf, mismo nombre
+theorem eq_de_prf (hM : EstandarDN M) (h : Prf (t ≐ u)) (v) : evalTerm M v t = evalTerm M v u
+theorem no_refuta (hM : EstandarDN M) (D hD) (hP) (v) (hφ : evalFormula M v φ) : ¬ Prf (neg φ)
+```
+
+Sólo `S` (de `gg φ` a `φ`) pide algo del modelo: que sean decidibles los átomos en su posición y la disyunción que
+decide; `∃` en posición `S` no pasa (sería Markov). De los 141 de la base pasan 134 sin decidir nada, y los 141 con `∈`
+de aridad 2 decidible (los siete restantes son los `lineWF` de la sustitución, por las guardas); el ancla es un átomo.
+
+## §3.79 · `Meta/ProvFiel.lean` — Prov es fiel, con el testigo (ADR‑191)
+
+```lean
+theorem proofN_of_prf {φ} (h : Prf φ) : ∃ m, ProofN m (codeNat φ)          -- D1 en ℕ
+theorem modelo_prov_iff (φ v) : evalFormula (MNV V₀) v (provCodeC' φ) ↔ Prf φ        -- SolidezVerificador.…
+theorem M_lineWF_de  (hM : Estandar M) (x) (hw : lineWFN Vm x) : M.rel lineWF [x]   -- y M_premsOf_de
+theorem M_cadena_de  (hM : Estandar M) : ∀ p c, chainOkN Vm c p → M.rel chainOk [c, p]
+theorem modelo_prov_iff_de (hM : Estandar M) (φ v) : evalFormula M v (provCodeC' φ) ↔ Prf φ   -- RigidezEstandar.…
+```
+
+La vuelta de «Prov es fiel» no se puede leer por la solidez doble‑negada: daría `¬¬∃p…`, y quitar esa doble negación
+es Markov. Hace falta el testigo: el código de la prueba de `posNum`, que `proofN_decide` confirma (su refutación choca,
+leída por `gg`, con `posNum`). En `MNV V₀`, `chainOk` es `chainOkN`; en un `M` estándar cualquiera, la vuelta de la
+rigidez, etiqueta por etiqueta.

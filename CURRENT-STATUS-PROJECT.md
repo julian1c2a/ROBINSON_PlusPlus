@@ -4,7 +4,7 @@
 > Este documento da las CIFRAS del árbol, cada una con el control que la mide, y la arquitectura por capas. Lo que se
 > hizo y cuándo está en [DECISIONS.md](DECISIONS.md); lo que queda, en [NEXT-STEPS.md](NEXT-STEPS.md) («Lo que queda»).
 
-**Last updated:** 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
+**Last updated:** 2026-10-27 — [ADR‑191](DECISIONS.md) (T61b): 134 jobs y 118 módulos (`SolidezDobleNegacion` y `ProvFiel`), 546 footprints, y `Classical.choice` sólo en `prf_sound`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
 y «Meta/CodeArith.lean», fuera: un solo `numeral` fuera de `Minimal`). Antes, el mismo día — [ADR‑182](DECISIONS.md) (T26): reescrito entero. El cuerpo anterior —las tablas del
 2026‑09‑10, con sus notas, y el diario de mayo a agosto— está, tal cual, en
 [doc/historia/CURRENT-STATUS-hasta-2026-10-21.md](doc/historia/CURRENT-STATUS-hasta-2026-10-21.md).
@@ -20,14 +20,14 @@ que tienen forma de frase fija (los jobs, los módulos, `sorry`, `axiom`, `cuare
 
 | cifra | hoy | la mide |
 |---|---|---|
-| Build | **132** jobs, 0 errores | `lake build` (la CI, en cada push) |
-| Módulos | **116** módulos activos: Minimal 2 + Meta 113 + Full 1, más el barrel `Meta.lean` y la raíz `ROBINSON_PlusPlus.lean` | `check-doc-sync.bash` `[A]` y `[L]` (la librería es el cierre de imports, y todo `.lean` del árbol está en ella) |
+| Build | **134** jobs, 0 errores | `lake build` (la CI, en cada push) |
+| Módulos | **118** módulos activos: Minimal 2 + Meta 115 + Full 1, más el barrel `Meta.lean` y la raíz `ROBINSON_PlusPlus.lean` | `check-doc-sync.bash` `[A]` y `[L]` (la librería es el cierre de imports, y todo `.lean` del árbol está en ella) |
 | Fuera del build | 0 en `cuarentena/` · **44** `sondeos/`, 11 de control | `check-sondeos.bash --controles` (los 11, en la CI); `sondeos/README.md` |
 | `sorry` | 0 `sorry` | `check-sorry.bash` (el texto) y `check-estratos.bash` (el entorno) |
 | `axiom` de Lean | 0 `axiom` de Lean en el build, en RPP y en FOL | `check-sorry.bash`, `check-estratos.bash` y `../FOL/check-axioms.bash`, por entorno y con señuelo (T13) |
 | Axiomas objeto | **142**: 34 matemáticos (`coreAxioms`) + 107 de codificación (`codingAxioms`) + el ancla diagonal | `axioms_len` y `axiomsBase_len` (`Full/Induction.lean`), por `rfl`, en cada build |
 | Titulares | **29**, cada uno con su fila en [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 o §3 | `[T]` (`T_UNIVERSO`); el contrato de sus enunciados (T07, `Meta/ContratoTitulares.lean`: 544 constantes en el cierre de sus tipos) y la pureza de la clase (i) (T08, `Meta/PurezaTitulares.lean`), en cada build |
-| Footprints | **538** filas | `check-footprints.bash` |
+| Footprints | **546** filas; en RPP, `Classical.choice` sólo en `prf_sound` (ADR‑191) | `check-footprints.bash` |
 | Avisos | **28** declarados: los 9 de siempre y 19 nombres obsoletos en seis módulos congelados de FOL | `check-warnings.bash` |
 | Estratos | **10** nociones de derivabilidad, ninguna habitada por un `axiom` | `check-estratos.bash` |
 | Núcleo | `leanchecker` re‑comprueba en la CI cada declaración de RPP, FOL y TheoryFramework | `.github/workflows/build.yml` |
@@ -61,7 +61,7 @@ módulo del árbol esté en él); las dependencias, [DEPENDENCIES.md](DEPENDENCI
 |---|---|---|
 | `Minimal/` | el lenguaje y la LISTA de axiomas (`Axioms.lean`: los 142, sin esquema de inducción) y la macro de los literales de símbolo (`SymLit.lean`) | 2 |
 | `Full/` | `primAxioms` y las longitudes del censo, los lemas de sustitución y la fórmula `inductionFormula` (`Induction.lean`); el `numeral`, uno solo, en `Meta/Godel.lean` (ADR‑190) | 1 |
-| `Meta/` | todo lo demás, en siete familias (abajo) | 113 |
+| `Meta/` | todo lo demás, en siete familias (abajo) | 115 |
 
 Las familias de `Meta/` (los nombres, en REFERENCE §1.5):
 
@@ -79,7 +79,8 @@ Las familias de `Meta/` (los nombres, en REFERENCE §1.5):
   (`LineWFTrackedPrf`, `LineWFAssemblePrf`…) y el ensamblaje (`D3ChainDotPrf`, `D3BodyPrf` y `PremsBdAllPrf`, con
   `d3_prf_real`).
 * **El modelo, la solidez y la consistencia**: `ModeloCodigo`, `ModeloEstandar`, `ModeloCodificacion`, `SolidezPrf`,
-  `Consistencia`, `SolidezVerificador` (W1), `RigidezEstandar` (W1 y E10 en todo modelo estándar) y `SegundoModelo`.
+  `SolidezDobleNegacion` (la solidez sin lógica clásica, ADR‑191), `Consistencia`, `SolidezVerificador` (W1),
+  `RigidezEstandar` (W1 y E10 en todo modelo estándar), `ProvFiel` (Prov fiel, con el testigo) y `SegundoModelo`.
 * **Los titulares**: `GodelTwo`, `GodelTwoPrf`, `GodelCorolarios`, `TarskiPrf`, `Rosser` y sus etapas (`RosserW1`,
   `RosserPosNum`, `RosserNumerales`, `RosserNumEval`, `RosserGuardNeg`, `RosserNegLinea`, `RosserNegNum`) y `Lob`.
 * **Los controles que viven en el build**: `PurezaComando` y `PurezaTitulares` (T08), `ContratoTitulares` y

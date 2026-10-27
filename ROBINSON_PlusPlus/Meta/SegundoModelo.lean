@@ -3,7 +3,7 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.RigidezEstandar
+import ROBINSON_PlusPlus.Meta.ProvFiel
 
 /-!
 # `Meta/SegundoModelo.lean` — 🏁 UN SEGUNDO modelo estándar: sobre la basura, `M` es libre (T75d, ADR‑175)

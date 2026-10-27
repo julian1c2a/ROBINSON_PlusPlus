@@ -1,0 +1,16 @@
+# T61b (ADR-191): sondeos/ChoiceFrontera.lean DESPUÉS de la solidez doble-negada, el 2026-10-27, con v4.35.0
+# (el ANTES, en doc/registro/2026-10-21-t61/choicefrontera.txt, «DESPUÉS»: 23 filas). bash check-sondeos.bash ChoiceFrontera.lean
+
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound: 1 puntos de entrada
+  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound  ←  [Classical.byContradiction]
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski: 0 puntos de entrada
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski: 0 puntos de entrada
+filas con choice: 1 (no encontradas en el entorno: 0) · pasan por prf_sound: 1 · sólo por prf_sound: 1 · no pasan por prf_sound: 0 · toda su frontera en las dos cancelaciones de lift (SubstArith.substTerm_liftLiftLift y …LiftLiftLift): 0
+puntos de entrada (filas que pasan por cada uno):
+  1  ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound

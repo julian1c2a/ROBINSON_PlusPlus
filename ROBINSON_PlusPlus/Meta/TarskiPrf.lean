@@ -147,22 +147,38 @@ example (hbot : Prf Formula.bottom) (Tr : Formula) :
 
 /-! ## §7 · TARSKI SEMÁNTICO: en TODO modelo estándar, y en `MNV V₀`
 
-Por la solidez (`prf_sound`) aplicada al mentiroso: si `Tr(⌜L⌝)` y `L` valieran a la vez en el modelo, como el modelo
-satisface `L ⇔ ¬Tr(⌜L⌝)`, `Tr(⌜L⌝)` valdría y no valdría. La prueba sólo pide la solidez, así que vale en todo `M`
-con `Estandar M` (T75a, ADR‑175); `tarski_semantico` es la instancia en `MNV V₀` (`estandar_MN`), que es también el
-control de que la hipótesis no es vacía. -/
+Si `Tr(⌜L⌝)` y `L` valieran a la vez en el modelo, como el modelo satisface `L ⇔ ¬Tr(⌜L⌝)`, `Tr(⌜L⌝)` valdría y no
+valdría. Vale en todo `M` con `Estandar M` (T75a, ADR‑175); `tarski_semantico` es la instancia en `MNV V₀`
+(`estandar_MN`), que es también el control de que la hipótesis no es vacía.
+
+✏️ *(ADR‑191)*: hasta ADR‑190, `L ⇔ ¬Tr(⌜L⌝)` se leía en el modelo por la solidez en `Prop` (`prf_sound`), que lleva la
+lógica clásica (`p3`). Con `Tr` arbitraria eso no se puede leer de otro modo; lo que se lee ahora es UNA IGUALDAD, la del
+término diagonal (`prf_diag_arith_num`): por la solidez doble‑negada vale en `M`, porque en `Nat` la igualdad es
+decidible (`eq_de_prf`). Con ella, `L` es literalmente `¬Tr(t)` con `t` del mismo valor que `⌜L⌝`, y el resto es
+lógica intuicionista. -/
 open FOL.Metamath.Semantics in
 /-- 🏁 Ninguna `Tr` define la verdad en un modelo estándar CUALQUIERA: falla en su mentiroso, para toda asignación. -/
 theorem tarski_semantico_de {M : Model Nat} (hM : ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar M) (Tr : Formula)
     (v : Nat → Nat) :
     ¬ (evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) ↔ evalFormula M v (liar Tr)) := by
   intro h1
-  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound hM (prf_liar Tr) v
-  -- `hs : (L → ¬T) ∧ (¬T → L)`, con `T := Tr(⌜L⌝)`; `h1 : T ↔ L`
-  have hLnT := hs.1
-  have hnTL := hs.2
-  have hnT : ¬ evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) := fun hT => hLnT (h1.mp hT) hT
-  exact hnT (h1.mpr (hnTL hnT))
+  -- el término diagonal vale lo que el numeral del mentiroso: una igualdad que `Prf` demuestra
+  have he : evalTerm M v (substTerm 0 (numeral (codeNat (diagBeta (neg Tr)))) diagTerm) =
+      evalTerm M v (numeral (codeNat (liar Tr))) :=
+    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.eq_de_prf
+      (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de hM) (prf_diag_arith_num (diagBeta (neg Tr))) v
+  -- `L` ES `¬ Tr(t)`, con `t` el término diagonal
+  have hL : liar Tr = neg (substFormula 0 (substTerm 0 (numeral (codeNat (diagBeta (neg Tr)))) diagTerm) Tr) := by
+    unfold liar selfAppN
+    rw [diagBeta_comp, substFormula_neg]
+  -- luego `L ↔ ¬ Tr(⌜L⌝)` en `M`, por el valor del término
+  have hLT : evalFormula M v (liar Tr) ↔ ¬ evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) := by
+    have h2 : evalFormula M v (liar Tr) ↔
+        ¬ evalFormula M v (substFormula 0 (substTerm 0 (numeral (codeNat (diagBeta (neg Tr)))) diagTerm) Tr) := by
+      rw [hL]; exact Iff.rfl
+    rw [h2, eval_substFormula_zero, eval_substFormula_zero M v (numeral (codeNat (liar Tr))), he]
+  have hnT : ¬ evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) := fun hT => hLT.mp (h1.mp hT) hT
+  exact hnT (h1.mpr (hLT.mpr hnT))
 
 open FOL.Metamath.Semantics in
 /-- 🏁 Ninguna `Tr` define la verdad en `MNV V₀`: la instancia de `tarski_semantico_de` en `estandar_MN`. -/

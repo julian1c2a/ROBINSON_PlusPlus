@@ -163,6 +163,7 @@ import ROBINSON_PlusPlus.Meta.ModeloCodigo
 import ROBINSON_PlusPlus.Meta.ModeloEstandar
 import ROBINSON_PlusPlus.Meta.ModeloCodificacion
 import ROBINSON_PlusPlus.Meta.SolidezPrf
+import ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
 import ROBINSON_PlusPlus.Meta.Consistencia
 import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
@@ -178,6 +179,7 @@ import ROBINSON_PlusPlus.Meta.Rosser
 import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.GodelCorolarios
 import ROBINSON_PlusPlus.Meta.RigidezEstandar
+import ROBINSON_PlusPlus.Meta.ProvFiel
 import ROBINSON_PlusPlus.Meta.SegundoModelo
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
 -- (✏️ 2026‑10‑19, ADR‑170, T74: `FOL.Deduction`, `FOL.Theorems.Derived`, `Impl` y `Neg`, sin nada en el cono, fuera.)

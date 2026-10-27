@@ -559,28 +559,38 @@ theorem prf_of_prov (φ : Formula) (v : Nat → Nat) :
   rw [dec_codeNat] at h
   exact h
 
-/-- 🏁 **`Prov` es FIEL en `MNV V₀`**, el modelo estándar construido: `MNV V₀ ⊨ Prov(⌜φ⌝)` exactamente cuando `φ` es
-    teorema (en TODO modelo estándar: `modelo_prov_iff_de`, `Meta/RigidezEstandar.lean`, ADR‑173). La ida es W1; la vuelta, D1 (`repr_pos'_prf`) y la solidez. Es también el control de vacuidad de W1: su hipótesis se
-    cumple para cada teorema. -/
-theorem modelo_prov_iff (φ : Formula) (v : Nat → Nat) :
-    evalFormula (MNV V₀) v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔ Prf φ :=
-  ⟨prf_of_prov φ v, fun h => ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN
-    (ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf h) v⟩
+-- (✏️ ADR‑191: `modelo_prov_iff` —`Prov` es fiel en `MNV V₀`— se mudó a `Meta/ProvFiel.lean`, con su nombre: su
+-- vuelta pide ahora el testigo de `posNum` y `proofN_decide`, que van después de este módulo.)
 
-/-- 🏁🏁 **GÖDEL I, la mitad `⊬ ¬G`**, sin hipótesis: con `Prf ¬G`, el modelo creería demostrable `G` (por el
-    punto fijo), y lo que cree demostrable lo es (`prf_of_prov`); `goedel_I` lo impide. -/
-theorem goedel_I_neg : ¬ Prf (neg ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) := by
-  intro hn
-  have hfp := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN
-    ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint (fun _ => 0)
-  have hng := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN
-    hn (fun _ => 0)
-  have hprov : evalFormula (MNV V₀) (fun _ => 0)
-      (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) := by
-    apply Classical.byContradiction
-    intro hnp
-    exact hng (hfp.2 hnp)
-  exact ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (prf_of_prov _ _ hprov)
+open ROBINSON_PlusPlus.Meta.SolidezDobleNegacion in
+/-- `G`, LEÍDA POR `gg`, vale en todo modelo de la lectura doble‑negada en el que lo que se cree demostrable lo es
+    (W1): el punto fijo, leído por `gg`, dice `gg G ⇔ ¬ gg Prov(⌜G⌝)`; y `gg Prov(⌜G⌝)` daría `¬¬ Prf G` (por `N`: la
+    matriz de `Prov` no tiene cuantificadores ni disyunciones), que `goedel_I` refuta. Sin lógica clásica (ADR‑191). -/
+theorem gg_godelCN {M : Model Nat} (hM : EstandarDN M)
+    (hW1 : ∀ v, evalFormula M v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) →
+      Prf ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)
+    (v : Nat → Nat) : evalFormula M v (gg ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) := by
+  have hfp := prf_sound_dn hM ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint v
+  have hN : (clas Dnada (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'
+      ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)).2.1 = true := by
+    rw [ROBINSON_PlusPlus.Meta.ProofChain.provCodeC', clas_subst]; rfl
+  exact hfp.2 (fun hP => (transfer Dnada decNada _ v).2.1 hN hP
+    (fun hp => ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (hW1 v hp)))
+
+open ROBINSON_PlusPlus.Meta.SolidezDobleNegacion in
+/-- La polaridad de `G` admite `S`: `G` es `¬Prov(…)`, y la matriz de `Prov` no pide nada. La de `godelPred'`, por
+    `clas_subst` dos veces: el numeral de `selfAppN` no se mira. -/
+theorem clas_godelCN : (clas Dnada ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN).2.2 = true := by
+  rw [ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN, ROBINSON_PlusPlus.Meta.DiagonalNumeral.selfAppN, clas_subst,
+    ROBINSON_PlusPlus.Meta.DiagonalTwo.godelBeta', clas_subst]
+  rfl
+
+/-- 🏁🏁 **GÖDEL I, la mitad `⊬ ¬G`**, sin hipótesis: con `Prf ¬G`, la solidez doble‑negada en `MNV V₀` daría
+    `¬ gg G`, y `gg G` vale (`gg_godelCN`, con W1 y `goedel_I`). Desde ADR‑191 sin lógica clásica: ya no hay
+    `Classical.byContradiction` (sacar `Prov(⌜G⌝)` de su doble negación era Markov). -/
+theorem goedel_I_neg : ¬ Prf (neg ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) := fun hn =>
+  ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN hn
+    (fun _ => 0) (gg_godelCN ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN (fun v hp => prf_of_prov _ v hp) _)
 
 /-- 🏁🏁 **`G` es INDECIDIBLE en `Prf`**: ni `G` (`goedel_I`) ni `¬G` (`goedel_I_neg`). -/
 theorem godelCN_indecidible : And (¬ Prf ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)
@@ -593,14 +603,13 @@ theorem godelCN_indecidible : And (¬ Prf ROBINSON_PlusPlus.Meta.DiagonalNumeral
 Lo que dicen —«no soy demostrable», «`⊥` no es demostrable»— es cierto en `MNV V₀`: si el modelo creyera lo
 contrario, `prf_of_prov` daría `Prf G` o `Prf ⊥`, y `goedel_I`/`consistencia` lo impiden. -/
 
-/-- 🏁 **`G` es VERDADERA en `MNV V₀`** (y no demostrable: `goedel_I`). -/
+/-- 🏁 **`G` es VERDADERA en `MNV V₀`** (y no demostrable: `goedel_I`): `gg G` vale (`gg_godelCN`), y `G` tiene `S`
+    (`clas_godelCN`), así que vale también en la lectura clásica. Sin lógica clásica (ADR‑191). -/
 theorem godelCN_verdadera (v : Nat → Nat) :
-    evalFormula (MNV V₀) v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN := by
-  have hfp := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN
-    ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint v
-  apply hfp.2
-  intro hp
-  exact ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (prf_of_prov _ _ hp)
+    evalFormula (MNV V₀) v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
+  (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ v).2.2 clas_godelCN
+    (gg_godelCN ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN (fun v' hp => prf_of_prov _ v' hp) v)
 
 /-- 🏁 **`Con` es VERDADERA en `MNV V₀`** (y no demostrable: `goedel_II`). -/
 theorem con_verdadera (v : Nat → Nat) :
@@ -615,4 +624,3 @@ end ROBINSON_PlusPlus.Meta.SolidezVerificador
 #print axioms ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible
 #print axioms ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera
 #print axioms ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera
-#print axioms ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff

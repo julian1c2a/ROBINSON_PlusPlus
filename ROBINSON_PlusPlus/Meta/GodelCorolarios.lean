@@ -75,12 +75,23 @@ theorem goedel_second_de_formalizado (hcon : ConsistentH) : ¬ Prf consistencyFo
   fun hC => hcon (prf_mp (prf_mp goedel_second_formalizado hC) (repr_pos'_prf hC))
 
 /-- 🏁 **`Con'` es INDECIDIBLE**: `goedel_II`, y `¬ Prf ¬Con'` porque `Con'` es verdadera en `MNV V₀` y `Prf` es
-    sólida. Clase (iii): la consistencia sola no basta (T+¬Con es consistente y demuestra ¬Con'). -/
+    sólida. Clase (iii): la consistencia sola no basta (T+¬Con es consistente y demuestra ¬Con'). Desde ADR‑191, por la
+    solidez doble‑negada: `Con'` es `¬Prov(⌜⊥⌝)`, tiene `P`, y lo verdadero con `P` no se refuta (`no_refuta`). -/
 theorem con_indecidible : And (¬ Prf consistencyFormula') (¬ Prf (neg consistencyFormula')) := by
-  refine ⟨ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, fun h => ?_⟩
-  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN h
-    (fun _ => 0)
-  exact hs (ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera (fun _ => 0))
+  refine ⟨ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, ?_⟩
+  have e : ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+      (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' Formula.bottom) =
+      ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+        ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC' := by
+    rw [ROBINSON_PlusPlus.Meta.ProofChain.provCodeC', ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas_subst]
+  have hP : (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+      consistencyFormula').1 = true := by
+    rw [consistencyFormula', neg]
+    simp only [ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas, e]
+    rfl
+  exact ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.no_refuta ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
+    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada hP
+    (fun _ => 0) (ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera (fun _ => 0))
 
 end ROBINSON_PlusPlus.Meta.GodelCorolarios
 

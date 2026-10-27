@@ -654,22 +654,26 @@ theorem control_neg_hasWit_zero : Prf (neg (hasWit (numeralM 0))) :=
 theorem control_neg_hasWitF_zero : Prf (neg (hasWitF (numeralM 0))) :=
   prf_neg_hasWitF fun h => codF_ne_zero (codF_of_hasWitFN h) rfl
 
-/-- ✅ **…y sólo donde la guarda es falsa**: donde vale en ℕ, `Prf` no la refuta, por la solidez en `MNV V₀`. Nombra la
+/-- ✅ **…y sólo donde la guarda es falsa**: donde vale en ℕ, `Prf` no la refuta, por la solidez en `MNV V₀` (la doble‑negada, ADR‑191: lo verdadero con `P` no se refuta). Nombra la
     semántica: es el control positivo del `#pureza`. -/
 theorem control_exacta (c : Nat) (h : hasWitN c) : ¬ Prf (neg (hasWit (numeralM c))) := by
   intro hp
-  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN hp
-    (fun _ => 0)
+  have hs := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
+    hp (fun _ => 0)
   apply hs
+  apply (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ _).1 rfl
   rw [ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_hasWit, ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM]
   exact h
 
 /-- ✅ Lo mismo para la guarda de fórmula. -/
 theorem control_exactaF (c : Nat) (h : hasWitFN c) : ¬ Prf (neg (hasWitF (numeralM c))) := by
   intro hp
-  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN hp
-    (fun _ => 0)
+  have hs := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
+    hp (fun _ => 0)
   apply hs
+  apply (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ _).1 rfl
   rw [ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_hasWitF, ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM]
   exact h
 

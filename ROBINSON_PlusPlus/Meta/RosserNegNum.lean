@@ -244,12 +244,14 @@ theorem negNum_formCode {φ : Formula} (h : ¬ Prf φ) (m : Nat) :
 theorem control_negNum_vacia (y : Nat) : Prf (neg (PfF (numeralM 0) (numeralM y))) :=
   negNum (not_proofN_zero y)
 
-/-- ✅ **…y sólo donde no hay prueba**: donde `ProofN` vale, `Prf` no refuta `PfF`, por la solidez en `MNV V₀`. -/
+/-- ✅ **…y sólo donde no hay prueba**: donde `ProofN` vale, `Prf` no refuta `PfF`, por la solidez en `MNV V₀` (la doble‑negada, ADR‑191: lo verdadero con `P` no se refuta). -/
 theorem control_exacta {m y : Nat} (h : ProofN m y) : ¬ Prf (neg (PfF (numeralM m) (numeralM y))) := by
   intro hp
-  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN hp
-    (fun _ => 0)
+  have hs := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
+    hp (fun _ => 0)
   apply hs
+  apply (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ _).1 rfl
   have em := ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM (V := codeNatList axioms) (fun _ => 0) m
   have ey := ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM (V := codeNatList axioms) (fun _ => 0) y
   simp only [PfF, land, chainOk, In, runFn, nil, zero, FOL.Metamath.Semantics.evalFormula,

@@ -52,8 +52,8 @@ namespace ROBINSON_PlusPlus.Meta.RigidezEstandar
 
 variable {M : Model Nat}
 
-theorem ax_de (hM : Estandar M) {φ : Formula} (h : φ ∈ axioms) (v : Nat → Nat) : evalFormula M v φ :=
-  hM.haxs v φ h
+-- (✏️ ADR‑191: `ax_de`, `consN_de` y `M_mem` bajaron a `Meta/SolidezDobleNegacion.lean`, con su nombre: la solidez
+-- doble‑negada en todo modelo estándar pide que `∈` sea el de verdad, y la consistencia va antes que este módulo.)
 
 /-! ## §1 · Los códigos cerrados -/
 
@@ -100,27 +100,6 @@ theorem M_carc (hM : Estandar M) (a b : Nat) : M.func sym!"carc" [consN a b] = a
 theorem M_cdrc (hM : Estandar M) (a b : Nat) : M.func sym!"cdrc" [consN a b] = b := by
   have h := ax_de hM (φ := ax_cdrc) (by simp [axioms]) (fun _ => 0) a b
   simpa [ax_cdrc, forall_2, cdrc, cons, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hcons] using h
-
-/-- Toda lista no vacía es un `consN`, y su cola es menor. -/
-theorem consN_de {l : Nat} (h : ¬ l = 0) : ∃ a b, And (l = consN a b) (b < l) :=
-  ⟨carN l, cdrN l, (consN_car_cdr h).symm, cdrN_lt h⟩
-
-theorem M_mem (hM : Estandar M) : ∀ (l x : Nat), M.rel in_sym [x, l] ↔ memN x l := by
-  intro l
-  induction l using Nat.strongRecOn with
-  | ind l ih =>
-    intro x
-    by_cases hl : l = 0
-    · subst hl
-      have h := ax_de hM (φ := ax_L1_in_nil) (by simp [axioms]) (fun _ => 0) x
-      simp [ax_L1_in_nil, forall_, neg, In, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] at h
-      simp [h, memN_zero]
-    · obtain ⟨a, b, rfl, hb⟩ := consN_de hl
-      have h := ax_de hM (φ := ax_L2_in_cons) (by simp [axioms]) (fun _ => 0) x a b
-      simp [ax_L2_in_cons, forall_3, _root_.iff, In, cons, lor, evalFormula, evalTerm, evalTerms, shiftEnv,
-        hM.hcons] at h
-      rw [show M.rel in_sym [x, consN a b] ↔ Or (x = a) (M.rel in_sym [x, b]) from ⟨h.1, h.2⟩,
-        memN_consN, ih b hb x]
 
 theorem M_lenc (hM : Estandar M) : ∀ l : Nat, M.func sym!"lenc" [l] = lenN l := by
   intro l
@@ -643,10 +622,13 @@ theorem M_listFormCodeM (hM : Estandar M) (v : Nat → Nat) :
 /-! ## §7 · El ancla, y lo que necesita la cadena: `carc` de una línea, `allIn` -/
 
 /-- El valor de `axiomsCodeT` en `M` es el código de los 142: el ancla es teorema (`prf_ancla`), `M` es sólida, y
-    el código cerrado se evalúa igual. -/
+    el código cerrado se evalúa igual. Desde ADR‑191, por la solidez doble‑negada: el ancla es una igualdad, y en `Nat`
+    la igualdad es decidible (`eq_de_prf`). -/
 theorem M_axiomsCodeT (hM : Estandar M) : M.func sym!"axiomsCodeT" [] = codeNatList axioms := by
-  have h := prf_sound hM ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla (fun _ => 0)
-  simp only [evalFormula, axiomsCodeT, evalTerm, evalTerms, M_listFormCodeM hM] at h
+  have h := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.eq_de_prf
+    (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de hM)
+    ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla (fun _ => 0)
+  simp only [axiomsCodeT, evalTerm, evalTerms, M_listFormCodeM hM] at h
   exact h
 
 theorem M_carc' (hM : Estandar M) {x : Nat} (hx : ¬ x = 0) : M.func sym!"carc" [x] = carN x := by
@@ -986,18 +968,18 @@ theorem prf_of_prov_de (hM : Estandar M) (φ : Formula) (v : Nat → Nat) :
     ROBINSON_PlusPlus.Meta.SolidezVerificador.bueno_zero hch (codeNat φ) hm
   rwa [ROBINSON_PlusPlus.Meta.SolidezVerificador.dec_codeNat] at h
 
-/-- 🏁 **`Prov` es FIEL en todo modelo estándar.** -/
-theorem modelo_prov_iff_de (hM : Estandar M) (φ : Formula) (v : Nat → Nat) :
-    evalFormula M v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔ Prf φ :=
-  ⟨prf_of_prov_de hM φ v, fun h => prf_sound hM (ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf h) v⟩
+-- (✏️ ADR‑191: `modelo_prov_iff_de` —`Prov` es fiel en todo modelo estándar— se mudó a `Meta/ProvFiel.lean`, con su
+-- nombre: su vuelta pide el testigo de `proofN_of_prf` y la vuelta de la rigidez, `M_cadena_de`.)
 
-/-- 🏁 **E10: `G` es VERDADERA en todo modelo estándar.** -/
+/-- 🏁 **E10: `G` es VERDADERA en todo modelo estándar**: `gg G` vale (`gg_godelCN`, con `prf_of_prov_de`) y `G`
+    tiene `S` (`clas_godelCN`). Sin lógica clásica (ADR‑191). -/
 theorem godelCN_verdadera_de (hM : Estandar M) (v : Nat → Nat) :
-    evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN := by
-  have hfp := prf_sound hM ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint v
-  apply hfp.2
-  intro hp
-  exact ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (prf_of_prov_de hM _ _ hp)
+    evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
+  (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
+    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ v).2.2
+    ROBINSON_PlusPlus.Meta.SolidezVerificador.clas_godelCN
+    (ROBINSON_PlusPlus.Meta.SolidezVerificador.gg_godelCN
+      (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de hM) (fun v' hp => prf_of_prov_de hM _ v' hp) v)
 
 /-- 🏁 **E10: `Con` es VERDADERA en todo modelo estándar.** -/
 theorem con_verdadera_de (hM : Estandar M) (v : Nat → Nat) :
@@ -1090,7 +1072,6 @@ end ROBINSON_PlusPlus.Meta.RigidezEstandar
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.M_lineWF
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.M_cadena
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
-#print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.control_ancla

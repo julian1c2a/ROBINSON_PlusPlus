@@ -7,7 +7,7 @@
 [![Build](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml/badge.svg)](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**Last updated:** 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
+**Last updated:** 2026-10-27 — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
 capas, la instalación con el hermano FOL y el toolchain exacto, los controles, los documentos). Lo de antes, en la
 historia de git.
 
@@ -42,7 +42,7 @@ Con(Lean) → Con(T_Prf)); absoluta no puede ser ([TEOREMAS-E-HIPOTESIS.md](TEOR
 
 ## Las capas
 
-**116** módulos activos (Minimal 2 + Meta 113 + Full 1); el catálogo, módulo a módulo, en [REFERENCE.md](REFERENCE.md)
+**118** módulos activos (Minimal 2 + Meta 115 + Full 1); el catálogo, módulo a módulo, en [REFERENCE.md](REFERENCE.md)
 §1, y las cifras de hoy, cada una con su control, en [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md).
 
 | capa | qué hay |

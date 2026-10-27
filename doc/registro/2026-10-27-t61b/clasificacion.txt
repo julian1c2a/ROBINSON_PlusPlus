@@ -1,0 +1,89 @@
+# T61b (ADR-191): la POLARIDAD de los 141 axiomas de la base, medida antes de escribir la solidez doble-negada
+# (2026-10-26, lake env lean sobre la fuente de abajo; el ancla, que es un átomo, no se evalúa).
+#
+# P = de φ a gg φ; N = de gg φ a ¬¬φ; S = de gg φ a φ. D = los símbolos de relación que el modelo decide.
+#   D = todos         → fallan 0 de 141
+#   D = {∈}           → fallan 0 de 141   (el que usa axiomas_clas, con la aridad 2)
+#   D = ninguno       → fallan 7 de 141: los índices 121, 123, 125, 127, 129, 131, 133, los lineWF de la
+#                       sustitución (q1, q2, q3, leibniz, ind, qconf, listInd): un ∈ bajo un ∀ en el antecedente
+#                       (las guardas hasWitF/hasWit) pide S de ∈.
+# Primera pasada, con S (A ∨ B) decidiendo sólo el lado izquierdo: con D = todos fallaban también esos 7 (el
+# lado izquierdo de la disyunción de la guarda lleva un ∀ acotado); decidir cualquiera de los dos lados lo arregla.
+
+== la fuente (Sonda, en el scratchpad de la sesión)
+import ROBINSON_PlusPlus.Minimal.Axioms
+
+open FOL ROBINSON_PlusPlus.Minimal.Axioms
+
+namespace Sonda
+
+/-- Sin cuantificadores, con todos los átomos de relación en `D` (la igualdad, siempre). -/
+def qfD (D : List Char → Bool) : Formula → Bool
+  | .bottom => true
+  | .atom p _ => D p
+  | .eq _ _ => true
+  | .impl A B => qfD D A && qfD D B
+  | .forall _ => false
+  | .and A B => qfD D A && qfD D B
+  | .or A B => qfD D A && qfD D B
+  | .ex _ => false
+
+mutual
+/-- P: `eval φ → eval (gg φ)`. -/
+def canP (D : List Char → Bool) : Formula → Bool
+  | .bottom => true
+  | .atom _ _ => true
+  | .eq _ _ => true
+  | .impl A B => canN D A && canP D B
+  | .forall A => canP D A
+  | .and A B => canP D A && canP D B
+  | .or A B => canP D A && canP D B
+  | .ex A => canP D A
+/-- N: `eval (gg φ) → ¬¬ eval φ`. -/
+def canN (D : List Char → Bool) : Formula → Bool
+  | .bottom => true
+  | .atom _ _ => true
+  | .eq _ _ => true
+  | .impl A B => canP D A && canN D B
+  | .forall A => canS D A
+  | .and A B => canN D A && canN D B
+  | .or A B => canN D A && canN D B
+  | .ex A => canN D A
+/-- S: `eval (gg φ) → eval φ`. -/
+def canS (D : List Char → Bool) : Formula → Bool
+  | .bottom => true
+  | .atom p _ => D p
+  | .eq _ _ => true
+  | .impl A B => canP D A && canS D B
+  | .forall A => canS D A
+  | .and A B => canS D A && canS D B
+  | .or A B => (qfD D A && canN D A && canS D B) || (qfD D B && canN D B && canS D A)
+  | .ex _ => false
+end
+
+def esq : Formula → String
+  | .bottom => "⊥"
+  | .atom p _ => String.ofList p
+  | .eq _ _ => "="
+  | .impl A B => "(" ++ esq A ++ " ⇒ " ++ esq B ++ ")"
+  | .forall A => "∀" ++ esq A
+  | .and A B => "(" ++ esq A ++ " ∧ " ++ esq B ++ ")"
+  | .or A B => "(" ++ esq A ++ " ∨ " ++ esq B ++ ")"
+  | .ex A => "∃" ++ esq A
+
+def todos : List Char → Bool := fun _ => true
+def nada : List Char → Bool := fun _ => false
+def ltMem : List Char → Bool := fun p => p == in_sym
+
+def informe (D : List Char → Bool) : List String :=
+  (axiomsBase.zipIdx).filterMap fun (a, i) =>
+    if canP D a then none else some (toString i ++ ": " ++ esq a)
+
+#eval axiomsBase.length
+#eval (informe todos).length
+#eval (informe ltMem).length
+#eval (informe nada).length
+#eval (informe nada).take 2
+#eval informe ltMem
+
+end Sonda

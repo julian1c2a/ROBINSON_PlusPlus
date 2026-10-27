@@ -1,0 +1,23 @@
+# T61b (ADR-191): las filas de check-footprints.bash que pierden Classical.choice con la solidez doble-negada (antes -> después: [propext, Quot.sound]). Medido con lake build, Lean v4.35.0, el 2026-10-27.
+ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
+ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible
+ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera
+ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera
+ROBINSON_PlusPlus.Meta.Rosser.rosser
+ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
+ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
+ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
+ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
+ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
+ROBINSON_PlusPlus.Meta.RigidezEstandar.control_ancla
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
+ROBINSON_PlusPlus.Meta.SegundoModelo.modelo_prov_iff_MB

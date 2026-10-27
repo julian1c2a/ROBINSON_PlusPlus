@@ -10,6 +10,7 @@ import ROBINSON_PlusPlus.Meta.Rosser
 import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.GodelCorolarios
 import ROBINSON_PlusPlus.Meta.RigidezEstandar
+import ROBINSON_PlusPlus.Meta.ProvFiel
 
 /-!
 # `Meta/ContratoTitulares.lean` — T07: el CONTRATO de los enunciados de los titulares (ADR‑165)

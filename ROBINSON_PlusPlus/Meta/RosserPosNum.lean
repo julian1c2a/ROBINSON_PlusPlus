@@ -23,7 +23,7 @@ verificador (`ModeloCodigo`): basta que el código de la prueba sea un numeral (
 
 **Controles.** `prov_of_pfF`: `PfF` es la matriz de `provCodeC'`, así que un testigo da `Prov(⌜φ⌝)`; con `posNum`,
 `repr_pos_num` es D1 otra vez, por un numeral. Y el `#pureza` del final: lo de la etapa no nombra la semántica, y
-`modelo_prov_iff` —D1 leído en el modelo— sí.
+`prf_of_prov` —W1 leído en el modelo— sí.
 
 ⛔ Ningún código se evalúa: `codeNat`, `codeNatTerm` y `codeNatProof` sólo se mueven por unificación estructural y por
 `rw` (ADR‑130).
@@ -183,8 +183,9 @@ end ROBINSON_PlusPlus.Meta.RosserPosNum
 #print axioms ROBINSON_PlusPlus.Meta.RosserPosNum.posNum
 #print axioms ROBINSON_PlusPlus.Meta.RosserPosNum.repr_pos_num
 
-/-! T08 en el módulo (ADR‑147): lo de esta etapa no nombra la semántica; `modelo_prov_iff`, D1 leído en el modelo,
-    sí. Si un paso de aquí pasara por el modelo, el build fallaría en este módulo. -/
+/-! T08 en el módulo (ADR‑147): lo de esta etapa no nombra la semántica; `prf_of_prov`, W1 leído en el modelo, sí
+    (✏️ ADR‑191: era `modelo_prov_iff`, que se mudó a `Meta/ProvFiel.lean`, después de este módulo). Si un paso de aquí
+    pasara por el modelo, el build fallaría en este módulo. -/
 #pureza ROBINSON_PlusPlus.Meta.RosserPosNum.prf_proofCode'_numeral ROBINSON_PlusPlus.Meta.RosserPosNum.posNum
   ROBINSON_PlusPlus.Meta.RosserPosNum.repr_pos_num
-  | ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff
+  | ROBINSON_PlusPlus.Meta.SolidezVerificador.prf_of_prov
