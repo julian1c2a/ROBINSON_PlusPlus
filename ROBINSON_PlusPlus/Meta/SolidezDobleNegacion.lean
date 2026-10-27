@@ -17,13 +17,13 @@ negación se sigue), y con eso `p3` —y todo `Prf`— es sólido sin lógica cl
 
 * **§1 · `gg`**, y que conmuta con la sustitución y el lift (`gg_subst`, `gg_lift`).
 * **§2 · La estabilidad** (`gg_estable`), por inducción sobre la fórmula.
-* **§3 · La solidez**: `EstandarDN M` —`0`, `σ` y `::` estándar, y los 142 verdaderos LEÍDOS POR `gg`—, y
+* **§3 · La solidez**: `EstandarDN M` —`0`, `σ` y `::` estándar, y los 120 verdaderos LEÍDOS POR `gg`—, y
   `prfI_sound_dn`, `prf_sound_dn`, `consistentH_dn`. Es `prf_sound` caso por caso, con `gg_estable` donde aquél usaba
   la lógica clásica (`p3`) o la forma positiva de `∨`/`∃` (`j3`, `q3`, `leibniz`).
 * **§4 · De la lectura clásica a la doble‑negada** (`transfer`), según la POLARIDAD que calcula `clas`: `P` (de `φ` a
   `gg φ`), `N` (de `gg φ` a `¬¬φ`) y `S` (de `gg φ` a `φ`). Sólo `S` pide algo del modelo: que los átomos que caen en
   su posición, y las disyunciones que decide, sean decidibles; `∃` en posición `S` no pasa nunca (sería Markov).
-* **§5 · Los 142**: pasan con `P` pidiendo decidible sólo `∈` de aridad 2 (`axiomas_clas`, comprobado por el núcleo;
+* **§5 · Los 120**: pasan con `P` pidiendo decidible sólo `∈` de aridad 2 (`axiomas_clas`, comprobado por el núcleo;
   sin decidibilidad no pasan siete: los `lineWF` de la sustitución, por las guardas). En todo modelo estándar `∈` es
   el de verdad (`M_mem`, bajado aquí de `Meta/RigidezEstandar.lean`), así que `estandarDN_de : Estandar M →
   EstandarDN M`, y `consistentH_de` —el de `SolidezPrf`, con el mismo enunciado— ya no pasa por `p3` en `Prop`.
@@ -113,7 +113,7 @@ theorem gg_qconf (P C : Formula) : gg (confinementFormula P C) = confinementForm
 theorem gg_listInd (A : Formula) : gg (listInductionFormula A) = listInductionFormula (gg A) := by
   simp only [listInductionFormula, gg, gg_subst, gg_lift]
 
-/-- Un modelo estándar de la lectura doble‑negada: `0`, `σ` y `::` los de verdad, y los 142 verdaderos por `gg`. -/
+/-- Un modelo estándar de la lectura doble‑negada: `0`, `σ` y `::` los de verdad, y los 120 verdaderos por `gg`. -/
 structure EstandarDN (M : Model Nat) : Prop where
   hzero : M.func zero_sym [] = 0
   hsucc : ∀ a, M.func succ_sym [a] = a + 1
@@ -387,14 +387,14 @@ theorem transfer (D : List Char → Nat → Bool)
           (fun hd => hn ⟨d, hd⟩))
       · exact absurd hc (by simp only [clas]; decide)
 
-/-! ## §5 · Los 142, y todo modelo estándar -/
+/-! ## §5 · Los 120, y todo modelo estándar -/
 
-/-- Lo único que hay que decidir para los 142: `∈`, con dos argumentos. -/
+/-- Lo único que hay que decidir para los 120: `∈`, con dos argumentos. -/
 def Dmem (p : List Char) : Nat → Bool
   | 2 => p == ROBINSON_PlusPlus.Minimal.Axioms.in_sym
   | _ => false
 
-/-- 🏁 **Los 142 pasan a la lectura doble‑negada con `P`**, con sólo `∈` decidible. Lo comprueba el núcleo: `clas` no
+/-- 🏁 **Los 120 pasan a la lectura doble‑negada con `P`**, con sólo `∈` decidible. Lo comprueba el núcleo: `clas` no
     mira ningún término, así que el numeral del ancla no se evalúa. -/
 theorem axiomas_clas : ∀ a, List.Mem a ROBINSON_PlusPlus.Minimal.Axioms.axioms → (clas Dmem a).1 = true := by
   decide +kernel
@@ -457,7 +457,7 @@ def decMem (hM : Estandar M) :
   | _, [_], h => absurd h Bool.false_ne_true
   | _, _ :: _ :: _ :: _, h => absurd h Bool.false_ne_true
 
-/-- 🏁 **Todo modelo estándar lo es de la lectura doble‑negada**: los 142, de `φ` a `gg φ` por `P`. -/
+/-- 🏁 **Todo modelo estándar lo es de la lectura doble‑negada**: los 120, de `φ` a `gg φ` por `P`. -/
 theorem estandarDN_de (hM : Estandar M) : EstandarDN M where
   hzero := hM.hzero
   hsucc := hM.hsucc

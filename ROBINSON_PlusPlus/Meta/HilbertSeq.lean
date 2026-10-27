@@ -437,7 +437,7 @@ def ruleCode : Rule → Term
   | .qconf P C => cons (numeral 19) (cons (formCode P) (cons (formCode C) nil))
   | .listInd A => cons (numeral 20) (cons (formCode A) nil)
   -- La línea `thy` TRANSPORTA el código del axioma (no el índice `k`). `thy`
-  -- recorre `axioms`, los 142 (✏️ 2026‑10‑12, ADR‑134: decía «`coreAxioms` (la teoría matemática), no las
+  -- recorre `axioms`, los 120 (✏️ 2026‑10‑12, ADR‑134: decía «`coreAxioms` (la teoría matemática), no las
   -- ecuaciones de coding», y el código usa `axioms`). En una derivación válida `k` está
   -- en rango, luego `axioms.getD k ⊥ = axioms[k]` = la conclusión real.
   | .thy k => cons (numeral 15) (cons (formCode (axioms.getD k Formula.bottom)) nil)

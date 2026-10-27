@@ -140,10 +140,10 @@ def listInductionFormula (Φ : Formula) : Formula :=
     **inducción** (`ind`, el esquema `Full.inductionFormula` para toda fórmula), el
     **confinamiento** ∀ (`qconf`) y la **inducción de listas** (`listInd`), cerrado bajo MP y GEN.
     Es r.e. (Fase 1). 🏁 Su **solidez para ℕ está demostrada** desde ADR‑120 (`prf_sound`, `Meta/SolidezPrf.lean`), con el modelo
-    de los 142 axiomas de `axioms` (141 y el ancla, ADR‑117) de `Meta/ModeloCodificacion.lean`; hasta ese día, pendiente. (Hasta el 2026‑10‑02
+    de los 120 axiomas de `axioms` (119 y el ancla; 142 —141 y el ancla— de ADR‑117 a ADR‑192) de `Meta/ModeloCodificacion.lean`; hasta ese día, pendiente. (Hasta el 2026‑10‑02
     decía «coherente con el `dne` y la inducción del proyecto» —los de la capa `⊢`, retirada con ADR‑115— y daba
     «sólido para ℕ» por hecho.)
-    📐 La teoría que deriva, `T_Prf` —los 142 de `axioms` y estos esquemas, con `ind` y `listInd` para TODA fórmula—,
+    📐 La teoría que deriva, `T_Prf` —los 120 de `axioms` y estos esquemas, con `ind` y `listInd` para TODA fórmula—,
     contiene a PA: no es Q ni IΣ₁. Descripción canónica en `AXIOMS.md` §0 (ADR‑134). -/
 inductive Prf : Formula → Prop where
   | incl {φ : Formula} : Prfᵢ φ → Prf φ

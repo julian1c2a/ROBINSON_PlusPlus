@@ -26,7 +26,7 @@ no de la ω‑consistencia ni de Rosser.
 * **§4 · W1**: cada una de las 21 reglas, decodificada, es una instancia de un constructor de `Prf` (`linea_*`); la
   regla `thy` pide que lo que haya en `V` sea teorema (`Bueno V`), y `mp`/`gen` el invariante de la cadena (`Bueno`:
   todo lo acumulado es teorema). La cadena es PARAMÉTRICA en `V` (ADR‑148): `bueno_codeNatList` da `Bueno` para el
-  código de los 142 sin el modelo —lo usa `w1Ax`, `Meta/RosserW1.lean`—, y `bueno_V₀` para `V₀`, por `V₀_eq_codigo`,
+  código de los 120 sin el modelo —lo usa `w1Ax`, `Meta/RosserW1.lean`—, y `bueno_V₀` para `V₀`, por `V₀_eq_codigo`,
   que es la solidez.
 * **§5 · `⊬ ¬G`**, y `modelo_prov_iff`: `MNV V₀ ⊨ Prov(⌜φ⌝) ↔ Prf φ` —la ida es W1, la vuelta D1 y la solidez—,
   que es también el control de vacuidad de W1.
@@ -520,14 +520,14 @@ theorem cadena_buena (hV : Bueno V) : ∀ (l : List Nat) (c : Nat), Bueno c → 
   | x :: r, c, hc, h =>
     cadena_buena hV r _ (bueno_snoc hc (linea_buena hV c hc h.1.2 (nthN x 1) rfl h.1.1.1 h.1.1.2)) h.2
 
-/-- El código de los 142 es `Bueno`: cada miembro, decodificado, es un axioma. Sin el modelo. -/
+/-- El código de los 120 es `Bueno`: cada miembro, decodificado, es un axioma. Sin el modelo. -/
 theorem bueno_codeNatList : Bueno (codeNatList axioms) := by
   intro y hy
   obtain ⟨a, ha, e⟩ := memN_codeNatList axioms y hy
   rw [e, dec_codeNat]
   exact Prf.incl (Prfᵢ.thy a ha)
 
-/-- `V₀`, el valor de `axiomsCodeT` en el modelo, es `Bueno`: es el código de los 142 por `V₀_eq_codigo`, que se
+/-- `V₀`, el valor de `axiomsCodeT` en el modelo, es `Bueno`: es el código de los 120 por `V₀_eq_codigo`, que se
     prueba con la solidez. Es el ÚNICO paso de W1 por el modelo. -/
 theorem bueno_V₀ : Bueno V₀ := by
   rw [ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo]

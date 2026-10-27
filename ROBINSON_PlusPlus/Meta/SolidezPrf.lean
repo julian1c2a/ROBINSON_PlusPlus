@@ -4,13 +4,14 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Hilbert
+import ROBINSON_PlusPlus.Meta.HilbertDeduction
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 import FOL.Semantics
 
 /-!
 # `Meta/SolidezPrf.lean` — la SOLIDEZ de `Prf` en todo modelo ESTÁNDAR sobre `Nat` (ADR‑119/120)
 
-`Estandar M`: `0`, `σ` y `::` estándar (`consN`), y los 142 verdaderos en `M`. Con eso, `prf_sound`: todo lo que
+`Estandar M`: `0`, `σ` y `::` estándar (`consN`), y los 120 verdaderos en `M`. Con eso, `prf_sound`: todo lo que
 `Prf` demuestra es verdadero en `M`, por inducción sobre los 7 constructores de `Prf` y los 17 de `Prfᵢ`
 (`prfI_sound`): `ind` pide `hzero`/`hsucc` y la inducción de `Nat`; `listInd`, `hcons`, `descompone` —todo `m + 1` es
 un `cons` con cabeza y cola menores, sin basura desde ADR‑113— y la inducción fuerte `fuerte`; `qconf` es lógica pura.
@@ -194,8 +195,15 @@ theorem prf_sound (hM : Estandar M) {φ : Formula} (h : Prf φ) : ∀ v, evalFor
   | mp A B _ _ ih1 ih2 => intro v; exact ih1 v (ih2 v)
   | gen A _ ih => intro v d; exact ih (shiftEnv v d)
 
+/-- 🏁 **`PrfH` es sólido** con el contexto vacío (T46, ADR‑194): es `Prf` (`prfH_nil_to_prf`). Con hipótesis, lo
+    dice la deducción interna (`prf_deduction`, `Meta/HilbertDeduction.lean`), no este corolario. -/
+theorem prfH_sound (hM : Estandar M) {φ : Formula}
+    (h : ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH [] φ) : ∀ v, evalFormula M v φ :=
+  prf_sound hM (ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf h rfl)
+
 end ROBINSON_PlusPlus.Meta.SolidezPrf
 end Modelo
 
 #print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
 #print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound
+#print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.prfH_sound

@@ -41,6 +41,17 @@ FOL.Compacity0	FOL.Compacity0.infinite_model_of_large_fresh	C
 FOL.Compacity0	FOL.Compacity0.loewenheim_skolem_down	C
 FOL.Compacity0	FOL.Compacity0.model_existence_countable₀	C
 FOL.Compacity0	FOL.Compacity0.model_existence_iff₀	C
+FOL.Estratos0	FOL.Estratos0.derives1_complete	C
+FOL.Estratos0	FOL.Estratos0.derives1_soundness	C
+FOL.Estratos0	FOL.Estratos0.derives2_complete	C
+FOL.Estratos0	FOL.Estratos0.derives2_soundness	C
+FOL.Estratos0	FOL.Estratos0.derives_semantic_complete	C
+FOL.Estratos0	FOL.Estratos0.lk0_complete	C
+FOL.Estratos0	FOL.Estratos0.lkc_complete	C
+FOL.Estratos0	FOL.Estratos0.lkh_complete	C
+FOL.Estratos0	FOL.Estratos0.lkh_sound	C
+FOL.Estratos0	FOL.Estratos0.lkp_complete	C
+FOL.Estratos0	FOL.Estratos0.lkp_sound	C
 FOL.Inconsistencia	FOL.Inconsistencia.derives_soundness	C
 FOL.Inconsistencia	FOL.Inconsistencia.ex_elim_refutable	C
 FOL.Lindenbaum0	FOL.Lindenbaum0.max_cons_contains	C
@@ -162,6 +173,7 @@ ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.PurezaComando.mostra
 ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.PurezaComando.proyectaSemantica	C
 ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.PurezaComando.recorrer	C
 ROBINSON_PlusPlus.Meta.Rosser	ROBINSON_PlusPlus.Meta.Rosser.R	N
+ROBINSON_PlusPlus.Meta.SolidezPrf	ROBINSON_PlusPlus.Meta.SolidezPrf.prfH_sound	C
 ROBINSON_PlusPlus.Meta.SolidezPrf	ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound	C
 ROBINSON_PlusPlus.Meta.TarskiPrf	ROBINSON_PlusPlus.Meta.TarskiPrf.liar	N
 ROBINSON_PlusPlus.Meta.TrackedAtomsPrf	ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.bdAllBndCtx	N

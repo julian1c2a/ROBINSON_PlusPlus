@@ -988,7 +988,8 @@ Medido con `#eval ·.length`, no contado a ojo:
     coreAxioms = 34      codingAxioms = 107      axioms = 141      (34 + 107 = 141)
 
 (✏️ Desde ADR‑117, `axiomsBase` = 141 y `axioms` = 142 —la base y el ancla—, comprobado por el núcleo en
-`Full/Induction.lean`, `axioms_len`. Ya no se mide con `#eval`: evaluar `axioms` no acabaría.)
+`Full/Induction.lean`, `axioms_len`. Ya no se mide con `#eval`: evaluar `axioms` no acabaría. ✏️ 2026‑10‑27, ADR‑192:
+119 y 120, con `codingAxioms` = 85.)
 
 **Sigue evitando el ciclo**, que era el punto bueno del párrafo original y se conserva:
 `axiomsCodeT` es un símbolo **opaco**, así que no aparece dentro de la lista que codifica y
@@ -1026,7 +1027,7 @@ def axiomsCodeT : Term := Term.func sym!"axiomsCodeT" []
 
 El ancla de antes, `axiomsCodeT =eq listFormCodeM axioms` (la hipótesis `AnclaEq`), no se puede
 POSTULAR: `axioms` la contendría a ella, y su código contendría el suyo. Se postula en su lugar UNA
-ecuación que no se contiene: para la lista BASE `L` (los 141 de siempre),
+ecuación que no se contiene: para la lista BASE `L` (los 119 de hoy; 141 hasta ADR‑192),
 
     axD L  ≝  axiomsCodeT =eq  ⌜L⌝ ++ [δ]       con δ = substfc 0 (tcFn N̄) N̄,  N̄ = ⌜ψ⌝ numeral,
                                                  ψ = (axiomsCodeT =eq ⌜L⌝ ++ [diag(x₀)])
@@ -1552,7 +1553,7 @@ theorem ax_axiomsCodeT_def_lift (c : Nat) :
 
 -- ## Axiom Set
 
-/-- The complete list of axioms for the Minimal system: los 141 de `axiomsBase`, en su orden, y el ancla
+/-- The complete list of axioms for the Minimal system: los 119 de `axiomsBase`, en su orden, y el ancla
     `ax_axiomsCodeT_def` AL FINAL (ADR‑117). Sigue siendo un LITERAL: los `simp [axioms]` lo despliegan. -/
 def axioms : List Formula := [
   ax2_peano_succ_neq_zero,

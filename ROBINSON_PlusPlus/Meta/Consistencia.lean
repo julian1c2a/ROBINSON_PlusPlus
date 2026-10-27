@@ -12,7 +12,7 @@ import ROBINSON_PlusPlus.Meta.GodelTwoPrf
 # `Meta/Consistencia.lean` — 🏁🏁 `ConsistentH` es un TEOREMA, y Gödel I y II van SIN HIPÓTESIS (ADR‑120)
 
 * `estandar_MN : Estandar (MNV V₀)` — cada campo INSTANCIA un lema probado para `V` arbitrario.
-* `consistencia : ConsistentH` — `¬ Prf ⊥`: `MNV V₀` es un modelo de los 142 (`MN_axioms`) y `Prf` es sólido
+* `consistencia : ConsistentH` — `¬ Prf ⊥`: `MNV V₀` es un modelo de los 120 (`MN_axioms`) y `Prf` es sólido
   en todo modelo estándar leído por la traducción doble‑negada (`prf_sound_dn`, `Meta/SolidezDobleNegacion.lean`,
   ADR‑191), sin lógica clásica.
 * `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'` — `goedel_first_prf` y
@@ -21,7 +21,7 @@ import ROBINSON_PlusPlus.Meta.GodelTwoPrf
 Footprint de los tres: `[propext, Quot.sound]` desde ADR‑191 (`check-footprints`; hasta entonces llevaban
 `Classical.choice`, de la regla `p3` en `prf_sound`).
 
-Y `V₀_eq_codigo : V₀ = codeNatList axioms` (ADR‑121): en el modelo, la regla `thy` acepta exactamente los 142.
+Y `V₀_eq_codigo : V₀ = codeNatList axioms` (ADR‑121): en el modelo, la regla `thy` acepta exactamente los 120.
 La otra mitad de Gödel I (`⊬ ¬G`), y que `G` y `Con` son VERDADERAS en `MNV V₀`, están en
 `Meta/SolidezVerificador.lean` (ADR‑121). ⚠️ Lo que NO dice: nada de Rosser.
 -/
@@ -54,8 +54,8 @@ theorem estandar_MN : ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar (MNV V₀) wher
 theorem estandarDN_MN : ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.EstandarDN (MNV V₀) :=
   ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de estandar_MN
 
-/-- 🏁 **`T_Prf` es CONSISTENTE** (los 142 con los esquemas de `Prf`): `Prf ⊥` no tiene prueba, porque `MNV V₀` es
-    estándar y satisface los 142 (`estandar_MN`), y `Prf` es sólido en todo modelo estándar, leído por la traducción
+/-- 🏁 **`T_Prf` es CONSISTENTE** (los 120 con los esquemas de `Prf`): `Prf ⊥` no tiene prueba, porque `MNV V₀` es
+    estándar y satisface los 120 (`estandar_MN`), y `Prf` es sólido en todo modelo estándar, leído por la traducción
     doble‑negada (`consistentH_de`, ADR‑191): sin lógica clásica, `[propext, Quot.sound]`.
     ⚠️ **La consistencia es RELATIVA a Lean** (ADR‑138; ✏️ 2026‑10‑17, ADR‑155): es un teorema de Lean, y fuera de Lean
     da PRA ⊢ Con(Lean) → Con(T_Prf), si el núcleo implementa bien su teoría de tipos. Absoluta no puede ser: `T_Prf`
@@ -72,8 +72,8 @@ theorem goedel_I : ¬ Prf ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
 theorem goedel_II : ¬ Prf ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
   ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf consistencia
 
-/-- 🏁 En `MNV V₀`, `axiomsCodeT` vale EXACTAMENTE el código de los 142 (ADR‑121): `prf_ancla` —el ancla es teorema—
-    por la solidez. Es lo que dice que, en el modelo, la regla `thy` acepta exactamente los 142. Desde ADR‑191, por la
+/-- 🏁 En `MNV V₀`, `axiomsCodeT` vale EXACTAMENTE el código de los 120 (ADR‑121): `prf_ancla` —el ancla es teorema—
+    por la solidez. Es lo que dice que, en el modelo, la regla `thy` acepta exactamente los 120. Desde ADR‑191, por la
     solidez doble‑negada: el ancla es una igualdad, y en `Nat` la igualdad es decidible (`eq_de_prf`). -/
 theorem V₀_eq_codigo : V₀ = codeNatList axioms := by
   have h' : evalTerm (MNV V₀) (fun _ => 0) axiomsCodeT =

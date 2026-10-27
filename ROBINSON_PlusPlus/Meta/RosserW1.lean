@@ -10,11 +10,11 @@ import ROBINSON_PlusPlus.Meta.PurezaComando
 # `Meta/RosserW1.lean` — Rosser, etapa W1(ax): W1 SIN el modelo (ADR‑146, ADR‑147, ADR‑148)
 
 **Qué.** `ProofN m y`, el espejo en ℕ del predicado de prueba de T: el verificador acepta la cadena `m` con el código
-de los 142 —`codeNatList axioms`— y `y` es una de sus conclusiones. **`w1Ax`**: lo que concluye, decodificado, es
+de los 120 —`codeNatList axioms`— y `y` es una de sus conclusiones. **`w1Ax`**: lo que concluye, decodificado, es
 teorema de `Prf`.
 
 **Por qué así.** W1 (`verificador_solido`, `Meta/SolidezVerificador.lean`) habla de `V₀`, el valor de `axiomsCodeT`
-en el modelo, y de `V₀` sólo se sabe que es el código de los 142 por la solidez (`V₀_eq_codigo`): por eso W1 es
+en el modelo, y de `V₀` sólo se sabe que es el código de los 120 por la solidez (`V₀_eq_codigo`): por eso W1 es
 IMPURO para T08. La cadena es la misma para cualquier `V` cuyos miembros, decodificados, sean teoremas (`cadena_buena`,
 paramétrica desde ADR‑148), y `codeNatList axioms` lo es por construcción (`bueno_codeNatList`). Rosser usa la
 contrapositiva: si `¬ Prf ¬R`, ningún numeral es prueba de `¬R` (NegNum' = `negNum ∘ w1Ax`, ADR‑146 §1).
@@ -35,11 +35,11 @@ open ROBINSON_PlusPlus.Meta.SolidezVerificador
 
 namespace ROBINSON_PlusPlus.Meta.RosserW1
 
-/-- El espejo en ℕ del predicado de prueba de T (ADR‑146 §1): la cadena `m` es correcta con el CÓDIGO de los 142
+/-- El espejo en ℕ del predicado de prueba de T (ADR‑146 §1): la cadena `m` es correcta con el CÓDIGO de los 120
     —`codeNatList axioms`, no `V₀`— y concluye `y`. -/
 def ProofN (m y : Nat) : Prop := And (chainOkN (codeNatList axioms) 0 m) (memN y (runFnN 0 m))
 
-/-- 🏁 **W1(ax)**: lo que concluye una cadena correcta con el código de los 142, decodificado, es teorema de `Prf`.
+/-- 🏁 **W1(ax)**: lo que concluye una cadena correcta con el código de los 120, decodificado, es teorema de `Prf`.
     Sin el modelo: `cadena_buena` con `bueno_codeNatList`. -/
 theorem w1Ax {m y : Nat} (h : ProofN m y) : Prf (dec y) :=
   cadena_buena bueno_codeNatList (decodeL m) 0 bueno_zero h.1 y h.2

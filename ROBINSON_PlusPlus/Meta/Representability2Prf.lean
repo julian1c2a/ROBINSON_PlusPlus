@@ -179,7 +179,7 @@ y la clase `AnclaEq` que la llevaba como hipótesis se RETIRÓ (ADR‑118): sus 
 y 3 del sondeo de F1—, y sus tres usos de `AnclaEq.eq`, a `prf_ancla`. Lo que sigue es su historia: por qué
 fue una clase (ADR‑026) y por qué no podía ser un `axiom` de Lean (lo que sigue siendo cierto es la razón de fondo;
 la de M‑11 estaba al revés: ver la nota ✏️ 2026‑10‑12 al final de esta sección). Lo que ya no vale:
-el argumento de F1 (ADR‑114), que era sobre la teoría de 141 axiomas, sin el ancla, y no se traslada a los 142.
+el argumento de F1 (ADR‑114), que era sobre la teoría de 141 axiomas, sin el ancla, y no se traslada a la teoría con el ancla (los 142 de entonces; 120 desde ADR‑192).
 
 **EL ANCLAJE DE CODIFICACIÓN — HIPÓTESIS CON NOMBRE, ya no `axiom`** ([ADR‑026](../../DECISIONS.md),
 2026‑09‑12; antes `axiom prf_axiomsCodeT_eq`).

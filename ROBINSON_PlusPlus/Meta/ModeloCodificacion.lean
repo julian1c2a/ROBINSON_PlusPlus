@@ -285,7 +285,7 @@ theorem v_ancla : ∀ v : Nat → Nat, evalFormula (MNV V₀) v ax_axiomsCodeT_d
     ev_numeralM]
   exact V₀_def
 
-/-! ## §5 · LOS 142 -/
+/-! ## §5 · LOS 120 -/
 
 theorem MN_codingAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ codingAxioms → evalFormula (MNV V) v φ := by
   unfold codingAxioms

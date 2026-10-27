@@ -4,7 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 
 Barrel file for `Meta/` — Gödelización del sistema `Minimal`. (✏️ 2026‑10‑12, ADR‑134: de `T_Prf`, el cálculo
-`Prf` —con `ind`, `listInd`, `p3` y `qconf`— sobre los 142 axiomas de `Minimal`: `AXIOMS.md` §0.)
+`Prf` —con `ind`, `listInd`, `p3` y `qconf`— sobre los 120 axiomas de `Minimal`: `AXIOMS.md` §0.)
 Public API:
   · Godel          (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
   · Provability    (Nivel C): formCode, IsFormula (núcleo real de codificación)
@@ -14,8 +14,8 @@ Public API:
     `goedel_second_prf (hcon : ConsistentH)` (Meta/GodelTwoPrf.lean).
     🏁 Desde ADR‑117, con `ConsistentH` como ÚNICA hipótesis: el ancla de `axiomsCodeT` es un teorema
     (`prf_ancla`; la clase `AnclaEq`, retirada con ADR‑118). Hasta ese día eran VACUOS: `[AnclaEq]` daba `Prf ⊥` (F1,
-    ADR‑114). 🏁 La consistencia de `T_Prf` —los 142 con los esquemas de `Prf`— está probada desde ADR‑120
-    (`consistencia : ConsistentH`: `MNV V₀`, un modelo estándar de los 142, y `prf_sound`; ✏️ 2026‑10‑14: decía
+    ADR‑114). 🏁 La consistencia de `T_Prf` —los 120 con los esquemas de `Prf`— está probada desde ADR‑120
+    (`consistencia : ConsistentH`: `MNV V₀`, un modelo estándar de los 120, y `prf_sound`; ✏️ 2026‑10‑14: decía
     «La consistencia de los 142»).
   · ✏️ 2026‑10‑14 (ADR‑134), sin hipótesis: `consistencia`, `goedel_I`, `goedel_II` (Meta/Consistencia.lean,
     ADR‑120); `goedel_I_neg` y `godelCN_indecidible` (Meta/SolidezVerificador.lean, ADR‑121: Gödel I entero);
@@ -24,7 +24,7 @@ Public API:
     titular de la clase (i) nombra la semántica (`FOL.Metamath.Semantics`, `Meta.SolidezPrf`), o si `goedel_I` y `tarski`
     dejan de nombrarla.
   · ✏️ 2026‑10‑17 (ADR‑148): `Meta/RosserW1.lean`, la primera etapa de Rosser (ADR‑146/147): `w1Ax`, W1 con el código
-    de los 142 en lugar de `V₀`, sin el modelo, con su `#pureza`.
+    de los 120 en lugar de `V₀`, sin el modelo, con su `#pureza`.
   · ✏️ 2026‑10‑17 (ADR‑149): `Meta/RosserPosNum.lean`, la etapa 6 de Rosser: `posNum`, D1 con el testigo en forma de
     NUMERAL (`prf_proofCode'_numeral`), con su `#pureza`.
   · ✏️ 2026‑10‑17 (ADR‑150): `Meta/RosserNumerales.lean`, la etapa 1 de Rosser: la capa de listas sobre numerales

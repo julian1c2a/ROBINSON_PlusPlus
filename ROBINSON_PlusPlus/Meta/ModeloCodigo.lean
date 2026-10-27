@@ -509,7 +509,7 @@ def hasWitFN (c : Nat) : Prop := ∃ wF, ∃ wT, And (And (wfAll1N wT) (wfAllFN 
 
 /-! ### El valor del ANCLA: el de su lado derecho, que no nombra `axiomsCodeT`
 
-⛔ Ni se evalúa ni se despliega: es una expresión de `Nat` con el código de los 141 de la base y el de `δ`,
+⛔ Ni se evalúa ni se despliega: es una expresión de `Nat` con el código de los 119 de la base y el de `δ`,
 y las pruebas sólo la mueven por `rw` con lemas ∀ (el numeral astronómico del ancla vive aquí dentro, como
 `codeNat (psiD axiomsBase)`, PLEGADO). -/
 

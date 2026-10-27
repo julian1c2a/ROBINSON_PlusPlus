@@ -31,21 +31,30 @@ export PATH="/usr/bin:$PATH"
 cd "$(dirname "$0")" || exit 2
 
 # ── LA TABLA DECLARADA ─────────────────────────────────────────────────────────────────────
-# nombre | constructores | axiomas que lo HABITAN | teorema de solidez EN EL BUILD ('-' = ninguno)
-# ⚠️ Esta tabla es la misma de `REFERENCE.md` §0bis. Si cambia una, cambian las dos.
+# nombre | constructores | axiomas que lo HABITAN | solidez EN EL BUILD | completitud EN EL BUILD | PUENTE ('-' = ninguno)
+# ⚠️ Esta tabla es la misma de `REFERENCE.md` §0bis, y desde T46 (ADR-194) lo comprueba la sección 1bis, abajo: los
+# mismos cálculos y los mismos constructores. Si cambia una, cambian las dos.
+# ✏️ 2026-10-27 (T46, ADR-194): entra `LKp` (13 constructores; `FOL/Craig0.lean`), que no estaba censado; la solidez de
+# `LK₀` y `LKc` (`FOL/SequentSound0.lean`), que estaba en el build y aquí decía «-»; y dos columnas: la COMPLETITUD, con
+# nombre desde la hoja `FOL/Estratos0.lean` (sólo `Derives₀` la tenía), y el PUENTE, el teorema que lleva sus
+# derivaciones a otro cálculo censado (al sujeto, `Derives₀` o `Prf`, por una cadena de ellos). Las tres, comprobadas
+# igual: el teorema existe y su TIPO menciona el inductivo de la fila. `Prf`, `Prfᵢ` y `PrfH` no tienen completitud:
+# para ℕ no la hay (Gödel I). Un cálculo NUEVO (el `DerivesI` intuicionista de X1, si llega) entra con su fila aquí
+# y en §0bis.
 # 2026-10-02 (ADR-115): `Derives` baja de 4 a 0 al borrarse `FOL/MetaRules.lean`, y gana su solidez
 # en el build (`FOL/Inconsistencia.lean` §1).
 read -r -d '' ESTRATOS <<'EOF'
-Derives|22|0|FOL.Inconsistencia.derives_soundness
-Derives₀|21|0|FOL.Metamath.Soundness0.derives0_soundness
-Derives₁|20|0|-
-Derives₂|22|0|-
-LK₀|14|0|-
-LKc|15|0|-
-LKh|14|0|-
-ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
-ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ|17|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound
-ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH|8|0|-
+Derives|22|0|FOL.Inconsistencia.derives_soundness|FOL.Estratos0.derives_semantic_complete|FOL.Inconsistencia.derives_to_derives0
+Derives₀|21|0|FOL.Metamath.Soundness0.derives0_soundness|FOL.Canonical0.completeness₀|-
+Derives₁|20|0|FOL.Estratos0.derives1_soundness|FOL.Estratos0.derives1_complete|FOL.Derives1.derives1_to_derives0
+Derives₂|22|0|FOL.Estratos0.derives2_soundness|FOL.Estratos0.derives2_complete|FOL.Derives2.derives2_to_derives1
+LK₀|14|0|FOL.SequentSound0.lk0_sound|FOL.Estratos0.lk0_complete|FOL.SequentSound0.lk0_to_derives0
+LKc|15|0|FOL.SequentSound0.lkc_sound|FOL.Estratos0.lkc_complete|FOL.NDtoLK0.ndToLK
+LKh|14|0|FOL.Estratos0.lkh_sound|FOL.Estratos0.lkh_complete|FOL.Hauptsatz0.lkh_to_lk0
+FOL.Craig0.LKp|13|0|FOL.Estratos0.lkp_sound|FOL.Estratos0.lkp_complete|FOL.Craig0.lkp_to_lk0
+ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|-|-
+ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ|17|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound|-|ROBINSON_PlusPlus.Meta.Hilbert.Prf.incl
+ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH|8|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfH_sound|-|ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
 EOF
 
 TMP=$(mktemp -d)
@@ -156,18 +165,23 @@ LEANEOF
 # bloque que la «miraba» era un `:` vacío, y un nombre inventado daba verde. Ahora, por cada
 # fila con solidez, el fichero busca el teorema en el entorno y exige que su TIPO mencione el
 # inductivo de la fila; si no, no imprime su marca y el control rompe.
-while IFS='|' read -r NOMBRE _ _ SOLIDEZ; do
-  { [ -n "$NOMBRE" ] && [ "$SOLIDEZ" != "-" ]; } || continue
-  cat >> "$LEANFILE" <<SOLEOF
+# ✏️ 2026-10-27 (T46, ADR-194): lo mismo para la completitud (@COMP) y el puente (@PUENTE).
+while IFS='|' read -r NOMBRE _ _ SOLIDEZ COMPLETITUD PUENTE; do
+  [ -n "$NOMBRE" ] || continue
+  for par in "SOL $SOLIDEZ" "COMP $COMPLETITUD" "PUENTE $PUENTE"; do
+    MARCA=${par%% *}; TEO=${par#* }
+    [ "$TEO" != "-" ] || continue
+    cat >> "$LEANFILE" <<SOLEOF
 
 run_cmd do
   let env ← Lean.getEnv
-  match env.find? (String.toName "$SOLIDEZ") with
+  match env.find? (String.toName "$TEO") with
   | none => pure ()
   | some ci =>
     if ci.type.getUsedConstants.contains (String.toName "$NOMBRE") then
-      logInfo m!"@SOL $NOMBRE $SOLIDEZ"
+      logInfo m!"@$MARCA $NOMBRE $TEO"
 SOLEOF
+  done
 done <<< "$ESTRATOS"
 
 echo "════ CENSO DE ESTRATOS ════"
@@ -195,7 +209,7 @@ FAIL=0
 N=0
 
 # ── 1 · por cada estrato declarado, contrastar constructores y habitantes ──────────────────
-while IFS='|' read -r NOMBRE CTORS HABS SOLIDEZ; do
+while IFS='|' read -r NOMBRE CTORS HABS SOLIDEZ COMPLETITUD PUENTE; do
   [ -n "$NOMBRE" ] || continue
   N=$((N + 1))
   REAL_C=$(printf '%s' "$PLANA" | grep -oF "@CTORS $NOMBRE " | head -1 >/dev/null 2>&1 \
@@ -232,7 +246,39 @@ while IFS='|' read -r NOMBRE CTORS HABS SOLIDEZ; do
       FAIL=1
     fi
   fi
+  # (✏️ T46, ADR-194) la completitud y el puente, igual
+  for par in "COMP completitud $COMPLETITUD" "PUENTE puente $PUENTE"; do
+    MARCA=${par%% *}; resto=${par#* }; QUE=${resto%% *}; TEO=${resto#* }
+    [ "$TEO" != "-" ] || continue
+    if printf '%s' "$PLANA" | grep -qF "@$MARCA $NOMBRE $TEO"; then
+      printf "      └ %s en el build: %s\n" "$QUE" "$TEO"
+    else
+      printf "  ✗ %-46s %s: '%s': NO está en el entorno, o su tipo no menciona '%s'\n" \
+        "$NOMBRE" "$QUE" "$TEO" "$NOMBRE"
+      FAIL=1
+    fi
+  done
 done <<< "$ESTRATOS"
+
+# ── 1bis · REFERENCE.md §0bis tiene los MISMOS cálculos, con los mismos constructores (T46, ADR-194) ──────────
+# Hasta el 2026-10-27 la tabla de aquí decía ser «la misma de §0bis» y tenía diez filas frente a cinco. Ahora se
+# comprueba: de cada fila de §0bis, la primera cita (`Derives₀`, `Prf`…) y su columna de constructores; de cada fila
+# de aquí, el último componente del nombre y sus constructores. Los dos conjuntos, iguales en LOS DOS SENTIDOS.
+echo
+echo "════ ¿§0bis de REFERENCE.md es esta tabla? ════"
+REF_0BIS=$(awk '/^## 0bis/ { en = 1; next } en && /^### / { exit } en && /^\| \*\*`/' REFERENCE.md \
+  | awk -F'|' '{ n = $2; sub(/^[^`]*`/, "", n); sub(/`.*$/, "", n); c = $4; gsub(/[^0-9]/, "", c); print n "|" c }' | LC_ALL=C sort)
+AQUI_0BIS=$(printf '%s\n' "$ESTRATOS" | awk -F'|' 'NF >= 2 { n = $1; sub(/.*[.]/, "", n); print n "|" $2 }' | LC_ALL=C sort)
+if [ -z "$REF_0BIS" ]; then
+  echo "  ✗ no encuentro la tabla de §0bis en REFERENCE.md: el cruce no comprueba nada"
+  FAIL=1
+elif [ "$REF_0BIS" = "$AQUI_0BIS" ]; then
+  echo "  ✓ §0bis tiene los mismos $(printf '%s\n' "$AQUI_0BIS" | grep -c .) cálculos, con los mismos constructores"
+else
+  echo "  ✗ §0bis y esta tabla NO cuadran («<» sólo aquí, «>» sólo en §0bis):"
+  diff <(printf '%s\n' "$AQUI_0BIS") <(printf '%s\n' "$REF_0BIS") | grep '^[<>]' | sed 's/^/      /'
+  FAIL=1
+fi
 
 # ── 2 · ⛔ ningún axioma puede habitar un inductivo NO declarado ───────────────────────────
 echo
@@ -396,7 +442,7 @@ if [ "$MAXUSO" -gt "$MAXMAQ" ] 2>/dev/null; then
   echo "      Es real y conocido — hay axiomas de aridad $MAXUSO sin instanciador de código."
   echo "      ⚠️ La maquinaria crece SUPERLINEALMENTE: medido 6 → 13 → 34 → 64 líneas"
   echo "         (pcc_thm_inst · inst2 · inst3 · inst4). El peldaño 5 NO es una tarde."
-  echo "      ⭐ El nivel de las DEFINICIONES sí está cerrado: \`forallN\` + los cinco puentes."
+  echo "      ⭐ El nivel de las DEFINICIONES sí está cerrado: \`forallN\` + sus puentes (cuatro desde ADR-192)."
 fi
 
 echo

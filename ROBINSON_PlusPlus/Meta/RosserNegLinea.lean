@@ -55,7 +55,7 @@ open ROBINSON_PlusPlus.Meta.RosserGuardNeg
 
 namespace ROBINSON_PlusPlus.Meta.RosserNegLinea
 
-/-- El valor de `axiomsCodeT`: el código de los 142 (ADR‑148). -/
+/-- El valor de `axiomsCodeT`: el código de los 120 (ADR‑148). -/
 abbrev Vax : Nat := codeNatList axioms
 
 /-! ## §1 · Los combinadores -/
@@ -254,7 +254,7 @@ theorem prf_listFormCodeM_numeral : ∀ L : List Formula, Prf (listFormCodeM L =
   | [] => prf_refl _
   | φ :: L => prf_cons_evalM_of (evForm φ) (prf_listFormCodeM_numeral L)
 
-/-- 🏁 **Lo que no está entre los 142, `Prf` lo saca de `axiomsCodeT`** (por el ancla). -/
+/-- 🏁 **Lo que no está entre los 120, `Prf` lo saca de `axiomsCodeT`** (por el ancla). -/
 theorem prf_not_In_axiomsCodeT {y : Nat} (h : ¬ memN y Vax) :
     Prf ((In (numeralM y) axiomsCodeT) ⇒ Formula.bottom) := by
   have hA : Prf (axiomsCodeT =eq numeralM Vax) :=

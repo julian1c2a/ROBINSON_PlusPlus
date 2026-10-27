@@ -11,7 +11,7 @@ import ROBINSON_PlusPlus.Meta.RosserNumEval
 
 Hasta aquí, `prf_of_prov`, `modelo_prov_iff`, `godelCN_verdadera` y `con_verdadera` (`Meta/SolidezVerificador.lean`)
 valían sólo para `MNV V₀`, el modelo construido. Aquí valen para TODO `M` con `Estandar M` (`Meta/SolidezPrf.lean`):
-el dominio es `Nat`, `0`, `σ` y `::` son los de verdad, y valen los 142.
+el dominio es `Nat`, `0`, `σ` y `::` son los de verdad, y valen los 120.
 
 **Por qué no es inmediato.** Las ecuaciones de codificación sólo hablan de códigos con forma (`varc`, `funcc`,
 `botc`…); sobre la basura, `M` es LIBRE (puede no ser `MNV V₀`). Lo que lo salva son las GUARDAS de ADR‑020: las
@@ -24,7 +24,7 @@ que en `MNV`.
   verdad, y lo mismo para las fórmulas. Lo que miran fuera de rango no cuenta: la forma ya lo descarta.
 * **§5 · La sustitución y el lift sobre los códigos BUENOS** (`CodT`/`CodF` de `Meta/RosserNumEval.lean`, que son las
   guardas): por inducción sobre el código, valen lo de `MNV`.
-* **§6–§7 · Los códigos cerrados, y el ancla**: `axiomsCodeT` vale en `M` el código de los 142 (el ancla es teorema y
+* **§6–§7 · Los códigos cerrados, y el ancla**: `axiomsCodeT` vale en `M` el código de los 120 (el ancla es teorema y
   `M` es sólida).
 * **§8–§10 · `lineWF`, las premisas, la cadena y `runFn`**: si `M` cree que `p` es una prueba, lo es, etiqueta por
   etiqueta (las 21), con el `V` del ancla.
@@ -32,7 +32,7 @@ que en `MNV`.
   demostrable lo es; `Prov` es fiel en `M`; `G` y `Con` son VERDADERAS en `M`. Las de `SolidezVerificador` son la
   instancia en `MNV V₀` (`estandar_MN`), que también es el control de que la hipótesis no es vacía.
 * **§12 · ⛔ El control del ANCLA** (`control_ancla`, T75b, ADR‑175): sin el ancla, `Prov` puede mentir. `MNV V⊥`, con
-  `V⊥` la lista del código de `⊥` sola, satisface los 141 de la base y cree demostrable `⊥` (una cadena de una línea
+  `V⊥` la lista del código de `⊥` sola, satisface los 119 de la base y cree demostrable `⊥` (una cadena de una línea
   `thy`), así que `Con` es FALSA en él; y el ancla falla, sin evaluar su numeral: si valiera, `MNV V⊥` sería estándar
   y `con_verdadera_de` haría verdadera `Con`.
 
@@ -621,7 +621,7 @@ theorem M_listFormCodeM (hM : Estandar M) (v : Nat → Nat) :
 
 /-! ## §7 · El ancla, y lo que necesita la cadena: `carc` de una línea, `allIn` -/
 
-/-- El valor de `axiomsCodeT` en `M` es el código de los 142: el ancla es teorema (`prf_ancla`), `M` es sólida, y
+/-- El valor de `axiomsCodeT` en `M` es el código de los 120: el ancla es teorema (`prf_ancla`), `M` es sólida, y
     el código cerrado se evalúa igual. Desde ADR‑191, por la solidez doble‑negada: el ancla es una igualdad, y en `Nat`
     la igualdad es decidible (`eq_de_prf`). -/
 theorem M_axiomsCodeT (hM : Estandar M) : M.func sym!"axiomsCodeT" [] = codeNatList axioms := by
@@ -995,7 +995,7 @@ theorem control_instancia (φ : Formula) (v : Nat → Nat) :
 
 /-! ## §12 · ⛔ El control del ANCLA: sin él, `Prov` puede mentir (T75b, ADR‑175)
 
-`Estandar M` pide los 142, ancla incluida. Sin el ancla no basta: `MNV V` satisface los 141 de la base para TODO `V`
+`Estandar M` pide los 120, ancla incluida. Sin el ancla no basta: `MNV V` satisface los 119 de la base para TODO `V`
 (`MN_coreAxioms`, `MN_codingAxioms`), y en `MNV V` la regla `thy` acepta lo que haya en `V`. Con `V⊥` —la lista del
 código de `⊥` sola— la cadena de UNA línea `⟨⌜⊥⌝, 15⟩` es una prueba de `⊥`, y `Con` es FALSA. El ancla falla en
 `MNV V⊥`, y no hace falta evaluar su numeral: si valiera, `MNV V⊥` sería estándar y `con_verdadera_de` haría
@@ -1047,7 +1047,7 @@ theorem MNbot_no_con (v : Nat → Nat) :
     ¬ evalFormula (MNV Vbot) v ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
   fun hc => hc (prov_de_mem Formula.bottom ((memN_consN _ _ _).2 (Or.inl rfl)) v)
 
-/-- ⛔ **El control del ancla**: `MNV V⊥` satisface los 141 de la base, `Con` es FALSA en él (cree demostrable `⊥`),
+/-- ⛔ **El control del ancla**: `MNV V⊥` satisface los 119 de la base, `Con` es FALSA en él (cree demostrable `⊥`),
     y el ancla FALLA —sin evaluar su numeral: si valiera, `MNV V⊥` sería estándar y `con_verdadera_de` lo
     impediría—. Es el ancla la que fija el sentido de `Prov`; hermano de `control_tc_cons`. -/
 theorem control_ancla : And (∀ v, contextSatisfies (MNV Vbot) v axiomsBase)

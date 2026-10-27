@@ -14,7 +14,7 @@
 
 ---
 
-## 0bis · ⭐⭐ LOS ESTRATOS — las cinco nociones de derivabilidad, y el ROL de cada una
+## 0bis · ⭐⭐ LOS ESTRATOS — las once nociones de derivabilidad, y el ROL de cada una
 
 > ⛔⛔ **Ésta es la tabla que faltaba, y su ausencia se cobró `FOL.soundness`.** El proyecto tiene
 > **cinco** nociones de derivabilidad, y hasta el 2026‑09‑14 nadie podía decir, mirando el árbol,
@@ -23,14 +23,26 @@
 > 🔧 **La vigila `check-estratos.bash`** (`make estratos`, y en CI). Mide los habitantes‑axioma
 > **por el TIPO** de cada axioma —la cabeza de su conclusión—, no por grep, y **rompe en los dos
 > sentidos**. Probado con el fallo puesto en tres modos.
+>
+> ✏️ 2026‑10‑27 (T46, ADR‑194): la tabla tenía cinco filas y el control diez; hoy las dos tienen las ONCE (entran
+> `Derives₁`, `Derives₂`, `LK₀`, `LKc`, `LKh` y `LKp`, que no estaba censado), con la solidez y la completitud de cada
+> una con nombre —las que faltaban, corolarios de una línea en `../FOL/FOL/Estratos0.lean`— y su PUENTE; y el
+> control comprueba que ésta y la suya tienen los mismos cálculos con los mismos constructores. Un cálculo nuevo (el
+> intuicionista de X1, si llega) entra en las dos.
 
-| noción | dónde | ctors | axiomas que la **HABITAN** | ¿`induction`? | solidez | **rol** |
-|---|---|---:|---:|---|---|---|
-| **`Derives`** (`⊢`) | `../FOL/FOL/FOL.lean` | 22 | ✅ **0** desde el 2026‑10‑02. Los cuatro de FOL (`imp_intro`, `raa`, `or_elim`, `ex_elim`) se borraron con `FOL/MetaRules.lean` porque eran refutables (`FOL/Inconsistencia.lean` §3); los tres de RPP (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`) quedaron retirados con la capa ([ADR‑115](DECISIONS.md)) | ✅ **sí** (antes, con los siete, ⛔ prohibida por [ADR‑029](DECISIONS.md)) | ✅ `derives_soundness` — **en el build** (`FOL/Inconsistencia.lean` §1: se traduce a `Derives₀` con `derives_to_derives0`) | 🗑️ **RETIRADA como capa de trabajo de RPP** (ADR‑115): RPP no la usa. Con las meta‑reglas era refutable |
-| **`Derives₀`** (`⊢₀`) | `../FOL/FOL/Derives0.lean` | 21 | ✅ **0** | ✅ **sí** | ✅ `derives0_soundness` — **en el build** | **SUJETO de FOL⁼**: solidez, consistencia, renombrado, eigenvariable, Henkin |
-| **`Prf`** | `Meta/Hilbert.lean` | 7 | ✅ **0** desde [ADR‑026](DECISIONS.md) | ✅ **sí** | ✅ `prf_sound` — **en el build** (`Meta/SolidezPrf.lean`, ADR‑120), en todo modelo ESTÁNDAR | **SUJETO de Gödel I y II** (`goedel_first_prf`, `goedel_second_prf`; sin hipótesis, `goedel_I`/`goedel_II`) |
-| **`Prfᵢ`** | `Meta/Hilbert.lean` | 17 | ✅ **0** | ✅ **sí** | ✅ `prfI_sound` — **en el build** (`Meta/SolidezPrf.lean`, ADR‑120); antes, `prfI_soundness`, FUERA (`sondeos/AnclaSoundness.lean`) | **ANCLA SEMÁNTICA**: la primera medición semántica del proyecto |
-| **`PrfH`** | `Meta/HilbertDeduction.lean` | 8 | ✅ **0** | ✅ **sí** | ⬜ no enunciada | **deducción interna** (`PrfH_mono`, `PrfH_w1`) |
+| noción | dónde | ctors | axiomas que la **HABITAN** | ¿`induction`? | solidez | completitud | puente | **rol** |
+|---|---|---:|---:|---|---|---|---|---|
+| **`Derives`** (`⊢`) | `../FOL/FOL/FOL.lean` | 22 | ✅ **0** desde el 2026‑10‑02. Los cuatro de FOL (`imp_intro`, `raa`, `or_elim`, `ex_elim`) se borraron con `FOL/MetaRules.lean` porque eran refutables (`FOL/Inconsistencia.lean` §3); los tres de RPP (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`) quedaron retirados con la capa ([ADR‑115](DECISIONS.md)) | ✅ **sí** (antes, con los siete, ⛔ prohibida por [ADR‑029](DECISIONS.md)) | ✅ `derives_soundness` — **en el build** (`FOL/Inconsistencia.lean` §1: se traduce a `Derives₀` con `derives_to_derives0`) | ✅ `derives_semantic_complete` (`../FOL/FOL/Estratos0.lean`) | `derives_to_derives0` · `derives0_to_derives` | 🗑️ **RETIRADA como capa de trabajo de RPP** (ADR‑115): RPP no la usa. Con las meta‑reglas era refutable |
+| **`Derives₀`** (`⊢₀`) | `../FOL/FOL/Derives0.lean` | 21 | ✅ **0** | ✅ **sí** | ✅ `derives0_soundness` — **en el build** | ✅ `completeness₀` (`../FOL/FOL/Canonical0.lean`): las dos direcciones, `derives0_complete_iff` | — (el sujeto) | **SUJETO de FOL⁼**: solidez, consistencia, renombrado, eigenvariable, Henkin |
+| **`Derives₁`** (`⊢₁`) | `../FOL/FOL/Derives1.lean` | 20 | ✅ **0** | ✅ **sí** | ✅ `derives1_soundness` (`Estratos0`) | ✅ `derives1_complete` | `derives1_to_derives0` · `derives0_to_derives1` | deducción natural con `rewrite_at` ADMISIBLE; equivale a `Derives₀` |
+| **`Derives₂`** (`⊢₂`) | `../FOL/FOL/Derives2.lean` | 22 | ✅ **0** | ✅ **sí** | ✅ `derives2_soundness` (`Estratos0`) | ✅ `derives2_complete` | `derives2_to_derives1` · `derives1_to_derives2` | con `subst` ADMISIBLE; de él sale la traducción a secuentes (`ndToLK`) |
+| **`LK₀`** | `../FOL/FOL/Sequent0.lean` | 14 | ✅ **0** | ✅ **sí** | ✅ `lk0_sound` (`../FOL/FOL/SequentSound0.lean`) | ✅ `lk0_complete` (`Estratos0`) | `lk0_to_derives0` | secuentes SIN corte: la extracción de Herbrand (`lk0_herbrand`) |
+| **`LKc`** | `../FOL/FOL/Sequent0.lean` | 15 | ✅ **0** | ✅ **sí** | ✅ `lkc_sound` (`SequentSound0`) | ✅ `lkc_complete` (`Estratos0`) | `ndToLK` (desde `Derives₂`) · `cut_elimination₀` (a `LK₀`) | `LK₀` con CORTE |
+| **`LKh`** | `../FOL/FOL/Hauptsatz0.lean` | 14 | ✅ **0** | ✅ **sí** | ✅ `lkh_sound` (`Estratos0`) | ✅ `lkh_complete`, con la altura | `lkh_to_lk0` · `lk0_to_lkh` | `LK₀` con ALTURA: la prueba del Hauptsatz |
+| **`LKp`** | `../FOL/FOL/Craig0.lean` | 13 | ✅ **0** | ✅ **sí** | ✅ `lkp_sound` (`Estratos0`) | ✅ `lkp_complete`, con las instancias de igualdad delante | `lkp_to_lk0` · `lk0_to_lkp` | SIN igualdad: Maehara y Craig |
+| **`Prf`** | `Meta/Hilbert.lean` | 7 | ✅ **0** desde [ADR‑026](DECISIONS.md) | ✅ **sí** | ✅ `prf_sound` — **en el build** (`Meta/SolidezPrf.lean`, ADR‑120), en todo modelo ESTÁNDAR | ⛔ no la hay para ℕ: Gödel I | — (el sujeto) | **SUJETO de Gödel I y II** (`goedel_first_prf`, `goedel_second_prf`; sin hipótesis, `goedel_I`/`goedel_II`) |
+| **`Prfᵢ`** | `Meta/Hilbert.lean` | 17 | ✅ **0** | ✅ **sí** | ✅ `prfI_sound` — **en el build** (`Meta/SolidezPrf.lean`, ADR‑120); antes, `prfI_soundness`, FUERA (`sondeos/AnclaSoundness.lean`) | — | `Prf.incl` (a `Prf`) | **ANCLA SEMÁNTICA**: la primera medición semántica del proyecto |
+| **`PrfH`** | `Meta/HilbertDeduction.lean` | 8 | ✅ **0** | ✅ **sí** | ✅ `prfH_sound`, con el contexto vacío (`Meta/SolidezPrf.lean`, T46) | — | `prfH_nil_to_prf` · `prf_to_prfH` | **deducción interna** (`PrfH_mono`, `PrfH_w1`) |
 
 ### ⚠️ Cómo se lee esta tabla, y por qué la columna que decide es la tercera
 

@@ -22,8 +22,8 @@ import ROBINSON_PlusPlus.Meta.ReprPrf
 tienen UNA sola hipótesis, `ConsistentH`, y footprint `[propext, Classical.choice, Quot.sound]`: el ancla
 de `axiomsCodeT` es un TEOREMA (`prf_ancla`, por el axioma diagonal `ax_axiomsCodeT_def`), y la clase
 `AnclaEq` se retiró (ADR‑118). ⚠️ Lo que NO dice: que `ConsistentH` se cumpla. Eso depende de la consistencia
-de los 142 axiomas: ✏️ desde ADR‑120 hay modelo, y `consistencia` (`Meta/Consistencia.lean`) la descarga.
-(✏️ 2026‑10‑12, ADR‑134: más exactamente, `ConsistentH` es la consistencia de `T_Prf` —los 142 CON los esquemas de
+de los 120 axiomas: ✏️ desde ADR‑120 hay modelo, y `consistencia` (`Meta/Consistencia.lean`) la descarga.
+(✏️ 2026‑10‑12, ADR‑134: más exactamente, `ConsistentH` es la consistencia de `T_Prf` —los 120 CON los esquemas de
 `Prf`—, y la da un modelo ESTÁNDAR, donde valen los esquemas: `AXIOMS.md` §0.)
 
 ⛔ **Hasta el 2026‑10‑04 eran VACUOS** (estado del 2026‑10‑02): su hipótesis de clase `[AnclaEq]` daba
@@ -55,7 +55,7 @@ más cualquiera de las meta‑reglas demuestra `False`; por eso la capa `⊢` en
 **Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis: `ConsistentH := ¬ Prf ⊥`**, que es la
 **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se **descargan
 aquí**. ⭐ Footprint: **sólo los tres de Lean**. El ancla de codificación es, desde ADR‑117, el ÚLTIMO de los
-142 axiomas objeto —el axioma diagonal—, y la clase `[AnclaEq]` que lo había sustituido
+120 axiomas objeto (142 hasta ADR‑192) —el axioma diagonal—, y la clase `[AnclaEq]` que lo había sustituido
 ([ADR‑026](../../DECISIONS.md); hasta ese día, sin instancia y contradictoria con `ConsistentH`) se
 retiró con ADR‑118. Ver `TEOREMAS-E-HIPOTESIS.md` §1.
 
@@ -209,8 +209,8 @@ ADR‑117, y hoy es el teorema `prf_ancla`. Entraban todos por `goedel_first_num
     `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`.
     🏁 (ADR‑117) Su única hipótesis es `ConsistentH`: el ancla de `axiomsCodeT` es un TEOREMA
     (`prf_ancla`, por el axioma diagonal), y no una hipótesis que daba `Prf ⊥` (F1). ⚠️ Que
-    `ConsistentH` se cumpla depende de la consistencia de los 142: ✏️ probada desde ADR‑120 (`consistencia`). (✏️
-    2026‑10‑12, ADR‑134: la de `T_Prf`, los 142 con los esquemas de `Prf`: `AXIOMS.md` §0.) -/
+    `ConsistentH` se cumpla depende de la consistencia de los 120: ✏️ probada desde ADR‑120 (`consistencia`). (✏️
+    2026‑10‑12, ADR‑134: la de `T_Prf`, los 120 con los esquemas de `Prf`: `AXIOMS.md` §0.) -/
 theorem goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN := by
   intro hG
   have h1 : Prf (provCodeC' godelCN) := repr_pos'_prf hG

@@ -119,6 +119,17 @@ FOL.Eigenvariable.derives0_inst_fresh|Quot.sound,propext
 FOL.Eigenvariable.occursFormula|-
 FOL.Eq0.derives0_atom_congr|Quot.sound,propext
 FOL.Eq0.derives0_eq_func_congr|Quot.sound,propext
+FOL.Estratos0.derives1_complete|Classical.choice,Quot.sound,propext
+FOL.Estratos0.derives1_soundness|Classical.choice,Quot.sound,propext
+FOL.Estratos0.derives2_complete|Classical.choice,Quot.sound,propext
+FOL.Estratos0.derives2_soundness|Classical.choice,Quot.sound,propext
+FOL.Estratos0.derives_semantic_complete|Classical.choice,Quot.sound,propext
+FOL.Estratos0.lk0_complete|Classical.choice,Quot.sound,propext
+FOL.Estratos0.lkc_complete|Classical.choice,Quot.sound,propext
+FOL.Estratos0.lkh_complete|Classical.choice,Quot.sound,propext
+FOL.Estratos0.lkh_sound|Classical.choice,Quot.sound,propext
+FOL.Estratos0.lkp_complete|Classical.choice,Quot.sound,propext
+FOL.Estratos0.lkp_sound|Classical.choice,Quot.sound,propext
 FOL.Finitary0.derives0_consistent_fin|Quot.sound,propext
 FOL.Finitary0.lk0_empty|Quot.sound,propext
 FOL.Finitary0.lk0_empty_of_no_bot|-
@@ -266,6 +277,7 @@ ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SolidezPrf.prfH_sound|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer|propext

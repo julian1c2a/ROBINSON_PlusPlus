@@ -10,7 +10,7 @@ import FOL.Semantics
 # `Meta/ModeloEstandar.lean` — el modelo `MNV V` y los 34 `coreAxioms` (ADR‑119/120)
 
 `MNV V : Model Nat` interpreta los 27 símbolos de función y los 5 de relación de los 120 (✏️ 28 y 142 hasta ADR‑192), con las funciones de
-`Meta/ModeloCodigo.lean`; `V` es el valor de `axiomsCodeT`, y el modelo es PARAMÉTRICO en él: los 141 de la base
+`Meta/ModeloCodigo.lean`; `V` es el valor de `axiomsCodeT`, y el modelo es PARAMÉTRICO en él: los 119 de la base
 valen para TODO `V`, y sólo el ancla (`Meta/ModeloCodificacion.lean`) lo fija en `V₀`.
 
 * Un lema `rfl` por símbolo (`MN_*`), para `V` VARIABLE. ⛔ No se escribe ningún `rfl` contra `V₀`: el núcleo
@@ -481,7 +481,7 @@ theorem mem_nil_elim {α : Type} {p : α → Prop} : ∀ x, List.Mem x ([] : Lis
   fun _ h => nomatch h
 
 /-- 🏁 **El modelo estándar satisface los 34 `coreAxioms`** (2026‑10‑05): la capa aritmética (25) y la de
-    listas (9). Los 107 de `codingAxioms` y el ancla van aparte, y `MN_axioms` junta los 142. -/
+    listas (9). Los 85 de `codingAxioms` y el ancla van aparte, y `MN_axioms` junta los 120. -/
 theorem MN_coreAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ coreAxioms → evalFormula (MNV V) v φ := by
   unfold coreAxioms
   exact mem_cons_elim (v_ax2 v) (mem_cons_elim (v_ax3 v) (mem_cons_elim (v_ax4 v) (mem_cons_elim (v_ax5 v) (mem_cons_elim (v_ax6 v) (mem_cons_elim (v_ax7 v) (mem_cons_elim (v_ax8 v) (mem_cons_elim (v_ax9 v) (mem_cons_elim (v_ax10 v) (mem_cons_elim (v_ax11 v) (mem_cons_elim (v_ax12 v) (mem_cons_elim (v_ax13 v) (mem_cons_elim (v_ax14 v) (mem_cons_elim (v_ax15 v) (mem_cons_elim (v_ax16 v) (mem_cons_elim (v_ax17 v) (mem_cons_elim (v_ax18 v) (mem_cons_elim (v_ax19 v) (mem_cons_elim (v_ax21 v) (mem_cons_elim (v_ax24 v) (mem_cons_elim (v_ax25 v) (mem_cons_elim (v_ax26 v) (mem_cons_elim (v_axL0 v) (mem_cons_elim (v_axL1 v) (mem_cons_elim (v_axL2 v) (mem_cons_elim (v_axC1 v) (mem_cons_elim (v_axC2 v) (mem_cons_elim (v_axC3 v) (mem_cons_elim (v_axL3 v) (mem_cons_elim (v_ax29 v) (mem_cons_elim (v_pow_zero v) (mem_cons_elim (v_pow_succ v) (mem_cons_elim (v_prodp_nil v) (mem_cons_elim (v_prodp_cons v) (mem_nil_elim))))))))))))))))))))))))))))))))))
