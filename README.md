@@ -7,7 +7,7 @@
 [![Build](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml/badge.svg)](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**Last updated:** 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
+**Last updated:** 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): el control nuevo, `check-choice.bash`. Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
 capas, la instalación con el hermano FOL y el toolchain exacto, los controles, los documentos). Lo de antes, en la
 historia de git.
 
@@ -77,6 +77,7 @@ pasa estos scripts (`.github/workflows/build.yml`), que también se lanzan a man
 |---|---|
 | `bash check-sorry.bash` | ningún `sorry` ni agujero de confianza («native_decide», «implemented_by»…) en lo que compila el build |
 | `bash check-footprints.bash` | el `#print axioms` de cada titular declarado, en los dos sentidos |
+| `bash check-choice.bash` | cada constante de RPP, FOL y TheoryFramework con `Classical.choice`, `noncomputable` o `String`, contra `doc/control/choice.tsv`, en los dos sentidos |
 | `bash check-estratos.bash` | por entorno: ningún `axiom` habita una noción de derivabilidad; `sorry`, confianza y `partial`, con señuelo |
 | `bash check-warnings.bash` | los avisos del build, declarados uno a uno |
 | `bash check-doc-sync.bash` | que los documentos digan lo que hay: cifras, citas muertas, marcas, catálogo |

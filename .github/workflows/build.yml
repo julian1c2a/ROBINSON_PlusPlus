@@ -165,6 +165,14 @@ jobs:
       - name: Check footprints
         run: bash check-footprints.bash
 
+      # ⭐ AÑADIDO el 2026-10-27 (T53, ADR-193). Las cifras de constructividad se midieron una vez y nada las
+      # vigilaba: check-footprints mira los titulares, y esto TODAS las constantes de RPP, FOL y TheoryFramework
+      # (sin las generadas): las que llevan Classical.choice, las noncomputable y las que nombran String, contra
+      # doc/control/choice.tsv, en los dos sentidos. Con tres constantes de calibración. Probado con el fallo puesto:
+      # una línea de menos y una de más en la tabla dan rojo.
+      - name: Check choice
+        run: bash check-choice.bash
+
       # El control de sincronía documentación ↔ código (AI-GUIDE §27). `--quick` omite el
       # `lake build`, que ya se hizo arriba; a cambio el control [A] de jobs no se ejecuta
       # y eso lo dice el propio script (§27.1: un control que no comprueba nada AVISA).

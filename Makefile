@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: footprints estratos warnings build clean rebuild sorry status lock unlock list init help probar-controles update-toolchain
+.PHONY: footprints estratos warnings choice build clean rebuild sorry status lock unlock list init help probar-controles update-toolchain
 
 ## Build the project
 build:
@@ -38,6 +38,11 @@ estratos:
 
 warnings:
 	@bash check-warnings.bash
+
+## La constructividad, constante a constante (T53, ADR-193): choice, noncomputable y String en RPP, FOL y
+## TheoryFramework, contra doc/control/choice.tsv
+choice:
+	@bash check-choice.bash
 
 ## Idem, sin lake build (para iterar rapido)
 docsync-quick:

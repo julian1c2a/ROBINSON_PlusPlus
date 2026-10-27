@@ -4,7 +4,7 @@
 > Este documento da las CIFRAS del árbol, cada una con el control que la mide, y la arquitectura por capas. Lo que se
 > hizo y cuándo está en [DECISIONS.md](DECISIONS.md); lo que queda, en [NEXT-STEPS.md](NEXT-STEPS.md) («Lo que queda»).
 
-**Last updated:** 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): 120 axiomas objeto (los 22 «ax_vpf_*», fuera) y 514 constantes en el contrato. Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 134 jobs y 118 módulos (`SolidezDobleNegacion` y `ProvFiel`), 546 footprints, y `Classical.choice` sólo en `prf_sound`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
+**Last updated:** 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): la constructividad, vigilada constante a constante (`check-choice.bash`). Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas objeto (los 22 «ax_vpf_*», fuera) y 514 constantes en el contrato. Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 134 jobs y 118 módulos (`SolidezDobleNegacion` y `ProvFiel`), 546 footprints, y `Classical.choice` sólo en `prf_sound`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
 y «Meta/CodeArith.lean», fuera: un solo `numeral` fuera de `Minimal`). Antes, el mismo día — [ADR‑182](DECISIONS.md) (T26): reescrito entero. El cuerpo anterior —las tablas del
 2026‑09‑10, con sus notas, y el diario de mayo a agosto— está, tal cual, en
 [doc/historia/CURRENT-STATUS-hasta-2026-10-21.md](doc/historia/CURRENT-STATUS-hasta-2026-10-21.md).
@@ -28,6 +28,7 @@ que tienen forma de frase fija (los jobs, los módulos, `sorry`, `axiom`, `cuare
 | Axiomas objeto | **120**: 34 matemáticos (`coreAxioms`) + 85 de codificación (`codingAxioms`) + el ancla diagonal (142 hasta ADR‑192, que retiró los 22 del verificador antiguo) | `axioms_len` y `axiomsBase_len` (`Full/Induction.lean`), por `rfl`, en cada build |
 | Titulares | **29**, cada uno con su fila en [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 o §3 | `[T]` (`T_UNIVERSO`); el contrato de sus enunciados (T07, `Meta/ContratoTitulares.lean`: 514 constantes en el cierre de sus tipos) y la pureza de la clase (i) (T08, `Meta/PurezaTitulares.lean`), en cada build |
 | Footprints | **546** filas; en RPP, `Classical.choice` sólo en `prf_sound` (ADR‑191) | `check-footprints.bash` |
+| Constructividad | sin las constantes generadas: en RPP, de **4306**, 17 con `Classical.choice` (`prf_sound` y 16 de las herramientas de T07 y T08, que lo heredan del marco meta de Lean), 74 `noncomputable` sin choice y 17 con `String`, ninguna en la lógica; en FOL y TheoryFramework, de 1498, 70 con choice y 1 `noncomputable` (ADR‑193) | `check-choice.bash` (`doc/control/choice.tsv`, 172 líneas) |
 | Avisos | **28** declarados: los 9 de siempre y 19 nombres obsoletos en seis módulos congelados de FOL | `check-warnings.bash` |
 | Estratos | **10** nociones de derivabilidad, ninguna habitada por un `axiom` | `check-estratos.bash` |
 | Núcleo | `leanchecker` re‑comprueba en la CI cada declaración de RPP, FOL y TheoryFramework | `.github/workflows/build.yml` |
