@@ -12,6 +12,9 @@ on:
   # ⭐ 2026-10-28 (T38, ADR-202): también CADA DÍA, y a mano. Sólo corría con un push de RPP, y una regresión de FOL (su
   # master es la dependencia, a propósito: ADR-073) se veía en el siguiente push de RPP y se atribuía a otro cambio. El
   # `repository_dispatch` desde FOL pediría un token de FOL con permiso sobre RPP: no está (decisión del propietario).
+  # ✏️ El mismo día (ADR-207, ADR-212 y ADR-216): y desde cada push al master de FOL, que la lanza con `workflow_dispatch`
+  # y un token del propietario (el secreto RPP_DISPATCH_TOKEN de FOL, con «Actions: Read and write» sólo sobre RPP).
+  # Funciona desde el 2026-10-28; caduca el 2027-01-26, y la CI de FOL imprime la fecha y avisa a 30 días.
   schedule:
     - cron: '41 4 * * *'
   workflow_dispatch:
