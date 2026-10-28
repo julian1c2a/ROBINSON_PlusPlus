@@ -557,6 +557,12 @@ la IA a priorizar qué cargar.
 | `CURRENT-STATUS-PROJECT.md` | Snapshot en vivo del build, jobs y estado de módulos |
 | `CHANGELOG.md` | Historial de cambios |
 
+> ✏️ **2026‑10‑28 ([ADR‑209](DECISIONS.md), T34): se cita por SÍMBOLO, nunca por número de línea.** En los documentos
+> de referencia (los autoritativos de §27, salvo `DECISIONS.md` y `NEXT-STEPS.md`, que son registro fechado), una cita
+> a código nombra la declaración y su fichero —`ax_tc_cons`, en `Minimal/Axioms.lean`—, no «fichero:línea»: la línea
+> se desplaza en cuanto el fichero cambia (de 43 medidas el 2026‑10‑28, 17 apuntaban ya a otra declaración). Lo comprueba
+> `check-doc-sync.bash` [N].
+
 `PLANNING.md` → `NEXT-STEPS.md`: los ítems migran solo cuando están lo bastante
 maduros para ejecutarse (objetivo claro, dependencias conocidas, sin preguntas de
 diseño abiertas). `THOUGHTS.md` → `PLANNING.md`: las ideas maduran ahí antes de

@@ -1,0 +1,43 @@
+# t34_citas.py — cada cita fichero:línea de los documentos de referencia, con su contexto y la declaración que hay HOY
+# en esa línea (si el fichero existe), para decidir la cita por símbolo.
+import os, re, subprocess, sys
+R = "/e/dropbox/github/lean4/ROBINSON_PlusPlus/"
+os.chdir(R)
+DOCS = ["REFERENCE.md", "sondeos/README.md", "doc/REFERENCE-Incompleteness.md"]
+CITA = re.compile(r"([A-Za-z0-9_./-]+\.(?:lean|bash|md|awk|yml|py|tsv|txt))(`?)[:#]L?(\d+)(?:-L?(\d+))?")
+DECL = re.compile(r"^\s*(?:@\[[^\]]*\]\s*)*(?:(?:private|protected|noncomputable|partial|unsafe)\s+)*"
+                  r"(theorem|lemma|def|abbrev|axiom|structure|inductive|instance|class|opaque)\s+([^\s:({]+)")
+
+def resuelve(f):
+    cands = [f, "ROBINSON_PlusPlus/" + f, "ROBINSON_PlusPlus/Meta/" + f, "ROBINSON_PlusPlus/Minimal/" + f,
+             "ROBINSON_PlusPlus/Full/" + f, "sondeos/" + f, "cuarentena/" + f, "../" + f, "../FOL/" + f]
+    for c in cands:
+        if os.path.isfile(c):
+            return c
+    return None
+
+def decl_en(path, n):
+    try:
+        L = open(path, encoding="utf-8", errors="replace").read().split("\n")
+    except Exception:
+        return "?"
+    if n > len(L):
+        return "(línea %d > %d líneas)" % (n, len(L))
+    for i in range(n - 1, max(-1, n - 80), -1):
+        m = DECL.match(L[i])
+        if m:
+            return "%s %s (l.%d)" % (m.group(1), m.group(2), i + 1)
+    return "(sin declaración en las 80 líneas anteriores) «%s»" % L[n - 1].strip()[:70]
+
+k = 0
+for d in DOCS:
+    for ln, linea in enumerate(open(d, encoding="utf-8").read().split("\n"), 1):
+        for m in CITA.finditer(linea):
+            k += 1
+            f, n = m.group(1), int(m.group(3))
+            p = resuelve(f)
+            a, b = max(0, m.start() - 110), min(len(linea), m.end() + 60)
+            print("#%d %s:%d  «%s»" % (k, d, ln, m.group(0)))
+            print("   ctx: …%s…" % linea[a:b].replace("\n", " "))
+            print("   hoy: %s" % (decl_en(p, n) if p else "NO EXISTE en el árbol"))
+print("total", k)

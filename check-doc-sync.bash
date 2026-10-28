@@ -972,6 +972,45 @@ fi
 rm -rf "$I_REGLAS" "$I_AUTO"
 [ "$I_FAIL" = "0" ] && echo "  ✓ ninguna frase que un teorema vivo desmienta ($(printf '%s\n' "$I_LEAN" | grep -c .) .lean y los documentos)" || FAIL=1
 
+# ─── [N] CITAS POR NÚMERO DE LÍNEA — ROJO ──────────────────────────────────────
+# ⭐ AÑADIDO el 2026-10-28 (T34, ADR-209). Los documentos de referencia citan por SÍMBOLO, nunca por número de línea
+# (decisión del propietario). Una cita «fichero:línea» se desplaza en cuanto el fichero cambia, y se actualizaba
+# «por desplazamiento» sin mirar el destino: nueve documentos citaban `ax_tc_cons` en la línea 827 de Minimal/Axioms
+# cuando estaba en la 902 (la auditoría, T34), y de las 43 que quedaban, una docena ya apuntaba a otra declaración.
+# Mira los documentos AUTORITATIVOS salvo DECISIONS.md y NEXT-STEPS.md, que son REGISTRO fechado (un ADR cita lo que
+# había ese día), y rompe con: un fichero con extensión seguido de «:N», «:LN» o «#LN» (también con la comilla
+# invertida de por medio), una cita suelta «`:N`» (la línea de un fichero citado antes) y un «`Módulo:N`» sin
+# extensión. (En su primera ejecución vio 46 que el primer recuento, sólo de «fichero.ext:N», no veía.)
+# ⚠️ Lo que NO mira: los comentarios de los .lean (no son documentos de referencia; corregirlos recompila sus módulos).
+# ⭐ Con AUTOTEST: siete líneas sintéticas —cuatro citas que tiene que ver y tres que no— deben dar exactamente 4.
+echo ""
+echo "════ [N] CITAS POR NÚMERO DE LÍNEA — ROJO (T34, ADR-209) ════"
+N_RE='[A-Za-z0-9_./-]*\.[A-Za-z]+`?(:|#)L?[0-9]|`:[0-9]+|`[A-Z][A-Za-z0-9_]*:[0-9]'
+N_FAIL=0
+N_AUTO=$(printf '%s\n' 'la cita `Minimal/Axioms.lean:902` se mueve' 'y su vecina (`:443`) también' \
+  'un enlace https://github.com/x/y/blob/master/README.md#L10' 'por símbolo: `ax_tc_cons` en `Minimal/Axioms.lean`' \
+  'una hora, 12:30, no es una línea' 'un sitio: `EvalPredPrf:128`' 'Lean v4.35.0: la versión' | grep -cE "$N_RE")
+if [ "$N_AUTO" != "4" ]; then
+  echo "  ❌ NO PUDE MEDIR [N]: el autotest da $N_AUTO citas y debían ser 4 (¿otro grep?)."
+  N_FAIL=1
+else
+  N_DOCS=""
+  for d in $AUTHORITATIVE; do
+    case "$d" in DECISIONS.md|NEXT-STEPS.md) continue ;; esac
+    [ -f "$d" ] && N_DOCS="$N_DOCS $d"
+  done
+  # shellcheck disable=SC2086
+  N_HAY=$(grep -nE "$N_RE" $N_DOCS /dev/null || true)
+  if [ -n "$N_HAY" ]; then
+    echo "  ✗ citas por número de línea ($(printf '%s\n' "$N_HAY" | grep -c .)): cítese el símbolo (y su fichero, sin línea)"
+    printf '%s\n' "$N_HAY" | head -15 | cut -c1-200 | sed 's/^/      /'
+    N_FAIL=1
+  else
+    echo "  ✓ ninguna cita por número de línea en $(printf '%s\n' $N_DOCS | grep -c .) documentos de referencia (autotest: 4 de 4)"
+  fi
+fi
+[ "$N_FAIL" = "0" ] || FAIL=1
+
 # ─── 4. PROYECCIÓN: ¿está cada módulo en el catálogo? ────────────────────────
 echo
 echo "════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════"

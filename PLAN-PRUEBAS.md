@@ -4,7 +4,7 @@
 > Las cifras de hoy, cada una con el control que la mide, en [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md).
 
 **Creado:** 2026‑09‑11 (lo abrió la auditoría, `doc/AUDITORIA-2026-09-11.md` F‑4) · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-28 — [ADR‑202](DECISIONS.md) (T41): P‑3, el tiempo y la memoria de la CI, vigilados. Antes, 2026-10-27 — [ADR‑194](DECISIONS.md) (T46): V11, las once nociones. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): entra en AUTHORITATIVE (lo miran `[A]` y `[A2]`); el
+**Last updated:** 2026-10-28 — [ADR‑209](DECISIONS.md) (T34): la cita del `.gitignore`, sin número de línea. Antes, el mismo día — [ADR‑202](DECISIONS.md) (T41): P‑3, el tiempo y la memoria de la CI, vigilados. Antes, 2026-10-27 — [ADR‑194](DECISIONS.md) (T46): V11, las once nociones. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): entra en AUTHORITATIVE (lo miran `[A]` y `[A2]`); el
 banner, sin las cifras del 2026‑09‑11; V3, V5, V7 y su recuadro (lo que bloquea en la CI: hoy, todo el job de build),
 V10 (29 titulares), y las filas V11–V16 de los controles que faltaban: los censos por entorno, los avisos,
 `leanchecker`, los sondeos de control, las herramientas de los controles y la vigilancia de versiones.
@@ -78,7 +78,7 @@ conclusión falsa** (regla **M‑8**). Lo que hay que preguntarle a un sondeo no
 
 | | qué es | ¿versionado? |
 |---|---|---|
-| **`Probe/`** | **borrador**: medir si algo casa, tantear una táctica, leer un error | ❌ **no** (`.gitignore:30`) — es ruido, y correctamente |
+| **`Probe/`** | **borrador**: medir si algo casa, tantear una táctica, leer un error | ❌ **no** (`.gitignore`) — es ruido, y correctamente |
 | **`sondeos/`** | **resultado**: la pregunta que se contestó, con su respuesta compilada | ✅ **sí**, con su fila en `sondeos/README.md` |
 
 > ⛔ **MANDATORY (M‑9)**: **un `Probe/` que decide un ADR se promueve a `sondeos/` antes de cerrar

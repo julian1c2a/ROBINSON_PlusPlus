@@ -165,7 +165,7 @@ llevan los `p3` que traducen de otra que reciben.
 > `doc/book/AUDITORIA-2026-09-10.md` R3.
 
 > ⚠️⚠️ **LA COLUMNA `#` SE RETIRA (2026‑09‑12).** Era un **acoplamiento por número de fila**:
-> `doc/book/capitulos/cap-representabilidad-d1.tex:70` cita *«los axiomas **5 y 6**»* de esta tabla,
+> `doc/book/capitulos/cap-representabilidad-d1.tex` cita *«los axiomas **5 y 6**»* de esta tabla,
 > y **ningún control detecta** que al retirar un axioma esa referencia pase a apuntar a otro sitio.
 > Ha pasado **dos veces en un día** (Ax‑P retirado y el ancla `Prf` convertida en hipótesis).
 > 🔑 **Se cita por NOMBRE, nunca por número.**
