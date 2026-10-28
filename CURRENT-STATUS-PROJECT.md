@@ -20,7 +20,7 @@ que tienen forma de frase fija (los jobs, los módulos, `sorry`, `axiom`, `cuare
 
 | cifra | hoy | la mide |
 |---|---|---|
-| Build | **147** jobs, 0 errores | `lake build` (la CI, en cada push) |
+| Build | **148** jobs, 0 errores | `lake build` (la CI, en cada push) |
 | Módulos | **119** módulos activos: Minimal 2 + Meta 116 + Full 1, más el barrel `Meta.lean` y la raíz `ROBINSON_PlusPlus.lean` | `check-doc-sync.bash` `[A]` y `[L]` (la librería es el cierre de imports, y todo `.lean` del árbol está en ella) |
 | Fuera del build | 0 en `cuarentena/` · **44** `sondeos/`, 11 de control | `check-sondeos.bash --controles` (los 11, en la CI); `sondeos/README.md` |
 | `sorry` | 0 `sorry` | `check-sorry.bash` (el texto) y `check-estratos.bash` (el entorno) |

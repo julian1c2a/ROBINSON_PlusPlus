@@ -13,7 +13,7 @@
 > **Ficheros `.lean`:** la cadena `Meta/` (barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean); cuántos
 > módulos, en la línea de cifras de abajo).
 
-**Build 147 jobs · 119 módulos activos** (Minimal 2 + Meta 116 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
+**Build 148 jobs · 119 módulos activos** (Minimal 2 + Meta 116 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
 · 0 `axiom` de Lean · 120 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
 
 **Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de
@@ -5723,6 +5723,8 @@ theorem prf_completo (h : ∀ D M v, (∀ φ, AxiomasT φ → evalFormula M v φ
 theorem goedel_I_fol (hS : ∀ φ, S φ → Prf φ) : ¬ DerivesSet₀ S godelCN    -- y goedel_I_neg_fol, goedel_II_fol (titulares, ADR-210)
 theorem modelo_sin_G : ∃ D M v, (∀ φ, Prf φ → evalFormula M v φ) ∧ ¬ evalFormula M v godelCN
 theorem goedel_I_semantico : (∀ M, Estandar M → ∀ v, evalFormula M v godelCN) ∧ (∃ D M v, …)
+theorem isSentence_iff_fol : IsSentence φ ↔ FOL.Sentence.IsSentence φ      -- T72, ADR-215
+theorem godelCN_eval_indep : evalFormula M v godelCN ↔ evalFormula M w godelCN
 ```
 
 La traducción va constructor a constructor, con el mismo contexto, porque `PrfH` ya tenía lo difícil: su teorema de

@@ -7,6 +7,8 @@ import ROBINSON_PlusPlus.Meta.HilbertDeduction
 import ROBINSON_PlusPlus.Meta.RigidezEstandar
 import FOL.Derives1
 import FOL.Canonical0
+import FOL.Sentence
+import ROBINSON_PlusPlus.Meta.TarskiPrf
 
 /-!
 # `Meta/PuenteFOL.lean` — el puente de FOL a `Prf`, y Gödel I semántico (T67, ADR‑195)
@@ -32,6 +34,9 @@ consecuencia de primer orden de FOL (`AXIOMS.md` §0.1). Este módulo pone el pu
   **`modelo_sin_G`**: hay un modelo de todos los teoremas de `Prf` en el que `G` es FALSA, mientras que `G` es
   verdadera en todo modelo estándar (`godelCN_verdadera_de`); `goedel_I_semantico` junta los dos hechos, y de ahí se lee
   que ese modelo no es estándar (el teorema no lo enuncia: los modelos estándar son sobre ℕ).
+* **§5 · Las sentencias, con FOL** (T72, ADR‑215): la `IsSentence` de RPP (`liftFormula 0 φ = φ`, `Meta/TarskiPrf.lean`)
+  es la de FOL (`FOL.Sentence.IsSentence`: sin variables libres, decidible), `isSentence_iff_fol`; y `G` es una
+  sentencia de FOL, así que su valor no depende de la valuación (`godelCN_eval_indep`): el de `modelo_sin_G`, tampoco.
 
 ⚠️ **Lo que NO dice.** La vuelta, `Prf → DerivesSet₀ AxiomasT`, no está: con instancias de los esquemas que tienen
 variables libres, `gen` pide las clausuras universales, y para Gödel I no hace falta. La solidez de `Prf` sigue siendo
@@ -228,6 +233,23 @@ theorem goedel_I_semantico :
           And (∀ φ, Prf φ → evalFormula M v φ) (¬ evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)) :=
   ⟨fun _ hM v => ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de hM v, modelo_sin_G⟩
 
+/-! ## §5 · Las sentencias, con FOL (T72, ADR‑215) -/
+
+/-- 🏁 La `IsSentence` de RPP (`liftFormula 0 φ = φ`) es la de FOL (sin variables libres, `FOL.Sentence`). -/
+theorem isSentence_iff_fol (φ : Formula) :
+    Iff (ROBINSON_PlusPlus.Meta.TarskiPrf.IsSentence φ) (FOL.Sentence.IsSentence φ) :=
+  (FOL.Sentence.isSentence_iff_lift φ).symm
+
+/-- `G` es una sentencia de FOL. -/
+theorem godelCN_isSentence_fol : FOL.Sentence.IsSentence ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
+  (isSentence_iff_fol _).mp ROBINSON_PlusPlus.Meta.TarskiPrf.godelCN_isSentence
+
+/-- El valor de `G` en un modelo no depende de la valuación: el modelo de `modelo_sin_G` la hace falsa en TODAS. -/
+theorem godelCN_eval_indep {D : Type} (M : Model D) (v w : Nat → D) :
+    Iff (evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)
+      (evalFormula M w ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) :=
+  FOL.Sentence.eval_sentence M godelCN_isSentence_fol v w
+
 end ROBINSON_PlusPlus.Meta.PuenteFOL
 
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.derives1_to_prfH
@@ -238,3 +260,6 @@ end ROBINSON_PlusPlus.Meta.PuenteFOL
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico
+#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.isSentence_iff_fol
+#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.godelCN_isSentence_fol
+#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.godelCN_eval_indep

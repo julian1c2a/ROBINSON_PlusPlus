@@ -154,6 +154,10 @@ FOL.Esencialidad0.E7.model_existence_stmt_implies_wlem|Quot.sound,propext
 FOL.Esencialidad0.ExElimFin.stable_MB|-
 FOL.Esencialidad0.ExElimFin.sound_MB|Quot.sound,propext
 FOL.Esencialidad0.ExElimFin.ex_elim_refutable_fin|Quot.sound,propext
+FOL.Sentence.evalFormula_agree|propext
+FOL.Sentence.eval_sentence|propext
+FOL.Sentence.liftFormula_eq_iff_closedAt|propext
+FOL.Sentence.isSentence_iff_lift|propext
 FOL.Finitary0.derives0_consistent_fin|Quot.sound,propext
 FOL.Finitary0.lk0_empty|Quot.sound,propext
 FOL.Finitary0.lk0_empty_of_no_bot|-
@@ -319,6 +323,9 @@ ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.isSentence_iff_fol|propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.godelCN_isSentence_fol|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.godelCN_eval_indep|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.consistencia|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.goedel_I|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.goedel_II|Quot.sound,propext

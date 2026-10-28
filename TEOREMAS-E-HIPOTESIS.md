@@ -1,6 +1,6 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑27 · `master` · **147 jobs · 119 módulos · 0 sorry · 0 `axiom` de Lean · Lean v4.35.0**
+> ## ESTADO REAL — 2026‑10‑28 · `master` · **148 jobs · 119 módulos · 0 sorry · 0 `axiom` de Lean · Lean v4.35.0**
 >
 > 🏁🏁 **Gödel I entero, Gödel II, Tarski y Rosser, SIN HIPÓTESIS** (ADR‑120, ADR‑121, ADR‑157): `goedel_I : ¬ Prf
 > godelCN`, `goedel_I_neg : ¬ Prf ¬godelCN`, `goedel_II : ¬ Prf consistencyFormula'`, `tarski` y `rosser : ¬ Prf R ∧
@@ -185,7 +185,9 @@ El `Classical.choice` de los tres últimos es el de la completitud de FOL (`mode
 2026‑10‑28 (ADR‑210, decisión del propietario): los tres primeros son TITULARES (§1), en la forma general —para todo
 conjunto de teoremas de `Prf`, que cubre las clausuras universales de los axiomas—; los tres últimos, no: su choice
 no se puede quitar. La
-vuelta del puente (`Prf → DerivesSet₀ AxiomasT`) no está ([AXIOMS.md](AXIOMS.md) §0.1).
+vuelta del puente (`Prf → DerivesSet₀ AxiomasT`) no está ([AXIOMS.md](AXIOMS.md) §0.1). ✏️ 2026‑10‑28 (T72, ADR‑215): y la
+sentencia de RPP es la de FOL (`isSentence_iff_fol`, por `../FOL/FOL/Sentence.lean`): `G` es una sentencia de FOL, y su valor
+no depende de la valuación (`godelCN_eval_indep`).
 
 ## 4 · Las hipótesis que quedan, y qué son exactamente
 
