@@ -1,5 +1,10 @@
 # FRENTE (a) — ¿vuelve la capa rastreada? (D3 y Gödel II)
 
+> 🗄️ **HISTÓRICO** (✏️ 2026‑10‑28, [ADR‑196](DECISIONS.md), T55): el frente del 2026‑08‑19, tras retirar
+> `ax_tc_cons`. Está cerrado: D3 es teorema (`d3_prf_real`), Gödel II también (`goedel_second_prf`, y sin hipótesis
+> `goedel_II`), y `cuarentena/` está vacía. Lo de abajo es registro; lo vigente, [NEXT-STEPS.md](NEXT-STEPS.md) y
+> [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md).
+
 **Abierto:** 2026‑08‑19, tras ejecutar la reparación (`master`, HEAD `d6552b9`, 85 jobs).
 **Contexto:** `cuarentena/README.md`, `sondeos/PilotoRastreada.lean`, `PLAN-SORTES.md`.
 

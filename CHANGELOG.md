@@ -6,7 +6,7 @@
 > ## ⚠️ ESTADO REAL — auditoría 2026-09-09 23:30
 >
 > **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
-> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
+> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → ~~PLAN-FRENTE-A.md~~ (✏️ 2026‑10‑28, ADR‑196: histórico)
 > → [cuarentena/README.md](cuarentena/README.md).
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en

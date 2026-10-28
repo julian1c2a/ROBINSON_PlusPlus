@@ -1,5 +1,9 @@
 # Discusión sobre Axiomas Temporales
 
+> 🗄️ **HISTÓRICO** (✏️ 2026‑10‑28, [ADR‑196](DECISIONS.md), T55): una nota de junio sobre axiomas provisionales de
+> `Minimal`. Los módulos que cita (`Block4_C6_C7` y los bloques de los `teo_…`) se retiraron, y la lista de axiomas
+> de hoy es otra (120, [AXIOMS.md](AXIOMS.md)). Lo de abajo es registro.
+
 **Última actualización:** 2026-06-03 — ~~ax22~~, ~~ax23~~, ~~ax27~~, ~~ax28~~ ELIMINADOS; este doc queda como nota histórica.
 **Autor**: Julián Calderón Almendros
 

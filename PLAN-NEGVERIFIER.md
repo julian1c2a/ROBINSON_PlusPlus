@@ -1,5 +1,10 @@
 # PLAN — `NegVerifier` (cerrar `⊬¬G`)
 
+> 🗄️ **HISTÓRICO** (✏️ 2026‑10‑28, [ADR‑196](DECISIONS.md), T55): el plan de septiembre para cerrar `⊬¬G` con un
+> verificador negativo sobre la capa `⊢`. Esa capa se retiró con ADR‑115 (y el módulo `VerifierSound` con ADR‑160),
+> y `⊬¬G` se cerró por otro camino: `goedel_I_neg` (ADR‑121), por la solidez en el modelo estándar y W1. Lo de abajo
+> es registro; lo vigente, [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §2.
+
 > # 🔬 VEREDICTO DEL SONDEO OBLIGATORIO DEL MÓDULO E (2026‑09‑10h)
 >
 > §8 exigía este sondeo **antes** de codificar `VerifierSound`. Hecho, compilado y guardado en
