@@ -98,7 +98,9 @@ jobs:
       # con «workflow file issue»). Detectado 2026-09-06 en lean4-project-template.
       - name: Install Lean toolchain
         run: |
-          elan toolchain install $(cut -d: -f2 lean-toolchain)
+          # ⚠️ `tr -d '\r'`, como en la CI de FOL (✏️ 2026-10-28, T43, ADR-200): si `lean-toolchain` llegara con CRLF,
+          # `cut` devolvería «v4.35.0\r» y elan contestaría «invalid toolchain name» (le pasó a AczelSetTheory).
+          elan toolchain install $(cut -d: -f2 lean-toolchain | tr -d '\r')
 
       # ⚠️ Los `path:`/`hashFiles` de un `uses:` NO ven el `working-directory` de arriba:
       # van con el prefijo del subdirectorio.
