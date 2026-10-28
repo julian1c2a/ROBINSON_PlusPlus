@@ -1,0 +1,31 @@
+T50 (ADR-214) — lo que PeanoRF (../Peano-from-ROB-n-FOL) tendría que adaptar para compilar contra el FOL de hoy,
+y en qué orden. MEDIDO el 2026-10-28 leyendo su árbol (sólo lectura: PeanoRF está bloqueado por el propietario; no se
+ha tocado nada). PeanoRF: 73 ficheros .lean versionados; último commit 70d79fc (2026-09-28); lean-toolchain v4.31.0.
+
+1. El toolchain: v4.31.0 → v4.35.0 (M-3 de RPP, M-1 de FOL: todo consumidor por ruta, en el mismo).
+   Las roturas conocidas de v4.35 (ADR-181 de RPP): Decidable como estructura, `ofReduceBool` y `trimRight` fuera,
+   seis lemas de `ite` obsoletos.
+
+2. PeanoRF/Prelim.lean importa FOL.MetaRules, que se BORRÓ el 2026-10-02 (ADR-115 de RPP; sus cuatro `axiom` eran
+   refutables). PeanoRF no compila DESDE ENTONCES, no «desde D7» (como decía NEXT-STEPS; hoy en
+   doc/historia/NEXT-STEPS-hasta-2026-10-14.md:31). Quitar el import y lo que use imp_intro, raa, or_elim o ex_elim.
+
+3. D7 (ADR-129 de RPP): los símbolos de FOL son `List Char`. Líneas con un literal de cadena en PeanoRF/ (sin los
+   sondeos): 29, en 11 ficheros —Meta/AxiomCheck 12, Calculus/Slash 6, HA/Model 2, HA/Numerals 2, y Consistency,
+   DerivesI, Soundness, Subst, HA/Order, Prelim y _template, 1 cada uno—; no todas son símbolos (también hay
+   mensajes). Las que construyen un `Term.func`/`Formula.atom` con un literal: Calculus/Slash 3, HA/Numerals 2,
+   Calculus/Consistency 1. Pasan a `['S']`, o a un `sym!` (hoy en RPP, ROBINSON_PlusPlus/Minimal/SymLit.lean; subirlo a
+   FOL va con T51).
+   (La auditoría del 2026-10-12 contó «88 líneas con String en 8 ficheros», con otro criterio: no es la misma cifra.)
+
+4. HA/Model.lean usa la forma VIEJA de `cons` (`ax_L0_cons_def`: «d :: e = pair d (σe)», su l. 201); desde ADR-113
+   de RPP es `cons a b = σ (pair a b)`.
+
+5. Meta/AxiomCheck.lean vigila nombres retirados: `ROBINSON_PlusPlus.Minimal.Axioms.axioms` como conjunto `⊢` y «los
+   cuatro meta-axiomas de ROBINSON_PlusPlus que postulan axioms ⊢ φ» (la capa `⊢`, retirada con ADR-115).
+
+6. X1 (la entrega de PeanoRF a FOL, sondeos/entrega-fol-2026-09-28/): la integra FOL (T51, decisión del propietario
+   del 2026-10-28). Después, PeanoRF la importaría de FOL en vez de llevarla.
+
+Imports de FOL que hace PeanoRF/ (por número de ficheros): FOL.FOL 3; FOL.Theorems.Quantifiers, .Neg, .Impl, .Eq,
+.Derived, FOL.Tactics, FOL.Semantics, FOL.MetaRules (BORRADO) y FOL.Finitary0, 1 cada uno.
