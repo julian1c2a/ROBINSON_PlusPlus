@@ -4,8 +4,14 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 
+import FOL.SymLit
+
 /-!
 # `Minimal/SymLit.lean` — los literales de SÍMBOLO, `sym!"…"` (D7, ADR‑129)
+
+✏️ 2026‑10‑28 (T51, ADR‑218): la macro y su `unexpander` viven en FOL (`../FOL/FOL/SymLit.lean`), que es de quien son los
+símbolos; aquí se importan, y quedan los controles de RPP (el despacho por patrones, la guarda de footprint). Lo de
+abajo describe la macro, que no ha cambiado.
 
 Desde D7 los símbolos de FOL son `List Char` (antes `String`). `sym!"substfc"` es el símbolo
 `['s', 'u', 'b', 's', 't', 'f', 'c'] : List Char`, y `sym!""` es `([] : List Char)`. Vale en TÉRMINO y en
@@ -32,28 +38,6 @@ set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
 namespace ROBINSON_PlusPlus.Minimal.SymLit
-
-/-- `sym!"abc"` es el símbolo `['a', 'b', 'c'] : List Char`; `sym!""` es `([] : List Char)`. -/
-syntax:max (name := symLit) "sym!" str : term
-
-macro_rules (kind := symLit)
-  | `(sym! $s:str) => do
-    let mut acc : Lean.Term ← ``(List.nil)
-    for c in s.getString.toList.reverse do
-      let lit : Lean.Term := Lean.Syntax.mkCharLit c
-      acc ← ``(List.cons $lit $acc)
-    ``(($acc : List Char))
-
-/-- Imprime de vuelta como `sym!"…"` una cadena de `List.cons` de literales de carácter que acaba en `[]`.
-Los `unexpander` actúan de abajo arriba: la cola ya es `[]` o `sym!"…"`. -/
-@[app_unexpander List.cons]
-def unexpandSymLit : Lean.PrettyPrinter.Unexpander
-  | `($(_) $c:char $tail) =>
-    match tail with
-    | `([])          => `(sym! $(Lean.Syntax.mkStrLit c.getChar.toString))
-    | `(sym! $s:str) => `(sym! $(Lean.Syntax.mkStrLit (c.getChar.toString ++ s.getString)))
-    | _              => throw ()
-  | _ => throw ()
 
 /-! ### Autocontroles -/
 

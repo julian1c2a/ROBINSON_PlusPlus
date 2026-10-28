@@ -45,6 +45,7 @@ FOL.Estratos0	FOL.Estratos0.derives1_complete	C
 FOL.Estratos0	FOL.Estratos0.derives1_soundness	C
 FOL.Estratos0	FOL.Estratos0.derives2_complete	C
 FOL.Estratos0	FOL.Estratos0.derives2_soundness	C
+FOL.Estratos0	FOL.Estratos0.derivesI_soundness	C
 FOL.Estratos0	FOL.Estratos0.derives_semantic_complete	C
 FOL.Estratos0	FOL.Estratos0.lk0_complete	C
 FOL.Estratos0	FOL.Estratos0.lkc_complete	C
@@ -79,6 +80,7 @@ FOL.Soundness0	FOL.Metamath.Soundness0.derives0_not_complete	C
 FOL.Soundness0	FOL.Metamath.Soundness0.derives0_not_derives_P	C
 FOL.Soundness0	FOL.Metamath.Soundness0.derives0_not_derives_negP	C
 FOL.Soundness0	FOL.Metamath.Soundness0.derives0_soundness	C
+FOL.SymLit	FOL.SymLit.unexpandSymLit	S
 FOL.Tactics	tryMem	C
 ROBINSON_PlusPlus.Meta.BdAllIntroPrf	ROBINSON_PlusPlus.Meta.BdAllIntroPrf.bdAllPred	N
 ROBINSON_PlusPlus.Meta.ContratoTabla	ROBINSON_PlusPlus.Meta.ContratoTabla.tabla	S
@@ -185,7 +187,6 @@ ROBINSON_PlusPlus.Meta.TrackedAtomsPrf	ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.bd
 ROBINSON_PlusPlus.Meta.TrackedAtomsPrf	ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.bdInPhic	N
 ROBINSON_PlusPlus.Meta.TrackedAtomsPrf	ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.shapeDot	N
 ROBINSON_PlusPlus.Minimal.Axioms	ROBINSON_PlusPlus.Minimal.Axioms.termToString	S
-ROBINSON_PlusPlus.Minimal.SymLit	ROBINSON_PlusPlus.Minimal.SymLit.unexpandSymLit	S
 TheoryFramework.Instances.FOL	TheoryFramework.Instances.fol0Complete	C
 TheoryFramework.Instances.FOL	TheoryFramework.Instances.fol0Sound	C
 TheoryFramework.Instances.FOL	TheoryFramework.Instances.fol0_proves_iff_models	C

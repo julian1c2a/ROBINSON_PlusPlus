@@ -1,6 +1,6 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑28 · `master` · **148 jobs · 119 módulos · 0 sorry · 0 `axiom` de Lean · Lean v4.35.0**
+> ## ESTADO REAL — 2026‑10‑28 · `master` · **149 jobs · 119 módulos · 0 sorry · 0 `axiom` de Lean · Lean v4.35.0**
 >
 > 🏁🏁 **Gödel I entero, Gödel II, Tarski y Rosser, SIN HIPÓTESIS** (ADR‑120, ADR‑121, ADR‑157): `goedel_I : ¬ Prf
 > godelCN`, `goedel_I_neg : ¬ Prf ¬godelCN`, `goedel_II : ¬ Prf consistencyFormula'`, `tarski` y `rosser : ¬ Prf R ∧

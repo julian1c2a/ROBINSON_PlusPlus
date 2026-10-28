@@ -13,7 +13,7 @@
 > **Ficheros `.lean`:** la cadena `Meta/` (barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean); cuántos
 > módulos, en la línea de cifras de abajo).
 
-**Build 148 jobs · 119 módulos activos** (Minimal 2 + Meta 116 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
+**Build 149 jobs · 119 módulos activos** (Minimal 2 + Meta 116 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
 · 0 `axiom` de Lean · 120 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
 
 **Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de

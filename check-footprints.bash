@@ -158,6 +158,16 @@ FOL.Sentence.evalFormula_agree|propext
 FOL.Sentence.eval_sentence|propext
 FOL.Sentence.liftFormula_eq_iff_closedAt|propext
 FOL.Sentence.isSentence_iff_lift|propext
+FOL.Calculus.derivesI_to_derives0|propext
+FOL.Calculus.consistI_syn|Quot.sound,propext
+FOL.Calculus.eqI_symm|Quot.sound,propext
+FOL.Calculus.derivesI_collapse|Quot.sound,propext
+FOL.Calculus.slash_of_derives|Quot.sound,propext
+FOL.Calculus.derivesI_disjunction_property|Quot.sound,propext
+FOL.Calculus.derivesI_existence_property|Quot.sound,propext
+FOL.Calculus.derivesI_ne_derives0|Quot.sound,propext
+FOL.Estratos0.derivesI_soundness|Classical.choice,Quot.sound,propext
+FOL.SymLit.symProbe|-
 FOL.Finitary0.derives0_consistent_fin|Quot.sound,propext
 FOL.Finitary0.lk0_empty|Quot.sound,propext
 FOL.Finitary0.lk0_empty_of_no_bot|-

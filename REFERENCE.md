@@ -14,7 +14,7 @@
 
 ---
 
-## 0bis · ⭐⭐ LOS ESTRATOS — las once nociones de derivabilidad, y el ROL de cada una
+## 0bis · ⭐⭐ LOS ESTRATOS — las doce nociones de derivabilidad, y el ROL de cada una
 
 > ⛔⛔ **Ésta es la tabla que faltaba, y su ausencia se cobró `FOL.soundness`.** El proyecto tiene
 > **cinco** nociones de derivabilidad, y hasta el 2026‑09‑14 nadie podía decir, mirando el árbol,
@@ -30,6 +30,8 @@
 > control comprueba que ésta y la suya tienen los mismos cálculos con los mismos constructores. Un cálculo nuevo (el
 > intuicionista de X1, si llega) entra en las dos.
 >
+> ✏️ 2026‑10‑28 (T51, ADR‑218): llegó el intuicionista de X1, `Derivesᵢ` (`../FOL/FOL/Calculus/DerivesI.lean`): doce.
+>
 > ✏️ 2026‑10‑28 (T67, ADR‑195): y entre los dos mundos, `derives1_to_prfH` (`Meta/PuenteFOL.lean`) lleva `Derives₁` a
 > `PrfH` con el mismo contexto: lo que FOL deriva de teoremas de `Prf` es teorema.
 
@@ -39,6 +41,7 @@
 | **`Derives₀`** (`⊢₀`) | `../FOL/FOL/Derives0.lean` | 21 | ✅ **0** | ✅ **sí** | ✅ `derives0_soundness` — **en el build** | ✅ `completeness₀` (`../FOL/FOL/Canonical0.lean`): las dos direcciones, `derives0_complete_iff` | — (el sujeto) | **SUJETO de FOL⁼**: solidez, consistencia, renombrado, eigenvariable, Henkin |
 | **`Derives₁`** (`⊢₁`) | `../FOL/FOL/Derives1.lean` | 20 | ✅ **0** | ✅ **sí** | ✅ `derives1_soundness` (`Estratos0`) | ✅ `derives1_complete` | `derives1_to_derives0` · `derives0_to_derives1` | deducción natural con `rewrite_at` ADMISIBLE; equivale a `Derives₀` |
 | **`Derives₂`** (`⊢₂`) | `../FOL/FOL/Derives2.lean` | 22 | ✅ **0** | ✅ **sí** | ✅ `derives2_soundness` (`Estratos0`) | ✅ `derives2_complete` | `derives2_to_derives1` · `derives1_to_derives2` | con `subst` ADMISIBLE; de él sale la traducción a secuentes (`ndToLK`) |
+| **`Derivesᵢ`** (`⊢ᵢ`) | `../FOL/FOL/Calculus/DerivesI.lean` | 18 | ✅ **0** | ✅ **sí** | ✅ `derivesI_soundness` (`Estratos0`) | ⛔ con la semántica de Tarski es FALSA: el tercero excluido es válido y `⊢ᵢ` no lo deriva (`derivesI_ne_derives0`) | `derivesI_to_derives0` | **INTUICIONISTA** (X1, de PeanoRF; T51, ADR‑218): la propiedad de disyunción y la de existencia (`derivesI_disjunction_property`, `derivesI_existence_property`), por el slash de Kleene |
 | **`LK₀`** | `../FOL/FOL/Sequent0.lean` | 14 | ✅ **0** | ✅ **sí** | ✅ `lk0_sound` (`../FOL/FOL/SequentSound0.lean`) | ✅ `lk0_complete` (`Estratos0`) | `lk0_to_derives0` | secuentes SIN corte: la extracción de Herbrand (`lk0_herbrand`) |
 | **`LKc`** | `../FOL/FOL/Sequent0.lean` | 15 | ✅ **0** | ✅ **sí** | ✅ `lkc_sound` (`SequentSound0`) | ✅ `lkc_complete` (`Estratos0`) | `ndToLK` (desde `Derives₂`) · `cut_elimination₀` (a `LK₀`) | `LK₀` con CORTE |
 | **`LKh`** | `../FOL/FOL/Hauptsatz0.lean` | 14 | ✅ **0** | ✅ **sí** | ✅ `lkh_sound` (`Estratos0`) | ✅ `lkh_complete`, con la altura | `lkh_to_lk0` · `lk0_to_lkh` | `LK₀` con ALTURA: la prueba del Hauptsatz |

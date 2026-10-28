@@ -45,7 +45,7 @@ cd "$(dirname "$0")" || exit 2
 # (`forallTelescopeReducing`): la SOLIDEZ y el PUENTE tienen una hipótesis del inductivo de la fila y una conclusión que
 # no lo es (salen de él); la COMPLETITUD concluye en él. Y `Prf` tiene completitud para su teoría, no para ℕ:
 # `prf_completo` (ADR-195). Un mutante permanente (`ndToLK` como puente de LKc) tiene que dar rojo. Un cálculo NUEVO (el `DerivesI` intuicionista de X1, si llega) entra con su fila aquí
-# y en §0bis.
+# y en §0bis. ✏️ 2026-10-28 (T51, ADR-218): llegó; su completitud, «-»: con la semántica de Tarski es falsa.
 # 2026-10-02 (ADR-115): `Derives` baja de 4 a 0 al borrarse `FOL/MetaRules.lean`, y gana su solidez
 # en el build (`FOL/Inconsistencia.lean` §1).
 read -r -d '' ESTRATOS <<'EOF'
@@ -55,6 +55,7 @@ Derives₁|20|0|FOL.Estratos0.derives1_soundness|FOL.Estratos0.derives1_complete
 Derives₂|22|0|FOL.Estratos0.derives2_soundness|FOL.Estratos0.derives2_complete|FOL.Derives2.derives2_to_derives1
 LK₀|14|0|FOL.SequentSound0.lk0_sound|FOL.Estratos0.lk0_complete|FOL.SequentSound0.lk0_to_derives0
 LKc|15|0|FOL.SequentSound0.lkc_sound|FOL.Estratos0.lkc_complete|FOL.Hauptsatz0.cut_elimination₀
+FOL.Calculus.Derivesᵢ|18|0|FOL.Estratos0.derivesI_soundness|-|FOL.Calculus.derivesI_to_derives0
 LKh|14|0|FOL.Estratos0.lkh_sound|FOL.Estratos0.lkh_complete|FOL.Hauptsatz0.lkh_to_lk0
 FOL.Craig0.LKp|13|0|FOL.Estratos0.lkp_sound|FOL.Estratos0.lkp_complete|FOL.Craig0.lkp_to_lk0
 ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo|-
