@@ -1,6 +1,7 @@
 #!/bin/bash
 # rotura_v5.bash — pruebas de rotura de los arreglos de la cuarta revisión (texto; sin lake), con copia y restauración.
 set -uo pipefail
+export PATH="/usr/bin:$PATH"
 R=/e/dropbox/github/lean4/ROBINSON_PlusPlus
 F=/e/dropbox/github/lean4/FOL
 BK=$(mktemp -d)

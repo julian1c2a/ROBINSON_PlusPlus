@@ -15,6 +15,7 @@
 # ⛔ Una definición delicada vive en UN sitio: las raíces de RPP están AQUÍ y en ningún otro fichero. El código es
 # el mismo que el de `../FOL/cierre-imports.bash`, salvo `RAICES` y `PREFIJOS`.
 
+export PATH="/usr/bin:$PATH"
 RAICES="ROBINSON_PlusPlus"
 PREFIJOS="ROBINSON_PlusPlus"
 
