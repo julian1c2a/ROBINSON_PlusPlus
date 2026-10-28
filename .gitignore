@@ -41,3 +41,5 @@ sondeos/pasadas/salida/
 
 # Python (scripts/pruebas: validar_strip.py y compañía)
 __pycache__/
+.claude/settings.json
+.claude/settings.local.json
