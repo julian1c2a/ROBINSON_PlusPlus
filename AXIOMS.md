@@ -55,9 +55,9 @@ de Hilbert propio de RPP, o sobre la verdad en su modelo. **`T_Prf`** es el conj
 | **reglas** | MP y GEN, sin restricción: `Prf` no tiene hipótesis, y su solidez es para toda valoración | `Meta/Hilbert.lean` |
 
 ⇒ **`T_Prf` contiene a PA** (por lectura): los seis axiomas de Peano son axiomas de la lista, y la inducción vale para
-toda fórmula de un lenguaje que contiene el de PA; y el cálculo lógico de `Prf` es un Hilbert clásico estándar (también
-por lectura: que sea completo para la lógica de primer orden con igualdad no está demostrado, y es la dirección
-`DerivesSet₀ → Prf` del puente de abajo). **No es Q, ni «Q++ sin inducción», ni IΣ₁.** Lo que no tiene
+toda fórmula de un lenguaje que contiene el de PA; y el cálculo lógico de `Prf` es un Hilbert clásico estándar, y COMPLETO para
+su teoría: lo que vale en todo modelo de `AxiomasT` (los 120 y las instancias de los dos esquemas de inducción), `Prf`
+lo demuestra (`prf_completo`, `Meta/PuenteFOL.lean`; ✏️ 2026‑10‑28, ADR‑195: hasta hoy decía «no está demostrado»). **No es Q, ni «Q++ sin inducción», ni IΣ₁.** Lo que no tiene
 esquema de inducción es la LISTA `axioms`, la que define `Minimal/`, no la teoría de los titulares. (La lista sola ya
 contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sale sin inducción de `ax2`, `ax5`, `ax13` y
 `ax19`, por lectura; y además tiene `ax6`, `ax7` y `ax10`–`ax12`, que Q no demuestra. En `Prf`, Q3 es
@@ -77,9 +77,11 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
   codificación vieja también valía, y `listInd` daba `Prf ⊥`. En el árbol, que todo `L` sea `nil` o un `::`
   (`prf_nil_or_cons_all`) se prueba precisamente con `listInd`. No está medido;
 * una traducción de `T_Prf` al lenguaje {0, σ, +, ×} (paso posterior y opcional);
-* un **puente** entre `Prf` y las relaciones de consecuencia de FOL (`DerivesSet₀`, `model_existence_iff₀`): no hay
-  ninguno, en ninguna dirección (T67). `goedel_I` dice que ESTE cálculo no deriva `G`; con el puente sería la
-  incompletitud de la teoría de primer orden en el sentido estándar.
+* la VUELTA del puente con FOL, `Prf φ → DerivesSet₀ AxiomasT φ`: con instancias de los esquemas con variables libres,
+  `gen` pide las clausuras universales. La IDA está desde ADR‑195 (T67, `Meta/PuenteFOL.lean`): lo que FOL deriva de
+  teoremas de `Prf` es teorema (`prf_of_derivesSet`), y de ahí Gödel I en la lógica de primer orden (`goedel_I_fol`:
+  `AxiomasT` no deriva `G` en FOL) y un modelo de T_Prf en que `G` es falsa (`modelo_sin_G`). ✏️ Hasta el
+  2026‑10‑28 este punto decía que no había puente «en ninguna dirección».
 
 ### 0.2 · Lo que se supone hoy
 

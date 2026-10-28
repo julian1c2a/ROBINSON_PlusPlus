@@ -29,6 +29,9 @@
 > una con nombre —las que faltaban, corolarios de una línea en `../FOL/FOL/Estratos0.lean`— y su PUENTE; y el
 > control comprueba que ésta y la suya tienen los mismos cálculos con los mismos constructores. Un cálculo nuevo (el
 > intuicionista de X1, si llega) entra en las dos.
+>
+> ✏️ 2026‑10‑28 (T67, ADR‑195): y entre los dos mundos, `derives1_to_prfH` (`Meta/PuenteFOL.lean`) lleva `Derives₁` a
+> `PrfH` con el mismo contexto: lo que FOL deriva de teoremas de `Prf` es teorema.
 
 | noción | dónde | ctors | axiomas que la **HABITAN** | ¿`induction`? | solidez | completitud | puente | **rol** |
 |---|---|---:|---:|---|---|---|---|---|
@@ -146,7 +149,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**118 módulos activos** (Minimal 2 + Meta 115 + Full 1) + barrel `Meta.lean` + raíz
+**119 módulos activos** (Minimal 2 + Meta 116 + Full 1) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **44** `sondeos/`
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)). ✏️ 2026‑10‑21
 ([ADR‑184](DECISIONS.md), T27): es la ÚNICA línea de cifras del documento, y `[A]` de `check-doc-sync.bash` la
@@ -268,6 +271,7 @@ nodo, desde §3.15. *(✏️ 2026‑10‑21, ADR‑184: decía «Los 88 módulos
 | 84zn | **`SegundoModelo`** | 🆕 🏁 **UN SEGUNDO modelo estándar** (2026‑10‑20, ADR‑175, T75d): `MNB V₀`, `MNV V₀` con otra `substfc` sobre la basura (`substfcB`) (✏️ y, hasta ADR‑192, «validProofFn» recalculada con ella, «stepTB»); valida los 120 —los 106 que no nombran `substfc`, por `agreeF`; los 13 que sí, uno a uno (35 con los 22 «ax_vpf_*», hasta ADR‑192); el ancla, por `rw`— y `segundo_modelo : Estandar (MNB V₀) ∧ MNB V₀ ≠ MNV V₀`; `modelo_prov_iff_MB`, Prov fiel también en él. Ningún axioma fija `substfc` sobre la basura: las guardas no se abaratan |
 | 84zo | **`SolidezDobleNegacion`** | 🆕 🏁 **la SOLIDEZ de `Prf` sin lógica clásica** (2026‑10‑27, ADR‑191, T61b): la traducción de Gödel–Gentzen `gg` (estable: `gg_estable`), `prf_sound_dn` en todo `EstandarDN M`, el paso de la lectura clásica a la doble‑negada por polaridad (`clas`, `transfer`), los 120 con sólo `∈` decidible (`axiomas_clas`, por el núcleo), `estandarDN_de` (todo modelo estándar lo es; `M_mem`, `ax_de` y `consN_de` bajan aquí con su nombre), `consistentH_de` (el de `SolidezPrf`, mismo enunciado) y las herramientas `eq_de_prf` y `no_refuta` |
 | 84zp | **`ProvFiel`** | 🆕 🏁 **Prov FIEL, sin lógica clásica** (2026‑10‑27, ADR‑191): `proofN_of_prf` (D1 en ℕ, con el testigo de `posNum` y `proofN_decide`), la vuelta de la rigidez (`M_lineWF_de`, `M_premsOf_de`, `M_cadena_de`, etiqueta por etiqueta) y, con sus nombres, `modelo_prov_iff` y `modelo_prov_iff_de` |
+| 84zq | **`PuenteFOL`** | 🆕 🏁 **el PUENTE de FOL a `Prf`, y Gödel I en la lógica de primer orden** (2026‑10‑28, ADR‑195, T67): `derives1_to_prfH` (toda derivación de `Derives₁` es una de `PrfH` con el mismo contexto), `prf_of_derivesSet` y `prf_iff_derivesSet` (lo que FOL deriva de teoremas de `Prf` es teorema), `AxiomasT` (T_Prf como teoría de primer orden), `prf_completo` (`Prf` es completo para su teoría), `goedel_I_fol`, `goedel_I_neg_fol` y `goedel_II_fol` (sin `Classical.choice`), `modelo_sin_G` y `goedel_I_semantico` (un modelo de T_Prf en que `G` es falsa, que no es estándar; con el `Classical.choice` de la completitud de FOL) |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo (`godelPred'`, `godelBeta'`, `godelC'`) y `consistencyFormula'`. Gödel II vive en `GodelTwoPrf`; `goedel_second'` (retirado el 2026‑09‑11) y el teorema `d3` sobre `⊢` (retirado con ADR‑115) ya no están |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).

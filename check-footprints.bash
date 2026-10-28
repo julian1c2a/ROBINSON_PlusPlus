@@ -287,6 +287,14 @@ ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.eq_de_prf|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.no_refuta|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.ProvFiel.proofN_of_prf|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.ProvFiel.M_cadena_de|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.derives1_to_prfH|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_of_derivesSet|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.consistencia|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.goedel_I|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.goedel_II|Quot.sound,propext

@@ -60,6 +60,10 @@ echo "  · ROBINSON_PlusPlus  (lake build)"
 lake build 2>&1 | grep -E "^warning: " >> "$TMP"
 echo "  · FOL + TheoryFramework  (lake build FOL TheoryFramework)"
 lake build FOL TheoryFramework 2>&1 | grep -E "^warning: " >> "$TMP"
+# ✏️ 2026-10-28 (T67, ADR-195): un aviso es su fichero, su línea, su columna y su mensaje, y cuenta UNA vez aunque lo
+# repitan los dos builds. Desde que RPP importa `FOL.Canonical0`, `FOL/Rename.lean` (congelado, dos avisos de
+# deprecación) entra en el cierre de RPP y el primer build también lo imprime: sin esto, «dice 2, real 4».
+sort -u "$TMP" -o "$TMP"
 echo
 
 # ── clasificar lo medido ──────────────────────────────────────────────────────

@@ -181,6 +181,7 @@ import ROBINSON_PlusPlus.Meta.GodelCorolarios
 import ROBINSON_PlusPlus.Meta.RigidezEstandar
 import ROBINSON_PlusPlus.Meta.ProvFiel
 import ROBINSON_PlusPlus.Meta.SegundoModelo
+import ROBINSON_PlusPlus.Meta.PuenteFOL
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
 -- (✏️ 2026‑10‑19, ADR‑170, T74: `FOL.Deduction`, `FOL.Theorems.Derived`, `Impl` y `Neg`, sin nada en el cono, fuera.)
 import FOL.FOL

@@ -13,7 +13,7 @@
 > **Ficheros `.lean`:** la cadena `Meta/` (barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean); cuántos
 > módulos, en la línea de cifras de abajo).
 
-**Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 115 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
+**Build 147 jobs · 119 módulos activos** (Minimal 2 + Meta 116 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
 · 0 `axiom` de Lean · 120 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
 
 **Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de
@@ -5711,3 +5711,24 @@ La vuelta de «Prov es fiel» no se puede leer por la solidez doble‑negada: da
 es Markov. Hace falta el testigo: el código de la prueba de `posNum`, que `proofN_decide` confirma (su refutación choca,
 leída por `gg`, con `posNum`). En `MNV V₀`, `chainOk` es `chainOkN`; en un `M` estándar cualquiera, la vuelta de la
 rigidez, etiqueta por etiqueta.
+
+## §3.80 · `Meta/PuenteFOL.lean` — el puente de FOL a `Prf`, y Gödel I en la lógica de primer orden (ADR‑195)
+
+```lean
+theorem derives1_to_prfH : Derives₁ Γ f → PrfH Γ f                    -- el mismo contexto
+theorem prf_of_derivesSet (hS : ∀ g, S g → Prf g) (h : DerivesSet₀ S f) : Prf f
+theorem prf_iff_derivesSet : Prf f ↔ DerivesSet₀ (fun g => Prf g) f
+def AxiomasT (φ : Formula) : Prop        -- los 120 de `axioms` y las instancias de `ind` y `listInd`
+theorem prf_completo (h : ∀ D M v, (∀ φ, AxiomasT φ → evalFormula M v φ) → evalFormula M v f) : Prf f
+theorem goedel_I_fol : ¬ DerivesSet₀ AxiomasT godelCN                     -- y goedel_I_neg_fol, goedel_II_fol
+theorem modelo_sin_G : ∃ D M v, (∀ φ, Prf φ → evalFormula M v φ) ∧ ¬ evalFormula M v godelCN
+theorem goedel_I_semantico : (∀ M, Estandar M → ∀ v, evalFormula M v godelCN) ∧ (∃ D M v, …)
+```
+
+La traducción va constructor a constructor, con el mismo contexto, porque `PrfH` ya tenía lo difícil: su teorema de
+deducción (`deduction_aux`, cuyo caso `gen` se cierra con `qconf`) y un `gen` que levanta el contexto como el
+`intro_forall` de FOL. El único caso con trabajo es `¬∀A ⇒ ∃¬A`: dentro del `∀`, `¬A` da `∃¬A` por `q2` con la variable
+ligada (`substFormula_lift_var`), luego `A`, luego `∀A`, contra `¬∀A`. La completitud y el modelo sin `G` salen de la
+existencia de modelo de FOL (`model_existence_lemma₀`) sobre `AxiomasT` (o los teoremas de `Prf`) y `¬f`, consistentes
+por el puente; de ahí su `Classical.choice`. La vuelta, `Prf → DerivesSet₀ AxiomasT`, no está: pide las clausuras
+universales de las instancias con variables libres.

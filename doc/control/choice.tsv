@@ -163,6 +163,9 @@ ROBINSON_PlusPlus.Meta.PremsBdAllPrf	ROBINSON_PlusPlus.Meta.PremsBdAllPrf.miPhiA
 ROBINSON_PlusPlus.Meta.PremsBdAllPrf	ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsPsiPk	N
 ROBINSON_PlusPlus.Meta.ProofChain	ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'	N
 ROBINSON_PlusPlus.Meta.PropCodePrf	ROBINSON_PlusPlus.Meta.PropCodePrf.indConcl	N
+ROBINSON_PlusPlus.Meta.PuenteFOL	ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico	C
+ROBINSON_PlusPlus.Meta.PuenteFOL	ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G	C
+ROBINSON_PlusPlus.Meta.PuenteFOL	ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo	C
 ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.PurezaComando.aristas	C
 ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.PurezaComando.comprobar	CS
 ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.PurezaComando.delProyecto	C

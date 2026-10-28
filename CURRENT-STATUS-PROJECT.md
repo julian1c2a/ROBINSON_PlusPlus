@@ -4,7 +4,7 @@
 > Este documento da las CIFRAS del árbol, cada una con el control que la mide, y la arquitectura por capas. Lo que se
 > hizo y cuándo está en [DECISIONS.md](DECISIONS.md); lo que queda, en [NEXT-STEPS.md](NEXT-STEPS.md) («Lo que queda»).
 
-**Last updated:** 2026-10-27 — [ADR‑194](DECISIONS.md) (T46): los once estratos, con su solidez, su completitud y su puente; 558 footprints. Antes, el mismo día — [ADR‑193](DECISIONS.md) (T53): la constructividad, vigilada constante a constante (`check-choice.bash`). Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas objeto (los 22 «ax_vpf_*», fuera) y 514 constantes en el contrato. Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 134 jobs y 118 módulos (`SolidezDobleNegacion` y `ProvFiel`), 546 footprints, y `Classical.choice` sólo en `prf_sound`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
+**Last updated:** 2026-10-28 — [ADR‑195](DECISIONS.md) (T67): el puente con FOL; 147 jobs, 119 módulos, 566 footprints. Antes, 2026-10-27 — [ADR‑194](DECISIONS.md) (T46): los once estratos, con su solidez, su completitud y su puente; 558 footprints. Antes, el mismo día — [ADR‑193](DECISIONS.md) (T53): la constructividad, vigilada constante a constante (`check-choice.bash`). Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas objeto (los 22 «ax_vpf_*», fuera) y 514 constantes en el contrato. Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 134 jobs y 118 módulos (`SolidezDobleNegacion` y `ProvFiel`), 546 footprints, y `Classical.choice` sólo en `prf_sound`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
 y «Meta/CodeArith.lean», fuera: un solo `numeral` fuera de `Minimal`). Antes, el mismo día — [ADR‑182](DECISIONS.md) (T26): reescrito entero. El cuerpo anterior —las tablas del
 2026‑09‑10, con sus notas, y el diario de mayo a agosto— está, tal cual, en
 [doc/historia/CURRENT-STATUS-hasta-2026-10-21.md](doc/historia/CURRENT-STATUS-hasta-2026-10-21.md).
@@ -20,15 +20,15 @@ que tienen forma de frase fija (los jobs, los módulos, `sorry`, `axiom`, `cuare
 
 | cifra | hoy | la mide |
 |---|---|---|
-| Build | **134** jobs, 0 errores | `lake build` (la CI, en cada push) |
-| Módulos | **118** módulos activos: Minimal 2 + Meta 115 + Full 1, más el barrel `Meta.lean` y la raíz `ROBINSON_PlusPlus.lean` | `check-doc-sync.bash` `[A]` y `[L]` (la librería es el cierre de imports, y todo `.lean` del árbol está en ella) |
+| Build | **147** jobs, 0 errores | `lake build` (la CI, en cada push) |
+| Módulos | **119** módulos activos: Minimal 2 + Meta 116 + Full 1, más el barrel `Meta.lean` y la raíz `ROBINSON_PlusPlus.lean` | `check-doc-sync.bash` `[A]` y `[L]` (la librería es el cierre de imports, y todo `.lean` del árbol está en ella) |
 | Fuera del build | 0 en `cuarentena/` · **44** `sondeos/`, 11 de control | `check-sondeos.bash --controles` (los 11, en la CI); `sondeos/README.md` |
 | `sorry` | 0 `sorry` | `check-sorry.bash` (el texto) y `check-estratos.bash` (el entorno) |
 | `axiom` de Lean | 0 `axiom` de Lean en el build, en RPP y en FOL | `check-sorry.bash`, `check-estratos.bash` y `../FOL/check-axioms.bash`, por entorno y con señuelo (T13) |
 | Axiomas objeto | **120**: 34 matemáticos (`coreAxioms`) + 85 de codificación (`codingAxioms`) + el ancla diagonal (142 hasta ADR‑192, que retiró los 22 del verificador antiguo) | `axioms_len` y `axiomsBase_len` (`Full/Induction.lean`), por `rfl`, en cada build |
 | Titulares | **29**, cada uno con su fila en [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 o §3 | `[T]` (`T_UNIVERSO`); el contrato de sus enunciados (T07, `Meta/ContratoTitulares.lean`: 514 constantes en el cierre de sus tipos) y la pureza de la clase (i) (T08, `Meta/PurezaTitulares.lean`), en cada build |
-| Footprints | **558** filas; en RPP, `Classical.choice` sólo en `prf_sound` (ADR‑191) y en su corolario `prfH_sound` (ADR‑194) | `check-footprints.bash` |
-| Constructividad | sin las constantes generadas: en RPP, de **4307**, 18 con `Classical.choice` (`prf_sound`, `prfH_sound` y 16 de las herramientas de T07 y T08, que lo heredan del marco meta de Lean), 74 `noncomputable` sin choice y 17 con `String`, ninguna en la lógica; en FOL y TheoryFramework, de 1509, 81 con choice (70 hasta los once corolarios de ruta de ADR‑194) y 1 `noncomputable` (ADR‑193) | `check-choice.bash` (`doc/control/choice.tsv`, 184 líneas) |
+| Footprints | **566** filas; en RPP, `Classical.choice` sólo en `prf_sound` (ADR‑191), en su corolario `prfH_sound` (ADR‑194) y en los tres de la completitud de FOL (`prf_completo`, `modelo_sin_G`, `goedel_I_semantico`, ADR‑195) | `check-footprints.bash` |
+| Constructividad | sin las constantes generadas: en RPP, de **4324**, 21 con `Classical.choice` (`prf_sound`, `prfH_sound`, los tres de la completitud de FOL y 16 de las herramientas de T07 y T08, que lo heredan del marco meta de Lean), 74 `noncomputable` sin choice y 17 con `String`, ninguna en la lógica; en FOL y TheoryFramework, de 1509, 81 con choice (70 hasta los once corolarios de ruta de ADR‑194) y 1 `noncomputable` (ADR‑193) | `check-choice.bash` (`doc/control/choice.tsv`, 187 líneas) |
 | Avisos | **28** declarados: los 9 de siempre y 19 nombres obsoletos en seis módulos congelados de FOL | `check-warnings.bash` |
 | Estratos | **11** nociones de derivabilidad, ninguna habitada por un `axiom`; las once con su solidez en el build, las ocho de FOL con su completitud (ADR‑194) | `check-estratos.bash` (y que §0bis de REFERENCE es su tabla) |
 | Núcleo | `leanchecker` re‑comprueba en la CI cada declaración de RPP, FOL y TheoryFramework | `.github/workflows/build.yml` |
@@ -43,7 +43,9 @@ Lo vigente, con la hipótesis de cada teorema, quién la descarga y qué usa su 
 T_Prf contiene a PA ([AXIOMS.md](AXIOMS.md) §0), **Gödel I entero** (`goedel_I` y `goedel_I_neg`), **Gödel II**
 (`goedel_II`, y dentro de la teoría `goedel_second_formalizado`), **Tarski** (sintáctico y semántico, este en todo modelo
 estándar), **Rosser** (también para toda extensión finita consistente, `rosser_ext`) y **Löb** (`lob`), con D1, D2 y D3
-demostradas y la consistencia de T_Prf como teorema (`consistencia`), sin hipótesis dentro de Lean.
+demostradas y la consistencia de T_Prf como teorema (`consistencia`), sin hipótesis dentro de Lean. Y por el puente
+con FOL (T67, ADR‑195): Gödel I en la lógica de primer orden (`goedel_I_fol`), `Prf` completo para su teoría
+(`prf_completo`) y un modelo de T_Prf en que G es falsa, que por eso no es estándar (`goedel_I_semantico`).
 
 ## 3 · Lo que se supone
 
@@ -82,6 +84,8 @@ Las familias de `Meta/` (los nombres, en REFERENCE §1.5):
 * **El modelo, la solidez y la consistencia**: `ModeloCodigo`, `ModeloEstandar`, `ModeloCodificacion`, `SolidezPrf`,
   `SolidezDobleNegacion` (la solidez sin lógica clásica, ADR‑191), `Consistencia`, `SolidezVerificador` (W1),
   `RigidezEstandar` (W1 y E10 en todo modelo estándar), `ProvFiel` (Prov fiel, con el testigo) y `SegundoModelo`.
+* **El puente con FOL**: `PuenteFOL` (T67, ADR‑195: lo que FOL deriva de teoremas de `Prf` es teorema; Gödel I en la
+  lógica de primer orden, `Prf` completo y un modelo de T_Prf en que G es falsa).
 * **Los titulares**: `GodelTwo`, `GodelTwoPrf`, `GodelCorolarios`, `TarskiPrf`, `Rosser` y sus etapas (`RosserW1`,
   `RosserPosNum`, `RosserNumerales`, `RosserNumEval`, `RosserGuardNeg`, `RosserNegLinea`, `RosserNegNum`) y `Lob`.
 * **Los controles que viven en el build**: `PurezaComando` y `PurezaTitulares` (T08), `ContratoTitulares` y

@@ -4,7 +4,7 @@
 **Autor:** Julián Calderón Almendros
 
 > ✏️ **2026‑10‑14 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es un estudio del 2026‑07‑08, y no se ha re‑medido.
-> Hoy no hay puente de `Prf` a `⊢` (`prf_to_derives` se retiró con esa capa, ADR‑115) ni en ninguna dirección (T67), el
+> Hoy no hay puente de `Prf` a `⊢` (`prf_to_derives` se retiró con esa capa, ADR‑115) ni en ninguna dirección (T67; ✏️ 2026‑10‑28, ADR‑195: hoy sí en una, de FOL a `Prf`, `Meta/PuenteFOL.lean`), el
 > TFA objeto se retiró, y la teoría de los titulares no es la lista sin inducción: [AXIOMS.md](AXIOMS.md) §0.
 
 > Estudio del enlace entre `ROBINSON_PlusPlus` y `Lean4_vs_PureLogic` (proyecto **DeepArith**),
