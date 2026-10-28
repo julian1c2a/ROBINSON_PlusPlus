@@ -30,13 +30,16 @@ consecuencia de primer orden de FOL (`AXIOMS.md` §0.1). Este módulo pone el pu
   primer orden de FOL ni `G` ni `¬G` (`goedel_I_fol`, `goedel_I_neg_fol`), ni `Con` (`goedel_II_fol`): ni `AxiomasT`,
   ni sus clausuras universales, ni todos los teoremas a la vez. Los tres son TITULARES (ADR‑210). Y
   **`modelo_sin_G`**: hay un modelo de todos los teoremas de `Prf` en el que `G` es FALSA, mientras que `G` es
-  verdadera en todo modelo estándar (`godelCN_verdadera_de`): ese modelo no es estándar (`goedel_I_semantico`).
+  verdadera en todo modelo estándar (`godelCN_verdadera_de`); `goedel_I_semantico` junta los dos hechos, y de ahí se lee
+  que ese modelo no es estándar (el teorema no lo enuncia: los modelos estándar son sobre ℕ).
 
 ⚠️ **Lo que NO dice.** La vuelta, `Prf → DerivesSet₀ AxiomasT`, no está: con instancias de los esquemas que tienen
 variables libres, `gen` pide las clausuras universales, y para Gödel I no hace falta. La solidez de `Prf` sigue siendo
 la de los modelos estándar (`prf_sound`, `prf_sound_dn`), no la de todo modelo de `AxiomasT` evaluado en una sola
-valuación. Las §3 y §4 llevan `Classical.choice`: el de la completitud de FOL (`model_existence_lemma₀`, esencial,
-`../FOL/AXIOMS.md` §4.2).
+valuación. En §3 y §4 llevan `Classical.choice` `prf_completo`, `modelo_sin_G` y `goedel_I_semantico` —no los tres
+sintácticos—: el de la completitud de FOL (`model_existence_lemma₀`, esencial: `../FOL/AXIOMS.md` §4.3 y E7 de
+`FOL.Esencialidad0`), y `prf_completo`, además, el de su propio `Classical.byContradiction`. ✏️ 2026‑10‑28 (R3‑4‑02 y
+R3‑5‑03 de la ronda 3): decía que todo §3 y §4 lo llevaba, y citaba §4.2.
 -/
 
 set_option autoImplicit false
@@ -216,7 +219,8 @@ theorem modelo_sin_G : ∃ (D : Type) (M : Model D) (v : Nat → D),
   exact ⟨D, M, v, fun φ hφ => hM φ (Or.inl hφ), hM (neg _) (Or.inr rfl)⟩
 
 /-- 🏁 **GÖDEL I SEMÁNTICO**: `G` es verdadera en todo modelo estándar (`godelCN_verdadera_de`) y falsa en un modelo
-    de `T_Prf` (`modelo_sin_G`), que por eso no es estándar. -/
+    de `T_Prf` (`modelo_sin_G`). Junta los dos hechos; que ese modelo no sea estándar es su lectura, no parte del
+    enunciado (los modelos estándar son sobre ℕ). -/
 theorem goedel_I_semantico :
     And (∀ (M : Model Nat), ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar M →
           ∀ v, evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)

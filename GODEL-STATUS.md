@@ -29,7 +29,7 @@ que se supone, en [AXIOMS.md](AXIOMS.md) §0.
 | **la aritmetización** | los códigos son numerales (`codeNat`, `numeral`; la reparación de ADR‑012/013), `formCode` codifica las fórmulas y `provCodeC'` es el predicado de prueba | `Minimal/Axioms.lean`, `Meta/Provability.lean`, `Meta/CodeNumeralPrf.lean`, `Meta/ProofChain.lean` |
 | **las condiciones de derivabilidad** | D1 `repr_pos'_prf`, D2 `d2_prf` y D3 `d3_prf_real`: teoremas, ninguna postulada; D3 es la Σ₁‑completitud demostrable del verificador | `Meta/Representability2Prf.lean`, `Meta/DerivCondPrf.lean`, `Meta/PremsBdAllPrf.lean` |
 | **el punto fijo** | `prf_godelCN_fixedpoint` para la sentencia de Gödel `godelCN`, y `prf_diagonal` para un predicado cualquiera | `Meta/GodelTwoPrf.lean`, `Meta/TarskiPrf.lean` |
-| **la consistencia** | el TEOREMA `consistencia : ConsistentH`, por un modelo de los 120 (`MNV V₀`) y la solidez de `Prf` (`prf_sound`). Relativa a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) ([TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §4) | `Meta/Consistencia.lean`, `Meta/SolidezPrf.lean` |
+| **la consistencia** | el TEOREMA `consistencia : ConsistentH`, por un modelo de los 120 (`MNV V₀`) y la solidez doble‑negada de `Prf` (`prf_sound_dn`; hasta ADR‑191, `prf_sound`). Relativa a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) ([TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §4) | `Meta/Consistencia.lean`, `Meta/SolidezPrf.lean` |
 | **para `⊬¬G`, más que la consistencia** | la verdad en ℕ en vez de la ω‑consistencia: el verificador es sólido en el modelo (W1, `verificador_solido`) | `Meta/SolidezVerificador.lean` |
 
 ---
@@ -43,7 +43,7 @@ que se supone, en [AXIOMS.md](AXIOMS.md) §0.
 | **Rosser** | `rosser`: ni R ni ¬R, desde la consistencia simple; `rosser_ext`, para toda extensión finita consistente T+E, por reducción a T (`prfH_iff_prf_impChain`) | (ii) · (i) |
 | **Tarski** | `prf_tarski` y `tarski` (la teoría no define su verdad: el mentiroso, `liar`); `tarski_semantico` y `tarski_semantico_de`: ninguna fórmula define la verdad en ningún modelo estándar | (i) · (ii) · (iii) |
 | **Löb** | `lob : Prf (Prov⌜φ⌝ ⇒ φ) → Prf φ`; Gödel II sale de él (`goedel_second_de_lob`) | (i) |
-| **Gödel I en la lógica de primer orden** | `goedel_I_fol`, `goedel_I_neg_fol`, `goedel_II_fol` (titulares desde ADR‑210): ningún conjunto de teoremas de `Prf` —los axiomas de T_Prf, sus clausuras— deriva en FOL ni G ni ¬G ni Con, por el puente de FOL a `Prf` (`derives1_to_prfH`); `prf_completo`: `Prf` es completo para su teoría; `modelo_sin_G` y `goedel_I_semantico`: un modelo de T_Prf en que G es falsa, que no es estándar (T67, ADR‑195; [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 y §3bis; los semánticos, no titulares) | (ii) · (iii) |
+| **Gödel I en la lógica de primer orden** | `goedel_I_fol`, `goedel_I_neg_fol`, `goedel_II_fol` (titulares desde ADR‑210): ningún conjunto de teoremas de `Prf` —los axiomas de T_Prf, sus clausuras— deriva en FOL ni G ni ¬G ni Con, por el puente de FOL a `Prf` (`derives1_to_prfH`); `prf_completo`: `Prf` es completo para su teoría; `modelo_sin_G` y `goedel_I_semantico`: un modelo de T_Prf en que G es falsa (y, con la verdad de G en todo modelo estándar, la lectura de que no es estándar) (T67, ADR‑195; [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 y §3bis; los semánticos, no titulares) | (ii) · (iii) |
 | **la verdad de G y de Con** | `godelCN_verdadera`, `con_verdadera` (E10), y en todo modelo estándar `godelCN_verdadera_de`, `con_verdadera_de`; los modelos estándar no son uno solo (`estandar_MN`, `estandar_MB`) | (iii) |
 
 Lo que este frente declaraba fuera de alcance en junio —la demostración interna de Gödel II, Rosser y Tarski— está
@@ -54,14 +54,14 @@ hecho. Fuera de este repositorio: Gentzen (ε₀), que nacerá en el suyo (ADR�
 ## 3 · Cómo se encadenan
 
 ```text
-codificación (formCode, codeNat) ─► verificador interno (validProofFn, chainOk, provCodeC')
+codificación (formCode, codeNat) ─► verificador interno (lineWF, chainOk, provCodeC'; validProofFn, retirado en ADR‑192)
         │                                   │
         ▼                                   ▼
 punto fijo (prf_godelCN_fixedpoint)    D1 · D2 · D3  ───────────────► goedel_first_prf, goedel_second_prf,
         │                                                              prf_godel_iff_con, lob
         │                              W1(ax), PosNum, NegNum (los espejos en ℕ del verificador) ─► rosser_ext
         ▼
-modelo MNV V₀ + solidez prf_sound ─► consistencia ─► goedel_I, goedel_II, tarski, rosser (sin hipótesis)
+modelo MNV V₀ + solidez prf_sound_dn ─► consistencia ─► goedel_I, goedel_II, tarski, rosser (sin hipótesis)
         │
         ├─► la verdad en el modelo: W1 (verificador_solido) y E10 ─► goedel_I_neg, con_indecidible
         └─► la semántica del modelo ─► tarski_semantico, tarski_semantico_de

@@ -14,7 +14,7 @@
 > estándar no son uno solo (`segundo_modelo`), y sin el ancla Prov puede mentir (`control_ancla`).
 > 🏁 Y desde ADR‑191, los titulares —29; 32 desde ADR‑210— van **sin `Classical.choice`** (`[propext, Quot.sound]`): la solidez de `Prf`
 > se lee por la traducción doble‑negada (`prf_sound_dn`, `Meta/SolidezDobleNegacion.lean`), que no pide lógica
-> clásica; en RPP sólo la lleva `prf_sound`, cuyo enunciado —la solidez para la lectura en `Prop`— la pide.
+> clásica; en RPP lo llevan `prf_sound` (cuyo enunciado —la solidez para la lectura en `Prop`— lo pide), su corolario `prfH_sound`, los tres semánticos del puente con FOL y 16 herramientas meta de T07 y T08 (`doc/control/choice.tsv`); ningún titular (✏️ 2026‑10‑28, R3‑5‑02 de la ronda 3: decía «sólo `prf_sound`»).
 >
 > ✏️ *(2026‑10‑16, ADR‑138)* «Sin hipótesis» quiere decir DENTRO de Lean: la consistencia que da `consistencia` es
 > RELATIVA a Lean (PRA ⊢ Con(Lean) → Con(T_Prf)), y no puede ser absoluta (§4).
@@ -93,7 +93,7 @@ de Rosser, medidos igual (`doc/registro/2026-10-18-rosser/`): `rosser_ext`, (i);
 
 | teorema | hipótesis | ¿quién la descarga? | ¿qué usa la prueba? |
 |---|---|---|---|
-| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁 **`consistencia`** (`Meta/Consistencia.lean`), en el build: un modelo de los 120 (`MN_axioms`) y la solidez de `Prf` (`prf_sound`); el corolario sin hipótesis es `goedel_I`. Es la hipótesis **mínima** (`¬ Prf ⊥`) | **(i)** |
+| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁 **`consistencia`** (`Meta/Consistencia.lean`), en el build: un modelo de los 120 (`MN_axioms`) y la solidez doble‑negada de `Prf` (`consistentH_de`, por `prf_sound_dn`; ✏️ 2026‑10‑28, R3‑5‑01: decía `prf_sound`, la ruta de antes de ADR‑191); el corolario sin hipótesis es `goedel_I`. Es la hipótesis **mínima** (`¬ Prf ⊥`) | **(i)** |
 | **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁 ídem; el corolario sin hipótesis es `goedel_II` | **(i)** |
 | **`prf_con_imp_godel`** (`Meta/GodelTwoPrf.lean`) | `fp_bwd : Prf (¬Prov⌜G⌝ ⇒ G)` y `nec1 : Prf (Prov⌜G ⇒ ¬Prov⌜G⌝⌝)` | ✅ `goedel_second_prf` las da con el punto fijo (`prf_godelCN_fixedpoint`) y D1 (`repr_pos'_prf`); usa D2 (`d2_prf`) y D3 (`d3_prf_real`) | **(i)** |
 | **`prf_godelCN_fixedpoint`** (`Meta/GodelTwoPrf.lean`) | ninguna | — (net‑0 PURO) | **(i)** |
@@ -102,9 +102,9 @@ de Rosser, medidos igual (`doc/registro/2026-10-18-rosser/`): `rosser_ext`, (i);
 | **`prf_tarski`** (`Meta/TarskiPrf.lean`) | ninguna | — (la teoría refuta `Tr(⌜L⌝) ⇔ L` en el mentiroso `L`) | **(i)** |
 | **`goedel_I`**, **`goedel_II`** (`Meta/Consistencia.lean`) | ninguna | — (`goedel_first_prf` y `goedel_second_prf`, aplicados a `consistencia`) | **(ii)** |
 | **`tarski`** (`Meta/TarskiPrf.lean`) | ninguna | — (`prf_tarski` y `consistencia`: `¬ Prf (Tr(⌜L⌝) ⇔ L)`) | **(ii)** |
-| **`goedel_I_neg`** (`Meta/SolidezVerificador.lean`) | ninguna | — (ADR‑121: `¬ Prf ¬godelCN`, la mitad `⊬¬G`; con `goedel_I`, `G` es INDECIDIBLE) | **(iii)**: `prf_sound` en `MNV V₀` y W1 (`verificador_solido`) |
+| **`goedel_I_neg`** (`Meta/SolidezVerificador.lean`) | ninguna | — (ADR‑121: `¬ Prf ¬godelCN`, la mitad `⊬¬G`; con `goedel_I`, `G` es INDECIDIBLE) | **(iii)**: `prf_sound_dn` en `MNV V₀` y W1 (`verificador_solido`) |
 | **`godelCN_indecidible`**, **`modelo_prov_iff`** (`Meta/SolidezVerificador.lean`) | ninguna | — (ni `G` ni `¬G`; y `MNV V₀ ⊨ Prov(⌜φ⌝) ↔ Prf φ`) | **(iii)** |
-| **`con_indecidible`** (`Meta/GodelCorolarios.lean`) | ninguna | — (T78, ADR‑162: ni `Con'` ni `¬Con'`; la segunda mitad, porque `Con'` es VERDADERA en `MNV V₀`, `con_verdadera`, y `Prf` es sólida; la consistencia sola no basta: T+¬Con' es consistente y la refuta) | **(iii)**: `prf_sound` en `MNV V₀` |
+| **`con_indecidible`** (`Meta/GodelCorolarios.lean`) | ninguna | — (T78, ADR‑162: ni `Con'` ni `¬Con'`; la segunda mitad, porque `Con'` es VERDADERA en `MNV V₀`, `con_verdadera`, y `Prf` es sólida; la consistencia sola no basta: T+¬Con' es consistente y la refuta) | **(iii)**: `prf_sound_dn` en `MNV V₀` |
 | **`godelCN_verdadera`**, **`con_verdadera`** (E10, `Meta/SolidezVerificador.lean`) | ninguna | — (`G` y `Con` son VERDADERAS en `MNV V₀`) | **(iii)** |
 | **`tarski_semantico`** (`Meta/TarskiPrf.lean`) | ninguna | — (ninguna fórmula define la verdad en `MNV V₀`) | **(iii)** |
 | **`prf_of_prov_de`**, **`modelo_prov_iff_de`** (`Meta/RigidezEstandar.lean`) | `hM : Estandar M` | — es el PARÁMETRO: valen para TODO modelo estándar `M` (T75e, ADR‑173; titulares por ADR‑174): lo que `M` cree demostrable lo es, y `M ⊨ Prov(⌜φ⌝) ↔ Prf φ`. No es vacía: `estandar_MN` la cumple en `MNV V₀` (`control_instancia`) | **(iii)** |
@@ -112,7 +112,7 @@ de Rosser, medidos igual (`doc/registro/2026-10-18-rosser/`): `rosser_ext`, (i);
 | **`tarski_semantico_de`** (`Meta/TarskiPrf.lean`) | `hM : Estandar M` | — ídem: ninguna fórmula define la verdad en NINGÚN modelo estándar (T75a, ADR‑175; titular por ADR‑178); `tarski_semantico` es su instancia en `MNV V₀`, y `estandar_MB` (`Meta/SegundoModelo.lean`) le da un segundo testigo distinto | **(iii)** |
 | **`goedel_I_fol`**, **`goedel_II_fol`** (`Meta/PuenteFOL.lean`) | `hS : ∀ φ, S φ → Prf φ` (todo lo de `S` es teorema de `Prf`) | — es el PARÁMETRO: valen para TODO conjunto de teoremas de `Prf` —`AxiomasT` (los 120 y las instancias de los dos esquemas, `prf_of_axiomasT`), sus clausuras universales (por `gen`) o todos los teoremas a la vez—: ninguno deriva en la lógica de primer orden de FOL ni `G` ni Con' (T67, ADR‑195; titulares por ADR‑210). No es vacía: la cumple `AxiomasT` | **(ii)** |
 | **`goedel_I_neg_fol`** (`Meta/PuenteFOL.lean`) | ídem | — ídem: tampoco `¬G` | **(iii)** |
-| **`consistencia`** (`Meta/Consistencia.lean`) | ninguna | — (es la que descarga `ConsistentH`) | — es el nodo de corte: la clase no se aplica. Usa el modelo para dar `ConsistentH` (`MN_axioms` y `prf_sound`) |
+| **`consistencia`** (`Meta/Consistencia.lean`) | ninguna | — (es la que descarga `ConsistentH`) | — es el nodo de corte: la clase no se aplica. Usa el modelo para dar `ConsistentH` (`MN_axioms` y `prf_sound_dn`, por `consistentH_de`) |
 | **`rosser_ext`** (`Meta/Rosser.lean`) | `hcon : ¬ PrfH E ⊥` (T+E es consistente) y `_hE` (E son sentencias: lo que hace de `PrfH E` la teoría T+E; la prueba no la usa, y `rosser_red` es la forma sin ella) | — es la hipótesis del enunciado, una propiedad de E: puede FALLAR (E = [⊥], y entonces T+[⊥] demuestra su sentencia: `control_bottom`) y puede VALER en un miembro NO sólido (T+¬Con, por Gödel II: `control_neg_con`); con E = [] la descarga `consistencia` (`rosser`). 🏁 ADR‑157: la sentencia de Rosser de T+E, `R E`, es indecidible en T+E; por REDUCCIÓN a T (ADR‑144/145: T+E es `PrfH E`, y su predicado de prueba, el de T delante de `impChain`), con PosNum y NegNum de T (ADR‑148…156, `Meta/RosserW1.lean` … `Meta/RosserNegNum.lean`) | **(i)**; en `PUROS` de T08 |
 | **`rosser`** (`Meta/Rosser.lean`) | ninguna | — (`rosser_ext` con E = [], y `consistencia`: ni `R []` ni `¬R []` son teoremas) | **(ii)** |
 | **`lob`** (`Meta/Lob.lean`) | `h : Prf (Prov⌜φ⌝ ⇒ φ)`, el antecedente de la regla (como el `Prf φ` de D1) | — puede VALER (si φ es teorema: `lob_iff`) y puede FALLAR (φ = ⊥ y φ = G, con `consistencia`: `control_reflexion_bot`, `control_reflexion_godel`). 🏁 ADR‑159: por el punto fijo de Prov(#0) ⇒ φ y D1–D3; Gödel II sale de él con φ = ⊥ (`goedel_second_de_lob`) | **(i)**; en `PUROS` de T08 |
@@ -122,11 +122,11 @@ Las condiciones de derivabilidad, D1–D3, dan **(i)** las tres (§3). Lo que us
 paso de DNE salvo `goedel_I_neg` y `con_indecidible`, al decodificar el modelo, y los dos de Rosser, al decodificar con W1(ax)
 (✏️ 2026‑10‑18, ADR‑157 y ADR‑162).
 
-**Footprint** (medido, `check-footprints.bash`, una fila por teorema): los **29** titulares, de las tres clases, y D1,
+**Footprint** (medido, `check-footprints.bash`, una fila por teorema): los **32** titulares, de las tres clases, y D1,
 D2 y D3 → `[propext, Quot.sound]`, **sin `Classical.choice`**. Los de las clases (ii) y (iii) leen en el modelo lo que
 `Prf` demuestra por la solidez DOBLE‑NEGADA (`prf_sound_dn`, `Meta/SolidezDobleNegacion.lean`): la traducción de
-Gödel–Gentzen hace estable cada fórmula, y la regla `p3` (¬¬A ⇒ A) deja de pedir lógica clásica. En RPP sólo
-`prf_sound`, la solidez para la lectura en `Prop`, lleva `Classical.choice`, y ningún titular la usa. *(✏️ 2026‑10‑27,
+Gödel–Gentzen hace estable cada fórmula, y la regla `p3` (¬¬A ⇒ A) deja de pedir lógica clásica. En RPP
+lo llevan `prf_sound` (la solidez para la lectura en `Prop`), `prfH_sound`, los tres semánticos del puente con FOL y 16 herramientas meta, y ningún titular lo usa (✏️ 2026‑10‑28, R3‑5‑02). *(✏️ 2026‑10‑27,
 [ADR‑191](DECISIONS.md), T61b: hasta hoy los de las clases (ii) y (iii) y `consistencia` lo llevaban, por `p3` en
 `prf_sound` y el `byContradiction` de `goedel_I_neg`; 2026‑10‑21, [ADR‑189](DECISIONS.md), T61: hasta entonces lo
 llevaban todos, por dos cancelaciones de lift de `Meta/SubstArith.lean` y por `v_ax16`; [ADR‑188](DECISIONS.md), T11b:
@@ -179,7 +179,7 @@ con el mismo contexto (`derives1_to_prfH`); sobre conjuntos, lo que FOL deriva d
 | `goedel_I_fol`, `goedel_I_neg_fol` (titulares, §1) | ningún conjunto de teoremas de `Prf` deriva en FOL ni `G` ni `¬G` | `[propext, Quot.sound]` |
 | `goedel_II_fol` (titular, §1) | ni Con' | `[propext, Quot.sound]` |
 | **`prf_completo`** | lo que vale en todo modelo de `AxiomasT`, `Prf` lo demuestra | `[propext, Classical.choice, Quot.sound]` |
-| **`modelo_sin_G`**, **`goedel_I_semantico`** | un modelo de todos los teoremas de `Prf` en que `G` es FALSA; como `G` es verdadera en todo modelo estándar (`godelCN_verdadera_de`), ese modelo no es estándar | `[propext, Classical.choice, Quot.sound]` |
+| **`modelo_sin_G`**, **`goedel_I_semantico`** | un modelo de todos los teoremas de `Prf` en que `G` es FALSA; con la verdad de `G` en todo modelo estándar (`godelCN_verdadera_de`), se lee que ese modelo no es estándar (el enunciado junta los dos hechos: los modelos estándar son sobre ℕ, y el de `modelo_sin_G` no tiene por qué) | `[propext, Classical.choice, Quot.sound]` |
 
 El `Classical.choice` de los tres últimos es el de la completitud de FOL (`model_existence_lemma₀`), esencial. ✏️
 2026‑10‑28 (ADR‑210, decisión del propietario): los tres primeros son TITULARES (§1), en la forma general —para todo
@@ -191,7 +191,7 @@ vuelta del puente (`Prf → DerivesSet₀ AxiomasT`) no está ([AXIOMS.md](AXIOM
 
 | hipótesis | definición | qué es de verdad |
 |---|---|---|
-| **`ConsistentH`** | `¬ Prf ⊥` | la de `goedel_first_prf` y `goedel_second_prf`: la consistencia de `T_Prf` —los 120 CON los esquemas de `Prf`—, la **mínima honesta**. 🏁🏁 **TEOREMA desde ADR‑120** (2026‑10‑05): `consistencia` (`Meta/Consistencia.lean`), por `prf_sound` (`Meta/SolidezPrf.lean`) y el modelo `MNV V₀` de los 120 (`MN_axioms`) |
+| **`ConsistentH`** | `¬ Prf ⊥` | la de `goedel_first_prf` y `goedel_second_prf`: la consistencia de `T_Prf` —los 120 CON los esquemas de `Prf`—, la **mínima honesta**. 🏁🏁 **TEOREMA desde ADR‑120** (2026‑10‑05): `consistencia` (`Meta/Consistencia.lean`), por la solidez doble‑negada (`prf_sound_dn`, `Meta/SolidezDobleNegacion.lean`; hasta ADR‑191, `prf_sound`) y el modelo `MNV V₀` de los 120 (`MN_axioms`) |
 | **`¬ PrfH E ⊥`** (de `rosser_ext`, ADR‑157) | T+E no deriva `⊥` | la consistencia de la EXTENSIÓN T+E: un parámetro del enunciado, no un supuesto global. Puede fallar (E = [⊥]) y valer sin solidez (T+¬Con, por Gödel II); con E = [] es `ConsistentH`, y la descarga `consistencia` (`rosser`) |
 | ~~`[AnclaEq]`~~ | `Prf (axiomsCodeT =eq listFormCodeM axioms)` | 🏁 **ya no es un supuesto: es TEOREMA** desde ADR‑117 (2026‑10‑04), `prf_ancla` (`Meta/Representability2Prf.lean`), por el axioma objeto DIAGONAL `ax_axiomsCodeT_def`, el último de los 120; la clase, con su instancia, se retiró el 2026‑10‑05 (ADR‑118). Hasta ADR‑117 era ⛔⛔ **INCONSISTENTE** (F1: daba `Prf ⊥` sobre los 141) |
 

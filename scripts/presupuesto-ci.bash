@@ -44,8 +44,10 @@ for f in "$@"; do
   S=$(segundos "$f"); M=$(megas "$f")
   LIN=$(grep -v '^#' "$TABLA" | tr -d '\r' | awk -F'\t' -v n="$nombre" '$1 == n { print $2 "\t" $3 }')
   PS=${LIN%%	*}; PM=${LIN##*	}
-  if [ -z "$S" ] || [ -z "$M" ] || [ -z "$LIN" ]; then
-    echo "❌ $nombre: no pude leer la medida («$S» s, «$M» MB) o su presupuesto («$LIN») en $TABLA"
+  # ✏️ 2026-10-28 (R3-3-03 de la ronda 3, ADR-212): también una celda vacía o no numérica (antes, `[ 5 -gt "" ]` daba
+  # error, no «mayor», y el control escribía ✓).
+  if [ -z "$S" ] || [ -z "$M" ] || [ -z "$LIN" ] || ! [[ "$S$M" =~ ^[0-9]+$ ]] || ! [[ "$PS" =~ ^[0-9]+$ ]] || ! [[ "$PM" =~ ^[0-9]+$ ]]; then
+    echo "❌ $nombre: no pude leer la medida («$S» s, «$M» MB) o su presupuesto («$PS» s, «$PM» MB) en $TABLA"
     FAIL=1; continue
   fi
   echo "| $nombre | $S | $PS | $M | $PM |" >> "$RESUMEN"

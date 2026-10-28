@@ -1,7 +1,7 @@
 # Development Workflow
 
 **Author**: Julián Calderón Almendros
-**Last updated:** 2026-06-05 — Adaptado a flujo IA + opción legacy `git-lock.bash`.
+**Last updated:** 2026-10-28 — ADR‑212: el orden del bump del toolchain (Parte 4). Antes, 2026-06-05 — Adaptado a flujo IA + opción legacy `git-lock.bash`.
 
 Guía operativa para colaborar en este proyecto. Cubre los **dos modos** activos: sesiones con asistente IA (modo principal) y trabajo humano con `git-lock.bash` (legacy, opcional).
 
@@ -113,7 +113,11 @@ Módulos completos pueden marcarse como permanentemente inmutables (`bash git-lo
 # PROBAR el par con otra versión de Lean (por defecto, la última estable), en worktrees aparte y SIN commit
 # (T42, ADR‑176): builds de FOL y RPP, leanchecker y los controles, con la versión que corre comprobada.
 bash update-toolchain.bash [v4.x.x]        # o: --check, sólo dice si hay otra
-# El bump, si se decide, va por un ADR y a mano, en los dos repos (M‑12: FOL primero). La vigilancia semanal:
+# El bump, si se decide, va por un ADR y a mano, en los dos repos (M‑12: FOL primero). El ORDEN (R3‑3‑02, ADR‑212):
+#   1. FOL, el commit del bump en una rama ci/…: su CI compara con el master de RPP, aún viejo, y AVISA (no rompe);
+#      verde, avance de su master;
+#   2. RPP, el commit del bump en ci/…: su CI compara con el master de FOL, ya nuevo, y ROMPE si difieren; verde, avance.
+# La vigilancia semanal:
 # .github/workflows/toolchain.yml, contra doc/control/toolchain-vigilado.txt (la última versión probada).
 ```
 

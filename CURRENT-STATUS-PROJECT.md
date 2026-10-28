@@ -26,8 +26,8 @@ que tienen forma de frase fija (los jobs, los módulos, `sorry`, `axiom`, `cuare
 | `sorry` | 0 `sorry` | `check-sorry.bash` (el texto) y `check-estratos.bash` (el entorno) |
 | `axiom` de Lean | 0 `axiom` de Lean en el build, en RPP y en FOL | `check-sorry.bash`, `check-estratos.bash` y `../FOL/check-axioms.bash`, por entorno y con señuelo (T13) |
 | Axiomas objeto | **120**: 34 matemáticos (`coreAxioms`) + 85 de codificación (`codingAxioms`) + el ancla diagonal (142 hasta ADR‑192, que retiró los 22 del verificador antiguo) | `axioms_len` y `axiomsBase_len` (`Full/Induction.lean`), por `rfl`, en cada build |
-| Titulares | **29**, cada uno con su fila en [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 o §3 | `[T]` (`T_UNIVERSO`); el contrato de sus enunciados (T07, `Meta/ContratoTitulares.lean`: 514 constantes en el cierre de sus tipos) y la pureza de la clase (i) (T08, `Meta/PurezaTitulares.lean`), en cada build |
-| Footprints | **566** filas; en RPP, `Classical.choice` sólo en `prf_sound` (ADR‑191), en su corolario `prfH_sound` (ADR‑194) y en los tres de la completitud de FOL (`prf_completo`, `modelo_sin_G`, `goedel_I_semantico`, ADR‑195) | `check-footprints.bash` |
+| Titulares | **32**, cada uno con su fila en [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 o §3 | `[T]` (`T_UNIVERSO`); el contrato de sus enunciados (T07, `Meta/ContratoTitulares.lean`: 559 constantes en el cierre de sus tipos) y la pureza de la clase (i) (T08, `Meta/PurezaTitulares.lean`), en cada build |
+| Footprints | **590** filas; en RPP, `Classical.choice` sólo en `prf_sound` (ADR‑191), en su corolario `prfH_sound` (ADR‑194) y en los tres de la completitud de FOL (`prf_completo`, `modelo_sin_G`, `goedel_I_semantico`, ADR‑195) | `check-footprints.bash` |
 | Constructividad | sin las constantes generadas: en RPP, de **4324**, 21 con `Classical.choice` (`prf_sound`, `prfH_sound`, los tres de la completitud de FOL y 16 de las herramientas de T07 y T08, que lo heredan del marco meta de Lean), 74 `noncomputable` sin choice y 17 con `String`, ninguna en la lógica; en FOL y TheoryFramework, de 1509, 81 con choice (70 hasta los once corolarios de ruta de ADR‑194) y 1 `noncomputable` (ADR‑193) | `check-choice.bash` (`doc/control/choice.tsv`, 187 líneas) |
 | Avisos | **28** declarados: los 9 de siempre y 19 nombres obsoletos en seis módulos congelados de FOL | `check-warnings.bash` |
 | Estratos | **11** nociones de derivabilidad, ninguna habitada por un `axiom`; las once con su solidez en el build, las ocho de FOL con su completitud (ADR‑194) | `check-estratos.bash` (y que §0bis de REFERENCE es su tabla) |
@@ -45,7 +45,7 @@ T_Prf contiene a PA ([AXIOMS.md](AXIOMS.md) §0), **Gödel I entero** (`goedel_I
 estándar), **Rosser** (también para toda extensión finita consistente, `rosser_ext`) y **Löb** (`lob`), con D1, D2 y D3
 demostradas y la consistencia de T_Prf como teorema (`consistencia`), sin hipótesis dentro de Lean. Y por el puente
 con FOL (T67, ADR‑195): Gödel I y II en la lógica de primer orden (`goedel_I_fol`, `goedel_II_fol`; titulares desde ADR‑210), `Prf` completo para su teoría
-(`prf_completo`) y un modelo de T_Prf en que G es falsa, que por eso no es estándar (`goedel_I_semantico`).
+(`prf_completo`) y un modelo de T_Prf en que G es falsa (`goedel_I_semantico`, que lo junta con la verdad de G en todo modelo estándar).
 
 ## 3 · Lo que se supone
 
@@ -64,7 +64,7 @@ módulo del árbol esté en él); las dependencias, [DEPENDENCIES.md](DEPENDENCI
 |---|---|---|
 | `Minimal/` | el lenguaje y la LISTA de axiomas (`Axioms.lean`: los 120, sin esquema de inducción) y la macro de los literales de símbolo (`SymLit.lean`) | 2 |
 | `Full/` | `primAxioms` y las longitudes del censo, los lemas de sustitución y la fórmula `inductionFormula` (`Induction.lean`); el `numeral`, uno solo, en `Meta/Godel.lean` (ADR‑190) | 1 |
-| `Meta/` | todo lo demás, en siete familias (abajo) | 115 |
+| `Meta/` | todo lo demás, en siete familias (abajo) | 116 |
 
 Las familias de `Meta/` (los nombres, en REFERENCE §1.5):
 

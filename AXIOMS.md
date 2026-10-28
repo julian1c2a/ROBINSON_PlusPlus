@@ -48,7 +48,7 @@ de Hilbert propio de RPP, o sobre la verdad en su modelo. **`T_Prf`** es el conj
 
 | | qué es | dónde |
 |---|---|---|
-| **lenguaje** | TODAS las `Formula` de FOL (`FormulaG (List Char)`): variables de De Bruijn, `⊥`, `=`, `⇒`, `∧`, `∨`, `∀`, `∃`, y átomos y términos con cualquier símbolo y cualquier número de argumentos. El tipo no fija una signatura. Los 120 axiomas nombran **33** símbolos, cada uno con una sola aridad: 28 de función y 5 de relación (`<`, `∈`, `allIn`, `lineWF`, `chainOk`); los demás entran en los esquemas como parámetros libres | `../FOL/FOL/FOL.lean` (`TermG`, `FormulaG`) |
+| **lenguaje** | TODAS las `Formula` de FOL (`FormulaG (List Char)`): variables de De Bruijn, `⊥`, `=`, `⇒`, `∧`, `∨`, `∀`, `∃`, y átomos y términos con cualquier símbolo y cualquier número de argumentos. El tipo no fija una signatura. Los 120 axiomas nombran **32** símbolos, cada uno con una sola aridad: 27 de función y 5 de relación (✏️ 2026‑10‑28, R3‑1‑H2 de la ronda 3: decía 33 y 28, la cuenta de antes de retirar «validProofFn», ADR‑192) (`<`, `∈`, `allIn`, `lineWF`, `chainOk`); los demás entran en los esquemas como parámetros libres | `../FOL/FOL/FOL.lean` (`TermG`, `FormulaG`) |
 | **axiomas propios** (`thy`) | las **120** sentencias de `axioms` (142 hasta ADR‑192): 34 de `coreAxioms` —entre ellos los seis axiomas de Peano de primer orden: `ax2`, `ax3`, `ax4`, `ax5`, `ax8` y `ax9`—; 85 de `codingAxioms`, las ecuaciones de la aritmetización (sustitución y desplazamiento de códigos, accesores de listas, el código del numeral y el verificador; ✏️ 107 hasta ADR‑192, que retiró los 22 «ax_vpf_*» del verificador antiguo: T68); y el ancla diagonal `ax_axiomsCodeT_def` (ADR‑117) | `Minimal/Axioms.lean` |
 | **esquemas lógicos** | los de `Prfᵢ` —P1, P2, C1–C3, J1–J3, EFQ, Q1–Q3, reflexividad e igualdad de Leibniz—, DNE (`p3`) y el confinamiento (`qconf`) | `Meta/Hilbert.lean` |
 | **esquemas no lógicos** | la **inducción** (`ind`, `Full.inductionFormula`: `Φ[0] ⇒ ∀x(Φ ⇒ Φ[σx]) ⇒ ∀x Φ`) y la **inducción de listas** (`listInd`: `Φ[nil] ⇒ ∀h∀t(Φ[t] ⇒ Φ[h :: t]) ⇒ ∀L Φ`), las dos para TODA fórmula, con parámetros | `Meta/Hilbert.lean`, `Full/Induction.lean` |
@@ -87,8 +87,9 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
 
 1. **El núcleo de Lean** (v4.35.0, desde ADR‑181) **y sus tres axiomas**, `propext`, `Classical.choice` y `Quot.sound`: son, como
    mucho, el footprint de los titulares (las filas de `check-footprints.bash`; desde ADR‑191, T61b, NINGÚN titular lleva
-   `Classical.choice`: la solidez que usan los que miran el modelo es la doble‑negada, `prf_sound_dn`; en RPP sólo lo lleva
-   `prf_sound`, la solidez para la lectura en `Prop`), y leanchecker re‑comprueba en la CI las declaraciones del
+   `Classical.choice`: la solidez que usan los que miran el modelo es la doble‑negada, `prf_sound_dn`; en RPP lo llevan
+   `prf_sound` (la solidez para la lectura en `Prop`), `prfH_sound`, los tres semánticos del puente con FOL y 16
+   herramientas meta: `doc/control/choice.tsv`), y leanchecker re‑comprueba en la CI las declaraciones del
    build con el núcleo (ADR‑116). **0 `axiom` de Lean** en los módulos del build, en RPP y en FOL (fuera del build, FOL guarda 15 en
    `cuarentena/`, T57, y RPP dos en `sondeos/`, en
    `lintlab/Uso.lean`, que prueban que un linter los detecta; el piloto `PilotoDiagonal.lean`, que suponía otros dos, está
@@ -102,7 +103,8 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
    las reglas, en todo modelo `Estandar` —dominio ℕ, 0 y σ los de siempre, `::` el `consN` de ADR‑113 (σ del par de Cantor), y
    los 120 verdaderos— (`prf_sound`: la
    inducción, por la de ℕ; la de listas, porque todo `m + 1` es un `::` de dos menores; DNE, por
-   `Classical.byContradiction`). De ahí `consistencia : ConsistentH` (ADR‑120) y Gödel I y II sin hipótesis; y todo lo
+   `Classical.byContradiction`). De ahí `consistencia : ConsistentH` (ADR‑120; desde ADR‑191, por la solidez doble‑negada,
+   `prf_sound_dn`, que no pide `Classical.byContradiction`) y Gödel I y II sin hipótesis; y todo lo
    que deriva `Prf` es verdadero en `MNV V₀`. No hay solidez respecto de TODO modelo de la teoría (sólo la de `Prfᵢ`, en
    `sondeos/AnclaSoundness.lean`).
 3. **Las definiciones**: que `Prf`, `axioms`, `godelCN`, `consistencyFormula'` o `evalFormula` sean lo que dicen sus

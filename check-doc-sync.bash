@@ -631,7 +631,7 @@ Sobre_el_libro.md
 # TEOREMAS-E-HIPOTESIS.md — SALDADA el 2026-10-02 (ADR-115): reescrito entero, con su marca.
 THOUGHTS.md
 TuplasFuncionesYListas.md
-WORKFLOW.md
+# WORKFLOW.md — SALDADA el 2026-10-28 (ADR-212): la Parte 4, con el orden del bump; su marca, al día.
 # ── y estas TRES las cazó el propio control, no la medición a mano: `comm` con
 #    locales distintos se las había comido. 🔑 Mi red era la estrecha esta vez.
 doc/PLAN-COMPLETITUD-FINITISTA.md

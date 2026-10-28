@@ -1,0 +1,153 @@
+export const meta = {
+  name: 'auditoria-base-ronda-3',
+  description: 'Ronda 3 de la auditoría de la BASE (T17), sobre RPP 5bb5690 y FOL fcf356a: consistencia y modelo, titulares, controles, FOL y el puente, y la prosa de los ADR (sólo lectura, sin compilar)',
+  phases: [
+    { title: 'Auditoría', detail: 'cinco lentes sobre la base de hoy' },
+    { title: 'Verificación', detail: 'un verificador adversarial por lente' },
+  ],
+}
+
+const RPP = args.rpp
+const FOL = args.fol
+const PEANO = args.peano
+
+const CONTEXTO = [
+  '# Auditoría de la BASE — ronda 3 (2026-10-28)',
+  '',
+  'Eres auditor de un proyecto de lógica formal en Lean 4 (v4.35.0, SIN Mathlib). Responde en español.',
+  '',
+  '## Dónde está (una INSTANTÁNEA: lee sólo aquí)',
+  '* RPP = ROBINSON_PlusPlus, instantánea en ' + RPP + ' (commit 5bb5690, el master de hoy). FOL, su base, en ' + FOL + ' (commit fcf356a). Son worktrees de git: `git log`, `git show`, `git grep` y `git blame` funcionan dentro.',
+  '* PeanoRF (' + PEANO + ') es un consumidor BLOQUEADO por el propietario: sólo lectura.',
+  '',
+  '## El proyecto hoy',
+  '* T_Prf: 120 axiomas = 34 «core» + 85 de codificación + 1 ancla diagonal (ROBINSON_PlusPlus/Minimal/Axioms.lean), más dos esquemas de inducción (`Prf.ind`, `Prf.listInd`). El cálculo es `Prf` (Hilbert propio: ROBINSON_PlusPlus/Meta/Hilbert.lean), con `PrfH` (con contexto) en Meta/HilbertDeduction.lean. El verificador de pruebas está DENTRO de la teoría (validProofFn, lineWF, premsOf, substfc, liftfc…, fijados por los axiomas de codificación).',
+  '* La consistencia es un TEOREMA, `consistencia` (Meta/Consistencia.lean): un modelo de los 120 (`MN_axioms`) y la solidez de Prf (`prf_sound`, Meta/SolidezPrf.lean; y `prf_sound_dn`, sin lógica clásica, Meta/SolidezDobleNegacion.lean). Es relativa a Lean (ADR-138).',
+  '* Los 29 TITULARES: `T_UNIVERSO` en check-doc-sync.bash:1302, igual a `TITULARES` de Meta/ContratoTitulares.lean; con su clase de prueba —(i) no usa el modelo, (ii) usa `consistencia`, (iii) usa la verdad en el modelo— en TEOREMAS-E-HIPOTESIS.md §1. Gödel I y II, `goedel_I_neg`, Tarski, Rosser (Meta/Rosser.lean) y Löb (Meta/Lob.lean), sin hipótesis; ninguno lleva `Classical.choice` (ADR-191).',
+  '* Desde la ronda 2 (2026-10-02): la capa `⊢` retirada (ADR-115), F1 arreglado con el ancla diagonal (ADR-117), el modelo y `consistencia` (ADR-119/120), `⊬¬G` (ADR-121), D7: símbolos `List Char` (ADR-129), Rosser (ADR-157), Löb (ADR-159), la rigidez en todo modelo estándar y un segundo modelo (ADR-173/175), la solidez doble-negada (ADR-191), 120 axiomas (ADR-192), el puente FOL → Prf (ADR-195, Meta/PuenteFOL.lean) y la esencialidad del choice de FOL en el build (ADR-203, FOL/Esencialidad0.lean). Las decisiones: DECISIONS.md (ADR-131 en adelante) y doc/historia/DECISIONS-001-130.md.',
+  '* Los controles: check-footprints.bash (590 filas), check-choice.bash (doc/control/choice.tsv), check-estratos.bash (11 estratos y los censos @TRUST/@NATIVO/@AJENO), check-sorry.bash, check-warnings.bash (28), check-sondeos.bash --controles (11 sondeos), check-doc-sync.bash (bloques [A] [A2] [B] [C] [E] [I] [L] [M] [T] [EOL] [H]…), el contrato de enunciados (Meta/ContratoTabla.lean) y la pureza (Meta/PurezaTitulares.lean) en cada build, y la CI (.github/workflows/, con leanchecker). En FOL: check-axioms.bash, check-doc-sync.bash, frozen_files.txt y locked_files.txt.',
+  '',
+  '## Lo ya conocido (no lo repitas como nuevo; sí sus consecuencias y otras instancias)',
+  '* Las rondas 1 y 2: ADR-114 y ADR-115 en doc/historia/DECISIONS-001-130.md; sus resúmenes completos (grandes: consúltalos con grep, no los leas enteros) en doc/registro/2026-10-02-auditoria-base/ronda1/resumen.txt y ronda2/resumen.txt.',
+  '* La auditoría del suelo del 2026-10-12, con 81 trabajos y el estado de cada uno: doc/AUDITORIA-SUELO-2026-10-12.md (no fue adversarial sobre ADR-117…131). Lo que sigue abierto: NEXT-STEPS.md, sección «Lo que queda». Si un hallazgo tuyo es un trabajo abierto de esa lista, dilo en relacion_con_conocido con su número (T##).',
+  '',
+  '## Reglas (OBLIGATORIAS)',
+  '* SÓLO LECTURA. No edites, no crees ni borres ficheros en ningún sitio, no hagas commits ni cambies de rama. Herramientas: Read, Grep, Glob y git de sólo lectura.',
+  '* ⛔ NO compiles ni ejecutes nada del proyecto: nada de lake, lean, lake env lean ni los scripts check-*.bash. Si algo sólo se zanja compilando, dilo y escribe en sonda_lean el texto de la sonda que lo zanjaría (lo compilará el propietario).',
+  '* Cada cifra va MEDIDA (di cómo) o etiquetada como ESTIMACIÓN.',
+  '* Trampas de notación: dentro de RPP, ∧ ∨ ¬ ≤ ∈ ⇒ ⇔ suelen ser símbolos OBJETO (fórmulas de la teoría); los de Lean son And/Or/Not.',
+  '* Antes de afirmar que algo FALTA o no existe, búscalo (en RPP y en FOL).',
+  '* Prioriza problemas de BASE (que un teorema no diga lo que se afirma, que un control dé verde sin comprobar, que algo sea refutable) sobre la cosmética.',
+].join('\n')
+
+const SALIDA = 'Rellena el esquema. En «examinado», lo que miraste de verdad; en «no_examinado», lo que tu lente debería cubrir y no cubriste. Cada hallazgo: afirmación FALSABLE, evidencia con fichero:línea y la cita, cómo verificarlo (con sonda_lean si hace falta compilar), por qué importa, y su relación con lo conocido (T##, un hallazgo de las rondas 1-2, o «nuevo»). Un «no hay» medido también es un resultado: dilo en el resumen.'
+
+const LENSES = [
+  {
+    key: 'R3-1-modelo',
+    titulo: 'R3-1 · La consistencia y el modelo: ¿se puede romper `consistencia`?',
+    encargo: 'Audita `consistencia` como si quisieras romperla. (a) Que el modelo satisface CADA uno de los 120 axiomas, el ancla diagonal incluida: localiza la prueba (MN_axioms y los módulos del modelo), comprueba que recorre la lista entera y cómo (decide +kernel, rfl, por casos), y que en su cono no hay native_decide, implemented_by, opaque, partial, unsafe, sorry ni axiom (mira también qué cuentan los censos @TRUST/@NATIVO de check-estratos.bash y si cubren ese cono). (b) Que prf_sound y prf_sound_dn cubren los 7 constructores de Prf, los 17 de Prfᵢ y los dos esquemas, con la semántica estándar (evalFormula de FOL, la interpretación del modelo) y no con una que haga verdadero todo. (c) Refutaciones baratas al estilo de L1-1 de la ronda 1: símbolos que la teoría sólo fija sobre formas canónicas (lineWF, premsOf, validProofFn, substfc/liftfc sobre códigos basura; `control_ancla` y Meta/SegundoModelo.lean, ADR-175), guardas, el método de reemplazo. (d) La relatividad (ADR-138, Con(Lean) → Con(T_Prf)): ¿algún texto vivo la presenta como absoluta? (e) Que T_Prf es r.e. y su relación de prueba decidible (M-10; el verificador, W1 `verificador_solido`). (f) Si importa que no esté demostrado que los 120 axiomas son SENTENCIAS (no hay un `axioms_isSentence`; `IsSentence` está en Meta/TarskiPrf.lean:106), por ejemplo para `AxiomasT` de Meta/PuenteFOL.lean.',
+  },
+  {
+    key: 'R3-2-titulares',
+    titulo: 'R3-2 · Los titulares dicen lo que dicen: fidelidad de los enunciados y vacuidad',
+    encargo: 'Para cada uno de los 29 titulares: (a) ¿el enunciado es el de libro y no una variante más débil o trivial? godelCN como punto fijo de ¬Prov (prf_godelCN_fixedpoint); Prov fiel a la demostrabilidad de T (Meta/ProvFiel.lean; W1); consistencyFormula\' como la consistencia de T; R como sentencia de Rosser (Meta/Rosser.lean; `rosser_ext` lleva `_hE`, que la prueba no usa: ADR-158); lob y lob_iff (Meta/Lob.lean); tarski y tarski_semantico_de; los corolarios de Meta/GodelCorolarios.lean; W1 y E10 en todo `Estandar M` (Meta/RigidezEstandar.lean). (b) La lente de VACUIDAD —teoremas ciertos que no dicen nada—: hipótesis satisfacibles A LA VEZ (¿hay una prueba de su conjunción?), `Estandar M` habitado (MNV V₀, Meta/SegundoModelo.lean), parámetros libres que trivializan el enunciado. (c) ¿El contrato de enunciados (T07: Meta/ContratoTabla.lean, #contrato_titulares) y el control de pureza (T08: Meta/PurezaTitulares.lean, #pureza) comprueban lo que dicen comprobar? (d) Meta/PuenteFOL.lean (ADR-195; NO son titulares, son candidatos): `goedel_I_fol` usa `AxiomasT`, con los axiomas y las instancias de los esquemas como hipótesis de `DerivesSet₀` con sus variables libres FIJAS, no sus clausuras universales: ¿equivale al enunciado de libro «las clausuras de T no derivan G»? ¿`modelo_sin_G` (verdad en UNA valuación) da un modelo de T en el sentido usual? ¿`goedel_I_semantico` dice que ese modelo no es estándar, o sólo lo sugiere?',
+  },
+  {
+    key: 'R3-3-controles',
+    titulo: 'R3-3 · Los controles: ¿alguno da verde sin comprobar?',
+    encargo: 'Revisa los controles nuevos o cambiados desde ADR-191: check-choice.bash y doc/control/choice.tsv; check-estratos.bash (once estratos); check-footprints.bash ([COBERTURA], `cob_extrae` y su autotest, las 590 filas, las de FOL.Esencialidad0); check-doc-sync.bash ([EOL], [H], [B] con B_SUBE_ADR y --b-deuda, [E], [I], [A2]); check-warnings.bash; scripts/presupuesto-ci.bash con doc/control/presupuesto-ci.tsv; la CI (.github/workflows/build.yml y toolchain.yml de RPP, y el build.yml de FOL: acciones fijadas por SHA, elan con sha256, doc/control/fol-sha.txt, la clave de caché, el mismo toolchain en los dos); guarda_y_bloquea.bash; y en FOL check-axioms.bash y check-doc-sync.bash. Para cada uno: ¿qué comprueba DE VERDAD? Busca entradas que lo dejen en verde sin comprobar: un patrón que no casa nunca, un awk que no lee nada, `grep -q` con pipefail, una salida vacía tomada por éxito, un alcance reducido que no se anuncia, un umbral dentro del ruido de la medida, un autotest que cuenta en vez de comparar. Un control tiene tres resultados (pasa, falla, no he podido comprobarlo) y el tercero se dice. Para cada sospecha, el caso concreto de entrada que da el verde falso.',
+  },
+  {
+    key: 'R3-4-fol',
+    titulo: 'R3-4 · FOL como base, y el puente con RPP',
+    encargo: '(a) Lo que RPP usa de FOL (FOL.Core, Derives₀/Derives₁, DerivesSet₀ en FOL/Henkin0.lean, Canonical0, Lindenbaum0, Lift0, Semantics) y sus enunciados: hipótesis vacuas, docstrings que afirman más que el lema. (b) FOL/AXIOMS.md frente al código: la frontera del Classical.choice (§4), el ámbito de «esenciales, MEDIDO», y FOL/Esencialidad0.lean (ADR-203): ¿los seis experimentos y `ex_elim_refutable_fin` prueban lo que su docstring dice (p. ej., E1: «el enunciado de la solidez implica ¬¬P → P»)?; FOL/Estratos0.lean. (c) El gobierno: frozen_files.txt, locked_files.txt, git-lock.bash y su gancho: ¿qué impide de verdad? (d) La cuarentena de FOL (15 `axiom`, T57): ¿alguno es alcanzable desde un objetivo del build, de FOL o de RPP? (e) Meta/PuenteFOL.lean de RPP: `derives1_to_prfH` (¿todos los constructores de Derives₁, con el MISMO contexto?), `prf_completo` (¿es correcta la semántica de AxiomasT en una sola valuación?). (f) TheoryFramework: sólo si encuentras algo distinto de lo que ya dice T58.',
+  },
+  {
+    key: 'R3-5-prosa',
+    titulo: 'R3-5 · La prosa: los ADR sin revisión adversarial y los documentos autoritativos',
+    encargo: '(a) Revisión adversarial de la PROSA de ADR-128, ADR-130 y ADR-131 (en doc/historia/DECISIONS-001-130.md y DECISIONS.md): ¿qué afirman que el árbol de hoy desmiente, o que nunca se midió? (Es el punto (c) de T17.) (b) ADR-191…203 (DECISIONS.md), los más recientes: cifras sin ámbito (M-13: una cifra se re-ejecuta o lleva su ámbito), «por primera vez», «sin choice», «medido» sin artefacto, afirmaciones que el código no sostiene. (c) Los documentos autoritativos —README.md, TEOREMAS-E-HIPOTESIS.md, GODEL-STATUS.md, CURRENT-STATUS-PROJECT.md, AXIOMS.md y REFERENCE.md de RPP, y el banner de NEXT-STEPS.md— frente al código: las cifras (120 axiomas, 29 titulares, 590 footprints, 119 módulos, 11 estratos, 28 avisos), nombres que no existen, frases que un teorema vivo desmiente. Los controles de check-doc-sync ya vigilan parte de esto: busca lo que se les escapa, y di por qué se les escapa.',
+  },
+]
+
+const VERIF = [
+  'Te paso los hallazgos que otro auditor encontró con esta lente. Intenta REFUTAR cada uno:',
+  '* comprueba que cada cita fichero:línea existe EN LA INSTANTÁNEA y dice lo que se afirma;',
+  '* comprueba que la afirmación se sigue, y que no está ya resuelta o declarada en el árbol (búscalo, en RPP y en FOL);',
+  '* corrige la gravedad si está inflada o rebajada;',
+  '* escéptico por defecto: si leyendo no puedes confirmarlo, el veredicto es «plausible» o «no_verificable_sin_compilar», nunca «confirmado»;',
+  '* no compiles ni ejecutes nada.',
+  'Además, en «omisiones», lista lo que esta lente debería haber examinado y no examinó.',
+].join('\n')
+
+const GRAVEDAD = ['bloqueante', 'grave', 'medio', 'menor']
+const FINDINGS_SCHEMA = {
+  type: 'object',
+  properties: {
+    lente: { type: 'string' },
+    resumen: { type: 'string' },
+    examinado: { type: 'array', items: { type: 'string' } },
+    no_examinado: { type: 'array', items: { type: 'string' } },
+    hallazgos: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          titulo: { type: 'string' },
+          gravedad: { type: 'string', enum: GRAVEDAD },
+          nivel: { type: 'string', enum: ['base', 'detalle'] },
+          afirmacion: { type: 'string' },
+          evidencia: { type: 'array', items: { type: 'string' } },
+          medido_o_estimado: { type: 'string', enum: ['medido', 'estimado', 'mixto'] },
+          por_que_importa: { type: 'string' },
+          como_verificar: { type: 'string' },
+          sonda_lean: { type: 'string' },
+          arreglo_propuesto: { type: 'string' },
+          relacion_con_conocido: { type: 'string' },
+          confianza: { type: 'string', enum: ['alta', 'media', 'baja'] },
+        },
+        required: ['id', 'titulo', 'gravedad', 'nivel', 'afirmacion', 'evidencia', 'medido_o_estimado', 'por_que_importa', 'como_verificar', 'relacion_con_conocido', 'confianza'],
+      },
+    },
+  },
+  required: ['lente', 'resumen', 'examinado', 'no_examinado', 'hallazgos'],
+}
+const VERDICT_SCHEMA = {
+  type: 'object',
+  properties: {
+    veredictos: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          veredicto: { type: 'string', enum: ['confirmado', 'plausible', 'refutado', 'no_verificable_sin_compilar'] },
+          razon: { type: 'string' },
+          evidencia_contraria: { type: 'array', items: { type: 'string' } },
+          gravedad_corregida: { type: 'string', enum: GRAVEDAD },
+          necesita_compilacion: { type: 'boolean' },
+        },
+        required: ['id', 'veredicto', 'razon', 'necesita_compilacion'],
+      },
+    },
+    omisiones: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['veredictos', 'omisiones'],
+}
+
+log('Ronda 3: cinco lentes sobre la base de hoy (RPP 5bb5690, FOL fcf356a), cada una con su verificador adversarial')
+const results = await pipeline(
+  LENSES,
+  l => agent(CONTEXTO + '\n\n# TU LENTE: ' + l.titulo + '\n\n' + l.encargo + '\n\n' + SALIDA,
+    { label: 'audit:' + l.key, phase: 'Auditoría', schema: FINDINGS_SCHEMA }),
+  (found, l) => found
+    ? agent(CONTEXTO + '\n\n# VERIFICADOR ADVERSARIAL — ' + l.titulo + '\n\n' + VERIF + '\n\nHallazgos a verificar (JSON):\n' + JSON.stringify(found, null, 1),
+        { label: 'verif:' + l.key, phase: 'Verificación', schema: VERDICT_SCHEMA })
+        .then(v => ({ lente: l.key, auditoria: found, verificacion: v }))
+    : null,
+)
+const ok = results.filter(Boolean)
+const n = ok.reduce((s, r) => s + ((r.auditoria && r.auditoria.hallazgos) ? r.auditoria.hallazgos.length : 0), 0)
+log(ok.length + '/' + LENSES.length + ' lentes completas; ' + n + ' hallazgos antes de verificar')
+return ok

@@ -39,7 +39,12 @@ cd "$(dirname "$0")" || exit 2
 # nombre desde la hoja `FOL/Estratos0.lean` (sólo `Derives₀` la tenía), y el PUENTE, el teorema que lleva sus
 # derivaciones a otro cálculo censado (al sujeto, `Derives₀` o `Prf`, por una cadena de ellos). Las tres, comprobadas
 # igual: el teorema existe y su TIPO menciona el inductivo de la fila. `Prf`, `Prfᵢ` y `PrfH` no tienen completitud:
-# para ℕ no la hay (Gödel I). Un cálculo NUEVO (el `DerivesI` intuicionista de X1, si llega) entra con su fila aquí
+# para ℕ no la hay (Gödel I). ✏️ 2026-10-28 (R3-3-01 de la ronda 3, ADR-212): «menciona» no miraba la DIRECCIÓN, y el
+# PUENTE de LKc era `ndToLK`, que ENTRA en LKc (de `Derives₂`); el que sale, `cut_elimination₀` (a `LK₀`), daba rojo,
+# porque su tipo es la constante `CutElim₀`. Ahora cada columna se comprueba por su FORMA, con el tipo desplegado
+# (`forallTelescopeReducing`): la SOLIDEZ y el PUENTE tienen una hipótesis del inductivo de la fila y una conclusión que
+# no lo es (salen de él); la COMPLETITUD concluye en él. Y `Prf` tiene completitud para su teoría, no para ℕ:
+# `prf_completo` (ADR-195). Un mutante permanente (`ndToLK` como puente de LKc) tiene que dar rojo. Un cálculo NUEVO (el `DerivesI` intuicionista de X1, si llega) entra con su fila aquí
 # y en §0bis.
 # 2026-10-02 (ADR-115): `Derives` baja de 4 a 0 al borrarse `FOL/MetaRules.lean`, y gana su solidez
 # en el build (`FOL/Inconsistencia.lean` §1).
@@ -49,10 +54,10 @@ Derives₀|21|0|FOL.Metamath.Soundness0.derives0_soundness|FOL.Canonical0.comple
 Derives₁|20|0|FOL.Estratos0.derives1_soundness|FOL.Estratos0.derives1_complete|FOL.Derives1.derives1_to_derives0
 Derives₂|22|0|FOL.Estratos0.derives2_soundness|FOL.Estratos0.derives2_complete|FOL.Derives2.derives2_to_derives1
 LK₀|14|0|FOL.SequentSound0.lk0_sound|FOL.Estratos0.lk0_complete|FOL.SequentSound0.lk0_to_derives0
-LKc|15|0|FOL.SequentSound0.lkc_sound|FOL.Estratos0.lkc_complete|FOL.NDtoLK0.ndToLK
+LKc|15|0|FOL.SequentSound0.lkc_sound|FOL.Estratos0.lkc_complete|FOL.Hauptsatz0.cut_elimination₀
 LKh|14|0|FOL.Estratos0.lkh_sound|FOL.Estratos0.lkh_complete|FOL.Hauptsatz0.lkh_to_lk0
 FOL.Craig0.LKp|13|0|FOL.Estratos0.lkp_sound|FOL.Estratos0.lkp_complete|FOL.Craig0.lkp_to_lk0
-ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|-|-
+ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo|-
 ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ|17|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound|-|ROBINSON_PlusPlus.Meta.Hilbert.Prf.incl
 ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH|8|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfH_sound|-|ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
 EOF
@@ -166,6 +171,40 @@ LEANEOF
 # fila con solidez, el fichero busca el teorema en el entorno y exige que su TIPO mencione el
 # inductivo de la fila; si no, no imprime su marca y el control rompe.
 # ✏️ 2026-10-27 (T46, ADR-194): lo mismo para la completitud (@COMP) y el puente (@PUENTE).
+# ✏️ 2026-10-28 (R3-3-01, ADR-212): la FORMA, no la mención (ver la cabecera de la tabla). `direccionOK` despliega el
+# tipo, mira las cabezas de las hipótesis y de la conclusión, y decide por la columna.
+cat >> "$LEANFILE" <<'DIREOF'
+
+/-- ¿Concluye `e` en el inductivo `ind`? Su cabeza es `ind`, o es un `∃` o un `∧` con `ind` dentro (así concluyen
+    `lkh_complete`, `∃ n, LKh n Γ [f]`, y `lkp_complete`, `∃ E, … ∧ LKp (E ++ Γ) [f]`). -/
+partial def concluyeEn (ind : Lean.Name) (e : Lean.Expr) : Lean.MetaM Bool := do
+  let e ← Lean.Meta.whnf e
+  if e.getAppFn.constName? == some ind then return true
+  match e.getAppFn.constName?, e.getAppArgs with
+  | some ``Exists, #[_, p] => Lean.Meta.lambdaTelescope p fun _ b => concluyeEn ind b
+  | some ``And, #[a, b] => return (← concluyeEn ind a) || (← concluyeEn ind b)
+  | _, _ => return false
+
+/-- ¿Tiene `teo` la forma de su columna para el inductivo `ind`? SOL/PUENTE: una hipótesis cuya cabeza es `ind` y
+    una conclusión que NO concluye en él (sale de `ind`); COMP: la conclusión concluye en `ind`. -/
+def direccionOK (marca : String) (ind teo : Lean.Name) : Lean.Elab.Command.CommandElabM Bool :=
+  Lean.Elab.Command.liftTermElabM do
+    match (← Lean.getEnv).find? teo with
+    | none => pure false
+    | some ci =>
+      Lean.Meta.forallTelescopeReducing ci.type fun hs concl => do
+        let enConcl ← concluyeEn ind concl
+        let mut enHip := false
+        for h in hs do
+          let t ← Lean.Meta.whnf (← Lean.Meta.inferType h)
+          if t.getAppFn.constName? == some ind then enHip := true
+        pure (if marca == "COMP" then enConcl else enHip && !enConcl)
+
+-- el mutante permanente: `ndToLK` ENTRA en LKc (desde `Derives₂`); como PUENTE de LKc tiene que dar rojo
+run_cmd do
+  if ((← Lean.getEnv).find? `FOL.NDtoLK0.ndToLK).isSome then
+    if !(← direccionOK "PUENTE" `LKc `FOL.NDtoLK0.ndToLK) then logInfo m!"@MUTANTE_DIRECCION_VISTO"
+DIREOF
 while IFS='|' read -r NOMBRE _ _ SOLIDEZ COMPLETITUD PUENTE; do
   [ -n "$NOMBRE" ] || continue
   for par in "SOL $SOLIDEZ" "COMP $COMPLETITUD" "PUENTE $PUENTE"; do
@@ -174,12 +213,8 @@ while IFS='|' read -r NOMBRE _ _ SOLIDEZ COMPLETITUD PUENTE; do
     cat >> "$LEANFILE" <<SOLEOF
 
 run_cmd do
-  let env ← Lean.getEnv
-  match env.find? (String.toName "$TEO") with
-  | none => pure ()
-  | some ci =>
-    if ci.type.getUsedConstants.contains (String.toName "$NOMBRE") then
-      logInfo m!"@$MARCA $NOMBRE $TEO"
+  if (← direccionOK "$MARCA" (String.toName "$NOMBRE") (String.toName "$TEO")) then
+    logInfo m!"@$MARCA $NOMBRE $TEO"
 SOLEOF
   done
 done <<< "$ESTRATOS"
@@ -202,6 +237,11 @@ rm -rf "$TMP"
 if [ "$RC" != "0" ] || printf '%s\n' "$SALIDA" | grep -qE ': error'; then
   echo "  ❌ NO PUDE MEDIR: 'lake env lean' sobre el fichero del censo dio error (código $RC). ¿Está construido el árbol?"
   printf '%s\n' "$SALIDA" | grep -m3 -E 'error' | sed 's/^/      /' | cut -c1-160
+  exit 1
+fi
+# ✏️ 2026-10-28 (R3-3-01, ADR-212): el mutante de dirección tiene que haber dado rojo; si no, la forma no se mira.
+if ! printf '%s' "$PLANA" | grep -qF "@MUTANTE_DIRECCION_VISTO"; then
+  echo "  ❌ NO PUDE MEDIR: el mutante de dirección (ndToLK como PUENTE de LKc) no dio rojo: la forma no se está mirando."
   exit 1
 fi
 
