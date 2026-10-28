@@ -198,6 +198,8 @@ Lean. Detalle en el addendum de [ADR‑023](../DECISIONS.md).
 
 #### (c) 🏁 **Estado: 10 de 10.** Y cuatro de ellos cayeron el 2026‑09‑10h
 
+> ✏️ *2026‑10‑28 (T20, [ADR‑197](../DECISIONS.md)): sin certificado desde ADR‑115, y el de septiembre era VACUO: su footprint llevaba los axiomas de «FOL.MetaRules», retirados por refutables.*
+
 | axioma | teorema en `Full` | fichero |
 |---|---|---|
 | ax6 `add_comm` | `add_comm_thm` | `Full/Induction.lean` |

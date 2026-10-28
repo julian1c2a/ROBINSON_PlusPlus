@@ -195,7 +195,7 @@ theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
 
 Sirve para **certificar** el censo de `coreAxioms`: los 11 derivables se demostraban con enunciados
 `axioms ⊢ axN` que son **triviales por `ax`**. Con el axioma en su sitio, **9 de los 11** están hoy
-certificados sobre `primAxioms` (7 en `Full/Induction.lean`, 2 en `Full/Lists.lean`).
+certificados sobre `primAxioms` (7 en `Full/Induction.lean`, 2 en `Full/Lists.lean`). ✏️ *2026‑10‑28 (T20, [ADR‑197](DECISIONS.md)): «hoy» era septiembre. No hay certificado desde ADR‑115, y el de septiembre era VACUO: su footprint llevaba los axiomas de «FOL.MetaRules», retirados por refutables.*
 
 ⛔ **La salida fácil estaba cerrada**: generalizarlo a `∀ {Γ}, Γ ⊢ inductionFormula φ` sería
 **FALSO** (con `Γ = []` haría la inducción **lógicamente válida**). Un axioma **tiene que nombrar su
@@ -210,7 +210,7 @@ que moverlo: **se retiró**, y el inventario bajó de **6 a 5**.
 fijan el rango de `mod2` (un modelo con `mod2 2̄ = 2̄` los satisface). ⇒ el censo pasa de
 **23 + 11** a **24 + 10**, y `ax21` entra en `primAxioms`.
 
-🏁🏁 **CENSO CERRADO: 10 DE 10** (2026‑09‑12). `ax24` **certificado** sobre los primitivos:
+🏁🏁 **CENSO CERRADO: 10 DE 10** (2026‑09‑12; ✏️ 2026‑10‑28, T20: un certificado vacuo, y hoy retirado: ver la nota de arriba). `ax24` **certificado** sobre los primitivos:
 `mod2_of_even_prim : primAxioms ⊢ ax24_mod2_of_even`, footprint
 `[propext, Classical.choice, Quot.sound, FOL.MetaRules.{ex_elim, gen, imp_intro, or_elim},
 ax_induction_prim]` — **sin `ax_list_induction`, sin anclas, sin nada de `axioms`**. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
