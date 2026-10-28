@@ -1,0 +1,4 @@
+# doc/control/fol-sha.txt — el commit de FOL contra el que este árbol se validó por última vez (T40, ADR-202).
+# La CI lo compara con el master de FOL y AVISA si es otro (no rompe: construir contra el master es el canario
+# de ADR-073). Se actualiza en el commit de RPP que sigue a cada push de FOL (M-12). La última línea es la que cuenta.
+99fa28890d5b0d548af05df7bd86b4adbc705fa5

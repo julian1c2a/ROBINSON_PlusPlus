@@ -319,6 +319,19 @@ Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
 
 ---
 
+### (15b.) Un término astronómico PLEGADO: `rw` nivel a nivel, nunca `simp` sobre él (T41, ADR‑202)
+
+El ancla de ADR‑117 lleva `nD L := numeralM (codeNat (psiD L))`, un numeral astronómico plegado tras un nombre (y lo
+mismo `deltaD`, `ax_axiomsCodeT_def`, el código de `godelBeta'` dentro de `godelCN`). Con ellos:
+* se prueba por `rw` con lemas que valen ∀ n (`occT_numeralM`, `evB_concat`…), un nivel por vez, de dentro afuera,
+  y un `rfl` final sólo cuando ya no queda el término en el objetivo;
+* NUNCA `simp`/`simp only [f]` sobre funciones recursivas que lo alcancen, ni un `show` que escriba su evaluación, ni
+  un `rfl`/`decide` que lo toque: el núcleo comprueba por reducción lo que eso deja como igualdad definicional, y no
+  acaba («(kernel) deep recursion detected», 11 GB medidos), y una declaración rechazada queda como AXIOMA en el
+  `#print axioms` de lo que la usa;
+* compilar con tiempo límite: la CI tiene `timeout-minutes` (60 el build) y un presupuesto de tiempo y memoria
+  (`doc/control/presupuesto-ci.tsv`).
+
 ## Scripts Disponibles
 
 | Script | Propósito |

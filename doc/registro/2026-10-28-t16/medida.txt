@@ -1,0 +1,6 @@
+1_fol_desde_rpp: rc=0 · 0 construidos · 0 «incompatible header» · 2 s · Build completed successfully (60 jobs)
+2_fol_desde_fol: rc=0 · 0 construidos · 0 «incompatible header» · 1 s · Build completed successfully (60 jobs)
+3_rpp_desde_rpp: rc=0 · 0 construidos · 0 «incompatible header» · 3 s · Build completed successfully (147 jobs)
+4_fol_desde_rpp: rc=0 · 0 construidos · 0 «incompatible header» · 1 s · Build completed successfully (60 jobs)
+5_fol_desde_fol: rc=0 · 0 construidos · 0 «incompatible header» · 1 s · Build completed successfully (60 jobs)
+toolchains: RPP leanprover/lean4:v4.35.0 · FOL leanprover/lean4:v4.35.0

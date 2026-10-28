@@ -1,0 +1,28 @@
+#!/bin/bash
+# T16: ¿romper M-3 rompe algo? Un par clonado (RPP y FOL hermanos), con los .lake del árbol copiados (en caliente):
+#   1. desde la raíz de RPP, los dos objetivos de FOL;  2. DESDE LA RAÍZ DE FOL, `lake build` (lo que M-3 prohíbe);
+#   3. otra vez desde RPP, `lake build` y los objetivos de FOL. Se mide el código de salida, cuántos módulos se
+#   construyen de nuevo y si aparece «incompatible header» (lo que M-3 dice que pasa).
+export PATH="/c/Users/julia/.elan/bin:/usr/bin:$PATH"
+SP=/d/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad
+P=$SP/par
+rm -rf "$P"; mkdir -p "$P"
+git clone -q /e/dropbox/github/lean4/ROBINSON_PlusPlus "$P/ROBINSON_PlusPlus"
+git clone -q /e/dropbox/github/lean4/FOL "$P/FOL"
+git -C "$P/ROBINSON_PlusPlus" checkout -q origin/ci/2026-10-28-rapidos 2>/dev/null || true
+cp -r /e/dropbox/github/lean4/FOL/.lake "$P/FOL/.lake"
+cp -r /e/dropbox/github/lean4/ROBINSON_PlusPlus/.lake "$P/ROBINSON_PlusPlus/.lake"
+paso () {  # nombre, directorio, orden...
+  local nombre="$1" dir="$2"; shift 2
+  local t0=$(date +%s)
+  ( cd "$dir" && "$@" ) > "$SP/t16_$nombre.log" 2>&1
+  local rc=$?
+  local t1=$(date +%s)
+  echo "$nombre: rc=$rc · $(grep -c 'Built ' "$SP/t16_$nombre.log") construidos · $(grep -c 'incompatible header' "$SP/t16_$nombre.log") «incompatible header» · $((t1 - t0)) s · $(grep -o 'Build completed successfully ([0-9]* jobs)' "$SP/t16_$nombre.log" | tail -1)"
+}
+paso 1_fol_desde_rpp "$P/ROBINSON_PlusPlus" lake build "@FOL/FOL" "@FOL/TheoryFramework"
+paso 2_fol_desde_fol "$P/FOL" lake build
+paso 3_rpp_desde_rpp "$P/ROBINSON_PlusPlus" lake build
+paso 4_fol_desde_rpp "$P/ROBINSON_PlusPlus" lake build "@FOL/FOL" "@FOL/TheoryFramework"
+paso 5_fol_desde_fol "$P/FOL" lake build
+echo "toolchains: RPP $(cat $P/ROBINSON_PlusPlus/lean-toolchain) · FOL $(cat $P/FOL/lean-toolchain)"

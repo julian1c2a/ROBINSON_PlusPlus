@@ -23,18 +23,20 @@ jobs:
   probar:
     name: probar el toolchain
     runs-on: ubuntu-24.04
+    # (T41, ADR-202: un tope; probar el par con una versión nueva es un build entero de los dos repos)
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: ROBINSON_PlusPlus
     steps:
       # Los dos checkouts, hermanos, como en build.yml (`require FOL from "../FOL"`).
       - name: Checkout ROBINSON_PlusPlus
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: ROBINSON_PlusPlus
           fetch-depth: 0
       - name: Checkout FOL (dependencia local hermana)
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: julian1c2a/FOL
           ref: master
@@ -43,7 +45,11 @@ jobs:
 
       - name: Install elan (Lean version manager)
         run: |
-          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --no-modify-path --default-toolchain none
+          # ⭐ 2026-10-28 (T40, ADR-202 de RPP): elan FIJADO (v4.2.4, con su sha256), no el `latest` de `elan-init.sh`.
+          curl -sSfL -o /tmp/elan.tar.gz https://github.com/leanprover/elan/releases/download/v4.2.4/elan-x86_64-unknown-linux-gnu.tar.gz
+          echo "42b94d4244e8353142c456ec0e4ca6528fd898a6c604d4059f494e706e431f63  /tmp/elan.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/elan.tar.gz -C /tmp
+          /tmp/elan-init -y --no-modify-path --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
       - name: ¿Hay una versión nueva sin probar?
@@ -76,7 +82,7 @@ jobs:
 
       - name: Los registros
         if: always() && steps.vigilar.outputs.objetivo != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: registro-toolchain
           path: ROBINSON_PlusPlus/registro-toolchain

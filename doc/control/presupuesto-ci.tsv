@@ -1,0 +1,5 @@
+# doc/control/presupuesto-ci.tsv — el presupuesto de tiempo y memoria de la CI de RPP (T41, ADR-202); lo compara
+# scripts/presupuesto-ci.bash con lo que mide /usr/bin/time -v. Se sube sólo con un ADR que diga por qué.
+# medida	segundos	MB
+build	1800	12000
+leanchecker	1500	12000
