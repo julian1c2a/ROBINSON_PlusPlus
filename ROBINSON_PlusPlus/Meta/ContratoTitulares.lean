@@ -11,6 +11,7 @@ import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.GodelCorolarios
 import ROBINSON_PlusPlus.Meta.RigidezEstandar
 import ROBINSON_PlusPlus.Meta.ProvFiel
+import ROBINSON_PlusPlus.Meta.PuenteFOL
 
 /-!
 # `Meta/ContratoTitulares.lean` — T07: el CONTRATO de los enunciados de los titulares (ADR‑165)
@@ -20,7 +21,7 @@ semántica. Ninguno fija el ENUNCIADO. Un cambio coherente que debilitara un tit
 sentencia, pasaba todos los controles (T07 de la auditoría). Un `example : ¬ Prf godelCN := goedel_I` tampoco basta:
 fija el tipo por NOMBRE, y redefinir `godelCN`, `Prf` o `axioms` no lo rompe.
 
-**Qué fija.** Para cada titular de `TITULARES` (los 29 de `T_UNIVERSO`, que `check-doc-sync.bash` [T] compara con esta
+**Qué fija.** Para cada titular de `TITULARES` (los 32 de `T_UNIVERSO`, que `check-doc-sync.bash` [T] compara con esta
 lista), el CIERRE de su tipo: las constantes del proyecto que alcanza el enunciado. El cierre sigue el tipo de cada
 una, el VALOR de las definiciones, los constructores de los inductivos y el inductivo de los constructores, y no entra
 en la prueba de ningún teorema. De cada constante guarda una huella: `Expr.hash` de su tipo y, si es una definición,
@@ -48,7 +49,7 @@ namespace ROBINSON_PlusPlus.Meta.ContratoTitulares
 
 open ROBINSON_PlusPlus.Meta.PurezaComando (delProyecto nombreUsuario)
 
-/-- Los 29 titulares de `T_UNIVERSO` (`check-doc-sync.bash` [T], `TEOREMAS-E-HIPOTESIS.md` §1). Añadir o quitar uno
+/-- Los 32 titulares de `T_UNIVERSO` (`check-doc-sync.bash` [T], `TEOREMAS-E-HIPOTESIS.md` §1). Añadir o quitar uno
     pide su ADR, su fila en TEOREMAS, su nombre en `T_UNIVERSO` y regenerar la tabla. -/
 def TITULARES : List Name := [
   ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf,
@@ -81,7 +82,11 @@ def TITULARES : List Name := [
   ``ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de,
   ``ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de,
   -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de` (T75a), titular por decisión del propietario.
-  ``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de]
+  ``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de,
+  -- ✏️ 2026‑10‑28 (ADR‑210): los tres sintácticos del puente con FOL (T67), titulares por decisión del propietario.
+  ``ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol,
+  ``ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol,
+  ``ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol]
 
 /-- Las constantes de una expresión, también las estructuras de sus proyecciones (`Expr.proj`), que
     `getUsedConstants` no ve. -/

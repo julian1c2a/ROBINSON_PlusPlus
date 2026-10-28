@@ -26,10 +26,11 @@ consecuencia de primer orden de FOL (`AXIOMS.md` §0.1). Este módulo pone el pu
 * **§3 · `T_Prf` como teoría de primer orden**: `AxiomasT`, los 120 de `axioms` y las instancias de los dos esquemas
   de inducción (la lógica de `Prf` —`p3`, `qconf`, los esquemas de `Prfᵢ`— es de FOL). **`prf_completo`**: lo que vale
   en todo modelo de `AxiomasT`, `Prf` lo demuestra (por la existencia de modelo de FOL, `model_existence_lemma₀`).
-* **§4 · Gödel I semántico**: `AxiomasT` no deriva ni `G` ni `¬G` en la lógica de primer orden de FOL
-  (`goedel_I_fol`, `goedel_I_neg_fol`), ni `Con` (`goedel_II_fol`); y **`modelo_sin_G`**: hay un modelo de todos los
-  teoremas de `Prf` en el que `G` es FALSA, mientras que `G` es verdadera en todo modelo estándar
-  (`godelCN_verdadera_de`): ese modelo no es estándar (`goedel_I_semantico`).
+* **§4 · Gödel I y II en FOL, y Gödel I semántico**: ningún conjunto de teoremas de `Prf` deriva en la lógica de
+  primer orden de FOL ni `G` ni `¬G` (`goedel_I_fol`, `goedel_I_neg_fol`), ni `Con` (`goedel_II_fol`): ni `AxiomasT`,
+  ni sus clausuras universales, ni todos los teoremas a la vez. Los tres son TITULARES (ADR‑210). Y
+  **`modelo_sin_G`**: hay un modelo de todos los teoremas de `Prf` en el que `G` es FALSA, mientras que `G` es
+  verdadera en todo modelo estándar (`godelCN_verdadera_de`): ese modelo no es estándar (`goedel_I_semantico`).
 
 ⚠️ **Lo que NO dice.** La vuelta, `Prf → DerivesSet₀ AxiomasT`, no está: con instancias de los esquemas que tienen
 variables libres, `gen` pide las clausuras universales, y para Gödel I no hace falta. La solidez de `Prf` sigue siendo
@@ -177,24 +178,40 @@ theorem prf_completo {f : Formula}
 
 /-! ## §4 · Gödel I en la lógica de primer orden, y el modelo en que `G` es falsa -/
 
-/-- 🏁 **Gödel I en FOL**: los axiomas de `T_Prf` no derivan `G` en la lógica de primer orden de FOL. -/
-theorem goedel_I_fol : ¬ DerivesSet₀ AxiomasT ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (prf_of_derivesSet_axiomasT h)
+/-- 🏁 **Gödel I en FOL** (titular, ADR‑210): ningún conjunto `S` de teoremas de `Prf` deriva `G` en la lógica de
+    primer orden de FOL. `S` puede ser `AxiomasT` (los 120 y las instancias de los dos esquemas: `prf_of_axiomasT`),
+    sus clausuras universales (teoremas de `Prf` por `gen`) o todos los teoremas a la vez; el enunciado de libro, «las
+    clausuras de T no derivan G», es una instancia, y no pide que los 120 sean sentencias. -/
+theorem goedel_I_fol {S : Formula → Prop} (hS : ∀ φ, S φ → Prf φ) :
+    ¬ DerivesSet₀ S ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
+  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (prf_of_derivesSet hS h)
 
-/-- Y tampoco `¬G`: `AxiomasT` es INCOMPLETA en FOL. -/
-theorem goedel_I_neg_fol : ¬ DerivesSet₀ AxiomasT (neg ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) :=
-  fun h => ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg (prf_of_derivesSet_axiomasT h)
+/-- 🏁 Y tampoco `¬G` (titular, ADR‑210): con `goedel_I_fol`, todo conjunto de teoremas de `Prf` es INCOMPLETO en
+    FOL. -/
+theorem goedel_I_neg_fol {S : Formula → Prop} (hS : ∀ φ, S φ → Prf φ) :
+    ¬ DerivesSet₀ S (neg ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) :=
+  fun h => ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg (prf_of_derivesSet hS h)
 
-/-- **Gödel II en FOL**: `AxiomasT` no deriva su consistencia. -/
-theorem goedel_II_fol : ¬ DerivesSet₀ AxiomasT ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_II (prf_of_derivesSet_axiomasT h)
+/-- 🏁 **Gödel II en FOL** (titular, ADR‑210): ningún conjunto de teoremas de `Prf` deriva en FOL la consistencia
+    de `T_Prf`. -/
+theorem goedel_II_fol {S : Formula → Prop} (hS : ∀ φ, S φ → Prf φ) :
+    ¬ DerivesSet₀ S ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
+  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_II (prf_of_derivesSet hS h)
+
+-- La hipótesis no es vacía: la cumplen `AxiomasT` y el conjunto de TODOS los teoremas de `Prf` (que contiene las
+-- clausuras universales de los axiomas, por `gen`).
+example : ¬ DerivesSet₀ AxiomasT ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
+  goedel_I_fol (fun _ => prf_of_axiomasT)
+example (A : Formula) (h : AxiomasT A) : Prf (Formula.forall A) := Prf.gen A (prf_of_axiomasT h)
+example : ¬ DerivesSet₀ (fun g => Prf g) ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
+  goedel_II_fol (fun _ h => h)
 
 /-- 🏁 **Un modelo de `T_Prf` en el que `G` es FALSA**: satisface todos los teoremas de `Prf` y no `G`. Por la
     existencia de modelo de FOL sobre los teoremas de `Prf` y `¬G`, consistentes por `goedel_I` y el puente. -/
 theorem modelo_sin_G : ∃ (D : Type) (M : Model D) (v : Nat → D),
     And (∀ φ, Prf φ → evalFormula M v φ) (¬ evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) := by
   have hc : ¬ DerivesSet₀ (fun g => Prf g) ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-    fun hd => ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (prf_of_derivesSet (fun _ h => h) hd)
+    goedel_I_fol (fun _ h => h)
   obtain ⟨D, M, v, hM⟩ := FOL.Canonical0.model_existence_lemma₀ (consistente_de hc)
   exact ⟨D, M, v, fun φ hφ => hM φ (Or.inl hφ), hM (neg _) (Or.inr rfl)⟩
 

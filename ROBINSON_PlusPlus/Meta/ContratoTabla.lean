@@ -14,8 +14,31 @@ clase, su huella y su nombre. La comprueba `#contrato_titulares`, en `Meta/Purez
 
 namespace ROBINSON_PlusPlus.Meta.ContratoTabla
 
-/-- 514 constantes del cierre de los tipos de 29 titulares. -/
+/-- 559 constantes del cierre de los tipos de 32 titulares. -/
 def tabla : String := "
+ind 5186777082224789786 Derives₀
+ctor 3312764733 Derives₀.bot_elim
+ctor 1126791727 Derives₀.dne_rule
+ctor 400020902 Derives₀.dne_schema
+ctor 3566630181 Derives₀.elim_and_l
+ctor 2904958755 Derives₀.elim_and_r
+ctor 1920017975 Derives₀.elim_ex
+ctor 1553580488 Derives₀.elim_forall
+ctor 2042824892 Derives₀.elim_impl
+ctor 2490307623 Derives₀.elim_or
+ctor 2531759110 Derives₀.forall_not_ex_not
+ctor 1222510172 Derives₀.hyp
+ctor 595685338 Derives₀.intro_and
+ctor 1454192690 Derives₀.intro_ex
+ctor 3472688018 Derives₀.intro_forall
+ctor 3012701853 Derives₀.intro_impl
+ctor 493460801 Derives₀.intro_or_l
+ctor 3312184272 Derives₀.intro_or_r
+ctor 2498145750 Derives₀.refl
+ctor 3473247160 Derives₀.rewrite_at
+ctor 590067591 Derives₀.subst
+ctor 3964336321 Derives₀.weakening
+def 8187652094330948865 FOL.Henkin0.DerivesSet₀
 def 3606628684449333096 FOL.Metamath.Semantics.Model
 ind 887465114820704127 FOL.Metamath.Semantics.ModelG
 def 15527263524663539472 FOL.Metamath.Semantics.ModelG.func
@@ -42,12 +65,22 @@ ctor 1845085140 FormulaG.bottom
 def 8135599001853268519 FormulaG.brecOn
 def 8855968852358856928 FormulaG.brecOn.go
 def 13836490958339741554 FormulaG.casesOn
+def 12105169978909781019 FormulaG.ctorIdx
 ctor 115709672 FormulaG.eq
 ctor 567486217 FormulaG.ex
 ctor 567486217 FormulaG.forall
 ctor 1254374946 FormulaG.impl
 ctor 1254374946 FormulaG.or
 rec 2713398806 FormulaG.rec
+ind 2913115869334764643 LocalRule
+ctor 2908939631 LocalRule.commuteImpl
+ind 8978471365315065994 Pos
+ctor 2916064653 Pos.body
+def 8226791070215010826 Pos.casesOn
+ctor 2916064653 Pos.left
+rec 1360990080 Pos.rec
+ctor 2916064653 Pos.right
+ctor 1101628466 Pos.root
 def 9723019624608409766 ROBINSON_PlusPlus.Full.inductionFormula
 thm 4052883643 ROBINSON_PlusPlus.Meta.Consistencia.consistencia
 thm 2724847736 ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
@@ -213,6 +246,9 @@ def 5482257869310228710 ROBINSON_PlusPlus.Meta.Provability.termCode.match_1
 def 11195034101090334962 ROBINSON_PlusPlus.Meta.Provability.termsCode
 def 14821870038638067166 ROBINSON_PlusPlus.Meta.Provability.termsCode._f
 def 14401384849228394516 ROBINSON_PlusPlus.Meta.Provability.termsCode.match_1
+thm 3856473026 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol
+thm 2674866193 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
+thm 2926819187 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol
 thm 3002450326 ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
 thm 2318897476 ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 thm 3520485007 ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
@@ -513,8 +549,15 @@ ctor 1624757390 TermG.func
 rec 4244444198 TermG.rec
 rec 3602232170 TermG.rec_1
 ctor 3782846635 TermG.var
+def 3361676000590668554 getAt?
+def 7847729752312836030 getAt?._f
+def 14211074887820074924 getAt?._sparseCasesOn_1
+def 6436368581514235968 getAt?._sparseCasesOn_4
+def 12951991277095494387 getAt?.match_1
+def 1105291872776713909 getAt?.match_4
 def 16183615840364320092 iff
 def 2823144865505142597 instReprFormulaG.repr.match_1
+def 12832655973433595906 instReprPos.repr.match_1
 def 12317973500456012343 instReprTermG.repr.match_1
 def 15905727775727130956 liftFormula
 def 16179815999470111075 liftFormula._f
@@ -524,6 +567,8 @@ def 12677667960186280187 liftTerms
 def 15442923364148695414 liftTerms._f
 def 10290865820884635616 liftTerms.match_1
 def 16748259257947724270 neg
+def 12826534528530864548 replaceAt
+def 6023533153116547673 replaceAt._f
 def 9344481204440118272 substFormula
 def 1254428002330146971 substFormula._f
 def 761378095711210997 substTerm

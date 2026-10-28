@@ -5720,7 +5720,7 @@ theorem prf_of_derivesSet (hS : ∀ g, S g → Prf g) (h : DerivesSet₀ S f) : 
 theorem prf_iff_derivesSet : Prf f ↔ DerivesSet₀ (fun g => Prf g) f
 def AxiomasT (φ : Formula) : Prop        -- los 120 de `axioms` y las instancias de `ind` y `listInd`
 theorem prf_completo (h : ∀ D M v, (∀ φ, AxiomasT φ → evalFormula M v φ) → evalFormula M v f) : Prf f
-theorem goedel_I_fol : ¬ DerivesSet₀ AxiomasT godelCN                     -- y goedel_I_neg_fol, goedel_II_fol
+theorem goedel_I_fol (hS : ∀ φ, S φ → Prf φ) : ¬ DerivesSet₀ S godelCN    -- y goedel_I_neg_fol, goedel_II_fol (titulares, ADR-210)
 theorem modelo_sin_G : ∃ D M v, (∀ φ, Prf φ → evalFormula M v φ) ∧ ¬ evalFormula M v godelCN
 theorem goedel_I_semantico : (∀ M, Estandar M → ∀ v, evalFormula M v godelCN) ∧ (∃ D M v, …)
 ```

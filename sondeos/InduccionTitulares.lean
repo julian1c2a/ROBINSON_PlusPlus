@@ -358,3 +358,7 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
 #modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
+-- ✏️ 2026‑10‑28 (ADR‑210): los tres sintácticos del puente con FOL.
+#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
+#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol
+#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol

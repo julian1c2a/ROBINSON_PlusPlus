@@ -1343,7 +1343,7 @@ T_UNIVERSO="goedel_first_prf goedel_second_prf prf_con_imp_godel prf_godelCN_fix
   tarski_semantico consistencia repr_pos'_prf d2_prf d3_prf_real rosser_ext rosser lob
   prf_godel_iff_con goedel_second_formalizado con_indecidible
   prf_of_prov_de modelo_prov_iff_de godelCN_verdadera_de con_verdadera_de
-  tarski_semantico_de"
+  tarski_semantico_de goedel_I_fol goedel_I_neg_fol goedel_II_fol"
 t_filas() {   # stdin: el documento → un nombre por cada aparición en la columna del nombre de §1 (1.ª) o §3 (2.ª)
   LC_ALL=C awk '
     /^## 1 · / { s = 1; next }

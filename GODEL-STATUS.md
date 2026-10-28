@@ -3,7 +3,7 @@
 > **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
 > Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
-**Last updated:** 2026-10-28 — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, y un modelo de T_Prf en que G es falsa. Antes, 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): T_Prf, con 120 axiomas (el verificador antiguo, fuera de T); el resto, igual. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
+**Last updated:** 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, y un modelo de T_Prf en que G es falsa. Antes, 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): T_Prf, con 120 axiomas (el verificador antiguo, fuera de T); el resto, igual. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
 2026‑06‑06 para el Nivel C con meta‑axiomas, con su «Resumen al día» del 2026‑07‑20 y un §4 que declaraba fuera de
 alcance lo que hoy está demostrado— está, tal cual, en
 [doc/historia/GODEL-STATUS-hasta-2026-10-21.md](doc/historia/GODEL-STATUS-hasta-2026-10-21.md).
@@ -43,7 +43,7 @@ que se supone, en [AXIOMS.md](AXIOMS.md) §0.
 | **Rosser** | `rosser`: ni R ni ¬R, desde la consistencia simple; `rosser_ext`, para toda extensión finita consistente T+E, por reducción a T (`prfH_iff_prf_impChain`) | (ii) · (i) |
 | **Tarski** | `prf_tarski` y `tarski` (la teoría no define su verdad: el mentiroso, `liar`); `tarski_semantico` y `tarski_semantico_de`: ninguna fórmula define la verdad en ningún modelo estándar | (i) · (ii) · (iii) |
 | **Löb** | `lob : Prf (Prov⌜φ⌝ ⇒ φ) → Prf φ`; Gödel II sale de él (`goedel_second_de_lob`) | (i) |
-| **Gödel I en la lógica de primer orden** | `goedel_I_fol`, `goedel_I_neg_fol`: los axiomas de T_Prf no derivan en FOL ni G ni ¬G, por el puente de FOL a `Prf` (`derives1_to_prfH`); `prf_completo`: `Prf` es completo para su teoría; `modelo_sin_G` y `goedel_I_semantico`: un modelo de T_Prf en que G es falsa, que no es estándar (T67, ADR‑195; [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §3bis, no titulares) | — |
+| **Gödel I en la lógica de primer orden** | `goedel_I_fol`, `goedel_I_neg_fol`, `goedel_II_fol` (titulares desde ADR‑210): ningún conjunto de teoremas de `Prf` —los axiomas de T_Prf, sus clausuras— deriva en FOL ni G ni ¬G ni Con, por el puente de FOL a `Prf` (`derives1_to_prfH`); `prf_completo`: `Prf` es completo para su teoría; `modelo_sin_G` y `goedel_I_semantico`: un modelo de T_Prf en que G es falsa, que no es estándar (T67, ADR‑195; [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 y §3bis; los semánticos, no titulares) | (ii) · (iii) |
 | **la verdad de G y de Con** | `godelCN_verdadera`, `con_verdadera` (E10), y en todo modelo estándar `godelCN_verdadera_de`, `con_verdadera_de`; los modelos estándar no son uno solo (`estandar_MN`, `estandar_MB`) | (iii) |
 
 Lo que este frente declaraba fuera de alcance en junio —la demostración interna de Gödel II, Rosser y Tarski— está
@@ -68,7 +68,7 @@ modelo MNV V₀ + solidez prf_sound ─► consistencia ─► goedel_I, goedel_
 ```
 
 La clase de cada titular —(i) sin el modelo, (ii) el modelo sólo para la consistencia, (iii) la verdad en el modelo—
-la comprueba cada build para la (i) (`Meta/PurezaTitulares.lean`, T08), y los enunciados de los 29 titulares los fija el
+la comprueba cada build para la (i) (`Meta/PurezaTitulares.lean`, T08), y los enunciados de los 32 titulares los fija el
 contrato (`Meta/ContratoTitulares.lean`, T07).
 
 ---

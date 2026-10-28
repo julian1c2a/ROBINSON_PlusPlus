@@ -7,7 +7,7 @@
 [![Build](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml/badge.svg)](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**Last updated:** 2026-10-28 — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, por el puente de FOL a `Prf`. Antes, 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): el control nuevo, `check-choice.bash`. Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
+**Last updated:** 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, por el puente de FOL a `Prf`. Antes, 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): el control nuevo, `check-choice.bash`. Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
 capas, la instalación con el hermano FOL y el toolchain exacto, los controles, los documentos). Lo de antes, en la
 historia de git.
 
@@ -29,10 +29,10 @@ Sobre el cálculo finitario `Prf` (`Meta/Hilbert.lean`), sin hipótesis dentro d
 | `rosser`, `rosser_ext` | la sentencia de Rosser es indecidible, también en toda extensión finita consistente | `Meta/Rosser.lean` |
 | `lob` | de `Prf (Prov⌜φ⌝ ⇒ φ)` se sigue `Prf φ` | `Meta/Lob.lean` |
 | `consistencia` | la teoría es consistente (un modelo de sus axiomas y la solidez de `Prf`) | `Meta/Consistencia.lean` |
-| `goedel_I_fol`, `goedel_I_semantico` | Gödel I también en la lógica de primer orden de FOL, y un modelo de la teoría en que `G` es falsa (no titulares) | `Meta/PuenteFOL.lean` |
+| `goedel_I_fol`, `goedel_II_fol`; `goedel_I_semantico` | Gödel I y II también en la lógica de primer orden de FOL, para todo conjunto de teoremas de `Prf` (titulares desde ADR‑210); y un modelo de la teoría en que `G` es falsa (no titular: lleva el `Classical.choice` de la completitud de FOL) | `Meta/PuenteFOL.lean` |
 
 Las condiciones de derivabilidad D1, D2 y D3 son teoremas (`repr_pos'_prf`, `d2_prf`, `d3_prf_real`). La tabla
-completa —29 titulares, con la hipótesis de cada uno, quién la descarga y qué usa su prueba— es
+completa —32 titulares, con la hipótesis de cada uno, quién la descarga y qué usa su prueba— es
 [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §1.
 
 **La teoría** de esos teoremas, T_Prf ([AXIOMS.md](AXIOMS.md) §0), es lo que deriva `Prf`: los 120 axiomas de la

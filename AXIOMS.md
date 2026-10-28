@@ -79,8 +79,8 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
 * una traducción de `T_Prf` al lenguaje {0, σ, +, ×} (paso posterior y opcional);
 * la VUELTA del puente con FOL, `Prf φ → DerivesSet₀ AxiomasT φ`: con instancias de los esquemas con variables libres,
   `gen` pide las clausuras universales. La IDA está desde ADR‑195 (T67, `Meta/PuenteFOL.lean`): lo que FOL deriva de
-  teoremas de `Prf` es teorema (`prf_of_derivesSet`), y de ahí Gödel I en la lógica de primer orden (`goedel_I_fol`:
-  `AxiomasT` no deriva `G` en FOL) y un modelo de T_Prf en que `G` es falsa (`modelo_sin_G`). ✏️ Hasta el
+  teoremas de `Prf` es teorema (`prf_of_derivesSet`), y de ahí Gödel I en la lógica de primer orden (`goedel_I_fol`,
+  titular desde ADR‑210: ningún conjunto de teoremas de `Prf` deriva `G` en FOL) y un modelo de T_Prf en que `G` es falsa (`modelo_sin_G`). ✏️ Hasta el
   2026‑10‑28 este punto decía que no había puente «en ninguna dirección».
 
 ### 0.2 · Lo que se supone hoy

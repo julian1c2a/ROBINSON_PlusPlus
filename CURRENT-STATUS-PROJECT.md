@@ -4,7 +4,7 @@
 > Este documento da las CIFRAS del árbol, cada una con el control que la mide, y la arquitectura por capas. Lo que se
 > hizo y cuándo está en [DECISIONS.md](DECISIONS.md); lo que queda, en [NEXT-STEPS.md](NEXT-STEPS.md) («Lo que queda»).
 
-**Last updated:** 2026-10-28 — [ADR‑195](DECISIONS.md) (T67): el puente con FOL; 147 jobs, 119 módulos, 566 footprints. Antes, 2026-10-27 — [ADR‑194](DECISIONS.md) (T46): los once estratos, con su solidez, su completitud y su puente; 558 footprints. Antes, el mismo día — [ADR‑193](DECISIONS.md) (T53): la constructividad, vigilada constante a constante (`check-choice.bash`). Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas objeto (los 22 «ax_vpf_*», fuera) y 514 constantes en el contrato. Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 134 jobs y 118 módulos (`SolidezDobleNegacion` y `ProvFiel`), 546 footprints, y `Classical.choice` sólo en `prf_sound`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
+**Last updated:** 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): el puente con FOL; 147 jobs, 119 módulos, 566 footprints. Antes, 2026-10-27 — [ADR‑194](DECISIONS.md) (T46): los once estratos, con su solidez, su completitud y su puente; 558 footprints. Antes, el mismo día — [ADR‑193](DECISIONS.md) (T53): la constructividad, vigilada constante a constante (`check-choice.bash`). Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas objeto (los 22 «ax_vpf_*», fuera) y 514 constantes en el contrato. Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 134 jobs y 118 módulos (`SolidezDobleNegacion` y `ProvFiel`), 546 footprints, y `Classical.choice` sólo en `prf_sound`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
 y «Meta/CodeArith.lean», fuera: un solo `numeral` fuera de `Minimal`). Antes, el mismo día — [ADR‑182](DECISIONS.md) (T26): reescrito entero. El cuerpo anterior —las tablas del
 2026‑09‑10, con sus notas, y el diario de mayo a agosto— está, tal cual, en
 [doc/historia/CURRENT-STATUS-hasta-2026-10-21.md](doc/historia/CURRENT-STATUS-hasta-2026-10-21.md).
@@ -44,7 +44,7 @@ T_Prf contiene a PA ([AXIOMS.md](AXIOMS.md) §0), **Gödel I entero** (`goedel_I
 (`goedel_II`, y dentro de la teoría `goedel_second_formalizado`), **Tarski** (sintáctico y semántico, este en todo modelo
 estándar), **Rosser** (también para toda extensión finita consistente, `rosser_ext`) y **Löb** (`lob`), con D1, D2 y D3
 demostradas y la consistencia de T_Prf como teorema (`consistencia`), sin hipótesis dentro de Lean. Y por el puente
-con FOL (T67, ADR‑195): Gödel I en la lógica de primer orden (`goedel_I_fol`), `Prf` completo para su teoría
+con FOL (T67, ADR‑195): Gödel I y II en la lógica de primer orden (`goedel_I_fol`, `goedel_II_fol`; titulares desde ADR‑210), `Prf` completo para su teoría
 (`prf_completo`) y un modelo de T_Prf en que G es falsa, que por eso no es estándar (`goedel_I_semantico`).
 
 ## 3 · Lo que se supone
