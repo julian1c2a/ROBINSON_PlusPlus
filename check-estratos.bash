@@ -26,7 +26,7 @@
 #    inducción sobre `Prfᵢ` (su solidez, por ejemplo) no lo refuta.
 #
 # 🔧 EJECUTAR DESDE POWERSHELL (desde Bash, `lake` no está en el PATH — y el script lo DICE).
-# ⛔ Desde la raíz de ROBINSON_PlusPlus, NUNCA `cd FOL && lake ...`.
+# Desde la raíz de ROBINSON_PlusPlus: mide los dos repos desde aquí (M-3, ADR-205: el mismo toolchain).
 export PATH="/usr/bin:$PATH"
 cd "$(dirname "$0")" || exit 2
 

@@ -16,8 +16,8 @@
 #      no se tocan: un cambio de toolchain invalida todos los `.olean`, y rehacerlos aquí costaría el build entero.
 #   2. Escribe la versión en los dos `lean-toolchain` (los dos repos se compilan SIEMPRE con la misma: M‑3), y
 #      COMPRUEBA que el `lake` que corre usa esa versión (si no, sale con 2: la prueba no mediría nada).
-#   3. Compila, desde la raíz de RPP, `@FOL/FOL` y `@FOL/TheoryFramework` y después RPP (⛔ nunca `cd FOL && lake
-#      build`, que usaría el toolchain de FOL), y pasa `leanchecker` sobre los tres, como la CI.
+#   3. Compila, desde la raíz de RPP, `@FOL/FOL` y `@FOL/TheoryFramework` y después RPP (como la CI), y pasa
+#      `leanchecker` sobre los tres, como la CI.
 #   4. Si compila, pasa los controles que dependen del toolchain: footprints, warnings, estratos, sorry y los
 #      sondeos de control (`IteSimboloNucleo` fija con `#guard_msgs` un mensaje del núcleo: T77).
 #   5. Escribe `resumen.txt` (las líneas `error:` de cada build, y el veredicto de cada control) y borra los

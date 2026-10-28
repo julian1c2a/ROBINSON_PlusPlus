@@ -38,7 +38,7 @@
 #
 # 🔧 EJECUTAR DESDE POWERSHELL: desde Bash, `lake` no está en el PATH (y el propio script
 #    lo dice en vez de callarse, que es la lección de feedback_controles_que_no_comprueban).
-# ⛔ Y desde la raíz de ROBINSON_PlusPlus, NUNCA `cd FOL && lake ...`.
+# Y desde la raíz de ROBINSON_PlusPlus: mide los dos repos desde aquí (M-3, ADR-205: el mismo toolchain).
 export PATH="/usr/bin:$PATH"
 cd "$(dirname "$0")" || exit 2
 

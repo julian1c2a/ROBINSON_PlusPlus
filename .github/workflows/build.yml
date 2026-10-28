@@ -38,8 +38,9 @@ jobs:
       # ⚠️ DOS CHECKOUTS, COMO HERMANOS. `lakefile.lean` declara
       #     require FOL from "../FOL"
       # es decir, una dependencia LOCAL, no de git — y a propósito: es la que garantiza
-      # que RPP y FOL se compilan SIEMPRE con el mismo toolchain (⛔ nunca `cd FOL &&
-      # lake build`). El runner necesita entonces el árbol de FOL al lado.
+      # que RPP y FOL se compilan SIEMPRE con el mismo toolchain (desde la raíz de RPP, FOL se compila con el
+      # de RPP; M-3 pide además los dos `lean-toolchain` iguales: el paso «El mismo toolchain…»). El runner
+      # necesita entonces el árbol de FOL al lado.
       #
       # Y como `actions/checkout` no admite un `path:` fuera del workspace, ESTE repo
       # también se clona en un subdirectorio: así `../FOL` cae dentro del workspace.
@@ -96,8 +97,8 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           echo "PAR: RPP=$RPP_SHA  FOL=$FOL_SHA"
 
-      # ⭐ 2026-10-28 (T38 y T16, ADR-202): RPP y FOL, en el MISMO toolchain. Es lo que de verdad pide M-3 (un toolchain
-      # distinto escribiría oleans incompatibles en el `.lake` compartido de FOL), y nadie lo comprobaba.
+      # ⭐ 2026-10-28 (T38 y T16, ADR-202): RPP y FOL, en el MISMO toolchain: es la verificación de M-3 (reescrita así
+      # en ADR-205; un toolchain distinto escribiría oleans incompatibles en el `.lake` compartido de FOL).
       - name: El mismo toolchain en RPP y en FOL
         run: |
           if cmp -s <(tr -d '\r' < lean-toolchain) <(tr -d '\r' < ../FOL/lean-toolchain); then
@@ -189,7 +190,7 @@ jobs:
       # `FOL.Enumeration`, la libreria `TheoryFramework` entera -- NO lo compilaba nadie en CI,
       # que es exactamente la enfermedad que este repo lleva dos dias pagando: codigo huerfano
       # que se autodescribe verificado. Aqui entran los DOS `@[default_target]` de FOL.
-      # ⛔ Y se hace desde la raiz de RPP, nunca con `cd FOL && lake build`.
+      # Desde la raiz de RPP, como en local (M-3, ADR-205: con el mismo toolchain daria lo mismo desde FOL).
       - name: Build FOL (sus dos default_target completos)
         run: lake build "@FOL/FOL" "@FOL/TheoryFramework"
 

@@ -19,8 +19,8 @@
 #    editar y un control frágil se acaba desactivando.
 #
 # 🔧 EJECUTAR DESDE POWERSHELL (desde Bash, `lake` no está en el PATH).
-# ⛔ Desde la raíz de ROBINSON_PlusPlus. NUNCA `cd FOL && lake build` (M-3): los dos objetivos
-#    de FOL se construyen desde AQUÍ, con `lake build FOL TheoryFramework`.
+# Desde la raíz de ROBINSON_PlusPlus: los dos objetivos de FOL se construyen desde AQUÍ, con
+#    `lake build FOL TheoryFramework` (M-3, ADR-205: el mismo toolchain en los dos repos).
 
 set -uo pipefail
 export PATH="/usr/bin:$PATH"

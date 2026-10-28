@@ -25,7 +25,7 @@
 # censo no corre, no ve nada o no llega al final (la línea FIN), es rojo, no verde.
 #
 # 🔧 Desde la raíz de RPP, con el build al día (`lake build` y `lake build "@FOL/FOL" "@FOL/TheoryFramework"`).
-# Desde PowerShell, o desde Git Bash con `lake` en el PATH. ⛔ Nunca `cd ../FOL && lake …` (M-3).
+# Desde PowerShell, o desde Git Bash con `lake` en el PATH. Los objetivos de FOL, desde aquí (`@FOL/…`; M-3, ADR-205).
 #
 #   bash check-choice.bash            # mide y compara con la tabla
 #   bash check-choice.bash --rehacer  # además, reescribe doc/control/choice.tsv con lo medido

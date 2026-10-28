@@ -312,7 +312,7 @@ por módulo. Resumen:
 
 1. **Separation of concerns**: un módulo ↔ un bloque temático de la spec `TuplasFuncionesYListas.md`.
 2. **Minimal dependencies**: cada módulo importa solo lo estrictamente necesario; `open` selectivo.
-3. **Selective exports**: cada módulo termina con un bloque `export` que enumera su API pública.
+3. **Selective exports**: el bloque `export`, donde lo hay (la cadena de Gödel de `Meta/`), enumera la API pública del módulo; es OPCIONAL (✏️ 2026‑10‑28, ADR‑206, T35: decía que todo módulo termina con uno, y 33 no lo hacían).
 4. **Sin Mathlib** (ADR-001): solo `FOL` como dependencia externa.
 5. **One namespace per module** (ADR-005): mirrors file path.
 6. ~~**6 meta-reglas ω** (ADR-010) … re-exportadas desde `Minimal.Axioms`.~~ ✏️ **2026‑10‑02 (ADR‑115):** RPP no usa `⊢`; las meta‑reglas de FOL (4 `axiom`, refutables: L1‑3) ya no se importan, y FOL las borró el mismo día (ADR‑115 §8).
@@ -333,4 +333,4 @@ lake env lean Probe/X.lean              # scratch de sesión (Probe/ está en .g
 `Meta.lean` lo deja **fuera del build**, y el build sale verde. **Señal de alarma: el número de jobs
 no cambia al añadir módulos.** Comprobar siempre que el conteo se mueve.
 
-⚠️ **NUNCA `cd FOL && lake build`** — desajuste de toolchain. Compilar siempre desde la raíz de RPP.
+⚠️ **RPP y FOL, en el MISMO toolchain** (M‑3, reescrita el 2026‑10‑28, ADR‑205): con él, construir FOL desde su raíz o desde la de RPP da lo mismo (medido); aquí, los objetivos de FOL se construyen desde la raíz de RPP con `lake build "@FOL/FOL" "@FOL/TheoryFramework"`. *(Decía «NUNCA `cd FOL && lake build` — desajuste de toolchain»: no lo había.)*

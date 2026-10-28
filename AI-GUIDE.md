@@ -200,8 +200,14 @@ impórtalo) antes de terminar la sesión — nunca lo dejes `git add`eado "por s
 
 ### (17.) Bloques de exportación (*export blocks*)
 
-Todo módulo de producción (hoja, no barrel) **DEBE** terminar con un bloque `export`
-que liste todas las definiciones, teoremas y lemas públicos:
+Un módulo de producción (hoja, no barrel) **PUEDE** terminar con un bloque `export`
+que liste las definiciones, teoremas y lemas que ofrece a otros módulos.
+
+> ✏️ **2026‑10‑28 ([ADR‑206](DECISIONS.md), T35):** aquí decía **DEBE**, y «todas» las declaraciones públicas. Lo
+> incumplían 15 módulos de producción el 2026‑10‑12 y 33 el 2026‑10‑28 —los de los titulares, el modelo, la solidez y
+> los controles—, y nada lo comprobaba. El propietario enmienda la regla: el bloque es OPCIONAL; donde lo hay (la
+> cadena de Gödel de `Meta/`) es la lista canónica de lo que el módulo ofrece, y lo que no lo tiene se cita con su
+> nombre completo (o con `open`). M‑5, igual.
 
 ```lean
 namespace MyNamespace
@@ -218,16 +224,16 @@ export MyNamespace (myDef myTheorem)
 Reglas:
 
 1. El `export` va DESPUÉS de `end namespace`, a nivel de fichero.
-2. Lista TODOS los `def`/`theorem`/`lemma`/`instance` no privados.
+2. Lista los `def`/`theorem`/`lemma`/`instance` no privados que el módulo ofrece (no se exige que sean todos: nada lo comprueba).
 3. NUNCA exportar declaraciones `private` ni auxiliares con sufijo `_aux`.
 4. Lista alfabética dentro de cada namespace.
 5. Si un módulo contribuye a varios namespaces, un `export` por namespace.
 6. `notation`/`macro`/`syntax` NO se listan en `export` — se propagan solas al
    importar.
 
-El bloque `export` es la **lista canónica** de la API pública de un módulo: añadir,
-renombrar o borrar una declaración pública exige actualizar el `export` (y, por (14),
-proyectarlo a REFERENCE.md).
+Donde lo hay, el bloque `export` es la **lista canónica** de la API pública del módulo: renombrar o borrar una
+declaración listada exige actualizarlo (el compilador lo exige: un `export` de un nombre inexistente no compila), y
+añadir una que se ofrece, también (y, por (14), proyectarla a REFERENCE.md).
 
 ### (18.) Archivos "barrel" (paraguas)
 
@@ -732,6 +738,16 @@ preservando los bloqueos locales.
 > Si la CI sale roja, se arregla con un commit nuevo, se sube a la misma rama y se repite; `master` no se toca.
 > ✏️ 2026‑10‑19 ([ADR‑168](DECISIONS.md)): **en FOL, igual.** Su `master` tiene la misma protección y su CI corre en las
 > ramas «ci/…»; M‑12 sigue (FOL antes que RPP).
+>
+> ✏️ 2026‑10‑28 ([ADR‑204](DECISIONS.md)): **tras el avance de `master`, se vigila también SU run**
+> (`gh run watch <id> -R julian1c2a/<repo> --exit-status`): el push dispara otro run sobre el mismo commit, y un
+> control que mide tiempo o memoria puede dar otro resultado (el `master` de ADR‑202 salió rojo con la rama verde).
+>
+> ✏️ 2026‑10‑28 ([ADR‑204](DECISIONS.md), T79): **ramas, stash y worktrees, en los dos repos.** Una rama se borra,
+> local y remota, en cuanto su punta está en `master` (`git merge-base --is-ancestor <punta> master`); una rama que se
+> abandona SIN fusionar se archiva antes en una etiqueta anotada `archivo/<rama>-<fecha de su último commit>`, subida
+> y comprobada, y después se borra, cada paso en su propia orden; un stash o un worktree no sobreviven a la sesión
+> que los crea (un stash que sólo es fin de línea se suelta).
 
 ---
 
