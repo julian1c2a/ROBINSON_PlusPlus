@@ -686,14 +686,40 @@ COBTMP=$(mktemp)
 # ✏️ 2026-10-21 (T11b, ADR-188): el nombre se extraía con «'[^']+'», y un nombre con PRIMA (`repr_pos'_prf`) salía
 # partido —«_prf», un titular inexistente—. El nombre no lleva espacios: «'[^ ]+'» lo toma entero, primas incluidas. Y
 # sin retro‑referencias (PLAN-PRUEBAS §4): se quitan la cola y la comilla de cabeza por separado.
-( lake build FOL TheoryFramework 2>&1; lake build 2>&1 ) \
-  | tr '\n' ' ' | tr -s ' ' \
-  | grep -oE "'[^ ]+' (depends on axioms|does not depend)" \
-  | sed -E "s/' (depends on axioms|does not depend)$//" | sed -E "s/^'//" | sort -u > "$COBTMP"
+# ✏️ 2026-10-28 (T11, ADR-199): la extracción, en una función, con su PRUEBA DE ROTURA: una prima interior y una FINAL
+# (con la extracción de antes de T11b, un nombre acabado en prima desaparecía: un verde falso si se imprimía sin fila).
+cob_extrae() {
+  tr '\n' ' ' | tr -s ' ' \
+    | grep -oE "'[^ ]+' (depends on axioms|does not depend)" \
+    | sed -E "s/' (depends on axioms|does not depend)$//" | sed -E "s/^'//"
+}
+COB_AUTO=$(printf '%s\n' "info: a.lean:1:0: 'X.uno'' depends on axioms: [propext]" \
+  "info: b.lean:2:0: 'X.dos'_tres' does not depend on any axioms" | cob_extrae | tr '\n' ' ')
+if [ "$COB_AUTO" != "X.uno' X.dos'_tres " ]; then
+  echo "  ❌ la extracción de nombres no pasa su prueba de rotura (primas): «$COB_AUTO»"
+  FAIL=1
+fi
+( lake build FOL TheoryFramework 2>&1; lake build 2>&1 ) | cob_extrae | sort -u > "$COBTMP"
 COB_IMPRESOS=$(wc -l < "$COBTMP" | tr -d ' ')
 COBDECL=$(mktemp)
 printf '%s' "$TABLA" | sed -E 's/\|.*//' | sed '/^$/d' | sort -u > "$COBDECL"
-COB_FALTAN=$(comm -23 "$COBTMP" "$COBDECL")
+# ✏️ 2026-10-28 (T11, ADR-199): el universo, también desde la FUENTE: cada `#print axioms X` del árbol del build (sin
+# comentarios ni cadenas, `strip-lean.awk`). La construcción tiene que imprimirlos todos: si no, o no se construyó o la
+# extracción no los ve, y el control no puede aprobar. Y los que faltan en la tabla salen de los dos universos.
+COBSRC=$(mktemp)
+find ROBINSON_PlusPlus ../FOL/FOL ../FOL/TheoryFramework -name '*.lean' ! -path '*/.lake/*' -print0 2>/dev/null \
+  | xargs -0 env LC_ALL=C awk -f strip-lean.awk | grep -oE "^#print axioms [^ ]+" | sed 's/^#print axioms //' \
+  | sort -u > "$COBSRC"
+COB_NOIMP=$(comm -23 "$COBSRC" "$COBTMP")
+if [ ! -s "$COBSRC" ]; then
+  echo "  ❌ NO PUDE MEDIR la fuente: ningún «#print axioms» en el árbol (¿strip-lean.awk? ¿../FOL?)."
+  FAIL=1
+elif [ -n "$COB_NOIMP" ]; then
+  echo "  ❌ «#print axioms» en la fuente que la construcción NO imprime (o la extracción no ve):"
+  printf '%s\n' "$COB_NOIMP" | head -10 | sed 's/^/      /'
+  FAIL=1
+fi
+COB_FALTAN=$(sort -u "$COBTMP" "$COBSRC" | comm -23 - "$COBDECL")
 # ⚠️ `printf '%s'` NO añade salto final: con EXACTAMENTE un titular sin declarar, `wc -l`
 # contaba 0 y este control APROBABA. Lo cazó su propia prueba de rotura, a la primera.
 # 🔑 Un control que no se ha visto romper no es un control — y el que lo escribe tampoco
@@ -704,7 +730,7 @@ if [ "$COB_IMPRESOS" = "0" ]; then
   echo "      Un control que no mide no aprueba. ¿Se construyó de verdad?"
   FAIL=1
 elif [ "$COB_N" = "0" ]; then
-  echo "  ✓ los $COB_IMPRESOS titulares que el árbol imprime están TODOS declarados"
+  echo "  ✓ los $COB_IMPRESOS titulares que el árbol imprime (con los $(wc -l < "$COBSRC" | tr -d " ") «#print axioms» de la fuente) están TODOS declarados"
 else
   echo "  ❌ $COB_N titular(es) impreso(s) por el árbol y SIN declarar en la tabla:"
   printf '%s\n' "$COB_FALTAN" | sed '/^$/d' | head -20 | sed 's/^/      /'
@@ -712,7 +738,7 @@ else
   echo "      🔑 Un titular que no se declara no lo vigila nadie. Añádelos a TABLA."
   FAIL=1
 fi
-rm -f "$COBTMP" "$COBDECL"
+rm -f "$COBTMP" "$COBDECL" "$COBSRC"
 
 echo
 if [ "$N" = "0" ]; then
