@@ -1,5 +1,7 @@
 # doc/control/presupuesto-ci.tsv — el presupuesto de tiempo y memoria de la CI de RPP (T41, ADR-202); lo compara
 # scripts/presupuesto-ci.bash con lo que mide /usr/bin/time -v. Se sube sólo con un ADR que diga por qué.
+# (✏️ 2026-10-28, ADR-203: con las dos primeras medidas de la CI —build 185 s y 5675 MB, en frío; leanchecker 62 s
+# y 11936 y 12094 MB: el master de ADR-202 salió rojo—, los tiempos bajan, y la memoria de leanchecker SUBE a 14000.)
 # medida	segundos	MB
-build	1800	12000
-leanchecker	1500	12000
+build	900	9000
+leanchecker	600	14000

@@ -2,3 +2,4 @@
 # La CI lo compara con el master de FOL y AVISA si es otro (no rompe: construir contra el master es el canario
 # de ADR-073). Se actualiza en el commit de RPP que sigue a cada push de FOL (M-12). La última línea es la que cuenta.
 99fa28890d5b0d548af05df7bd86b4adbc705fa5
+fcf356a8f952435b5c8e475f9ef86d0b0dd84ac1
