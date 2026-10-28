@@ -6,6 +6,9 @@ License: MIT
 import ROBINSON_PlusPlus
 import FOL
 import TheoryFramework.Instances.FOL
+-- ✏️ 2026-10-28 (T58, ADR-217): y la de los modelos, con `Semantics` y `Conservativity` (sin ella, `[B]` daba por
+-- muertas las citas de sus declaraciones).
+import TheoryFramework.Instances.FOLModels
 
 /-! `scripts/VolcarEntorno.lean` — el entorno de Lean de RPP, para `[B]` de `check-doc-sync.bash` (T04, ADR‑166).
 

@@ -189,3 +189,14 @@ ROBINSON_PlusPlus.Minimal.SymLit	ROBINSON_PlusPlus.Minimal.SymLit.unexpandSymLit
 TheoryFramework.Instances.FOL	TheoryFramework.Instances.fol0Complete	C
 TheoryFramework.Instances.FOL	TheoryFramework.Instances.fol0Sound	C
 TheoryFramework.Instances.FOL	TheoryFramework.Instances.fol0_proves_iff_models	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0Compact	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0_conservativeOver_of_expansion	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0_consistent_iff_hasModel	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0_extDef_conservative	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0_extDef_not_conservative	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0_models_iff_entails	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0_proves_iff_entails	C
+TheoryFramework.Instances.FOLModels	TheoryFramework.Instances.fol0_satCompact	C
+TheoryFramework.Semantics	TheoryFramework.compact_of_satCompact	C
+TheoryFramework.Semantics	TheoryFramework.consistent_iff_hasModel	C
+TheoryFramework.Semantics	TheoryFramework.satCompact_of_compact	C

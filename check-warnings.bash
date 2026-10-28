@@ -35,10 +35,10 @@ cd "$(dirname "$0")" || exit 2
 #   deprecated   →  "`x` has been deprecated" (✏️ 2026-10-21, T42b, ADR-181: v4.35.0 da por obsoletos «if_pos», «if_neg»,
 #                   «dif_pos», «dif_neg», «if_true» e «if_false»; se renombraron en todo el árbol MENOS en los módulos
 #                   CONGELADOS de FOL —`../FOL/frozen_files.txt`: inmutables sin un «thaw», que decide el propietario—)
+# ✏️ 2026-10-28 (T58, ADR-217): fuera los cuatro `var-unref` de `TheoryFramework/Relations.lean`, arreglados.
 DECLARED=$(cat <<'TABLA'
 ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean|simp-unused|4
 ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean|var-unref|1
-TheoryFramework/Relations.lean|var-unref|4
 FOL/Compacity0.lean|deprecated|2
 FOL/Hauptsatz0.lean|deprecated|2
 FOL/QFDecide0.lean|deprecated|8

@@ -298,6 +298,16 @@ TheoryFramework.Instances.fol0System|-
 TheoryFramework.Instances.fol0Sound|Classical.choice,Quot.sound,propext
 TheoryFramework.Instances.fol0Complete|Classical.choice,Quot.sound,propext
 TheoryFramework.Instances.fol0_proves_iff_models|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.fol0Semantics|-
+TheoryFramework.Instances.fol0Compact|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.fol0_proves_iff_entails|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.fol0_models_iff_entails|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.fol0_consistent_iff_hasModel|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.evalFormula_agreeOn|-
+TheoryFramework.Instances.fol0_conservativeOver_of_expansion|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.expandRel_defAx|propext
+TheoryFramework.Instances.fol0_extDef_conservative|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.fol0_extDef_not_conservative|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel|Quot.sound,propext
@@ -651,6 +661,8 @@ LEANFILE="$TMP/Footprints.lean"
   echo "import FOL"
   # TheoryFramework no la importa el barril FOL: su instancia sobre Derives₀ (2026-09-27) se mide aparte
   echo "import TheoryFramework.Instances.FOL"
+  # ✏️ 2026-10-28 (T58, ADR-217): y la de los modelos (FOL⁼ con su semántica, la compacidad y la conservatividad)
+  echo "import TheoryFramework.Instances.FOLModels"
   while IFS='|' read -r NOMBRE _; do
     [ -n "$NOMBRE" ] || continue
     echo "#print axioms $NOMBRE"
