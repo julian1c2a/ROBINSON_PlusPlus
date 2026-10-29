@@ -57,6 +57,7 @@ FOL.Inconsistencia	FOL.Inconsistencia.derives_soundness	C
 FOL.Inconsistencia	FOL.Inconsistencia.ex_elim_refutable	C
 FOL.Lindenbaum0	FOL.Lindenbaum0.max_cons_contains	C
 FOL.Lindenbaum0	FOL.Lindenbaum0.max_cons_impl	C
+FOL.Markov0	FOL.Markov0.markov_dioph_classical	C
 FOL.SequentSound0	FOL.SequentSound0.lk0_not_empty	C
 FOL.SequentSound0	FOL.SequentSound0.lk0_sound	C
 FOL.SequentSound0	FOL.SequentSound0.lk0_to_derives0	C

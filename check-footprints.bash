@@ -168,6 +168,10 @@ FOL.Calculus.derivesI_existence_property|Quot.sound,propext
 FOL.Calculus.derivesI_ne_derives0|Quot.sound,propext
 FOL.Estratos0.derivesI_soundness|Classical.choice,Quot.sound,propext
 FOL.SymLit.symProbe|-
+FOL.Markov0.valid_nn_kreiselF|Quot.sound,propext
+FOL.Markov0.solution_of_cert|Quot.sound,propext
+FOL.Markov0.markov_dioph_of_completeness|Quot.sound,propext
+FOL.Markov0.markov_dioph_classical|Classical.choice,Quot.sound,propext
 FOL.Finitary0.derives0_consistent_fin|Quot.sound,propext
 FOL.Finitary0.lk0_empty|Quot.sound,propext
 FOL.Finitary0.lk0_empty_of_no_bot|-
