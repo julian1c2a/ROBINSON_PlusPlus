@@ -36,9 +36,10 @@ cd "$(dirname "$0")" || exit 2
 #                   «dif_pos», «dif_neg», «if_true» e «if_false»; se renombraron en todo el árbol MENOS en los módulos
 #                   CONGELADOS de FOL —`../FOL/frozen_files.txt`: inmutables sin un «thaw», que decide el propietario—)
 # ✏️ 2026-10-28 (T58, ADR-217): fuera los cuatro `var-unref` de `TheoryFramework/Relations.lean`, arreglados.
+# ✏️ 2026-10-30 (T44, ADR-226): fuera los cuatro `simp-unused` de `CodeWitnessPrf.lean` y el `var-unref` de
+# `SubstfcWitnessPrf.lean`, arreglados. Quedan los 19 `deprecated` de seis módulos CONGELADOS de FOL: arreglarlos pide un
+# «thaw» del propietario.
 DECLARED=$(cat <<'TABLA'
-ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean|simp-unused|4
-ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean|var-unref|1
 FOL/Compacity0.lean|deprecated|2
 FOL/Hauptsatz0.lean|deprecated|2
 FOL/QFDecide0.lean|deprecated|8
@@ -116,13 +117,82 @@ done <<< "$MEAS_TABLE"
 
 rm -f "$TMP" "$MEASURED"
 
+# ── 2 · EL CENSO DE LAS OPCIONES QUE APAGAN LINTERS O SUBEN LÍMITES (✏️ 2026-10-30, T44, ADR-226) ─────────────────
+# Un aviso que un `set_option linter.X false` apaga no llega a la tabla de arriba, y un `set_option maxHeartbeats N`
+# de fichero tapa el coste de todo lo que venga después. Nadie los contaba (la auditoría, T44: «106 y 74, sin censo»).
+# Aquí, los de FICHERO —no los `… in`, que valen para una declaración— de RPP, FOL y TheoryFramework, sobre el código
+# despojado (`strip-lean.awk`: no cuenta uno comentado), por fichero, opción y cuenta, contra `doc/control/opciones.tsv`,
+# con IGUALDAD en los dos sentidos: uno nuevo es rojo, y uno que desaparece también, para que la tabla baje. La tabla
+# la escribe `bash check-warnings.bash --generar-opciones` y sólo cambia con un ADR. Antes, un autotest con un fixture:
+# si no da sus cuentas, SIN MEDIR.
+OPC_TABLA=doc/control/opciones.tsv
+OPC_RE='^[[:space:]]*set_option[[:space:]]+(linter\.[A-Za-z0-9_.]+[[:space:]]+false|max[A-Za-z]+[[:space:]]+[0-9]+)[[:space:]]*$'
+opc_censo () {   # $@ = «raíz:directorio…» → «fichero<TAB>opción<TAB>cuenta», ordenado; «@@SIN_MEDIR@@ f» si no despoja
+  local arg raiz dir f
+  for arg in "$@"; do
+    raiz=${arg%%:*}; dir=${arg#*:}
+    (cd "$raiz" && find "$dir" -name '*.lean' | LC_ALL=C sort | while IFS= read -r f; do
+      if ! LC_ALL=C awk -f "$OPC_STRIP" "$f" > "$OPC_TMP.cod"; then echo "@@SIN_MEDIR@@ $f"; continue; fi
+      LC_ALL=C grep -E "$OPC_RE" "$OPC_TMP.cod" | awk -v f="$f" '{ print f "\t" $2 }'
+    done)
+  done | LC_ALL=C sort | uniq -c | awk '{ print $2 "\t" $3 "\t" $1 }'
+}
+OPC_STRIP="$(pwd)/strip-lean.awk"
+OPC_TMP=$(mktemp)
+OPC_FIX=$(mktemp -d)
+mkdir -p "$OPC_FIX/Fix"
+cat > "$OPC_FIX/Fix/Opciones.lean" <<'EOF'
+set_option linter.unusedVariables false
+set_option maxHeartbeats 400000
+set_option maxHeartbeats 800000
+set_option linter.unusedSimpArgs false in
+-- set_option linter.unusedSimpArgs false
+/- set_option maxRecDepth 2000 -/
+set_option linter.unusedVariables true
+theorem t : True := trivial
+EOF
+OPC_AUTO=$(opc_censo "$OPC_FIX:Fix" | tr '\t\n' '| ')
+rm -rf "$OPC_FIX"
+OPC_ESP='Fix/Opciones.lean|linter.unusedVariables|1 Fix/Opciones.lean|maxHeartbeats|2 '
+echo
+echo "════ OPCIONES QUE APAGAN LINTERS O SUBEN LÍMITES (de fichero) ════"
+OPC_FAIL=0
+if [ "$OPC_AUTO" != "$OPC_ESP" ]; then
+  echo "  ⚠️  SIN MEDIR — el autotest da «$OPC_AUTO» (esperado «$OPC_ESP»)"
+  rm -f "$OPC_TMP" "$OPC_TMP.cod"; exit 2
+fi
+OPC_MED=$(opc_censo ".:ROBINSON_PlusPlus" "../FOL:FOL" "../FOL:TheoryFramework")
+rm -f "$OPC_TMP" "$OPC_TMP.cod"
+if printf '%s\n' "$OPC_MED" | grep -q '@@SIN_MEDIR@@'; then
+  echo "  ⚠️  SIN MEDIR — el despojador falló en: $(printf '%s\n' "$OPC_MED" | grep '@@SIN_MEDIR@@' | cut -d' ' -f2- | paste -sd' ' -)"
+  exit 2
+fi
+if [ "${1:-}" = "--generar-opciones" ]; then
+  { echo "# doc/control/opciones.tsv — los set_option de FICHERO que apagan un linter o suben un límite (T44, ADR-226)."
+    echo "# Lo escribe \`bash check-warnings.bash --generar-opciones\`; lo compara check-warnings.bash con igualdad. Sólo con un ADR."
+    echo "# fichero	opción	cuenta"
+    printf '%s\n' "$OPC_MED"; } > "$OPC_TABLA"
+  echo "  ✓ $OPC_TABLA, regenerada: $(printf '%s\n' "$OPC_MED" | grep -c .) filas"
+fi
+if [ ! -s "$OPC_TABLA" ]; then
+  echo "  ⚠️  SIN MEDIR — falta $OPC_TABLA"; exit 2
+fi
+OPC_DEC=$(grep -v '^#' "$OPC_TABLA" | tr -d '\r' | grep . | LC_ALL=C sort)
+if [ "$OPC_DEC" = "$OPC_MED" ]; then
+  echo "  ✓ las $(printf '%s\n' "$OPC_MED" | grep -c .) filas cuadran: $(printf '%s\n' "$OPC_MED" | awk -F'\t' '$2 ~ /^linter/ { l += $3 } $2 ~ /^max/ { m += $3 } END { print l " que apagan un linter y " m " que suben un límite" }') (autotest: 2 de 2)"
+else
+  echo "  ✗ no cuadran con $OPC_TABLA:"
+  diff <(printf '%s\n' "$OPC_DEC") <(printf '%s\n' "$OPC_MED") | grep -E '^[<>]' | sed 's/^</      · en la tabla y no en el código:/; s/^>/      · en el código y no en la tabla:/' | head -20
+  OPC_FAIL=1
+fi
+
 echo
 echo "  declarados: $TOTAL_D   ·   medidos: $TOTAL_M"
-if [ "$FAIL" = "0" ] && [ "$TOTAL_D" = "$TOTAL_M" ]; then
-  echo "✅ LOS $TOTAL_M WARNINGS CUADRAN."
+if [ "$FAIL" = "0" ] && [ "$TOTAL_D" = "$TOTAL_M" ] && [ "$OPC_FAIL" = "0" ]; then
+  echo "✅ LOS $TOTAL_M WARNINGS CUADRAN, Y LAS OPCIONES TAMBIÉN."
   exit 0
 else
-  echo "❌ LOS WARNINGS NO CUADRAN."
+  echo "❌ LOS WARNINGS O LAS OPCIONES NO CUADRAN."
   echo
   echo "⚠️  Si has ARREGLADO uno, baja la tabla de arriba — el control rompe también hacia abajo,"
   echo "    a propósito: una cota no protege una cifra, sólo una igualdad lo hace."

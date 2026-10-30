@@ -2045,7 +2045,7 @@ example (x y : Term) :
   prf_hasWit_funcc2 _ _ _ (prf_hasWit_tcFn x) (prf_hasWit_tcFn y)
 
 /-- `hw_auto` sobre una torre real de constructores dotados anidados. -/
-example (p h t : Term) :
+example (h t : Term) :
     Prf (hasWit (funcc (strCode sym!"liftsc") (cons (termCode nil)
       (cons (funcc (strCode sym!"cons") (cons (tcFn h) (cons (tcFn t) nil))) nil)))) := by
   hw_auto

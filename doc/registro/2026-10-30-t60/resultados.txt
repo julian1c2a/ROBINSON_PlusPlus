@@ -1,0 +1,8 @@
+T60E.lean	2,7 s	814 MB	exit 	acabó
+T60F.lean	2,5 s	839 MB	exit 	acabó
+T60B.lean	2,6 s	831 MB	exit 	acabó
+T60D.lean	2,5 s	792 MB	exit 	acabó
+T60A.lean	45,0 s	8.001 MB	exit 	PARADO: memoria > 8000 MB
+T60C.lean	47,8 s	8.028 MB	exit 	PARADO: memoria > 8000 MB
+T60E2.lean	2,7 s	820 MB	exit 0	acabó
+T60B2.lean	2,4 s	791 MB	exit 0	acabó

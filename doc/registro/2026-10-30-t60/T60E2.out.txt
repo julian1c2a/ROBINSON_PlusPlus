@@ -1,0 +1,1 @@
+'T60E.liftTerm_miPhiAt_rfl' does not depend on any axioms

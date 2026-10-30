@@ -1,0 +1,16 @@
+T44 (ADR-226), 2026-10-30: la pasada del linter de variables sin usar en los módulos de RPP que lo APAGAN de fichero
+(`set_option linter.unusedVariables false`: diez veces en nueve módulos de la reflexión).
+
+Cómo. Una copia de cada módulo con esa línea cambiada a `true` (el resto, igual: los números de línea son los del
+módulo), compilada con el `lean` del toolchain y el LEAN_PATH de `lake env`, bajo el vigilante de memoria de T60
+(`doc/registro/2026-10-30-t60/mide.ps1.txt`; límites 12000 MB y 900 s). `tiempos.txt`: lo que tardó cada una (todas
+acabaron, sin errores). `avisos-variables.txt`: los 25 avisos.
+
+Qué son (leídos uno a uno):
+  · 15, variables de los `example` de control negativo (`example (w : Term) : True := by fail_if_success …`): la
+    variable sólo aparece dentro de `fail_if_success`, y el linter no lo cuenta. Inofensivos.
+  · 7, nombres de los binders `∀` del TIPO de `okT_F` y `okF` (`CodeWitnessPrf.lean`), dos teoremas por ajuste de
+    patrones: el tipo no depende de ellos (podrían ser flechas). Los casos sí los usan con su propio nombre. Estilo.
+  · 3, hipótesis que la prueba NO usa: `hmax` de `pcc_lineWF_tracked_of_stree` (`SubstTreeReflect.lean`) y `hu`, `hv` de
+    `PrfH_shapeDot_transport` (`TrackedAtomsPrf.lean`). El teorema vale también sin ellas, así que no pueden hacerlo
+    vacuo: son hipótesis de sobra. Quitarlas cambia el enunciado y lo que lo llama: no se ha hecho.

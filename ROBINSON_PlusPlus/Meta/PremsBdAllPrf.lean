@@ -557,8 +557,8 @@ correcta** y está ejecutada en §9bis. Se conserva porque su valor es de métod
 * ⚠️ `hphi` necesita la cota `j < lenc L`, que **no viajaba** por el genérico ⇒ hubo que darle una
   **hipótesis extra `A`** que atraviese el `∃`‑elim;
 * ⚠️ dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hacía que Lean desplegara `strCode "premsOf"`
-  **carácter a carácter** y agotara los heartbeats (medido con `String`, antes de D7; hoy `sym!"premsOf"`, sin
-  volver a medir): hay que dárselo por **lemas**;
+  **carácter a carácter** y agotara los heartbeats (medido con `String`, antes de D7): hay que dárselo por
+  **lemas**; ✏️ 2026‑10‑30 (T60, ADR‑224): con `List Char` ya no, `rfl` cierra al instante (MEDIDO, abajo);
 * ⚠️ al desempaquetar con Leibniz, el argumento que **no** se sustituye puede mencionar `#0` ⇒ hay
   que protegerlo con `liftTerm 0`, o el lema es **FALSO**. -/
 
@@ -932,8 +932,9 @@ theorem hphi_gen (Q I J : Term) :
 /-! ### Naturalidad, por LEMAS y no por `rfl`
 
 ⚠️ **Medido** (con símbolos `String`, antes de D7): dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hacía que Lean
-desplegara `strCode "premsOf"` **carácter a carácter** y agotara los heartbeats (hoy `sym!"premsOf"`; con
-`List Char`, sin volver a medir). Con `liftTerm_strCode` en el `simp` set sale en un instante. -/
+desplegara `strCode "premsOf"` **carácter a carácter** y agotara los heartbeats. Con `liftTerm_strCode` en el `simp`
+set sale en un instante. ✏️ 2026‑10‑30 (T60, ADR‑224): con `List Char` (`sym!"premsOf"`), MEDIDO de nuevo: `rfl`
+también cierra, en 2,7 s el fichero entero y sin axiomas (`doc/registro/2026-10-30-t60/`). Los lemas se quedan. -/
 
 theorem liftTerm_miPhiAt (c : Nat) (Q I J : Term) :
     liftTerm c (miPhiAt Q I J) = miPhiAt (liftTerm c Q) (liftTerm c I) (liftTerm c J) := by

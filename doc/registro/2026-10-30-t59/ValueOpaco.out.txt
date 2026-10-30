@@ -1,0 +1,3 @@
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (thm): value? = false; value? (allowOpaque := true) = true
+Nat.add_comm (thm): value? = false; value? (allowOpaque := true) = true
+Nat.add (def): value? = true; value? (allowOpaque := true) = true

@@ -1,0 +1,9 @@
+CodeWitnessPrf.lean	3,3 s	896 MB	exit 0	acabó
+EvalLiftcPrf.lean	2,9 s	852 MB	exit 0	acabó
+EvalLiftfcPrf.lean	22,6 s	911 MB	exit 0	acabó
+EvalSubstfcPrf.lean	15,6 s	929 MB	exit 0	acabó
+EvalSubsttcPrf.lean	14,1 s	914 MB	exit 0	acabó
+HasWitFTrackedPrf.lean	51,4 s	1.127 MB	exit 0	acabó
+LiftcCodePrf.lean	28,2 s	927 MB	exit 0	acabó
+SubstTreeReflect.lean	3,9 s	901 MB	exit 0	acabó
+TrackedAtomsPrf.lean	4,0 s	869 MB	exit 0	acabó

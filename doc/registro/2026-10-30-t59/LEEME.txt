@@ -1,0 +1,9 @@
+T59 (ADR-225), 2026-10-30: la medida que rectifica la lección «un crawler de dependencias no sirve».
+
+ValueOpaco.lean.txt (en .txt para que ningún control lo recorra como fuente) pregunta a Lean v4.35.0, con el árbol de
+RPP de ese día, por `ConstantInfo.value?` de dos teoremas importados (uno del proyecto, uno del núcleo) y de una
+definición, con `allowOpaque` en su valor por defecto y en `true`. Se compiló con
+    lake env lean ValueOpaco.lean
+desde la raíz de RPP (copiado como .lean). ValueOpaco.out.txt es su salida: un teorema da `none` sin `allowOpaque` y
+su cuerpo con él; la definición, en los dos casos. Es lo que dice la definición de `value?` (Lean/Declaration.lean del
+toolchain): los teoremas y los `opaque` sólo devuelven su valor con `allowOpaque := true`. No hay cuerpos perezosos.

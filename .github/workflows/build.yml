@@ -202,8 +202,25 @@ jobs:
       # `debug.skipKernelTC` o `addDeclWithoutChecking` no la ve ningún censo: no es un `axiom` ni nombra
       # `sorryAx`, y su `#print axioms` sale vacío. Probado con un señuelo así en TheoryFramework: rojo.
       # Medido en local: RPP ~5 min; FOL y TheoryFramework ~20 s.
+      # ✏️ 2026-10-30 (T23, ADR-222): con `--verbose` (una línea «replaying M» por módulo), y el paso siguiente cuenta lo
+      # que replayó contra los módulos de las fuentes y los `.olean`. Antes no lo decía nadie: leanchecker sólo da error
+      # si un prefijo no encuentra NINGÚN `.olean`.
       - name: Check kernel (leanchecker)
-        run: /usr/bin/time -v -o "$RUNNER_TEMP/tiempo-leanchecker.txt" lake env leanchecker ROBINSON_PlusPlus FOL TheoryFramework
+        run: |
+          /usr/bin/time -v -o "$RUNNER_TEMP/tiempo-leanchecker.txt" lake env leanchecker --verbose ROBINSON_PlusPlus FOL TheoryFramework > "$RUNNER_TEMP/leanchecker.log"
+          tail -3 "$RUNNER_TEMP/leanchecker.log"
+
+      - name: Cobertura de leanchecker (lo replayado = las fuentes = los .olean)
+        run: bash scripts/leanchecker-cobertura.bash "$RUNNER_TEMP/leanchecker.log"
+
+      # ⭐ 2026-10-30 (T23, ADR-222): el SEGUNDO NÚCLEO. leanchecker es el mismo núcleo de Lean («This is not an external
+      # verifier»). Desde v4.35 el toolchain trae otros cuatro, independientes (lean4lean, nanoda, con-leche, con-ron), y
+      # una versión paranoica del de Lean. Este paso exporta el cierre de los 32 titulares y el de los 12 de la clase (i)
+      # con `leanexport`, comprueba que sus `axiom` son los de los footprints, los pasa por los seis núcleos y compara lo
+      # que dice cada uno con `doc/control/segundo-nucleo.tsv`, en los dos sentidos; un mutante (una prueba cambiada por
+      # su enunciado) tiene que rechazarlo todo núcleo que acepte. Medido: unos 3 min y 5 GB de pico.
+      - name: Segundo núcleo (el cierre de los titulares, por seis núcleos)
+        run: bash scripts/segundo-nucleo.bash "$RUNNER_TEMP/segundo-nucleo"
 
       # ⭐ 2026-10-28 (T41, ADR-202): el tiempo y la memoria del build y de leanchecker, en el resumen y contra un
       # presupuesto versionado (`doc/control/presupuesto-ci.tsv`): por encima, rojo. Las cifras sólo estaban en prosa.

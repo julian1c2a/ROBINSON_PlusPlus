@@ -457,16 +457,51 @@ EOF
 
 echo
 echo "════ ESCALERA DE BINDERS ════"
+# ✏️ 2026-10-30 (T45, ADR-223): sobre el código DESPOJADO (`strip-lean.awk`) y con los modificadores. Antes buscaba
+# `^(theorem|def|abbrev) X ` en el texto crudo: contaba un peldaño escrito dentro de un comentario `/- … -/` y no veía
+# `private theorem`, `@[simp] def` ni `noncomputable def`. Antes de medir, un autotest con las cuatro formas (dos que
+# cuentan y dos que no); si no da su peldaño, SIN MEDIR. Si el despojador falla en un fichero, SIN MEDIR también.
+ESC_RE_DECL='^[[:space:]]*(@\[[^]]*\][[:space:]]*)?((private|protected|noncomputable|partial|unsafe|nonrec)[[:space:]]+)*(theorem|lemma|def|abbrev)[[:space:]]+'
+peldano () {   # $1 = prefijo, $2 = código despojado → el máximo k (de 1 a 8) con una declaración `prefijo` + k
+  local k r=0
+  for k in 1 2 3 4 5 6 7 8; do
+    LC_ALL=C grep -qE "${ESC_RE_DECL}$1$k([[:space:]]|:|$)" "$2" && r=$k
+  done
+  echo "$r"
+}
+despoja_todo () {   # stdout: el código despojado de los .lean de $@; si el despojador falla, SIN MEDIR
+  local f
+  find "$@" -name '*.lean' | LC_ALL=C sort | while IFS= read -r f; do
+    LC_ALL=C awk -f strip-lean.awk "$f" || { echo "@@SIN_MEDIR@@ $f"; }
+  done
+}
+mkdir -p "$TMP/esc"
+cat > "$TMP/esc/Escalera.lean" <<'EOF'
+private theorem forall_5 : True := trivial
+@[simp] noncomputable def forall_6 : Nat := 0
+/-
+theorem forall_7 : True := trivial
+-/
+-- def forall_8 : Nat := 0
+theorem forall_60 : True := trivial
+EOF
+despoja_todo "$TMP/esc" > "$TMP/esc.cod"
+ESC_AUTO=$(peldano forall_ "$TMP/esc.cod")
+if [ "$ESC_AUTO" != "6" ] || grep -q '@@SIN_MEDIR@@' "$TMP/esc.cod"; then
+  echo "  ⚠️  SIN MEDIR — el autotest de la escalera da el peldaño «$ESC_AUTO» (esperado 6: cuentan \`private theorem\` y"
+  echo "      \`@[simp] noncomputable def\`; no cuentan los de un comentario ni \`forall_60\`)"
+  exit 2
+fi
+despoja_todo ROBINSON_PlusPlus > "$TMP/esc-rpp.cod"
+if grep -q '@@SIN_MEDIR@@' "$TMP/esc-rpp.cod"; then
+  echo "  ⚠️  SIN MEDIR — el despojador falló en: $(grep '@@SIN_MEDIR@@' "$TMP/esc-rpp.cod" | cut -d' ' -f2- | paste -sd' ' -)"
+  exit 2
+fi
 MAXUSO=0
 MAXMAQ=99
 while IFS='|' read -r PREF ESP; do
   [ -n "$PREF" ] || continue
-  REAL=0
-  for k in 1 2 3 4 5 6 7 8; do
-    if grep -rqE "^(theorem|def|abbrev) ${PREF}${k} " ROBINSON_PlusPlus/ --include=*.lean 2>/dev/null; then
-      REAL=$k
-    fi
-  done
+  REAL=$(peldano "$PREF" "$TMP/esc-rpp.cod")
   if [ "$REAL" = "$ESP" ]; then
     printf "  ✓ %-18s peldaño máximo %s\n" "$PREF" "$REAL"
   else

@@ -1,0 +1,24 @@
+T60 (ADR-224), 2026-10-30: las dos inferencias sobre el núcleo que sostenían recetas, MEDIDAS con el árbol de ese día
+(Lean v4.35.0, símbolos `List Char` desde D7).
+
+Cómo se midió. `mide.ps1.txt` (PowerShell; en .txt para que ningún control lo recorra) compila un fichero con el `lean`
+del toolchain y el LEAN_PATH de `lake env`, vigila la memoria del proceso cada 200 ms y lo PARA si pasa de 8000 MB o de
+180 s; escribe una línea en `resultados.txt` (fichero, segundos, pico de memoria, código de salida, cómo acabó). Las
+cuatro primeras líneas no tienen código de salida: el script no lo recogía (faltaba `$p.Handle`); se arregló y se
+repitió lo que importaba (T60E2 y T60B2, con `#print axioms`). Los `.lean.txt` son las variantes; los `.out.txt`, su
+salida (vacía: compiló sin mensajes, o se paró antes de imprimir).
+
+1 · `control_tc_cons` (ADR-124 §1 lo dejaba como INFERENCIA: «que el coste sea el NÚCLEO no se aisló con
+    debug.skipKernelTC»). La forma de ADR-124 (`simp only … at h1`, `rw … at h1` y `generalize` sobre la hipótesis
+    concreta, y la hipótesis USADA al final), importando sólo `Meta/ModeloCodificacion.lean`:
+      T60A  con el núcleo                      → PARADO a los 45 s, > 8000 MB
+      T60B  con `debug.skipKernelTC true`      → 2,6 s el fichero entero (T60B2: el teorema existe, [propext, Quot.sound])
+      T60C  con el núcleo y el profiler        → PARADO a los 48 s, > 8000 MB (el profiler no llega a imprimir)
+      T60D  sin núcleo, con el profiler        → elaboración 0,5 ms, tácticas 13 ms, simp 4 ms (T60D.out.txt)
+    ⇒ MEDIDO: el coste está en el NÚCLEO; el elaborador hace la prueba en milisegundos.
+
+2 · La naturalidad de `miPhiAt` por `rfl` (`Meta/PremsBdAllPrf.lean`, «Naturalidad, por LEMAS y no por rfl»: medido con
+    `String`, «hoy sym!"premsOf"; con List Char, sin volver a medir»), con los `set_option` del módulo:
+      T60E  con el núcleo                      → 2,7 s el fichero entero (T60E2: el teorema existe, sin axiomas)
+      T60F  con `debug.skipKernelTC true`      → 2,5 s
+    ⇒ MEDIDO: con `List Char`, `rfl` cierra al instante; la nota era cierta con `String` y ya no lo es.

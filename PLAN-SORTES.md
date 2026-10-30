@@ -220,10 +220,15 @@ un piloto: **un** solo sitio de `InAxiomsCodePrf` re‑probado por la vía numer
 Piloto en `Probe/PilotoAislado.lean` (no es módulo de producción). Compila, **0 errores, 0 avisos**,
 footprint `[propext, Classical.choice, Quot.sound]` — **sin `sorryAx`**.
 
-### Cómo se verificó la independencia (el crawler de dependencias NO sirve)
+### Cómo se verificó la independencia (~~el crawler de dependencias NO sirve~~)
 
-Un auditor de constantes transitivas da **falsos negativos**: Lean 4.31 devuelve `value? = NONE`
-para teoremas importados (medido), así que sólo recorre **tipos**, no pruebas. Se descartó.
+~~Un auditor de constantes transitivas da **falsos negativos**: Lean 4.31 devuelve `value? = NONE`
+para teoremas importados (medido), así que sólo recorre **tipos**, no pruebas. Se descartó.~~
+
+✏️ *(2026‑10‑30, T59, ADR‑225)*: **falso como regla.** El `none` era el parámetro `allowOpaque`, que vale
+`false` por defecto (`ConstantInfo.value?`); con `value? (allowOpaque := true)` el cuerpo de un teorema
+importado llega entero (MEDIDO en v4.35.0, `doc/registro/2026-10-30-t59/`). El aislamiento por imports de
+abajo sigue siendo válido; el crawler con `allowOpaque` también lo habría sido.
 
 En su lugar, **aislamiento por importaciones**, que sí es concluyente:
 

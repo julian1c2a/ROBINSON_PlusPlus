@@ -23,7 +23,9 @@ lema diagonal semántico.
 el axioma retirado que hizo INCONSISTENTE la teoría (ADR‑012)—. ⛔ Sus códigos cerrados (`strCodeM cons_sym`,
 `numeralM 1`) no se evalúan: entran como TÉRMINOS variables de un lema `rfl`, y el argumento es la longitud de la
 lista de argumentos (uno contra dos). La forma con `simp` sobre la hipótesis concreta no acababa (>3 GB a los 14 s; en
-ADR‑119, >14 GB): según la bisección, el coste está en comprobar su prueba —el NÚCLEO, por inferencia, no medido—.
+ADR‑119, >14 GB): según la bisección, el coste está en comprobar su prueba —el NÚCLEO—. ✏️ 2026‑10‑30 (T60, ADR‑224):
+MEDIDO, ya no inferido: con el núcleo, la forma con `simp` pasa de 8 GB a los 45 s; con `debug.skipKernelTC`, el fichero
+entero compila en 2,6 s y el elaborador hace la prueba en milisegundos (`doc/registro/2026-10-30-t60/`).
 -/
 
 set_option autoImplicit false

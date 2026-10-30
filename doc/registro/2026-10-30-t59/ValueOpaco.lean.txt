@@ -1,0 +1,9 @@
+import ROBINSON_PlusPlus.Meta.Consistencia
+
+open Lean in
+#eval show CoreM Unit from do
+  let env ← getEnv
+  for n in [``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I, ``Nat.add_comm, ``Nat.add] do
+    let some ci := env.find? n | throwError "no está {n}"
+    let clase := match ci with | .thmInfo _ => "thm" | .defnInfo _ => "def" | _ => "otra"
+    IO.println s!"{n} ({clase}): value? = {ci.value?.isSome}; value? (allowOpaque := true) = {(ci.value? (allowOpaque := true)).isSome}"

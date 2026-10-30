@@ -23,9 +23,13 @@ Barrido con `collectAxioms` sobre **todas** las declaraciones de los dos paquete
 | `FOL` (después) | 411 | **16** |
 | `FOL` + `ROBINSON_PlusPlus` | 5 045 | **3 143** (62 %) |
 
-⚠️ El grafo de dependencias **no** se puede recorrer con `ConstantInfo.value?`: en Lean v4.31 los
-cuerpos de los teoremas importados llegan **perezosos** y `value?` da `none`. Medido. El análisis
+~~⚠️ El grafo de dependencias **no** se puede recorrer con `ConstantInfo.value?`: en Lean v4.31 los
+cuerpos de los teoremas importados llegan **perezosos** y `value?` da `none`. Medido.~~ El análisis
 de abajo se hizo bisecando con pruebas, no con el grafo.
+✏️ *(2026‑10‑30, T59, ADR‑225)*: falso. `value?` da `none` en un teorema porque `allowOpaque` vale
+`false` por defecto; con `value? (allowOpaque := true)` el cuerpo llega (MEDIDO en v4.35.0,
+`doc/registro/2026-10-30-t59/`), y el grafo se recorre: `D7Contrafactual`, `ChoiceFrontera`,
+`Meta/PurezaComando.lean`.
 
 ## 1 · ⭐ CAUSA A — `omega` cerrando una rama imposible (MECÁNICA, se quita)
 

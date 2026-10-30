@@ -1,0 +1,40 @@
+import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
+
+set_option autoImplicit false
+set_option relaxedAutoImplicit false
+
+open FOL
+open ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Godel ROBINSON_PlusPlus.Meta.Provability
+open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
+open ROBINSON_PlusPlus.Meta.CodeWitnessPrf ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
+open ROBINSON_PlusPlus.Meta.EvalListPrf ROBINSON_PlusPlus.Meta.EvalNthcPrf
+open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
+open ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
+open ROBINSON_PlusPlus.Meta.BdAllIntroPrf
+open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
+open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.PremsOfDotPrf
+open ROBINSON_PlusPlus.Meta.D3ChainDotPrf
+open ROBINSON_PlusPlus.Meta.D3BodyPrf
+open ROBINSON_PlusPlus.Meta.D3InDotPrf
+open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+open ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
+open ROBINSON_PlusPlus.Meta.PremsBdAllPrf
+
+set_option maxRecDepth 40000
+set_option maxHeartbeats 2000000
+
+namespace T60E
+
+-- La naturalidad de miPhiAt por rfl (PremsBdAllPrf, «Naturalidad, por LEMAS y no por rfl»): medido con String antes de D7.
+theorem liftTerm_miPhiAt_rfl (c : Nat) (Q I J : Term) :
+    liftTerm c (miPhiAt Q I J) = miPhiAt (liftTerm c Q) (liftTerm c I) (liftTerm c J) := rfl
+
+end T60E
+
+#print axioms T60E.liftTerm_miPhiAt_rfl

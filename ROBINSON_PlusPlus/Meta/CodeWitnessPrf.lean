@@ -1392,7 +1392,7 @@ open SinWTs
 
 theorem liftF_isTC1 (k : Nat) (w c : Term) :
     liftFormula k (isTC1 w c) = isTC1 (liftTerm k w) (liftTerm k c) := by
-  simp only [isTC1, land, In, liftFormula, liftF_wfAll1, liftTerm, liftTerms]
+  simp only [isTC1, land, In, liftFormula, liftF_wfAll1, liftTerms]
 
 
 
@@ -1470,13 +1470,13 @@ theorem liftF_isFormCodeE2 (k : Nat) (wF wT X : Term) :
 theorem liftF_wfAllF (k : Nat) (wF wT : Term) :
     liftFormula k (wfAllF wF wT) = wfAllF (liftTerm k wF) (liftTerm k wT) := by
   simp only [wfAllF, wfAllFBody, liftFormula, liftF_isFormCodeE2, lt, lenc, nthc,
-    liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
+    liftTerm, liftTerms, Nat.zero_lt_succ, ite_true, ← FOL.liftTerm_comm_zero]
 
 
 theorem liftF_isFC1 (k : Nat) (wF wT c : Term) :
     liftFormula k (isFC1 wF wT c)
       = isFC1 (liftTerm k wF) (liftTerm k wT) (liftTerm k c) := by
-  simp only [isFC1, land, In, liftFormula, liftF_wfAll1, liftF_wfAllF, liftTerm, liftTerms]
+  simp only [isFC1, land, In, liftFormula, liftF_wfAll1, liftF_wfAllF, liftTerms]
 
 
 /-! ### Del testigo al NODO — espejo de `EvalSubsttc.prf_isTermCodeE1_of_In` -/
@@ -1540,7 +1540,7 @@ theorem liftF_hasWitF (k : Nat) (c : Term) :
     liftFormula k (hasWitF c) = hasWitF (liftTerm k c) := by
   have h1 : (1 < k + 1 + 1) = True := eq_true (by omega)
   simp only [hasWitF, liftFormula, liftF_isFC1, liftTerm, Nat.reduceAdd, h1, ite_true,
-    Nat.zero_lt_succ, reduceIte, ← FOL.liftTerm_comm_zero]
+    Nat.zero_lt_succ, ← FOL.liftTerm_comm_zero]
 
 
 /-! ### El kit de DISCRIMINACIÓN (promovido de `archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean`, B8)

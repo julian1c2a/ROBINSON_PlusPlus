@@ -1,0 +1,13 @@
+cumulative profiling times:
+	attribute application 0.0076ms
+	congr simp thm 0.372ms
+	elaboration 0.471ms
+	fix level params 0.023ms
+	instantiate metavars 0.105ms
+	let-to-have transformation 0.0064ms
+	process pre-definitions 0.279ms
+	share common exprs 0.199ms
+	simp 3.95ms
+	tactic execution 13.1ms
+	type checking 0.0389ms
+	typeclass inference 3.45ms

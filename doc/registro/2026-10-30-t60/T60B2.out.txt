@@ -1,0 +1,1 @@
+'T60.control_tc_cons' depends on axioms: [propext, Quot.sound]

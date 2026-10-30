@@ -1,0 +1,19 @@
+# mide.ps1 -File X.lean [-MaxMB 8000] [-MaxSec 180]: compila X.lean con el lean del toolchain y LEAN_PATH de lake env,
+# vigilando la memoria (WorkingSet) y el tiempo; si pasa de un límite, lo para. Escribe X.lean.out.txt y una línea.
+param([string]$File, [int]$MaxMB = 8000, [int]$MaxSec = 180, [string]$LeanPath)
+$lean = "$HOME\.elan\toolchains\leanprover--lean4---v4.35.0\bin\lean.exe"
+$env:LEAN_PATH = $LeanPath
+$out = "$File.out.txt"; $err = "$File.err.txt"
+$sw = [Diagnostics.Stopwatch]::StartNew()
+$p = Start-Process -FilePath $lean -ArgumentList "`"$File`"" -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
+$null = $p.Handle
+$peak = 0; $motivo = "acabó"
+while (-not $p.HasExited) {
+  Start-Sleep -Milliseconds 200
+  try { $p.Refresh(); $ws = $p.WorkingSet64 / 1MB; if ($ws -gt $peak) { $peak = $ws } } catch {}
+  if ($peak -gt $MaxMB) { $motivo = "PARADO: memoria > $MaxMB MB"; Stop-Process -Id $p.Id -Force; break }
+  if ($sw.Elapsed.TotalSeconds -gt $MaxSec) { $motivo = "PARADO: tiempo > $MaxSec s"; Stop-Process -Id $p.Id -Force; break }
+}
+$p.WaitForExit()
+$code = $p.ExitCode
+"{0}`t{1:N1} s`t{2:N0} MB`texit {3}`t{4}" -f (Split-Path $File -Leaf), $sw.Elapsed.TotalSeconds, $peak, $code, $motivo

@@ -45,6 +45,23 @@ cd "$(dirname "$0")" || exit 2
 STRIP_AWK="$(cd "$(dirname "$0")" && pwd)/strip-lean.awk"
 [ -f "$STRIP_AWK" ] || { echo "⚠️  SIN MEDIR — falta $STRIP_AWK"; exit 2; }
 STRIP () { LC_ALL=C awk -f "$STRIP_AWK" "$@"; }
+# ✏️ 2026-10-30 (T45, ADR-223): «SIN MEDIR» POR FICHERO. Las tres recogidas de abajo hacían `STRIP f | grep … || true`:
+# si el despojador fallaba en un fichero (exit 2, nada en la salida), `grep` no veía nada y el `|| true` se tragaba el
+# fallo: ese fichero salía LIMPIO sin haberse mirado (la auditoría, T45). Ahora `STRIP_F` despoja un fichero y, si
+# falla, lo apunta en `$SIN_MEDIR_F` y no imprime nada; tras cada recogida, un fichero apuntado es exit 2. Y
+# `pipefail`. Visto fallar: con un despojador que falla en un fichero, el informe era «✅» y ahora es «SIN MEDIR».
+set -o pipefail
+SIN_MEDIR_F=$(mktemp)
+STRIP_F () {   # $1 = fichero → su código despojado; si el despojador falla, lo apunta y no imprime nada
+  local s
+  if s=$(STRIP "$1"); then printf '%s\n' "$s"; else echo "$1" >> "$SIN_MEDIR_F"; fi
+}
+sin_medir () {   # exit 2 si algún fichero no se pudo despojar
+  if [ -s "$SIN_MEDIR_F" ]; then
+    echo "⚠️  SIN MEDIR — el despojador falló en: $(LC_ALL=C sort -u "$SIN_MEDIR_F" | paste -sd' ' -)"
+    exit 2
+  fi
+}
 # ⛔ 2026-10-03 (ADR-116): `admit` es `sorry`, `stop` es `repeat sorry` y `sorryAx` es el propio axioma
 # (Init/Tactics.lean del core); el patrón sólo casaba `sorry` y los tres daban verde.
 # (un literal de nombre, `` `sorryAx ``, no es un uso: se excluye la comilla invertida delante; el
@@ -164,10 +181,11 @@ while IFS= read -r FILE; do
     [ "$MODE" != "staged" ] && [ ! -f "$FILE" ] && continue
     if [ "$MODE" = "staged" ]; then
         CONTENIDO=$(git show ":$FILE" 2>/dev/null || true)
-        HITS=$(printf '%s\n' "$CONTENIDO" | STRIP | grep -nE "$SORRY_RE" | cut -d: -f1 || true)
+        if ! DESP=$(printf '%s\n' "$CONTENIDO" | STRIP); then echo "$FILE" >> "$SIN_MEDIR_F"; continue; fi
     else
-        HITS=$(STRIP "$FILE" | grep -nE "$SORRY_RE" | cut -d: -f1 || true)
+        if ! DESP=$(STRIP "$FILE"); then echo "$FILE" >> "$SIN_MEDIR_F"; continue; fi
     fi
+    HITS=$(printf '%s\n' "$DESP" | grep -nE "$SORRY_RE" | cut -d: -f1 || true)
     [ -z "$HITS" ] && continue
     COUNT=$(printf '%s\n' "$HITS" | grep -c . || true)
     echo ""
@@ -185,6 +203,7 @@ while IFS= read -r FILE; do
 done <<< "$LEAN_FILES"
 
 echo ""
+sin_medir
 if [ "$TOTAL" -eq 0 ]; then
     echo "✅ No sorry found."
     SORRY_FAIL=0
@@ -245,7 +264,7 @@ AG_ETIQUETAS=('native_decide' 'decide +native' 'unsafe' 'opaque' 'implemented_by
 AG_FAMILIAS=$(for e in "${AG_ETIQUETAS[@]}"; do ag_patron "$e"; done | paste -sd'|' -)
 ag_recoge () {   # $@ = caminos → «fichero:línea:código» de cada línea despojada con un agujero
   find "$@" -name '*.lean' ! -path '*/.lake/*' | sort | while IFS= read -r f; do
-    STRIP "$f" | LC_ALL=C grep -nE "${AG_B0}(${AG_FAMILIAS})${AG_B1}" | sed "s|^|$f:|" || true
+    STRIP_F "$f" | { LC_ALL=C grep -nE "${AG_B0}(${AG_FAMILIAS})${AG_B1}" || true; } | sed "s|^|$f:|"
   done
 }
 # ⛔ 2026-10-04 (ADR-117): AUTOTEST. Los ocho dan 0 de verdad, y un patrón que dejara de casar (una errata
@@ -293,6 +312,7 @@ if [ -n "$AG_AUTO" ]; then
 fi
 AG_COD=$(mktemp)
 ag_recoge $AG_ALCANCE > "$AG_COD"
+sin_medir
 AG_N=0
 for etiqueta in "${AG_ETIQUETAS[@]}"; do
   pat=$(ag_patron "$etiqueta")
@@ -362,7 +382,7 @@ ev_ordenes () {   # stdin: código despojado → «línea:orden» de cada orden 
 }
 ev_recoge () {   # $@ = caminos → «fichero:línea:orden» de cada orden que toca el ancla
   find "$@" -name '*.lean' ! -path '*/.lake/*' | sort | while IFS= read -r f; do
-    STRIP "$f" | ev_ordenes | { LC_ALL=C grep -E "$EV_TOK" || true; } | sed "s|^|$f:|"
+    STRIP_F "$f" | ev_ordenes | { LC_ALL=C grep -E "$EV_TOK" || true; } | sed "s|^|$f:|"
   done
 }
 for p in $EV_ALCANCE; do
@@ -414,6 +434,7 @@ if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 23 24 25 26 27 28 31 " ]; then
 fi
 EV_FAIL=0
 EV_HITS=$(ev_recoge $EV_ALCANCE)
+sin_medir
 if [ -z "$EV_HITS" ]; then
   echo "  ✓ ninguna orden \`#eval\`, \`#reduce\`, \`#guard\` ni \`run_cmd\` toca \`axioms\`, el ancla ni un evaluador META (el build y sondeos/)"
 else
