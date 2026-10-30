@@ -1,162 +1,70 @@
-# doc/control/opciones.tsv — los set_option de FICHERO que apagan un linter o suben un límite (T44, ADR-226).
-# Lo escribe `bash check-warnings.bash --generar-opciones`; lo compara check-warnings.bash con igualdad. Sólo con un ADR.
-# fichero	opción	cuenta
-FOL/Theorems/Eq.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Full/Induction.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ArithPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/BdAllIntroPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/BdAllIntroPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/BoundedInPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/BoundedInPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/CantorMonoPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/CantorMonoPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/ChainOkBoundedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ChainOkBoundedPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/ChainPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/CheckArith.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/CodeCtorKit.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/CodeTreeReflect.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean	linter.unusedSimpArgs	2
-ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean	linter.unusedVariables	2
-ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean	maxHeartbeats	2
-ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/D3BodyPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/D3BodyPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/D3DottedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/D3DottedPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/D3InDotPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/D3InDotPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/D3InDotPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/Delta0ReflectPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Delta0ReflectPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/Delta0ReflectPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/DerivCondPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/DerivCondPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/Diagonal.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/DiagonalTwo.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Div2ParityPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/DotConsPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalArithPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalArithPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalBoundedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalBoundedPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalCarcNthcPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalCarcNthcPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalCarcNthcPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/EvalListPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalListPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalLtPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalLtPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalMulPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/EvalPredPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalPredPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/EvalRunFnPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalRunFnPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/ExIntroCodePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ExIntroCodePrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/ForallElimCodePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ForallElimCodePrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/Godel.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/GodelTwo.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/HasWitTcFnPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Hilbert.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/HilbertSeq.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/InAxiomsCodePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/LineWFAssemblePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFCases.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFConsPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFEfqPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFMpPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFSchemaPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFThyPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/LineWFTrackedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ListEtaPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ModeloCodigo.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ModeloEstandar.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/MpCodePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/MpCodePrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/NatArithPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/NatArithPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/NatMulPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/NatMulPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/NatOrderPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/NatOrderPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/NumCodeClosedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/NumCodeClosedPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/NumListPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/NumListPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/ProofChain.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/PropCodePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/PropCodePrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/ProvFiel.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Provability.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ReprPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/ReprPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/Representability.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Representability2.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Representability2Prf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/RigidezEstandar.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/RunFnBoundedPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/RunFnBoundedPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/Sigma1AtomPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Sigma1CorePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Sigma1CorePrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/Sigma1Prf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/Sigma1Prf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/SolidezDobleNegacion.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/StrongInductionPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/StrongInductionPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/SubstArith.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/SubstCodeOpenPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/SubstCodeOpenPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean	maxRecDepth	1
-ROBINSON_PlusPlus/Meta/TcArithPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/TcArithPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean	linter.unusedVariables	1
-ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Meta/TrackedCorePrf.lean	linter.unusedSimpArgs	1
-ROBINSON_PlusPlus/Meta/TrackedCorePrf.lean	maxHeartbeats	1
-ROBINSON_PlusPlus/Minimal/Axioms.lean	linter.unusedSimpArgs	1
+# doc/control/opciones.tsv — los set_option que apagan un linter o suben un límite, de FICHERO o con «in» (T44,
+# ADR-226; la forma, ADR-229). Lo escribe `bash check-warnings.bash --generar-opciones`; lo compara
+# check-warnings.bash con igualdad. Sólo con un ADR.
+# fichero	opción	forma	cuenta
+FOL/QFDecide0.lean	maxRecDepth	in	1
+FOL/Theorems/Eq.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Full/Induction.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Full/Induction.lean	maxRecDepth	in	4
+ROBINSON_PlusPlus/Meta/ArithPrf.lean	linter.unusedSimpArgs	in	29
+ROBINSON_PlusPlus/Meta/BdAllIntroPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/BoundedInPrf.lean	linter.unusedSimpArgs	in	9
+ROBINSON_PlusPlus/Meta/CantorMonoPrf.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/ChainOkBoundedPrf.lean	linter.unusedSimpArgs	in	27
+ROBINSON_PlusPlus/Meta/ChainPrf.lean	linter.unusedSimpArgs	in	13
+ROBINSON_PlusPlus/Meta/CodeTreeReflect.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean	linter.unusedSimpArgs	in	8
+ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean	linter.unusedVariables	in	5
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean	linter.unusedSimpArgs	in	5
+ROBINSON_PlusPlus/Meta/D3DottedPrf.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/D3InDotPrf.lean	maxRecDepth	in	1
+ROBINSON_PlusPlus/Meta/Delta0ReflectPrf.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/Delta0ReflectPrf.lean	maxRecDepth	in	1
+ROBINSON_PlusPlus/Meta/DerivCondPrf.lean	linter.unusedSimpArgs	in	4
+ROBINSON_PlusPlus/Meta/DiagonalTwo.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/EvalArithPrf.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean	linter.unusedVariables	in	2
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean	linter.unusedVariables	in	1
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean	maxRecDepth	in	1
+ROBINSON_PlusPlus/Meta/EvalPredPrf.lean	linter.unusedVariables	in	1
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean	linter.unusedVariables	in	2
+ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean	linter.unusedVariables	in	1
+ROBINSON_PlusPlus/Meta/ExIntroCodePrf.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/ForallElimCodePrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean	maxHeartbeats	in	1
+ROBINSON_PlusPlus/Meta/HasWitTcFnPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/HasWitTcFnPrf.lean	maxRecDepth	in	1
+ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean	linter.unusedSimpArgs	in	3
+ROBINSON_PlusPlus/Meta/Hilbert.lean	maxRecDepth	in	1
+ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean	linter.unusedVariables	in	1
+ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean	linter.unusedSimpArgs	in	3
+ROBINSON_PlusPlus/Meta/LineWFConsPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/LineWFEfqPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/LineWFSchemaPrf.lean	linter.unusedSimpArgs	in	3
+ROBINSON_PlusPlus/Meta/ListEtaPrf.lean	linter.unusedSimpArgs	in	4
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean	linter.unusedSimpArgs	in	33
+ROBINSON_PlusPlus/Meta/MpCodePrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/NatArithPrf.lean	linter.unusedSimpArgs	in	7
+ROBINSON_PlusPlus/Meta/NatMulPrf.lean	linter.unusedSimpArgs	in	8
+ROBINSON_PlusPlus/Meta/NatOrderPrf.lean	linter.unusedSimpArgs	in	6
+ROBINSON_PlusPlus/Meta/NumListPrf.lean	linter.unusedSimpArgs	in	3
+ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean	linter.unusedSimpArgs	in	3
+ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean	maxRecDepth	in	1
+ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/ProvFiel.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/ReprPrf.lean	linter.unusedSimpArgs	in	63
+ROBINSON_PlusPlus/Meta/ReprPrf.lean	maxRecDepth	in	2
+ROBINSON_PlusPlus/Meta/RigidezEstandar.lean	linter.unusedSimpArgs	in	15
+ROBINSON_PlusPlus/Meta/RosserNegLinea.lean	maxRecDepth	in	2
+ROBINSON_PlusPlus/Meta/RunFnBoundedPrf.lean	linter.unusedSimpArgs	in	6
+ROBINSON_PlusPlus/Meta/SolidezDobleNegacion.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/StrongInductionPrf.lean	linter.unusedSimpArgs	in	2
+ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean	linter.unusedSimpArgs	in	5
+ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean	linter.unusedSimpArgs	in	12
+ROBINSON_PlusPlus/Meta/TcArithPrf.lean	linter.unusedSimpArgs	in	1
+ROBINSON_PlusPlus/Meta/TrackedCorePrf.lean	linter.unusedSimpArgs	in	3
+ROBINSON_PlusPlus/Minimal/Axioms.lean	maxRecDepth	in	1

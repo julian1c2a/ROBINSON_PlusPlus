@@ -24,10 +24,6 @@ open ROBINSON_PlusPlus.Meta.EvalNthcPrf
 open ROBINSON_PlusPlus.Meta.LineWFConsPrf
 open ROBINSON_PlusPlus.Meta.NumListPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 
 /-!

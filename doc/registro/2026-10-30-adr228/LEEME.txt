@@ -1,0 +1,34 @@
+ADR-228, 2026-10-30: el cierre de los 32 titulares —el modelo incluido—, por los núcleos que no son el de Lean.
+
+Dónde se midió. En esta máquina Windows bloquea `leanexport`, `lean4lean`, `con-leche` y `con-ron` (ADR-222 §6). En WSL
+(Ubuntu 26.04) está instalado el MISMO toolchain, leanprover/lean4:v4.35.0, en Linux, con los seis binarios. `leanexport`
+de Linux lee los `.olean` que compiló Windows (mismo toolchain): `exporta.sh` pone su LEAN_PATH en
+.lake/build/lib/lean de RPP y de FOL. La exportación del cierre de los 32 sale igual que en la CI (48 MB). No se corre
+`lake` en WSL.
+
+Ficheros (los scripts, con .txt para que no se ejecuten por error):
+  exporta.sh        leanexport MÓDULO SALIDA decl…  (en WSL, con los .olean de Windows)
+  nucleos.sh        los cuatro núcleos independientes sobre una exportación; nanoda, cuatro hilos
+  axiomiza.py       convierte unos `thm` de la exportación en `axiom`: para ver el SIGUIENTE fallo (sólo diagnóstico:
+                    con-leche y con-ron no admiten axiomas nuevos)
+  bucle.sh          lean4lean, axiomizar lo que falla, repetir: la lista de TODO lo que lean4lean no acepta
+  prefijo.py, biseca.sh   el primer prefijo de la exportación que nanoda no acepta (la exportación va en orden de
+                    dependencias: cada prefijo es una exportación válida)
+  nanoda_todos.sh   biseca.sh + axiomiza.py en bucle (parado a mano en el 9.º)
+  nanoda_var.sh     nanoda con 1 o 4 hilos y pila de 8 MB o sin límite
+  solo_nanoda.sh    cada declaración, exportada sola, por nanoda
+  mutante_nanoda.sh nanoda (1 hilo) sobre el mutante de scripts/exportacion.py
+  resultados.txt    lo que dijeron (copiado de la salida)
+  variantes.lean.txt, variantes-resultados.txt   las pruebas alternativas de v_tc_zero y las de aislar lo de nanoda
+
+Lo medido, en una línea por paso:
+  1. lean4lean, antes del cambio: lo ÚNICO que no acepta del cierre de los 32 es `v_tc_zero`; axiomizado, comprueba
+     las 6327 declaraciones.
+  2. `v_tc_zero` sin `abre` (variantes, tanda 1): lo aceptan los cuatro.
+  3. Con la prueba nueva en el módulo y el cierre exportado de nuevo: lean4lean (6328 declaraciones, 21 s), con-leche
+     (6331, 3,5 s) y con-ron (6331, 1,8 s) ACEPTAN el cierre entero de los 32. nanoda, con cuatro hilos, agota la pila
+     de sus hilos (también con RUST_MIN_STACK de 1 GiB).
+  4. nanoda con UN hilo y la pila del proceso sin límite (`ulimit -s unlimited`): «Checked 6680 declarations with no
+     typechecker errors», 527 s, 2,7 GB. Con un hilo y 8 MB, agota («thread 'main'»); con cuatro hilos y sin límite,
+     agota: la pila que crece es la del hilo principal.
+  5. El mutante, con un hilo: nanoda lo RECHAZA en 0,6 s («assertion failed: self.def_eq(u, v)», código 101).

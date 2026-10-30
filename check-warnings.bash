@@ -39,13 +39,9 @@ cd "$(dirname "$0")" || exit 2
 # ✏️ 2026-10-30 (T44, ADR-226): fuera los cuatro `simp-unused` de `CodeWitnessPrf.lean` y el `var-unref` de
 # `SubstfcWitnessPrf.lean`, arreglados. Quedan los 19 `deprecated` de seis módulos CONGELADOS de FOL: arreglarlos pide un
 # «thaw» del propietario.
+# ✏️ 2026-10-30 (ADR-227): el propietario autorizó el thaw; los 19, renombrados (los mismos sustitutos de T42b) y los seis
+# módulos, vueltos a congelar. La tabla, VACÍA: cualquier aviso es rojo.
 DECLARED=$(cat <<'TABLA'
-FOL/Compacity0.lean|deprecated|2
-FOL/Hauptsatz0.lean|deprecated|2
-FOL/QFDecide0.lean|deprecated|8
-FOL/Rename.lean|deprecated|2
-FOL/Skolem0.lean|deprecated|3
-FOL/SkolemN0.lean|deprecated|2
 TABLA
 )
 
@@ -85,13 +81,15 @@ MEAS_TABLE=$(sort "$MEASURED" | uniq -c | awk '{printf "%s|%s\n", $2, $1}')
 
 FAIL=0
 TOTAL_D=0
-TOTAL_M=$(grep -c . "$MEASURED" 2>/dev/null || echo 0)
+# ✏️ 2026-10-30 (ADR-227): `grep -c` sin coincidencias imprime «0» Y sale con 1, y el `|| echo 0` añadía otro «0»: con
+# cero avisos, TOTAL_M era «0⏎0» y el control daba ROJO. Nunca se había medido el caso de cero; con la tabla vacía, sí.
+TOTAL_M=$(grep -c . "$MEASURED" 2>/dev/null); TOTAL_M=${TOTAL_M:-0}
 
 echo "════ CONTRA LA TABLA DECLARADA ════"
 while IFS='|' read -r f c n; do
   [ -z "${f:-}" ] && continue
   TOTAL_D=$((TOTAL_D + n))
-  got=$(grep -c "^$f|$c$" "$MEASURED" 2>/dev/null || echo 0)
+  got=$(grep -c "^$f|$c$" "$MEASURED" 2>/dev/null); got=${got:-0}
   if [ "$got" = "$n" ]; then
     printf "  ✓ %-52s %-12s %s\n" "$f" "$c" "$n"
   else
@@ -125,17 +123,23 @@ rm -f "$TMP" "$MEASURED"
 # con IGUALDAD en los dos sentidos: uno nuevo es rojo, y uno que desaparece también, para que la tabla baje. La tabla
 # la escribe `bash check-warnings.bash --generar-opciones` y sólo cambia con un ADR. Antes, un autotest con un fixture:
 # si no da sus cuentas, SIN MEDIR.
+# ✏️ 2026-10-30 (ADR-229): los de fichero, pasados a `set_option … in` delante de la declaración que los pide (en RPP y
+# en FOL: ninguno queda), y el censo cuenta ahora LAS DOS FORMAS, con una columna más («fichero» o «in»): un `… in`
+# nuevo también es rojo, y uno que sobra, al quitarlo, baja la tabla. La tabla ya no tiene filas «fichero»: uno que
+# vuelva, rojo.
 OPC_TABLA=doc/control/opciones.tsv
 OPC_RE='^[[:space:]]*set_option[[:space:]]+(linter\.[A-Za-z0-9_.]+[[:space:]]+false|max[A-Za-z]+[[:space:]]+[0-9]+)[[:space:]]*$'
-opc_censo () {   # $@ = «raíz:directorio…» → «fichero<TAB>opción<TAB>cuenta», ordenado; «@@SIN_MEDIR@@ f» si no despoja
+OPC_RE_IN='^[[:space:]]*set_option[[:space:]]+(linter\.[A-Za-z0-9_.]+[[:space:]]+false|max[A-Za-z]+[[:space:]]+[0-9]+)[[:space:]]+in([[:space:]]|$)'
+opc_censo () {   # $@ = «raíz:directorio…» → «fichero<TAB>opción<TAB>forma<TAB>cuenta», ordenado; «@@SIN_MEDIR@@ f» si no despoja
   local arg raiz dir f
   for arg in "$@"; do
     raiz=${arg%%:*}; dir=${arg#*:}
     (cd "$raiz" && find "$dir" -name '*.lean' | LC_ALL=C sort | while IFS= read -r f; do
       if ! LC_ALL=C awk -f "$OPC_STRIP" "$f" > "$OPC_TMP.cod"; then echo "@@SIN_MEDIR@@ $f"; continue; fi
-      LC_ALL=C grep -E "$OPC_RE" "$OPC_TMP.cod" | awk -v f="$f" '{ print f "\t" $2 }'
+      LC_ALL=C grep -E "$OPC_RE" "$OPC_TMP.cod" | awk -v f="$f" '{ print f "\t" $2 "\tfichero" }'
+      LC_ALL=C grep -E "$OPC_RE_IN" "$OPC_TMP.cod" | awk -v f="$f" '{ print f "\t" $2 "\tin" }'
     done)
-  done | LC_ALL=C sort | uniq -c | awk '{ print $2 "\t" $3 "\t" $1 }'
+  done | LC_ALL=C sort | uniq -c | awk '{ print $2 "\t" $3 "\t" $4 "\t" $1 }'
 }
 OPC_STRIP="$(pwd)/strip-lean.awk"
 OPC_TMP=$(mktemp)
@@ -149,13 +153,17 @@ set_option linter.unusedSimpArgs false in
 -- set_option linter.unusedSimpArgs false
 /- set_option maxRecDepth 2000 -/
 set_option linter.unusedVariables true
-theorem t : True := trivial
+set_option maxRecDepth 4000 in
+-- set_option maxRecDepth 4000 in
+theorem t : True := by
+  set_option maxHeartbeats 300000 in
+  trivial
 EOF
 OPC_AUTO=$(opc_censo "$OPC_FIX:Fix" | tr '\t\n' '| ')
 rm -rf "$OPC_FIX"
-OPC_ESP='Fix/Opciones.lean|linter.unusedVariables|1 Fix/Opciones.lean|maxHeartbeats|2 '
+OPC_ESP='Fix/Opciones.lean|linter.unusedSimpArgs|in|1 Fix/Opciones.lean|linter.unusedVariables|fichero|1 Fix/Opciones.lean|maxHeartbeats|fichero|2 Fix/Opciones.lean|maxHeartbeats|in|1 Fix/Opciones.lean|maxRecDepth|in|1 '
 echo
-echo "════ OPCIONES QUE APAGAN LINTERS O SUBEN LÍMITES (de fichero) ════"
+echo "════ OPCIONES QUE APAGAN LINTERS O SUBEN LÍMITES (de fichero y con «in») ════"
 OPC_FAIL=0
 if [ "$OPC_AUTO" != "$OPC_ESP" ]; then
   echo "  ⚠️  SIN MEDIR — el autotest da «$OPC_AUTO» (esperado «$OPC_ESP»)"
@@ -168,9 +176,10 @@ if printf '%s\n' "$OPC_MED" | grep -q '@@SIN_MEDIR@@'; then
   exit 2
 fi
 if [ "${1:-}" = "--generar-opciones" ]; then
-  { echo "# doc/control/opciones.tsv — los set_option de FICHERO que apagan un linter o suben un límite (T44, ADR-226)."
-    echo "# Lo escribe \`bash check-warnings.bash --generar-opciones\`; lo compara check-warnings.bash con igualdad. Sólo con un ADR."
-    echo "# fichero	opción	cuenta"
+  { echo "# doc/control/opciones.tsv — los set_option que apagan un linter o suben un límite, de FICHERO o con «in» (T44,"
+    echo "# ADR-226; la forma, ADR-229). Lo escribe \`bash check-warnings.bash --generar-opciones\`; lo compara"
+    echo "# check-warnings.bash con igualdad. Sólo con un ADR."
+    echo "# fichero	opción	forma	cuenta"
     printf '%s\n' "$OPC_MED"; } > "$OPC_TABLA"
   echo "  ✓ $OPC_TABLA, regenerada: $(printf '%s\n' "$OPC_MED" | grep -c .) filas"
 fi
@@ -179,7 +188,7 @@ if [ ! -s "$OPC_TABLA" ]; then
 fi
 OPC_DEC=$(grep -v '^#' "$OPC_TABLA" | tr -d '\r' | grep . | LC_ALL=C sort)
 if [ "$OPC_DEC" = "$OPC_MED" ]; then
-  echo "  ✓ las $(printf '%s\n' "$OPC_MED" | grep -c .) filas cuadran: $(printf '%s\n' "$OPC_MED" | awk -F'\t' '$2 ~ /^linter/ { l += $3 } $2 ~ /^max/ { m += $3 } END { print l " que apagan un linter y " m " que suben un límite" }') (autotest: 2 de 2)"
+  echo "  ✓ las $(printf '%s\n' "$OPC_MED" | grep -c .) filas cuadran: $(printf '%s\n' "$OPC_MED" | awk -F'\t' '$3 == "fichero" { f += $4 } $3 == "in" && $2 ~ /^linter/ { l += $4 } $3 == "in" && $2 ~ /^max/ { m += $4 } END { print (f + 0) " de fichero; con «in», " (l + 0) " que apagan un linter y " (m + 0) " que suben un límite" }') (autotest: 5 de 5)"
 else
   echo "  ✗ no cuadran con $OPC_TABLA:"
   diff <(printf '%s\n' "$OPC_DEC") <(printf '%s\n' "$OPC_MED") | grep -E '^[<>]' | sed 's/^</      · en la tabla y no en el código:/; s/^>/      · en el código y no en la tabla:/' | head -20

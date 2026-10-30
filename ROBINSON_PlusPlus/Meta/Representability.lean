@@ -36,8 +36,6 @@ open ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.HilbertSeq
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.Representability
 
 /-!

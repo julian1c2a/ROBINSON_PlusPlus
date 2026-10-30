@@ -1,0 +1,18 @@
+#!/bin/bash
+# nucleos.sh EXPORT [lim] — corre los cuatro núcleos independientes (y paranoid) sobre una exportación
+set -u
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+export PATH=$BIN:$PATH ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0
+f=$1; L=${2:-600}
+d=$(dirname "$f")
+for k in lean4lean nanoda con-leche con-ron; do
+  log=$f.$k.log
+  case $k in
+    lean4lean) /usr/bin/time -f "%e s %M KB" -o $log.t timeout $L "$BIN/lean4lean" --import "$f" > $log 2>&1 ;;
+    nanoda) python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":sys.argv[1],"permitted_axioms":["propext","Quot.sound","Classical.choice"]+[a for a in sys.argv[2].split(",") if a],"unpermitted_axiom_hard_error":True,"num_threads":4,"nat_extension":True,"string_extension":True}))' "$f" "${EXTRA:-}" > $f.nanoda.json
+            RUST_MIN_STACK=1073741824 /usr/bin/time -f "%e s %M KB" -o $log.t timeout $L "$BIN/nanoda_bin" $f.nanoda.json > $log 2>&1 ;;
+    *) /usr/bin/time -f "%e s %M KB" -o $log.t timeout $L "$BIN/$k" "$f" > $log 2>&1 ;;
+  esac
+  rc=$?
+  echo "== $k rc=$rc $(tail -1 $log.t) :: $(tail -c 300 $log | tr '\n' ' ')"
+done

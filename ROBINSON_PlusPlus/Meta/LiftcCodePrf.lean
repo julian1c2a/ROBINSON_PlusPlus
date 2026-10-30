@@ -99,11 +99,6 @@ open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
   (shapeUn shapeBin argsIn argsInBody isTermCodeE1 impT prf_or_elim_imp)
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.LiftcCodePrf
 
 /-! ## §1 · Los constructores de codigo DOTADOS
@@ -244,6 +239,7 @@ def targetLift (s : Term) : Formula :=
 def targetLiftsc (b : Term) : Formula :=
   provFromCode (eqc (liftscT (termCode zero) (tcFn b)) (tcFn (liftsc zero b)))
 
+set_option linter.unusedVariables false in
 /-- CONTROL NEGATIVO: `targetLift` no es una reflexividad disfrazada. -/
 example (s : Term) : True := by
   fail_if_success

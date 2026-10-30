@@ -21,9 +21,6 @@ open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 open ROBINSON_PlusPlus.Meta.EvalArithPrf
 open ROBINSON_PlusPlus.Meta.EvalListPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 
 /-!

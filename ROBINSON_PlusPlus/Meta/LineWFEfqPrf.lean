@@ -29,8 +29,6 @@ open ROBINSON_PlusPlus.Meta.CodeCtorKit
 open ROBINSON_PlusPlus.Meta.DotConsPrf
 open ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFEfqPrf
 
 /-!
@@ -60,6 +58,7 @@ theorem ax_lineWF_efq_eq :
 /-- Obligación administrativa del chasis: la condición sólo menciona `#0`. -/
 theorem substFormula_condEfq : substFormula 0 (.var 0) condEfq = condEfq := rfl
 
+set_option linter.unusedSimpArgs false in
 /-- La condición instanciada en una línea concreta `t`. -/
 theorem substFormula_condEfq_at (t : Term) :
     substFormula 0 t condEfq = (carc t =eq implc botc (nthc t (numeralM 2))) := by

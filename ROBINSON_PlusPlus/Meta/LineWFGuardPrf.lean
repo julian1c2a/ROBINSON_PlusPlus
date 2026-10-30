@@ -63,8 +63,6 @@ open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf ROBINSON_PlusPlus.Meta.LineWFSchema
 open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFGuardPrf
 
 /-! ## §1 · EL CHASIS ABSORBE UN CONJUNTO EXTRA

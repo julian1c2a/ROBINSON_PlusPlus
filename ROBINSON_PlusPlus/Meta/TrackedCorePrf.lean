@@ -27,9 +27,6 @@ open ROBINSON_PlusPlus.Meta.Sigma1Prf
 open ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.TrackedCorePrf
 
 /-!
@@ -61,6 +58,7 @@ La infraestructura de este módulo sí se usa (`liftFormula_provFromCode_open`,
 las `Eval*`; grep del 2026‑10‑14). Lo que sigue describe el estado del 2026‑07‑05b.
 -/
 
+set_option linter.unusedSimpArgs false in
 /-- **Clausura genérica de `provFromCode`**: para un código **cerrado** `c`
     (`∀ lvl, liftTerm lvl c = c`), `provFromCode c` es invariante bajo `liftFormula`.
     Generaliza `liftFormula_provCodeC'` (c = `formCode φ`) y `liftFormula_provFromCode_exc`
@@ -72,6 +70,7 @@ theorem liftFormula_provFromCode (k : Nat) (c : Term) (hc : ∀ lvl, liftTerm lv
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, hc]
 
+set_option linter.unusedSimpArgs false in
 /-- **Versión para códigos ABIERTOS**: sin exigir `c` cerrado, el `liftFormula` sobre
     `provFromCode c` se traslada al **código**: `liftFormula k (provFromCode c) = provFromCode (↑c)`.
     (El cuerpo Σ₁ `provFormulaC'` es cerrado; el único slot es `c`, que aparece bajo un binder — de
@@ -86,6 +85,7 @@ theorem liftFormula_provFromCode_open (k : Nat) (c : Term) :
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, ← FOL.liftTerm_comm_zero]
 
+set_option linter.unusedSimpArgs false in
 /-- **`substFormula` atraviesa `provFromCode`** y cae sobre el código:
     `substFormula v s (provFromCode c) = provFromCode (substTerm v s c)`.
     (El cuerpo Σ₁ es cerrado; el código está bajo un binder, de ahí `substTerm_lift_comm_zero`.)

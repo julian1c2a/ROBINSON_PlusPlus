@@ -35,10 +35,6 @@ open ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 open ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.D3InDotPrf
 
 /-!
@@ -381,6 +377,7 @@ theorem prf_bddCarcDot_eq_at (φ : Formula) (p : Term) :
 4. **`PrfH_bdEx_intro_open`** (testigo `K = ı̇`) ensambla, y `prf_bddCarcDot_eq_at` transporta a la
    forma `substfc` del código dotado. -/
 
+set_option maxRecDepth 8000 in
 /-- **NÚCLEO de Step B**: la reflexión punteada del `∃` acotado `boundedCarcIn`. -/
 theorem pcc_bddCarcDot_reflect (φ : Formula) (p : Term) :
     Prf (chainOk nil p ⇒ (boundedCarcIn (formCode φ) p ⇒ provFromCode (bddCarcDotAt φ p))) := by

@@ -46,9 +46,6 @@ los de Lean, sí: `SinWTs.prf_isTermCodeE1_of_In` sale `[propext, Quot.sound]` (
 namespace ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 
 
-set_option maxHeartbeats 1000000
-set_option maxRecDepth 8000
-
 /-! ############################################################################
     Rotulo heredado de `archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean` (copia de `archivo/sondeos-2026-10:sondeos/SubstfcEx.lean`
     lineas 46-4111, segun aquel). Aqui hay tres secciones: `S_Clausura` (namespace `SinWTs`),
@@ -63,10 +60,6 @@ open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
-
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
 
 namespace SinWTs
 
@@ -424,6 +417,7 @@ def nthLiftPred : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 1)))
     (Formula.eq (nthc (liftsc zero (.var 1)) (.var 0)) (liftc zero (nthc (.var 1) (.var 0)))))
 
+set_option linter.unusedSimpArgs false in
 theorem nthLiftPred_at (L : Term) :
     substFormula 0 L nthLiftPred
       = Formula.forall (Formula.impl (lt (.var 0) (lenc (liftTerm 0 L)))
@@ -444,6 +438,7 @@ theorem nthLiftPred_base : Prf (substFormula 0 nil nthLiftPred) := by
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
 
+set_option linter.unusedSimpArgs false in
 theorem nthLiftPred_step :
     Prf (Formula.forall (Formula.forall (Formula.impl (liftFormula 1 nthLiftPred)
       (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 nthLiftPred)))))) := by
@@ -529,6 +524,7 @@ theorem liftT_liftc (k : Nat) (t : Term) :
     liftTerm k (liftc zero t) = liftc zero (liftTerm k t) := by
   simp only [liftc, zero, liftTerm, liftTerms]
 
+set_option linter.unusedSimpArgs false in
 theorem prf_boundedIn_liftsc (x w : Term) :
     Prf (Formula.impl (boundedIn x w) (boundedIn (liftc zero x) (liftsc zero w))) := by
   refine prf_ex_elim_imp ?_
@@ -562,6 +558,7 @@ theorem prf_In_liftsc (x w : Term) :
 
 /-! ## 4 · CLAUSURA DEL PREDICADO BAJO `liftc zero` — el testigo nuevo es `liftsc zero w` -/
 
+set_option linter.unusedSimpArgs false in
 theorem liftF_argsIn (k : Nat) (wT Y : Term) :
     liftFormula k (argsIn wT Y) = argsIn (liftTerm k wT) (liftTerm k Y) := by
   simp only [argsIn, argsInBody, liftFormula, lt, lenc, nthc, In, liftTerm, liftTerms,
@@ -575,6 +572,7 @@ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
     nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
 
+set_option linter.unusedSimpArgs false in
 theorem liftF_wfAll1 (k : Nat) (w : Term) :
     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
   simp only [wfAll1, wfAll1Body, liftFormula, liftF_isTermCodeE1, lt, lenc, nthc,
@@ -1115,6 +1113,7 @@ theorem okE1_Ts : ∀ (ts : List Term) (W : Term)
             simp only [tcodes1s]; exact List.mem_append.mpr (Or.inr hy))) x hB
 end
 
+set_option linter.unusedSimpArgs false in
 /-- **HITO (i) PARA LA VIA 2**: todo termino tiene testigo, y el testigo es **UNA SOLA
     LISTA** — `tcodes1 t`. Cero axiomas, cero simbolos nuevos. -/
 theorem prf_isTC1_tcodes (t : Term) : Prf (isTC1 (objList (tcodes1 t)) (termCodeM t)) := by
@@ -1316,10 +1315,12 @@ theorem crit_isFormCodeB2_rejects_funcc (wF wT s ts : Term) :
 
 /-! ## 9 · CONTROLES NEGATIVOS — los enunciados no son reflexividades disfrazadas -/
 
+set_option linter.unusedVariables false in
 example (w : Term) : True := by
   fail_if_success exact (rfl : liftsc zero w = w)
   trivial
 
+set_option linter.unusedVariables false in
 example (w : Term) : True := by
   fail_if_success exact (rfl : wfAll1 (liftsc zero w) = wfAll1 w)
   trivial
@@ -1329,6 +1330,7 @@ example : Prf (Formula.impl (isTC1 (.var 0) (.var 1))
     (isTC1 (liftsc zero (.var 0)) (liftc zero (.var 1)))) :=
   prf_isTC1_lift (.var 0) (.var 1)
 
+set_option linter.unusedVariables false in
 /-- Y el reconocedor sin `wTs` **no** es el de `wTs` con la lista puesta a `nil`: son
     formulas distintas (la carga de `funcc` cambio de `In` a `∀` acotado). -/
 example (W X : Term) : True := by
@@ -1636,9 +1638,6 @@ open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.BoundedInPrf
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-
 namespace HW
 
 /-! ## §HW.0 · PUENTES `rfl` — `SinWTs.*` y `ENS.*` son la MISMA formula.
@@ -1876,6 +1875,7 @@ theorem closed_mem_tcodesF : ∀ (phi : Formula) (x : Term),
     esta construido a base de `tcodes1`/`tcodes1s`, que es exactamente el cierre por
     subterminos con el que P2 trabaja. -/
 
+set_option linter.unusedVariables false in
 theorem okT_F : ∀ (phi : Formula) (WT : Term)
     (hWl : ∀ c : Nat, liftTerm c WT = WT)
     (hWs : ∀ (v : Nat) (s : Term), substTerm v s WT = WT)
@@ -1910,6 +1910,7 @@ theorem okT_F : ∀ (phi : Formula) (WT : Term)
 
 /-! ## §HW.6 · LOS NODOS DE **FORMULA** de `fcodesF phi`. -/
 
+set_option linter.unusedVariables false in
 theorem okF : ∀ (phi : Formula) (WF WT : Term)
     (hWTl : ∀ c : Nat, liftTerm c WT = WT)
     (hWTs : ∀ (v : Nat) (s : Term), substTerm v s WT = WT)
@@ -2049,6 +2050,7 @@ theorem okF : ∀ (phi : Formula) (WF WT : Term)
     está versionado —lo ignora `.gitignore`—; la copia versionada del mismo lema está en
     `archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean`.) -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_wfAll1_of_list (L : List Term)
     (hcl : ∀ x, List.Mem x L → SinWTs.CodeClosed x)
     (hnode : ∀ x, List.Mem x L → Prf (SinWTs.isTermCodeE1 (objList L) x)) :
@@ -2077,6 +2079,7 @@ theorem prf_wfAll1_of_list (L : List Term)
     simpa only [SinWTs.substF_isTermCodeE1, nthc, substTerm, substTerms, hWs,
       substTerm_numeralM, ite_true, reduceIte] using h2
 
+set_option linter.unusedSimpArgs false in
 theorem prf_wfAllF_of_list (LF : List Term) (WT : Term)
     (hWTl : ∀ c : Nat, liftTerm c WT = WT)
     (hWTs : ∀ (v : Nat) (s : Term), substTerm v s WT = WT)

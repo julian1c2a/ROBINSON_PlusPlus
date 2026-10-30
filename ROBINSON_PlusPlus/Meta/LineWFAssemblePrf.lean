@@ -22,8 +22,6 @@ open ROBINSON_PlusPlus.Meta.LineWFMpPrf
 open ROBINSON_PlusPlus.Meta.LineWFEfqPrf
 open ROBINSON_PlusPlus.Meta.LineWFPropPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 
 /-!

@@ -30,8 +30,6 @@ open ROBINSON_PlusPlus.Meta.DotConsPrf
 open ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.CodeCtorKit
 
 /-!

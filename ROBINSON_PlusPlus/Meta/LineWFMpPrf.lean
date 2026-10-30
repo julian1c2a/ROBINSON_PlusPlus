@@ -34,8 +34,6 @@ open ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFMpPrf
 
 /-!

@@ -13,8 +13,6 @@ open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFConsPrf
 
 /-!
@@ -37,6 +35,7 @@ theorem prf_lineWF_cons (line : Term) :
   simpa [ax_lineWF_cons, substFormula, substTerm, substTerms, lineWF, carc, cdrc, cons,
     nil, zero, FOL.substTerm_liftTerm] using hh
 
+set_option linter.unusedSimpArgs false in
 /-- **`chainOk nil p` da `lineWF` de la línea `i`** (para `i < lenc p`). Vía `chainOkB` (que es
     `∀i<lenc p. lineOkB nil p i`) y `∧`‑elim izquierdo (`lineOkB = lineWF (nthc p i) ∧ …`). -/
 theorem prf_chainOk_lineWF (p i : Term) :

@@ -25,8 +25,6 @@ open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.Representability
 open ROBINSON_PlusPlus.Meta.Hilbert
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.Diagonal
 
 /-!

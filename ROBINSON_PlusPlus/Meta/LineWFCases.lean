@@ -25,8 +25,6 @@ open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFCases
 
 /-!

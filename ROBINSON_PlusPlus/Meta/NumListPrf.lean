@@ -9,9 +9,6 @@ open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.NumListPrf
 
 /-!
@@ -27,6 +24,7 @@ theorem prf_lenc_nil : Prf (lenc nil =eq zero) := by
   have hh := prf_ax (show ax_lenc_nil ∈ axioms by simp [axioms])
   simpa [ax_lenc_nil] using hh
 
+set_option linter.unusedSimpArgs false in
 /-- `lenc (cons h t) = σ (lenc t)` en `Prf`. -/
 theorem prf_lenc_cons (h t : Term) : Prf (lenc (cons h t) =eq succ (lenc t)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_lenc_cons ∈ axioms by simp [axioms])) h) t
@@ -34,6 +32,7 @@ theorem prf_lenc_cons (h t : Term) : Prf (lenc (cons h t) =eq succ (lenc t)) := 
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- `nthc (cons h t) 0 = h` en `Prf`. -/
 theorem prf_nthc_zero (h t : Term) : Prf (nthc (cons h t) zero =eq h) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_nthc_zero ∈ axioms by simp [axioms])) h) t
@@ -41,6 +40,7 @@ theorem prf_nthc_zero (h t : Term) : Prf (nthc (cons h t) zero =eq h) := by
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- `nthc (cons h t) (σ i) = nthc t i` en `Prf`. -/
 theorem prf_nthc_succ (h t i : Term) : Prf (nthc (cons h t) (succ i) =eq nthc t i) := by
   have hh := prf_spec (prf_spec (prf_spec

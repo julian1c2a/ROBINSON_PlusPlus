@@ -88,8 +88,6 @@ open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf ROBINSON_PlusPlus.Meta.NatOrderPrf
 open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf ROBINSON_PlusPlus.Meta.CantorMonoPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## §1 · EL PUENTE ÁTOMO ↔ FORMA ACOTADA, DENTRO DE `Prov` -/
@@ -334,11 +332,13 @@ noncomputable def bdCarcLtPhic (y p : Term) : Term :=
 noncomputable def bdCarcLtDot (y p b : Term) : Term :=
   bdExCode (liftc zero (tcFn b)) (bdCarcLtPhic y p)
 
+set_option linter.unusedSimpArgs false in
 theorem liftTerm_bdCarcLtPhic (c : Nat) (y p : Term) :
     liftTerm c (bdCarcLtPhic y p) = bdCarcLtPhic (liftTerm c y) (liftTerm c p) := by
   simp only [bdCarcLtPhic, eqCodeFn, carcT, nthcT, liftc, varc, numeral, funcc, cons, nil, zero,
     succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral]
 
+set_option linter.unusedSimpArgs false in
 theorem liftTerm_bdCarcLtDot (c : Nat) (y p b : Term) :
     liftTerm c (bdCarcLtDot y p b) = bdCarcLtDot (liftTerm c y) (liftTerm c p) (liftTerm c b) := by
   simp only [bdCarcLtDot, bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral,
@@ -371,6 +371,7 @@ theorem prf_contract {A B : Formula} (h : Prf (A ⇒ (A ⇒ B))) : Prf (A ⇒ B)
   prf_deduction (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH h _) (prfH_hyp_self _))
     (prfH_hyp_self _))
 
+set_option linter.unusedSimpArgs false in
 theorem pcc_bdEx_carc_reflect_gen (y p b Phic Phic' : Term) (A A' : Formula)
     (hPlift : liftTerm 0 Phic = Phic')
     (hAlift : liftFormula 0 A = A')
@@ -594,10 +595,12 @@ theorem hCs_premsPair (v : Nat) (s q : Term) :
   simp only [premsPair, pkP, pkI, pkL, substFormula_boundedPremsIn, carc, cdrc, nil, zero,
     substTerm, substTerms]
 
+set_option linter.unusedSimpArgs false in
 theorem hbl_premsBnd (k : Nat) (q : Term) :
     liftTerm k (premsBnd q) = premsBnd (liftTerm k q) := by
   simp only [premsBnd, pkL, lenc, carc, cdrc, liftTerm, liftTerms]
 
+set_option linter.unusedSimpArgs false in
 theorem hbs_premsBnd (v : Nat) (s q : Term) :
     substTerm v s (premsBnd q) = premsBnd (substTerm v s q) := by
   simp only [premsBnd, pkL, lenc, carc, cdrc, substTerm, substTerms]

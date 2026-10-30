@@ -43,7 +43,6 @@ difiere de `MNV V₀` en `substfc` sobre la basura.
 -/
 
 set_option autoImplicit false
-set_option linter.unusedSimpArgs false
 
 open FOL FOL.Metamath.Semantics
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.ModeloCodigo ROBINSON_PlusPlus.Meta.SolidezPrf
@@ -71,6 +70,7 @@ theorem M_str (hM : Estandar M) (v : Nat → Nat) (s : List Char) : evalTerm M v
 
 /-! ## §2 · La aritmética que miran las guardas: `+` y `<` -/
 
+set_option linter.unusedSimpArgs false in
 /-- `+` es la suma: `ax4`, `ax5` y la inducción sobre el segundo sumando. -/
 theorem M_add (hM : Estandar M) (a b : Nat) : M.func add_sym [a, b] = a + b := by
   induction b with
@@ -82,6 +82,7 @@ theorem M_add (hM : Estandar M) (a b : Nat) : M.func add_sym [a, b] = a + b := b
     simp [forall_2, add, succ, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hsucc] at h
     rw [h, ih]; omega
 
+set_option linter.unusedSimpArgs false in
 /-- `<` es el orden: `ax13` (`n < m ⇔ ∃k, n + σk = m`) con `+` rígido. -/
 theorem M_lt (hM : Estandar M) (a b : Nat) : M.rel lt_sym [a, b] ↔ a < b := by
   have h := ax_de hM (φ := ax13_lt_def) (by simp [axioms]) (fun _ => 0) a b
@@ -101,6 +102,7 @@ theorem M_cdrc (hM : Estandar M) (a b : Nat) : M.func sym!"cdrc" [consN a b] = b
   have h := ax_de hM (φ := ax_cdrc) (by simp [axioms]) (fun _ => 0) a b
   simpa [ax_cdrc, forall_2, cdrc, cons, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hcons] using h
 
+set_option linter.unusedSimpArgs false in
 theorem M_lenc (hM : Estandar M) : ∀ l : Nat, M.func sym!"lenc" [l] = lenN l := by
   intro l
   induction l using Nat.strongRecOn with
@@ -115,6 +117,7 @@ theorem M_lenc (hM : Estandar M) : ∀ l : Nat, M.func sym!"lenc" [l] = lenN l :
         hM.hcons, hM.hsucc] at h
       rw [h, ih b hb, lenN_consN]
 
+set_option linter.unusedSimpArgs false in
 /-- `nthc` en RANGO: `ax_nthc_zero` y `ax_nthc_succ`. (Fuera de rango, sobre `nil`, ningún axioma lo fija.) -/
 theorem M_nthc (hM : Estandar M) : ∀ (i l : Nat), i < lenN l → M.func sym!"nthc" [l, i] = nthN l i := by
   intro i
@@ -137,6 +140,7 @@ theorem M_nthc (hM : Estandar M) : ∀ (i l : Nat), i < lenN l → M.func sym!"n
     rw [lenN_consN] at hi
     rw [h, nthN_cs, ih b (by omega)]
 
+set_option linter.unusedSimpArgs false in
 theorem M_concat (hM : Estandar M) : ∀ a b : Nat, M.func concat_sym [a, b] = concatN a b := by
   intro a
   induction a using Nat.strongRecOn with
@@ -153,6 +157,7 @@ theorem M_concat (hM : Estandar M) : ∀ a b : Nat, M.func concat_sym [a, b] = c
         hM.hcons] at h
       rw [h, ih r hr b, concatN_consN]
 
+set_option linter.unusedSimpArgs false in
 /-- `tcFn` sobre todo `Nat`: `ax_tc_zero` y `ax_tc_succ`. -/
 theorem M_tcFn (hM : Estandar M) : ∀ n : Nat, M.func sym!"tcFn" [n] = tcFnN n := by
   intro n
@@ -356,6 +361,7 @@ theorem M_pred (hM : Estandar M) (n : Nat) : M.func pred_sym [n] = n - 1 := by
     have h := ax_de hM (φ := ax26_pred_succ) (by simp [axioms]) (fun _ => 0) n
     simpa [ax26_pred_succ, forall_, pred, succ, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hsucc] using h
 
+set_option linter.unusedSimpArgs false in
 mutual
 theorem M_substtc (hM : Estandar M) {c : Nat} (h : CodT c) (k s : Nat) :
     M.func sym!"substtc" [k, s, c] = substtcN k s c :=
@@ -395,6 +401,7 @@ theorem M_substtsc (hM : Estandar M) {ts : Nat} (h : CodTs ts) (k s : Nat) :
       rw [h, M_substtc hM ha k s, M_substtsc hM hr k s, substtscN_consN]
 end
 
+set_option linter.unusedSimpArgs false in
 mutual
 theorem M_liftc (hM : Estandar M) {t : Nat} (h : CodT t) (c : Nat) :
     M.func sym!"liftc" [c, t] = liftcN c t :=
@@ -432,6 +439,7 @@ end
 
 
 
+set_option linter.unusedSimpArgs false in
 /-- `substfc`, sobre un código de fórmula bueno y un sustituyendo bueno (el que piden las guardas). -/
 theorem M_substfc (hM : Estandar M) {A : Nat} (h : CodF A) :
     ∀ (k s : Nat), CodT s → M.func sym!"substfc" [k, s, A] = substfcN k s A := by
@@ -485,6 +493,7 @@ theorem M_substfc (hM : Estandar M) {A : Nat} (h : CodF A) :
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, M_liftc hM hs 0, iha (k + 1) (liftcN 0 s) (codT_liftcN hs 0), substfcN_ex]
 
+set_option linter.unusedSimpArgs false in
 /-- `liftfc`, sobre un código de fórmula bueno. -/
 theorem M_liftfc (hM : Estandar M) {A : Nat} (h : CodF A) : ∀ c : Nat, M.func sym!"liftfc" [c, A] = liftfcN c A := by
   induction h with
@@ -634,6 +643,7 @@ theorem M_axiomsCodeT (hM : Estandar M) : M.func sym!"axiomsCodeT" [] = codeNatL
 theorem M_carc' (hM : Estandar M) {x : Nat} (hx : ¬ x = 0) : M.func sym!"carc" [x] = carN x := by
   obtain ⟨a, b, rfl, _⟩ := consN_de hx; rw [M_carc hM, carN_consN]
 
+set_option linter.unusedSimpArgs false in
 theorem M_allIn (hM : Estandar M) (c : Nat) : ∀ L : Nat, M.rel sym!"allIn" [c, L] ↔ allInN c L := by
   intro L
   induction L using Nat.strongRecOn with
@@ -815,6 +825,7 @@ theorem lw_20 (htag : M.func sym!"nthc" [x, 1] = 20) : lineWFN Vm x := by
 
 /-! ## §9 · De `lineWF` en `M` a `lineWFN`, por la etiqueta (`ax_lineWF_inv`) -/
 
+set_option linter.unusedSimpArgs false in
 theorem M_tagDisj (hM : Estandar M) (v : Nat → Nat) (t : Term) : ∀ n : Nat,
     evalFormula M v (tagDisj t n) → ∃ K, And (K ≤ n) (M.func sym!"nthc" [evalTerm M v t, 1] = K) := by
   intro n
@@ -833,6 +844,7 @@ theorem M_tagDisj (hM : Estandar M) (v : Nat → Nat) (t : Term) : ∀ n : Nat,
     · obtain ⟨K, hK, e⟩ := ih h; exact ⟨K, by omega, e⟩
 
 include hM hwf in
+set_option linter.unusedSimpArgs false in
 /-- 🏁 **Si `M` cree que `x` es una línea bien formada, lo es** (con el `V` de `M`). -/
 theorem M_lineWF : lineWFN (M.func sym!"axiomsCodeT" []) x := by
   have h := ax_de hM (φ := ax_lineWF_inv) (by simp [axioms]) (fun _ => 0) x
@@ -884,6 +896,7 @@ theorem dec3 {x : Nat} (h : lenN x = 3) : ∃ a b c, x = consN a (consN b (consN
     · obtain ⟨d, s, rfl, _⟩ := consN_de (Nat.pos_iff_ne_zero.mp hpos); rw [lenN_consN] at h; omega
   subst this; exact ⟨a, b, c, rfl⟩
 
+set_option linter.unusedSimpArgs false in
 /-- Si `M` cree que las premisas de una línea bien formada están en `c`, lo están: sólo `mp` y `gen` tienen. -/
 theorem M_allIn_prems (hM : Estandar M) {V c x : Nat} (hwf : lineWFN V x)
     (h : M.rel sym!"allIn" [c, M.func sym!"premsOf" [x]]) : allInN c (premsOfN x) := by
@@ -910,6 +923,7 @@ theorem M_allIn_prems (hM : Estandar M) {V c x : Nat} (hwf : lineWFN V x)
       simpa [premsOfN, nthN_cs, nthN_cz] using h
     · rw [premsOfN, ite_eq_right h16, ite_eq_right h17]; exact allInN_zero c
 
+set_option linter.unusedSimpArgs false in
 /-- 🏁 **Si `M` cree que `p` es una cadena válida desde `c`, lo es**, y `runFn` vale lo mismo. -/
 theorem M_cadena (hM : Estandar M) : ∀ (p c : Nat), M.rel sym!"chainOk" [c, p] →
     And (chainOkN (M.func sym!"axiomsCodeT" []) c p) (M.func sym!"runFn" [c, p] = runFnN c p) := by

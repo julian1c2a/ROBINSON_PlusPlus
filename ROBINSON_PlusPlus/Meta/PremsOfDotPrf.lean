@@ -66,9 +66,6 @@ open ROBINSON_PlusPlus.Meta.EvalNthcPrf
 open ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 open ROBINSON_PlusPlus.Meta.SubstTreeReflect
 
-set_option linter.unusedSimpArgs false
-set_option maxRecDepth 40000
-
 namespace ROBINSON_PlusPlus.Meta.PremsOfDotPrf
 
 

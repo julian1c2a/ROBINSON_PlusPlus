@@ -18,9 +18,6 @@ open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.Representability2Prf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.Sigma1Prf
 
 /-!

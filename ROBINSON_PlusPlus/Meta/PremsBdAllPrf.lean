@@ -67,10 +67,6 @@ open ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 open ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxRecDepth 40000
-set_option maxHeartbeats 2000000
-
 namespace ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 
 
@@ -85,6 +81,7 @@ theorem liftTerm_nil (k : Nat) : liftTerm k nil = nil := rfl
 theorem liftTerm_liftc (k : Nat) (x : Term) :
     liftTerm k (liftc zero x) = liftc zero (liftTerm k x) := rfl
 
+set_option linter.unusedSimpArgs false in
 mutual
 
 theorem liftTerm_substCodeT2 (k v : Nat) (u W : Term) : ∀ t : Term,
@@ -146,6 +143,7 @@ theorem substTerm_nil (v : Nat) (s : Term) : substTerm v s nil = nil := rfl
 theorem substTerm_liftc (v : Nat) (s x : Term) :
     substTerm v s (liftc zero x) = liftc zero (substTerm v s x) := rfl
 
+set_option linter.unusedSimpArgs false in
 mutual
 
 theorem substTerm_substCodeT2 (c v : Nat) (s u W : Term) : ∀ t : Term,
@@ -439,6 +437,7 @@ theorem premsPsi_eq (q i : Term) :
     premsPsi q i = substCodeF2 1 (liftc zero (tcFn i)) (liftc zero (liftc zero (tcFn q)))
       premsBodyF := rfl
 
+set_option linter.unusedSimpArgs false in
 theorem hfv_premsBodyF : liftFormula 3 premsBodyF = premsBodyF := by
   simp only [premsBodyF, lor, In, boundedCarcLt, nthc, premsOf, carc, lt, nil, zero, succ,
     land, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT, reduceIte]
@@ -967,6 +966,7 @@ theorem substfc_premsPsi_at (q i j : Term) :
   refine prf_eq_trans (prf_substfc_or zero (tcFn j) _ _) ?_
   exact prf_congr_orc (prf_refl _) (substfc_bdEx_at q i j)
 
+set_option maxRecDepth 40000 in
 /-- 🏁🏁🏁 **LA NOVENA OBLIGACIÓN, PROBADA.** -/
 theorem premsBody_reflect (q i j : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ (lt j (lenc (premsOf (nthc q i))) ⇒

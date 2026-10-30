@@ -1,0 +1,9 @@
+#!/bin/bash
+# nanoda_var.sh EXPORT — nanoda con varias pilas e hilos
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+f=$1
+for cfg in "1 8192" "1 unlimited" "4 unlimited"; do
+  set -- $cfg
+  python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":sys.argv[1],"permitted_axioms":["propext","Quot.sound","Classical.choice"],"unpermitted_axiom_hard_error":True,"num_threads":int(sys.argv[2]),"nat_extension":True,"string_extension":True,"print_success_message":True}))' "$f" "$1" > /tmp/nv.json
+  ( ulimit -s $2; RUST_MIN_STACK=1073741824 /usr/bin/time -f "%e s %M KB" timeout 900 "$BIN/nanoda_bin" /tmp/nv.json > /tmp/nv.log 2>&1; echo "hilos=$1 pila=$2 rc=$? :: $(tail -c 250 /tmp/nv.log | tr '\n' ' ')" )
+done

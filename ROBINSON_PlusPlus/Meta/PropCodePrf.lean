@@ -16,9 +16,6 @@ open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 open ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.PropCodePrf
 
 /-!

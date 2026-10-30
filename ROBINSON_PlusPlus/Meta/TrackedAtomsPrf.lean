@@ -65,10 +65,6 @@ open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf ROBINSON_PlusPlus.Meta.LineWFTrack
 open ROBINSON_PlusPlus.Meta.LiftcCodePrf
 open ROBINSON_PlusPlus.Meta.CodeCtorKit ROBINSON_PlusPlus.Meta.CodeTreeReflect
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 
 noncomputable def shapeDot (X : Term) (k n : Nat) : Term :=
@@ -315,7 +311,6 @@ theorem prf_substtc_child (s X X' : Term) (k : Nat)
 
 /-- Transporte de la ranura del nodo dentro de una `shapeDot`, DENTRO de `Prov`. -/
 theorem PrfH_shapeDot_transport {Γ : List Formula} (u v : Term) (k n : Nat)
-    (hu : ∀ W, Prf (substtc zero W u =eq u)) (hv : ∀ W, Prf (substtc zero W v =eq v))
     (heq : PrfH Γ (provFromCode (eqCodeFn u v)))
     (h : PrfH Γ (provFromCode (shapeDot u k n)))
     (hwu : Prf (hasWit u) := by hw_auto) (hwv : Prf (hasWit v) := by hw_auto) :

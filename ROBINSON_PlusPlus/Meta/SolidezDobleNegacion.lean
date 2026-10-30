@@ -34,7 +34,6 @@ lógica clásica (daría el tercio excluso de toda fórmula aritmética).
 
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
-set_option linter.unusedSimpArgs false
 
 -- ⚠️ `open` acotado: con `Minimal.Axioms` abierto, `∧`, `∨` y `∈` resuelven a los símbolos OBJETO (`land`, `lor`,
 -- `In`); aquí se abre sólo en las secciones que lo necesitan, y se escribe `And`, `Or` y `List.Mem`.
@@ -418,6 +417,7 @@ theorem ax_de (hM : Estandar M) {φ : Formula} (h : φ ∈ axioms) (v : Nat → 
 theorem consN_de {l : Nat} (h : ¬ l = 0) : ∃ a b, And (l = consN a b) (b < l) :=
   ⟨carN l, cdrN l, (consN_car_cdr h).symm, cdrN_lt h⟩
 
+set_option linter.unusedSimpArgs false in
 theorem M_mem (hM : Estandar M) : ∀ (l x : Nat), M.rel in_sym [x, l] ↔ memN x l := by
   intro l
   induction l using Nat.strongRecOn with

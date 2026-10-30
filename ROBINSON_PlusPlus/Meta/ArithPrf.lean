@@ -24,8 +24,6 @@ open ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.ArithPrf
 
 /-!
@@ -80,6 +78,7 @@ theorem prf_congr_substfc_arg3 {x t a b : Term} (h : Prf (a =eq b)) :
 
 /-! ### Numerales en `Prf`: `pred`, `add`, orden -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_pred_numeral (m : Nat) : Prf (pred (numeral (m + 1)) =eq numeral m) := by
   have hh := prf_spec (prf_ax (show ax26_pred_succ ∈ axioms by simp [axioms])) (numeral m)
   simp only [ax26_pred_succ, substFormula, substTerm, substTerms, pred, succ,
@@ -106,6 +105,7 @@ theorem prf_numeral_add (a b : Nat) :
     exact prf_eq_trans (prf_add_succ_t (numeral a) (numeral k))
       (prf_eq_congr_succ ih)
 
+set_option linter.unusedSimpArgs false in
 /-- Orden estricto en `Prf` sobre numerales (espejo del «numeral_lt» de la capa `⊢`, retirada con ADR‑115). -/
 theorem prf_numeral_lt {a b : Nat} (h : a < b) :
     Prf (lt (numeral a) (numeral b)) := by
@@ -127,6 +127,7 @@ theorem prf_numeral_lt {a b : Nat} (h : a < b) :
 
 /-! ### Ecuaciones recursivas de la sustitución (nivel término) en `Prf` -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substtc_var_eq (v s n : Term) :
     Prf ((v =eq n) ⇒ (substtc v s (varc n) =eq s)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_substtc_var_eq ∈ axioms by simp [axioms])) v) s) n
@@ -134,6 +135,7 @@ theorem prf_substtc_var_eq (v s n : Term) :
     lt, pred, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substtc_var_gt (v s n : Term) :
     Prf ((lt v n) ⇒ (substtc v s (varc n) =eq varc (pred n))) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_substtc_var_gt ∈ axioms by simp [axioms])) v) s) n
@@ -141,6 +143,7 @@ theorem prf_substtc_var_gt (v s n : Term) :
     lt, pred, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substtc_var_lt (v s n : Term) :
     Prf ((lt n v) ⇒ (substtc v s (varc n) =eq varc n)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_substtc_var_lt ∈ axioms by simp [axioms])) v) s) n
@@ -148,6 +151,7 @@ theorem prf_substtc_var_lt (v s n : Term) :
     lt, pred, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substtc_func (v s sc tsc : Term) :
     Prf (substtc v s (funcc sc tsc) =eq funcc sc (substtsc v s tsc)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_substtc_func ∈ axioms by simp [axioms])) v) s) sc) tsc
@@ -155,6 +159,7 @@ theorem prf_substtc_func (v s sc tsc : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substtsc_nil (v s : Term) :
     Prf (substtsc v s nil =eq nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_substtsc_nil ∈ axioms by simp [axioms])) v) s
@@ -162,6 +167,7 @@ theorem prf_substtsc_nil (v s : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substtsc_cons (v s h t : Term) :
     Prf (substtsc v s (cons h t) =eq cons (substtc v s h) (substtsc v s t)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_substtsc_cons ∈ axioms by simp [axioms])) v) s) h) t
@@ -222,6 +228,7 @@ end
 
 /-! ### `liftTerm` aritmetizado en `Prf` -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftc_var_lt (c n : Term) :
     Prf ((lt n c) ⇒ (liftc c (varc n) =eq varc n)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_liftc_var_lt ∈ axioms by simp [axioms])) c) n
@@ -229,6 +236,7 @@ theorem prf_liftc_var_lt (c n : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftc_var_ge (c n : Term) :
     Prf ((lt c (succ n)) ⇒ (liftc c (varc n) =eq varc (succ n))) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_liftc_var_ge ∈ axioms by simp [axioms])) c) n
@@ -236,6 +244,7 @@ theorem prf_liftc_var_ge (c n : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftc_func (c sc tsc : Term) :
     Prf (liftc c (funcc sc tsc) =eq funcc sc (liftsc c tsc)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_liftc_func ∈ axioms by simp [axioms])) c) sc) tsc
@@ -243,6 +252,7 @@ theorem prf_liftc_func (c sc tsc : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftsc_nil (c : Term) :
     Prf (liftsc c nil =eq nil) := by
   have hh := prf_spec (prf_ax (show ax_liftsc_nil ∈ axioms by simp [axioms])) c
@@ -250,6 +260,7 @@ theorem prf_liftsc_nil (c : Term) :
     FOL.substTerm_liftTerm] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftsc_cons (c h t : Term) :
     Prf (liftsc c (cons h t) =eq cons (liftc c h) (liftsc c t)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_liftsc_cons ∈ axioms by simp [axioms])) c) h) t
@@ -295,6 +306,7 @@ end
 
 /-! ### `substFormula` aritmetizado en `Prf`: ecuaciones -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_bottom (v t : Term) :
     Prf (substfc v t botc =eq botc) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_substfc_bottom ∈ axioms by simp [axioms])) v) t
@@ -302,6 +314,7 @@ theorem prf_substfc_bottom (v t : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_atom (v t pc tsc : Term) :
     Prf (substfc v t (atomc pc tsc) =eq atomc pc (substtsc v t tsc)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_substfc_atom ∈ axioms by simp [axioms])) v) t) pc) tsc
@@ -309,6 +322,7 @@ theorem prf_substfc_atom (v t pc tsc : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_eq (v t a b : Term) :
     Prf (substfc v t (eqc a b) =eq eqc (substtc v t a) (substtc v t b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_substfc_eq ∈ axioms by simp [axioms])) v) t) a) b
@@ -316,6 +330,7 @@ theorem prf_substfc_eq (v t a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_impl (v t a b : Term) :
     Prf (substfc v t (implc a b) =eq implc (substfc v t a) (substfc v t b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_substfc_impl ∈ axioms by simp [axioms])) v) t) a) b
@@ -323,6 +338,7 @@ theorem prf_substfc_impl (v t a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_and (v t a b : Term) :
     Prf (substfc v t (andc a b) =eq andc (substfc v t a) (substfc v t b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_substfc_and ∈ axioms by simp [axioms])) v) t) a) b
@@ -330,6 +346,7 @@ theorem prf_substfc_and (v t a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_or (v t a b : Term) :
     Prf (substfc v t (orc a b) =eq orc (substfc v t a) (substfc v t b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_substfc_or ∈ axioms by simp [axioms])) v) t) a) b
@@ -337,6 +354,7 @@ theorem prf_substfc_or (v t a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_forall (v t a : Term) :
     Prf (substfc v t (forallc a) =eq forallc (substfc (succ v) (liftc zero t) a)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_substfc_forall ∈ axioms by simp [axioms])) v) t) a
@@ -344,6 +362,7 @@ theorem prf_substfc_forall (v t a : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_substfc_ex (v t a : Term) :
     Prf (substfc v t (exc a) =eq exc (substfc (succ v) (liftc zero t) a)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_substfc_ex ∈ axioms by simp [axioms])) v) t) a
@@ -383,6 +402,7 @@ theorem prf_substFormula_arith : ∀ (v : Nat) (s : Term) (f : Formula),
 
 /-! ### `liftFormula` aritmetizado en `Prf` (esquema Q3) -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_bottom (c : Term) :
     Prf (liftfc c botc =eq botc) := by
   have hh := prf_spec (prf_ax (show ax_liftfc_bottom ∈ axioms by simp [axioms])) c
@@ -390,6 +410,7 @@ theorem prf_liftfc_bottom (c : Term) :
     FOL.substTerm_liftTerm] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_atom (c pc tsc : Term) :
     Prf (liftfc c (atomc pc tsc) =eq atomc pc (liftsc c tsc)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_liftfc_atom ∈ axioms by simp [axioms])) c) pc) tsc
@@ -397,6 +418,7 @@ theorem prf_liftfc_atom (c pc tsc : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_eq (c a b : Term) :
     Prf (liftfc c (eqc a b) =eq eqc (liftc c a) (liftc c b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_liftfc_eq ∈ axioms by simp [axioms])) c) a) b
@@ -404,6 +426,7 @@ theorem prf_liftfc_eq (c a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_impl (c a b : Term) :
     Prf (liftfc c (implc a b) =eq implc (liftfc c a) (liftfc c b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_liftfc_impl ∈ axioms by simp [axioms])) c) a) b
@@ -411,6 +434,7 @@ theorem prf_liftfc_impl (c a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_and (c a b : Term) :
     Prf (liftfc c (andc a b) =eq andc (liftfc c a) (liftfc c b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_liftfc_and ∈ axioms by simp [axioms])) c) a) b
@@ -418,6 +442,7 @@ theorem prf_liftfc_and (c a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_or (c a b : Term) :
     Prf (liftfc c (orc a b) =eq orc (liftfc c a) (liftfc c b)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_liftfc_or ∈ axioms by simp [axioms])) c) a) b
@@ -425,6 +450,7 @@ theorem prf_liftfc_or (c a b : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_forall (c a : Term) :
     Prf (liftfc c (forallc a) =eq forallc (liftfc (succ c) a)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_liftfc_forall ∈ axioms by simp [axioms])) c) a
@@ -432,6 +458,7 @@ theorem prf_liftfc_forall (c a : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_liftfc_ex (c a : Term) :
     Prf (liftfc c (exc a) =eq exc (liftfc (succ c) a)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_liftfc_ex ∈ axioms by simp [axioms])) c) a

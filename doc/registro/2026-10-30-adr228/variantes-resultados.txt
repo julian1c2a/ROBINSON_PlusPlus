@@ -1,0 +1,27 @@
+ADR-228, 2026-10-30 — lo que dijo cada núcleo de cada variante de variantes.lean.txt. Cada variante se exportó SOLA
+(su cierre: `exporta.sh TcTest salida TcTest.<nombre>`) y se pasó por `nucleos.sh` (los cuatro independientes; nanoda
+con cuatro hilos) o por `solo_nanoda.sh` (sólo nanoda, cuatro hilos). Copiado de la salida de las órdenes.
+
+Tanda 1 (nucleos.sh, límite 120 s):
+  goal_after_abre  lean4lean rc=1 «(kernel) deep recursion detected» · nanoda rc=134 «overflowed its stack» ·
+                   con-leche rc=3 y con-ron rc=3 «fuel exhausted: whnfCore»   (= lo de ADR-222 §4 en v_tc_zero)
+  t1               los cuatro ACEPTAN (173 declaraciones)
+  t2               los cuatro ACEPTAN (174)
+  va               los cuatro ACEPTAN (lean4lean 1579; con-leche y con-ron 1582)        ← la prueba nueva de v_tc_zero
+  vb               los cuatro AGOTAN, como goal_after_abre
+  vc               los cuatro ACEPTAN
+  ⇒ El objetivo final (`tcFnN 0 = …`, t1) no es el problema: lo es la prueba de `abre`; `exact tcFnN.eq_1` tras `abre`
+    (vb) agota igual. Sin `abre` (va, vc), aceptan.
+
+Tanda 2 (solo_nanoda.sh):
+  a0 a1 a2 c2      rc=134 «overflowed its stack» (también sin `abre`: a1, a2, c2)
+  m1 m2            rc=0
+
+Tanda 3 (solo_nanoda.sh):
+  b1 b3            rc=134;   b2 b5 b6 b7   rc=0
+  e1 e6 e7         rc=0      (un modelo GENÉRICO `M`)
+  e2 e3 e5         rc=134    (el mismo enunciado que e1, con el modelo concreto `MNV V`)
+  e4               rc=0
+  ⇒ A nanoda, con cuatro hilos, le falta pila en cuanto compara por definición `evalFormula (MNV V) …` de un ÁTOMO con
+    su valor: con un modelo genérico no (e1). No se siguió: con un hilo (el principal, con la pila del proceso sin
+    límite) acepta el cierre entero de los 32 (resultados.txt, §4).

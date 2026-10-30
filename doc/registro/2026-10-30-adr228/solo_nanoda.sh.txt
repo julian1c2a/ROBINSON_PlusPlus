@@ -1,0 +1,10 @@
+#!/bin/bash
+# solo_nanoda.sh MOD decl... — exporta cada decl por separado y la pasa por nanoda (4 hilos)
+S=$(dirname "$0"); BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+M=$1; shift
+for d in "$@"; do
+  bash $S/exporta.sh $M /tmp/sn_$d.ndjson $M.$d > /dev/null 2>&1 || bash $S/exporta.sh $M /tmp/sn_$d.ndjson $d > /dev/null 2>&1
+  python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":sys.argv[1],"permitted_axioms":["propext","Quot.sound","Classical.choice"],"unpermitted_axiom_hard_error":True,"num_threads":4,"nat_extension":True,"string_extension":True}))' /tmp/sn_$d.ndjson > /tmp/sn.json
+  timeout 300 "$BIN/nanoda_bin" /tmp/sn.json > /tmp/sn.log 2>&1; rc=$?
+  echo "$d rc=$rc $(wc -c < /tmp/sn_$d.ndjson)B :: $(tail -c 120 /tmp/sn.log | tr '\n' ' ')"
+done

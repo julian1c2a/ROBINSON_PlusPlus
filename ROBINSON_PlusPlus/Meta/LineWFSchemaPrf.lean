@@ -27,8 +27,6 @@ open ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
 
 /-!
@@ -93,16 +91,19 @@ def tagF (k : Nat) : Formula := nthc (.var 0) (succ zero) =eq numeralM k
 /-- Cláusula canónica de longitud genérica: `lenc #0 = ṅ`. -/
 def lencF (n : Nat) : Formula := lenc (.var 0) =eq numeralM n
 
+set_option linter.unusedSimpArgs false in
 @[simp] theorem substFormula_tagF (k : Nat) (t : Term) :
     substFormula 0 t (tagF k) = (nthc t (succ zero) =eq numeralM k) := by
   simp only [tagF, nthc, succ, zero, substFormula, substTerm, substTerms, substTerm_numeralM,
     FOL.substTerm_liftTerm, ite_true]
 
+set_option linter.unusedSimpArgs false in
 @[simp] theorem substFormula_lencF (n : Nat) (t : Term) :
     substFormula 0 t (lencF n) = (lenc t =eq numeralM n) := by
   simp only [lencF, lenc, substFormula, substTerm, substTerms, substTerm_numeralM,
     FOL.substTerm_liftTerm, ite_true]
 
+set_option linter.unusedSimpArgs false in
 @[simp] theorem substFormula_lwfVar (t : Term) : substFormula 0 t lwfVar = lineWF t := by
   simp only [lwfVar, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
 

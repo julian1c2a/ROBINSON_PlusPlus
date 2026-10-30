@@ -72,11 +72,6 @@ open ROBINSON_PlusPlus.Meta.EvalPredPrf ROBINSON_PlusPlus.Meta.LiftcCodePrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 4000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.EvalSubsttcPrf
 
 /-! ############################################################################
@@ -645,6 +640,7 @@ def targetSubsttc (v s X : Term) : Formula :=
 def targetSubsttsc (v s X : Term) : Formula :=
   provFromCode (eqc (substtscT (tcFn v) (tcFn s) (tcFn X)) (tcFn (substtsc v s X)))
 
+set_option linter.unusedVariables false in
 /-- CONTROL NEGATIVO: no es una reflexividad disfrazada. -/
 example (v s X : Term) : True := by
   fail_if_success

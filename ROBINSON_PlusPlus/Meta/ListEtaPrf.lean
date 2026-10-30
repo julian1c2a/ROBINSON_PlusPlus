@@ -38,13 +38,12 @@ open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.ListEtaPrf
 
 /-! ## §1 · UN PISO: `L` es un `cons` si su longitud es un sucesor -/
 
 
+set_option linter.unusedSimpArgs false in
 /-- `lenc L = 0` ⇒ `L = nil`. -/
 theorem prf_nil_of_lenc_zero (L : Term) : Prf ((lenc L =eq zero) ⇒ (L =eq nil)) := by
   refine prf_deduction ?_
@@ -68,6 +67,7 @@ theorem prf_nil_of_lenc_zero (L : Term) : Prf ((lenc L =eq zero) ⇒ (L =eq nil)
       (PrfH.mp _ _ _ (prf_to_prfH (prf_succ_ne_zero (lenc (cdrc L))) _)
         (PrfH_eq_trans (PrfH_eq_symm hlc) hz))
 
+set_option linter.unusedSimpArgs false in
 /-- ⭐ **η DE LISTA DESDE LA LONGITUD**: si `lenc L` es un sucesor, `L` es un `cons`. -/
 theorem prf_eta_of_lenc_succ (L n : Term) :
     Prf ((lenc L =eq succ n) ⇒ (L =eq cons (carc L) (cdrc L))) := by
@@ -91,6 +91,7 @@ theorem prf_eta_of_lenc_succ (L n : Term) :
         (PrfH_eq_trans (PrfH_eq_symm hs) hlz))
   · exact PrfH.hyp _ _ (List.Mem.head _)
 
+set_option linter.unusedSimpArgs false in
 /-- Y la longitud de la cola baja en uno. -/
 theorem prf_lenc_cdrc (L n : Term) :
     Prf ((lenc L =eq succ n) ⇒ (lenc (cdrc L) =eq n)) := by
@@ -149,6 +150,7 @@ theorem prf_eta_lenc : ∀ (n : Nat) (L : Term),
 `lineTag L = nthc L 1̄`, y la η lo pone en `carc (cdrc L)`. Los dos pisos se recorren con
 `prf_nthc_succ` y `prf_nthc_zero`. -/
 
+set_option linter.unusedSimpArgs false in
 /-- `nthc L 1̄ = carc (cdrc L)` para una lista de longitud ≥ 2. -/
 theorem prf_nthc1_carc_cdrc (L : Term) (n : Nat) :
     Prf ((lenc L =eq numeralM (n + 2)) ⇒ (nthc L (numeralM 1) =eq carc (cdrc L))) := by

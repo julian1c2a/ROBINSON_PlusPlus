@@ -20,9 +20,6 @@ open ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 open ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 open ROBINSON_PlusPlus.Meta.TrackedCorePrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 
 /-!
@@ -79,6 +76,7 @@ theorem prf_lineOk_q1 (c Ac w : Term)
     (prf_iff_mpr (prf_lineWF_q1 _ Ac w hwF hwT) (prf_refl _))
     (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q1 _ Ac w)) (prf_allIn_nil c))
 
+set_option linter.unusedSimpArgs false in
 /-- **`∀`‑elim a nivel de código** (reflexión de la regla Q1), con testigo‑código **abierto**:
     de la demostrabilidad del código universal `forallc Ac` sale la del código sustituido
     `substfc zero w Ac`. No pide `Ac` cerrado (eso es `pcc_forallElim_code'`, con `hAc`): pide las

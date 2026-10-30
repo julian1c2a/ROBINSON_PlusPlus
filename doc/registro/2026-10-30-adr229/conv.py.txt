@@ -1,0 +1,241 @@
+#!/usr/bin/env python3
+"""conv.py — pasa los set_option de FICHERO (los del censo de check-warnings, T44) a `set_option … in`.
+
+  conv.py quitar  RAIZ LISTA BACKUP   quita las líneas del censo de cada fichero de LISTA (guarda el original en BACKUP
+                                      y, en BACKUP/opciones.json, fichero → {opción: valor máximo})
+  conv.py aplicar RAIZ LISTA LOGS BACKUP
+                                      lee LOGS/<fichero>.log (la salida de `lake env lean`) y, por cada diagnóstico,
+                                      inserta `set_option OPC VAL in` delante de la ORDEN que lo contiene; imprime lo
+                                      que no sabe clasificar
+"""
+import json
+import os
+import re
+import sys
+
+OPC_RE = re.compile(r'^\s*set_option\s+(linter\.[A-Za-z0-9_.]+\s+false|max[A-Za-z]+\s+[0-9]+)\s*$')
+DECL_RE = re.compile(r'^(@\[|(private|protected|noncomputable|partial|unsafe|nonrec)\s|'
+                     r'(theorem|lemma|def|abbrev|instance|example|structure|inductive|class|opaque|axiom|mutual|'
+                     r'macro|macro_rules|syntax|elab|attribute|local|scoped)\b|set_option\b.*\bin\s*$|open\b.*\bin\s*$)')
+
+
+def estado_lineas(lineas):
+    """Para cada línea: (en_comentario_al_empezar, en_cadena_al_empezar), y los comentarios de bloque de nivel 0
+    como lista de (línea_inicio, línea_fin, es_doc)."""
+    est = []
+    depth = 0
+    instr = False
+    bloques = []
+    ini = None
+    for i, l in enumerate(lineas):
+        est.append((depth > 0, instr))
+        j = 0
+        n = len(l)
+        while j < n:
+            c = l[j]
+            if instr:
+                if c == '\\':
+                    j += 2
+                    continue
+                if c == '"':
+                    instr = False
+                j += 1
+                continue
+            if depth > 0:
+                if l.startswith('/-', j):
+                    depth += 1
+                    j += 2
+                    continue
+                if l.startswith('-/', j):
+                    depth -= 1
+                    j += 2
+                    if depth == 0:
+                        bloques.append((ini[0], i, ini[1]))
+                    continue
+                j += 1
+                continue
+            if l.startswith('--', j):
+                break
+            if l.startswith('/-', j):
+                depth = 1
+                ini = (i, l.startswith('/--', j) and not l.startswith('/--/', j))
+                j += 2
+                continue
+            if c == '"':
+                instr = True
+                j += 1
+                continue
+            if c == "'" and (j == 0 or not (l[j - 1].isalnum() or l[j - 1] in "_'.!?")):
+                m = re.match(r"'(\\.[^']*|[^'\\])'", l[j:])
+                if m:
+                    j += len(m.group(0))
+                    continue
+            j += 1
+    return est, bloques
+
+
+def es_censo(l, est):
+    return not est[0] and not est[1] and OPC_RE.match(l)
+
+
+def quitar(raiz, lista, backup):
+    opciones = {}
+    for f in lista:
+        ruta = os.path.join(raiz, f)
+        texto = open(ruta, encoding='utf-8', newline='').read()
+        os.makedirs(os.path.dirname(os.path.join(backup, f)), exist_ok=True)
+        open(os.path.join(backup, f), 'w', encoding='utf-8', newline='').write(texto)
+        crlf = '\r\n' in texto
+        lineas = texto.replace('\r\n', '\n').split('\n')
+        est, _ = estado_lineas(lineas)
+        quitadas = [i for i, l in enumerate(lineas) if es_censo(l, est[i])]
+        ops = {}
+        for i in quitadas:
+            p = lineas[i].split()
+            ops[p[1]] = p[2] if p[2] == 'false' else str(max(int(p[2]), int(ops.get(p[1], '0'))))
+        nuevas = []
+        q = set(quitadas)
+        for i, l in enumerate(lineas):
+            if i in q:
+                continue
+            # dos líneas en blanco seguidas donde estaba la opción: una
+            if l.strip() == '' and nuevas and nuevas[-1].strip() == '' and (i - 1) in q:
+                continue
+            nuevas.append(l)
+        s = '\n'.join(nuevas)
+        if crlf:
+            s = s.replace('\n', '\r\n')
+        open(ruta, 'w', encoding='utf-8', newline='').write(s)
+        opciones[f] = ops
+        print(f"{f}: quitadas {len(quitadas)} ({', '.join(f'{k}={v}' for k, v in ops.items())})")
+    json.dump(opciones, open(os.path.join(backup, 'opciones.json'), 'w'), indent=1)
+
+
+DIAG_RE = re.compile(r'^(?P<f>[^\n]*?\.lean):(?P<l>\d+):(?P<c>\d+): (?P<k>warning|error|info): ', re.M)
+
+
+def diagnosticos(log):
+    texto = open(log, encoding='utf-8', errors='replace').read().replace('\r\n', '\n')
+    ms = list(DIAG_RE.finditer(texto))
+    out = []
+    for a, b in zip(ms, ms[1:] + [None]):
+        cuerpo = texto[a.end():b.start() if b else len(texto)]
+        out.append((int(a.group('l')), a.group('k'), cuerpo))
+    return out
+
+
+def clasifica(k, cuerpo):
+    m = re.search(r'set_option (linter\.[A-Za-z0-9_.]+) false', cuerpo)
+    if k == 'warning' and m:
+        return m.group(1)
+    if 'maximum number of heartbeats' in cuerpo or 'deterministic timeout' in cuerpo:
+        return 'maxHeartbeats'
+    if 'maximum recursion depth' in cuerpo:
+        return 'maxRecDepth'
+    return None
+
+
+def inicio_orden(lineas, est, bloques, L):
+    """La línea (0-based) donde empieza la orden que contiene la línea L (0-based), con su docstring y atributos."""
+    i = L
+    while i >= 0 and not (not est[i][0] and not est[i][1] and DECL_RE.match(lineas[i])):
+        i -= 1
+    if i < 0:
+        return None
+    # dentro de un mutual
+    j = i - 1
+    while j >= 0:
+        if not est[j][0] and not est[j][1]:
+            if re.match(r'^end\s*$', lineas[j]):
+                break
+            if re.match(r'^mutual\s*$', lineas[j]):
+                i = j
+                break
+        j -= 1
+    # docstring y atributos encima
+    fin = {b[1]: b for b in bloques}
+    while i > 0:
+        p = i - 1
+        # comentarios de línea entre el docstring y la orden: el docstring sigue siendo suyo
+        while p > 0 and not est[p][0] and re.match(r'^\s*--', lineas[p]):
+            p -= 1
+        if p in fin and fin[p][2] and lineas[p].rstrip().endswith('-/'):
+            i = fin[p][0]
+            continue
+        p = i - 1
+        if not est[p][0] and re.match(r'^@\[[^\]]*\]\s*$', lineas[p]):
+            i = p
+            continue
+        break
+    return i
+
+
+ORDEN = ['maxHeartbeats', 'maxRecDepth']
+
+
+def aplicar(raiz, lista, logs, backup):
+    opciones = json.load(open(os.path.join(backup, 'opciones.json')))
+    total = 0
+    raro = 0
+    for f in lista:
+        log = os.path.join(logs, f.replace('/', '__') + '.log')
+        if not os.path.exists(log):
+            print(f"⛔ {f}: sin log")
+            raro += 1
+            continue
+        ruta = os.path.join(raiz, f)
+        texto = open(ruta, encoding='utf-8', newline='').read()
+        crlf = '\r\n' in texto
+        lineas = texto.replace('\r\n', '\n').split('\n')
+        est, bloques = estado_lineas(lineas)
+        ops = opciones.get(f, {})
+        poner = {}   # línea de inicio → conjunto de opciones
+        for L, k, cuerpo in diagnosticos(log):
+            if k == 'info':
+                continue
+            o = clasifica(k, cuerpo)
+            i = inicio_orden(lineas, est, bloques, L - 1)
+            if o is None or i is None:
+                print(f"⛔ {f}:{L}: {k} sin clasificar: {cuerpo.strip()[:200]}")
+                raro += 1
+                continue
+            if o not in ops:
+                # un error sin su opción en el fichero: las de límite que hubiera
+                print(f"⚠️ {f}:{L}: {o} no estaba en el fichero ({ops})")
+                raro += 1
+                continue
+            # ya puesta en esa orden (ronda anterior): no repetir
+            ya = False
+            j = i
+            while j > 0 and re.match(r'^set_option\b.*\bin\s*$', lineas[j - 1]):
+                j -= 1
+            for t in range(j, i):
+                if lineas[t].split()[1] == o:
+                    ya = True
+            if ya:
+                print(f"⛔ {f}:{L}: {o} ya estaba en la orden de la línea {i + 1} y sigue fallando")
+                raro += 1
+                continue
+            poner.setdefault(i, set()).add(o)
+        for i in sorted(poner, reverse=True):
+            os_ = sorted(poner[i], key=lambda o: (ORDEN.index(o) if o in ORDEN else 9, o))
+            ins = [f"set_option {o} {ops[o]} in" for o in os_]
+            lineas[i:i] = ins
+            total += len(ins)
+        s = '\n'.join(lineas)
+        if crlf:
+            s = s.replace('\n', '\r\n')
+        if poner:
+            open(ruta, 'w', encoding='utf-8', newline='').write(s)
+        print(f"{f}: {sum(len(v) for v in poner.values())} `in` en {len(poner)} órdenes")
+    print(f"TOTAL {total} `in`; {raro} sin resolver")
+
+
+if __name__ == '__main__':
+    cmd = sys.argv[1]
+    raiz = sys.argv[2]
+    lista = [l.strip() for l in open(sys.argv[3]) if l.strip()]
+    if cmd == 'quitar':
+        quitar(raiz, lista, sys.argv[4])
+    elif cmd == 'aplicar':
+        aplicar(raiz, lista, sys.argv[4], sys.argv[5])

@@ -1,0 +1,10 @@
+#!/bin/bash
+# exporta.sh MODULO OUT decl... — leanexport en WSL con los .olean de Windows
+set -u
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+export PATH=$BIN:$PATH ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0
+R=/mnt/e/dropbox/github/lean4/ROBINSON_PlusPlus
+export LEAN_PATH=$R/.lake/build/lib/lean:/mnt/e/dropbox/github/lean4/FOL/.lake/build/lib/lean:/mnt/d/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/tc/olean
+M=$1; O=$2; shift 2
+/usr/bin/time -f "%e s %M KB" "$BIN/leanexport" "$M" -- "$@" > "$O"
+echo "rc=$? $(wc -c < "$O") bytes"

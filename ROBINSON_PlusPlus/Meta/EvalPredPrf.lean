@@ -45,9 +45,6 @@ open ROBINSON_PlusPlus.Meta.NatArithPrf ROBINSON_PlusPlus.Meta.CodeCtorKit
 open ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
-set_option maxHeartbeats 1000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.EvalPredPrf
 
 

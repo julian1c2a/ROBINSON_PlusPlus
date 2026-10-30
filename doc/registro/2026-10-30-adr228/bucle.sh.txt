@@ -1,0 +1,17 @@
+#!/bin/bash
+# bucle.sh EXPORT N — lean4lean, axiomizar el que falla, repetir: la lista de TODOS los que agotan
+set -u
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+S=$(dirname "$0")
+f=$1; N=${2:-60}; lista=""; cur=$f.b0
+cp "$f" "$cur"
+for i in $(seq 1 $N); do
+  out=$(timeout 900 "$BIN/lean4lean" --import "$cur" 2>&1 | tail -2)
+  n=$(printf '%s' "$out" | sed -n 's/.*uncaught exception: at \([^:]*\): .*/\1/p' | head -1)
+  if [ -z "$n" ]; then echo "FIN tras $((i-1)): $out"; break; fi
+  why=$(printf '%s' "$out" | sed -n 's/.*uncaught exception: at [^:]*: \(.\{0,80\}\).*/\1/p' | head -1)
+  echo "$i $n :: $why"
+  lista="$lista,$n"
+  python3 "$S/axiomiza.py" "$f" "$cur" "$lista" > /dev/null
+done
+echo "LISTA $lista"

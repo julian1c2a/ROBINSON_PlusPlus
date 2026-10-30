@@ -1,0 +1,20 @@
+# la ronda 1 (sin las opciones de fichero): diagnósticos por clase, contados en logs1/*.log
+   1682 warning: This simp argument is unused:
+     22 warning: Variable name 
+      7 error: maximum recursion depth has been reached
+      2 error: (deterministic) timeout at 
+
+# por opción a la que apunta el diagnóstico (lo que lee conv.py aplicar)
+   1682 set_option linter.unusedSimpArgs false
+     22 set_option linter.unusedVariables false
+
+# los errores de la ronda 1, uno por línea
+ROBINSON_PlusPlus/Meta/D3InDotPrf.lean:489:7: error: maximum recursion depth has been reached
+ROBINSON_PlusPlus/Meta/Delta0ReflectPrf.lean:208:7: error: maximum recursion depth has been reached
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean:320:34: error: maximum recursion depth has been reached
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean:363:34: error: maximum recursion depth has been reached
+ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1047:77: error: (deterministic) timeout at `isDefEq`, maximum number of heartbeats (200000) has been reached
+ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1048:7: error: (deterministic) timeout at `«synthesize pending MVars»`, maximum number of heartbeats (200000) has been reached
+ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1001:66: error: maximum recursion depth has been reached
+ROBINSON_PlusPlus/Meta/ReprPrf.lean:883:152: error: maximum recursion depth has been reached
+ROBINSON_PlusPlus/Meta/ReprPrf.lean:1067:114: error: maximum recursion depth has been reached

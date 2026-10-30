@@ -17,8 +17,6 @@ import FOL.Theorems.Quantifiers
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Full
 
 /-!
@@ -116,6 +114,7 @@ theorem primAxioms_subset : ∀ f ∈ primAxioms, f ∈ axioms := by
 
 /-! ### Lema de composición de sustitución (De Bruijn, offset 0) -/
 
+set_option linter.unusedSimpArgs false in
 mutual
 theorem substTerm_subst_succ_lift (m t : Term) :
     substTerm 0 m (substTerm 0 (succ (.var 0)) (liftTerm 1 t)) = substTerm 0 (succ m) t := by
@@ -143,6 +142,7 @@ end
 
 /-! ### Composición generalizada (offset arbitrario) — para fórmulas con `∀`/`∃` -/
 
+set_option linter.unusedSimpArgs false in
 mutual
 theorem substTerm_subst_succ_lift_gen (c : Nat) (m t : Term) :
     substTerm c m (substTerm c (succ (.var c)) (liftTerm (c + 1) t)) = substTerm c (succ m) t := by

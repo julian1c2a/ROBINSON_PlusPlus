@@ -55,8 +55,6 @@ open ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.HasWitTcFnPrf
 
 /-! ## §1 · El encuadre -/
@@ -228,6 +226,7 @@ theorem prf_ax_tc_succ (x : Term) : Prf (tcFn (succ x) =eq SUCCNODE x) := by
 La lista de argumentos del nodo `σ` tiene UN elemento. `argsIn W [hd]` se reduce a `In hd W`:
 la posición 0 es `hd`, y no hay más porque `lenc nil = 0` cierra el caso sucesor por `efq`. -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_argsIn_singleton (W hd : Term) :
     Prf (Formula.impl (In hd W) (argsIn W (cons hd nil))) := by
   refine prf_mp (Prf.qconf (In hd W) (argsInBody W (cons hd nil))) (Prf.gen _ ?_)

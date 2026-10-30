@@ -44,10 +44,6 @@ open ROBINSON_PlusPlus.Meta.CodeTreeReflect ROBINSON_PlusPlus.Meta.Delta0Reflect
 open ROBINSON_PlusPlus.Meta.HasWitTrackedPrf ROBINSON_PlusPlus.Meta.LineWFGuardPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf
 
 /-! ## §0 · LA TERCERA FORMA: `shapeNul`
@@ -985,6 +981,7 @@ theorem prf_substfc_hasWitFAcT_wT (T I UF UT : Term)
     exact prf_congr_atom2CodeFn
       (prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hT0 hI0)) hUF0
 
+set_option maxHeartbeats 1000000 in
 /-- ⭐⭐ **EL CUERPO, REFLEJADO Y CERRADO POR EL `∃∃`.** Los dos `pcc_exIntro_code_open` se
     encadenan por `prf_substfc_ex`, que es lo que convierte el `substfc` de nivel 0 sobre el
     `exc` en un `exc` del `substfc` de nivel 1. -/
@@ -1131,6 +1128,7 @@ theorem prf_condD_hasWitF_eq (t : Term) (i : Nat) :
   rw [← h]
   exact prf_substfc_arith_open 0 (tcFn t) _
 
+set_option linter.unusedSimpArgs false in
 /-- ⭐⭐⭐ **`DEUDA_hGuardF` PROBADA**, para toda casilla `i` bajo la longitud canónica `n`.
 
     La cota `i < n` es la misma de C3‑T y por la misma razón: el transporte

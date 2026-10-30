@@ -12,8 +12,6 @@ import FOL.Theorems.Eq
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.Hilbert
 
 /-!

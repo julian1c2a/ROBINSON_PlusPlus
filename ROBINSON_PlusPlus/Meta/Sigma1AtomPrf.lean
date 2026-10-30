@@ -18,8 +18,6 @@ open ROBINSON_PlusPlus.Meta.ProofChain
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ChainPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 
 /-!

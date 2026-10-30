@@ -26,9 +26,6 @@ open ROBINSON_PlusPlus.Meta.Representability
 open ROBINSON_PlusPlus.Meta.ProofChain
 open ROBINSON_PlusPlus.Meta.SubstArith
 
-set_option linter.unusedSimpArgs false
-set_option maxRecDepth 16000
-
 namespace ROBINSON_PlusPlus.Meta.ReprPrf
 
 /-!
@@ -67,6 +64,7 @@ theorem prf_mp {A B : Formula} (hAB : Prf (A ⇒ B)) (hA : Prf A) : Prf B :=
 
 /-! ### Sonda: ecuaciones de `runFn`/`chainOk` portadas a `Prf` -/
 
+set_option linter.unusedSimpArgs false in
 /-- `Prf (runFn c nil =eq c)` (porte de `runFn_nil`). -/
 theorem prf_runFn_nil (c : Term) : Prf (runFn c nil =eq c) := by
   have hh := prf_spec (prf_ax (show ax_runFn_nil ∈ axioms by simp [axioms])) c
@@ -74,6 +72,7 @@ theorem prf_runFn_nil (c : Term) : Prf (runFn c nil =eq c) := by
     FOL.substTerm_liftTerm] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- `Prf (runFn c (cons line rest) =eq runFn (concat c [carc line]) rest)`. -/
 theorem prf_runFn_cons (c line rest : Term) :
     Prf (runFn c (cons line rest) =eq runFn (concat c (cons (carc line) nil)) rest) := by
@@ -132,6 +131,7 @@ theorem prf_or_intro_left {a b : Formula} (ha : Prf a) : Prf (a ∨ b) :=
 theorem prf_or_intro_right {a b : Formula} (hb : Prf b) : Prf (a ∨ b) :=
   prf_mp (Prf.incl (Prfᵢ.j2 a b)) hb
 
+set_option linter.unusedSimpArgs false in
 /-- Transitividad de `=eq` en `Prf` (vía Leibniz sobre `· =eq c`). -/
 theorem prf_eq_trans {a b c : Term} (h1 : Prf (a =eq b)) (h2 : Prf (b =eq c)) : Prf (a =eq c) := by
   let f : Formula := Formula.eq (liftTerm 0 a) (.var 0)
@@ -139,6 +139,7 @@ theorem prf_eq_trans {a b c : Term} (h1 : Prf (a =eq b)) (h2 : Prf (b =eq c)) : 
     intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS c) ▸ prf_leibniz_subst (A := f) h2 ((hS b) ▸ h1)
 
+set_option linter.unusedSimpArgs false in
 /-- Simetría de `=eq` en `Prf`. -/
 theorem prf_eq_symm {a b : Term} (h : Prf (a =eq b)) : Prf (b =eq a) := by
   let f : Formula := Formula.eq (.var 0) (liftTerm 0 a)
@@ -207,6 +208,7 @@ theorem prf_eq_subst_in {x t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) (hin : Pr
 
 /-! ### Ecuaciones `Prf` de `carc`/`concat`/`chainOk`/`allIn` -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_carc_cons (h t : Term) : Prf (carc (cons h t) =eq h) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_carc ∈ axioms by simp [axioms])) h) t
   simp [ax_carc, substFormula, substTerm, substTerms, carc, cons, nil, zero, succ,
@@ -396,11 +398,13 @@ theorem prf_lineWF_iff_transport_in {L x x' C : Term}
       ite_true]
   exact (hS x') ▸ prf_leibniz_subst (A := A) hx ((hS x) ▸ h)
 
+set_option linter.unusedSimpArgs false in
 theorem prf_concat_nil_eq (X : Term) : Prf (concat nil X =eq X) := by
   have hh := prf_spec (prf_ax (show ax_C1_concat_nil ∈ axioms by simp [axioms])) X
   simp [ax_C1_concat_nil, substFormula, substTerm, substTerms, concat, nil, zero] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_concat_cons_eq (h t X : Term) : Prf (concat (cons h t) X =eq cons h (concat t X)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_C2_concat_cons ∈ axioms by simp [axioms])) h) t) X
   simp [ax_C2_concat_cons, substFormula, substTerm, substTerms, concat, cons, nil, zero,
@@ -412,6 +416,7 @@ theorem prf_chainOk_nil (c : Term) : Prf (chainOk c nil) := by
   simpa [ax_chainOk_nil, substFormula, substTerm, substTerms, chainOk, nil, zero,
     FOL.substTerm_liftTerm] using hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_chainOk_cons (c line rest : Term) :
     Prf (chainOk c (cons line rest) ⇔
       land (lineOk c line) (chainOk (concat c (cons (carc line) nil)) rest)) := by
@@ -426,6 +431,7 @@ theorem prf_allIn_nil (c : Term) : Prf (allIn c nil) := by
   simpa [ax_allIn_nil, substFormula, substTerm, substTerms, allIn, nil, zero,
     FOL.substTerm_liftTerm] using hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_allIn_cons (c x t : Term) :
     Prf (allIn c (cons x t) ⇔ land (In x c) (allIn c t)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_allIn_cons ∈ axioms by simp [axioms])) c) x) t
@@ -435,6 +441,7 @@ theorem prf_allIn_cons (c x t : Term) :
 
 /-! ### `In`-primitivos en `Prf` -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_in_cons_head (x t : Term) : Prf (In x (cons x t)) := by
   have hiff : Prf (In x (cons x t) ⇔ lor (x =eq x) (In x t)) := by
     have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_L2_in_cons ∈ axioms by simp [axioms])) x) x) t
@@ -443,6 +450,7 @@ theorem prf_in_cons_head (x t : Term) : Prf (In x (cons x t)) := by
     exact hh
   exact prf_iff_mpr hiff (prf_or_intro_left (prf_refl x))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_in_cons_tail (hd : Term) {x t : Term} (hx : Prf (In x t)) : Prf (In x (cons hd t)) := by
   have hiff : Prf (In x (cons hd t) ⇔ lor (x =eq hd) (In x t)) := by
     have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_L2_in_cons ∈ axioms by simp [axioms])) x) hd) t
@@ -462,6 +470,7 @@ theorem prf_In_listFormCode {g : Formula} : ∀ {l : List Formula},
 
 /-! ### Validez `Prf` de las reglas de inferencia (mp/gen/thy) -/
 
+set_option linter.unusedSimpArgs false in
 /-- MP. Recuperado del axioma en forma de accesores + cláusula canónica (esquema ESTRICTO):
     instanciar en la línea explícita, descargar el tag por cómputo, y aplicar `iff.mpr` a la
     longitud `lenc = 3̇` (demostrable en la línea canónica). El enunciado sigue siendo
@@ -482,6 +491,7 @@ theorem prf_lineWF_mp (concl premA : Term) :
           (prf_eq_congr_succ_loc prf_lenc_nil_loc)))))
   exact prf_iff_mpr (prf_mp hax htag) hlenc
 
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_mp (concl premA : Term) :
     Prf (premsOf (cons concl (cons (numeralM 16) (cons premA nil))) =eq
       cons (implc premA concl) (cons premA nil)) := by
@@ -490,6 +500,7 @@ theorem prf_premsOf_mp (concl premA : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_gen (concl body : Term) :
     Prf (lineWF (cons concl (cons (numeralM 17) (cons body (nil)))) ⇔
       (concl =eq forallc (body))) := by
@@ -502,6 +513,7 @@ theorem prf_lineWF_gen (concl body : Term) :
   have h_body : Prf (nthc (cons concl (cons (numeralM 17) (cons body (nil)))) (numeralM 2) =eq body) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 17) (cons body (nil)))) =eq numeralM 3) := prf_lenc_3_loc _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_un (h_body))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_gen (concl body : Term) :
     Prf (premsOf (cons concl (cons (numeralM 17) (cons body nil))) =eq cons body nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_premsOf_gen ∈ axioms by simp [axioms])) concl) body
@@ -509,6 +521,7 @@ theorem prf_premsOf_gen (concl body : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- THY. Recuperado del axioma en forma de accesores + cláusula canónica (esquema ESTRICTO):
     instanciar en la línea explícita, descargar el tag por cómputo, eliminar el conjunto
     `lenc = 2̇` (demostrable en la línea canónica) y transportar `carc L → concl`. -/
@@ -528,6 +541,7 @@ theorem prf_lineWF_thy (concl : Term) :
   exact prf_lineWF_iff_transport_in
     (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc
 
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_thy (concl : Term) :
     Prf (premsOf (cons concl (cons (numeralM 15) nil)) =eq nil) := by
   have hh := prf_spec (prf_ax (show ax_premsOf_thy ∈ axioms by simp [axioms])) concl
@@ -537,6 +551,7 @@ theorem prf_premsOf_thy (concl : Term) :
 
 /-! ### `lineWF`/`premsOf` de los esquemas proposicionales en `Prf` (porte de ProofChain) -/
 
+set_option linter.unusedSimpArgs false in
 /-- P1. Recuperado del axioma en forma de accesores (§44): instanciar en la línea explícita,
     descargar la hipótesis del tag (`nthc L 1 =eq 0`) por cómputo, y transportar los accesores
     (`carc L → concl`, `nthc L 2/3 → a/b`). -/
@@ -559,6 +574,7 @@ theorem prf_lineWF_p1 (concl a b : Term) :
       (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 0) (cons a (cons b nil)))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin h2 (prf_congr_bin h3 h2))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_p1 (concl a b : Term) :
     Prf (premsOf (cons concl (cons (numeralM 0) (cons a (cons b nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_p1 ∈ axioms by simp [axioms])) concl) a) b
@@ -566,6 +582,7 @@ theorem prf_premsOf_p1 (concl a b : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- P2. -/
 theorem prf_lineWF_p2 (concl a b c : Term) :
     Prf (lineWF (cons concl (cons (numeralM 1) (cons a (cons b (cons c (nil)))))) ⇔
@@ -581,6 +598,7 @@ theorem prf_lineWF_p2 (concl a b c : Term) :
   have h_c : Prf (nthc (cons concl (cons (numeralM 1) (cons a (cons b (cons c (nil)))))) (numeralM 4) =eq c) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 1) (cons a (cons b (cons c (nil)))))) =eq numeralM 5) := prf_lenc_5_loc _ _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (prf_congr_bin (h_a) (prf_congr_bin (h_b) (h_c))) (prf_congr_bin (prf_congr_bin (h_a) (h_b)) (prf_congr_bin (h_a) (h_c))))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_p2 (concl a b c : Term) :
     Prf (premsOf (cons concl (cons (numeralM 1) (cons a (cons b (cons c nil))))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_p2 ∈ axioms by simp [axioms])) concl) a) b) c
@@ -588,6 +606,7 @@ theorem prf_premsOf_p2 (concl a b c : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- C1. -/
 theorem prf_lineWF_c1 (concl a b : Term) :
     Prf (lineWF (cons concl (cons (numeralM 2) (cons a (cons b (nil))))) ⇔
@@ -602,6 +621,7 @@ theorem prf_lineWF_c1 (concl a b : Term) :
   have h_b : Prf (nthc (cons concl (cons (numeralM 2) (cons a (cons b (nil))))) (numeralM 3) =eq b) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 2) (cons a (cons b (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (h_a) (prf_congr_bin (h_b) (prf_congr_bin (h_a) (h_b))))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_c1 (concl a b : Term) :
     Prf (premsOf (cons concl (cons (numeralM 2) (cons a (cons b nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_c1 ∈ axioms by simp [axioms])) concl) a) b
@@ -609,6 +629,7 @@ theorem prf_premsOf_c1 (concl a b : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- C2. -/
 theorem prf_lineWF_c2 (concl a b : Term) :
     Prf (lineWF (cons concl (cons (numeralM 3) (cons a (cons b (nil))))) ⇔
@@ -623,6 +644,7 @@ theorem prf_lineWF_c2 (concl a b : Term) :
   have h_b : Prf (nthc (cons concl (cons (numeralM 3) (cons a (cons b (nil))))) (numeralM 3) =eq b) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 3) (cons a (cons b (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (prf_congr_bin (h_a) (h_b)) (h_a))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_c2 (concl a b : Term) :
     Prf (premsOf (cons concl (cons (numeralM 3) (cons a (cons b nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_c2 ∈ axioms by simp [axioms])) concl) a) b
@@ -630,6 +652,7 @@ theorem prf_premsOf_c2 (concl a b : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- C3. -/
 theorem prf_lineWF_c3 (concl a b : Term) :
     Prf (lineWF (cons concl (cons (numeralM 4) (cons a (cons b (nil))))) ⇔
@@ -644,6 +667,7 @@ theorem prf_lineWF_c3 (concl a b : Term) :
   have h_b : Prf (nthc (cons concl (cons (numeralM 4) (cons a (cons b (nil))))) (numeralM 3) =eq b) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 4) (cons a (cons b (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (prf_congr_bin (h_a) (h_b)) (h_b))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_c3 (concl a b : Term) :
     Prf (premsOf (cons concl (cons (numeralM 4) (cons a (cons b nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_c3 ∈ axioms by simp [axioms])) concl) a) b
@@ -651,6 +675,7 @@ theorem prf_premsOf_c3 (concl a b : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- J1. -/
 theorem prf_lineWF_j1 (concl a b : Term) :
     Prf (lineWF (cons concl (cons (numeralM 5) (cons a (cons b (nil))))) ⇔
@@ -665,6 +690,7 @@ theorem prf_lineWF_j1 (concl a b : Term) :
   have h_b : Prf (nthc (cons concl (cons (numeralM 5) (cons a (cons b (nil))))) (numeralM 3) =eq b) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 5) (cons a (cons b (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (h_a) (prf_congr_bin (h_a) (h_b)))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_j1 (concl a b : Term) :
     Prf (premsOf (cons concl (cons (numeralM 5) (cons a (cons b nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_j1 ∈ axioms by simp [axioms])) concl) a) b
@@ -672,6 +698,7 @@ theorem prf_premsOf_j1 (concl a b : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- J2. -/
 theorem prf_lineWF_j2 (concl a b : Term) :
     Prf (lineWF (cons concl (cons (numeralM 6) (cons a (cons b (nil))))) ⇔
@@ -686,6 +713,7 @@ theorem prf_lineWF_j2 (concl a b : Term) :
   have h_b : Prf (nthc (cons concl (cons (numeralM 6) (cons a (cons b (nil))))) (numeralM 3) =eq b) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 6) (cons a (cons b (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (h_b) (prf_congr_bin (h_a) (h_b)))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_j2 (concl a b : Term) :
     Prf (premsOf (cons concl (cons (numeralM 6) (cons a (cons b nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_j2 ∈ axioms by simp [axioms])) concl) a) b
@@ -693,6 +721,7 @@ theorem prf_premsOf_j2 (concl a b : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- J3. -/
 theorem prf_lineWF_j3 (concl a b c : Term) :
     Prf (lineWF (cons concl (cons (numeralM 7) (cons a (cons b (cons c (nil)))))) ⇔
@@ -708,6 +737,7 @@ theorem prf_lineWF_j3 (concl a b c : Term) :
   have h_c : Prf (nthc (cons concl (cons (numeralM 7) (cons a (cons b (cons c (nil)))))) (numeralM 4) =eq c) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 7) (cons a (cons b (cons c (nil)))))) =eq numeralM 5) := prf_lenc_5_loc _ _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (prf_congr_bin (h_a) (h_b)) (prf_congr_bin (prf_congr_bin (h_a) (h_c)) (prf_congr_bin (prf_congr_bin (h_b) (h_c)) (h_c))))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_j3 (concl a b c : Term) :
     Prf (premsOf (cons concl (cons (numeralM 7) (cons a (cons b (cons c nil))))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_j3 ∈ axioms by simp [axioms])) concl) a) b) c
@@ -715,6 +745,7 @@ theorem prf_premsOf_j3 (concl a b c : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- EFQ. -/
 theorem prf_lineWF_efq (concl a : Term) :
     Prf (lineWF (cons concl (cons (numeralM 8) (cons a (nil)))) ⇔
@@ -728,6 +759,7 @@ theorem prf_lineWF_efq (concl a : Term) :
   have h_a : Prf (nthc (cons concl (cons (numeralM 8) (cons a (nil)))) (numeralM 2) =eq a) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 8) (cons a (nil)))) =eq numeralM 3) := prf_lenc_3_loc _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (prf_refl botc) (h_a))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_efq (concl a : Term) :
     Prf (premsOf (cons concl (cons (numeralM 8) (cons a nil))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_premsOf_efq ∈ axioms by simp [axioms])) concl) a
@@ -735,6 +767,7 @@ theorem prf_premsOf_efq (concl a : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- EQREFL. -/
 theorem prf_lineWF_eqrefl (concl t : Term) :
     Prf (lineWF (cons concl (cons (numeralM 12) (cons t (nil)))) ⇔
@@ -754,6 +787,7 @@ theorem prf_lineWF_eqrefl (concl t : Term) :
           (prf_eq_congr_succ_loc prf_lenc_nil_loc)))))
   exact prf_lineWF_iff_transport
     (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (h_t) (h_t))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_eqrefl (concl t : Term) :
     Prf (premsOf (cons concl (cons (numeralM 12) (cons t nil))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_premsOf_eqrefl ∈ axioms by simp [axioms])) concl) t
@@ -761,6 +795,7 @@ theorem prf_premsOf_eqrefl (concl t : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- P3. -/
 theorem prf_lineWF_p3 (concl a : Term) :
     Prf (lineWF (cons concl (cons (numeralM 14) (cons a (nil)))) ⇔
@@ -774,6 +809,7 @@ theorem prf_lineWF_p3 (concl a : Term) :
   have h_a : Prf (nthc (cons concl (cons (numeralM 14) (cons a (nil)))) (numeralM 2) =eq a) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 14) (cons a (nil)))) =eq numeralM 3) := prf_lenc_3_loc _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (prf_congr_bin (prf_congr_bin (h_a) (prf_refl botc)) (prf_refl botc)) (h_a))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_p3 (concl a : Term) :
     Prf (premsOf (cons concl (cons (numeralM 14) (cons a nil))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_premsOf_p3 ∈ axioms by simp [axioms])) concl) a
@@ -783,6 +819,7 @@ theorem prf_premsOf_p3 (concl a : Term) :
 
 /-! ### `lineWF`/`premsOf` de los esquemas de sustitución en `Prf` (porte de ProofChain) -/
 
+set_option linter.unusedSimpArgs false in
 /-- Q1. -/
 theorem prf_lineWF_q1 (concl A t : Term) (hwA : Prf (hasWitF A)) (hwt : Prf (hasWit t)) :
     Prf (lineWF (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) ⇔
@@ -797,6 +834,7 @@ theorem prf_lineWF_q1 (concl A t : Term) (hwA : Prf (hasWitF A)) (hwt : Prf (has
   have h_t : Prf (nthc (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) (numeralM 3) =eq t) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) (prf_congr_hasWitF (prf_eq_symm h_A) hwA)) (prf_congr_hasWit (prf_eq_symm h_t) hwt)) hc (prf_congr_bin (prf_congr_un (h_A)) (prf_eq_trans (prf_congr_substfc_a2_loc (h_t)) (prf_congr_substfc_a3_loc (h_A))))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_q1 (concl A t : Term) :
     Prf (premsOf (cons concl (cons (numeralM 9) (cons A (cons t nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_q1 ∈ axioms by simp [axioms])) concl) A) t
@@ -804,6 +842,7 @@ theorem prf_premsOf_q1 (concl A t : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- Q2. -/
 theorem prf_lineWF_q2 (concl A t : Term) (hwA : Prf (hasWitF A)) (hwt : Prf (hasWit t)) :
     Prf (lineWF (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) ⇔
@@ -818,6 +857,7 @@ theorem prf_lineWF_q2 (concl A t : Term) (hwA : Prf (hasWitF A)) (hwt : Prf (has
   have h_t : Prf (nthc (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) (numeralM 3) =eq t) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) (prf_congr_hasWitF (prf_eq_symm h_A) hwA)) (prf_congr_hasWit (prf_eq_symm h_t) hwt)) hc (prf_congr_bin (prf_eq_trans (prf_congr_substfc_a2_loc (h_t)) (prf_congr_substfc_a3_loc (h_A))) (prf_congr_un (h_A)))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_q2 (concl A t : Term) :
     Prf (premsOf (cons concl (cons (numeralM 10) (cons A (cons t nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_q2 ∈ axioms by simp [axioms])) concl) A) t
@@ -825,6 +865,7 @@ theorem prf_premsOf_q2 (concl A t : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- Q3. -/
 theorem prf_lineWF_q3 (concl A B : Term) (hwB : Prf (hasWitF B)) :
     Prf (lineWF (cons concl (cons (numeralM 11) (cons A (cons B (nil))))) ⇔
@@ -839,6 +880,7 @@ theorem prf_lineWF_q3 (concl A B : Term) (hwB : Prf (hasWitF B)) :
   have h_B : Prf (nthc (cons concl (cons (numeralM 11) (cons A (cons B (nil))))) (numeralM 3) =eq B) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 11) (cons A (cons B (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) (prf_congr_hasWitF (prf_eq_symm h_B) hwB)) hc (prf_congr_bin (prf_congr_un (prf_congr_bin (h_A) (prf_congr_liftfc_a2_loc (h_B)))) (prf_congr_bin (prf_congr_un (h_A)) (h_B)))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_q3 (concl A B : Term) :
     Prf (premsOf (cons concl (cons (numeralM 11) (cons A (cons B nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_q3 ∈ axioms by simp [axioms])) concl) A) B
@@ -846,6 +888,7 @@ theorem prf_premsOf_q3 (concl A B : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- LEIBNIZ. -/
 theorem prf_lineWF_leibniz (concl A t1 t2 : Term) (hwA : Prf (hasWitF A)) (hwt1 : Prf (hasWit t1)) (hwt2 : Prf (hasWit t2)) :
     Prf (lineWF (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil)))))) ⇔
@@ -861,6 +904,7 @@ theorem prf_lineWF_leibniz (concl A t1 t2 : Term) (hwA : Prf (hasWitF A)) (hwt1 
   have h_t2 : Prf (nthc (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil)))))) (numeralM 4) =eq t2) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil)))))) =eq numeralM 5) := prf_lenc_5_loc _ _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) (prf_congr_hasWitF (prf_eq_symm h_A) hwA)) (prf_congr_hasWit (prf_eq_symm h_t1) hwt1)) (prf_congr_hasWit (prf_eq_symm h_t2) hwt2)) hc (prf_congr_bin (prf_congr_bin (h_t1) (h_t2)) (prf_congr_bin (prf_eq_trans (prf_congr_substfc_a2_loc (h_t1)) (prf_congr_substfc_a3_loc (h_A))) (prf_eq_trans (prf_congr_substfc_a2_loc (h_t2)) (prf_congr_substfc_a3_loc (h_A)))))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_leibniz (concl A t₁ t₂ : Term) :
     Prf (premsOf (cons concl (cons (numeralM 13) (cons A (cons t₁ (cons t₂ nil))))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_leibniz ∈ axioms by simp [axioms])) concl) A) t₁) t₂
@@ -869,6 +913,8 @@ theorem prf_premsOf_leibniz (concl A t₁ t₂ : Term) :
     substTerm_liftLiftLiftLift] at hh
   exact hh
 
+set_option maxRecDepth 16000 in
+set_option linter.unusedSimpArgs false in
 /-- IND (códigos cerrados `termCodeM`, gestionados por clausura como en `vpf_ind`). -/
 theorem prf_lineWF_ind (concl a : Term) (hwa : Prf (hasWitF a)) :
     Prf (lineWF (cons concl (cons (numeralM 18) (cons a (nil)))) ⇔
@@ -884,6 +930,7 @@ theorem prf_lineWF_ind (concl a : Term) (hwa : Prf (hasWitF a)) :
     prf_congr_bin (prf_congr_substfc_a3_loc (h_a)) (prf_congr_bin (prf_congr_un (prf_congr_bin (h_a) (prf_congr_substfc_a3_loc (prf_congr_liftfc_a2_loc (h_a))))) (prf_congr_un (h_a)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 18) (cons a (nil)))) =eq numeralM 3) := prf_lenc_3_loc _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) (prf_congr_hasWitF (prf_eq_symm h_a) hwa)) hc hy
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_ind (concl a : Term) :
     Prf (premsOf (cons concl (cons (numeralM 18) (cons a nil))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_premsOf_ind ∈ axioms by simp [axioms])) concl) a
@@ -891,6 +938,7 @@ theorem prf_premsOf_ind (concl a : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- LISTIND (tag 20, [A]): inducción de listas, en `Prf`. -/
 theorem prf_lineWF_listInd (concl a : Term) (hwa : Prf (hasWitF a)) :
     Prf (lineWF (cons concl (cons (numeralM 20) (cons a (nil)))) ⇔
@@ -906,6 +954,7 @@ theorem prf_lineWF_listInd (concl a : Term) (hwa : Prf (hasWitF a)) :
     prf_congr_bin (prf_congr_substfc_a3_loc (h_a)) (prf_congr_bin (prf_congr_un (prf_congr_un (prf_congr_bin (prf_congr_liftfc_a2_loc (h_a)) (prf_congr_substfc_a3_loc (prf_congr_liftfc_a2_loc (prf_congr_liftfc_a2_loc (h_a))))))) (prf_congr_un (h_a)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 20) (cons a (nil)))) =eq numeralM 3) := prf_lenc_3_loc _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) (prf_congr_hasWitF (prf_eq_symm h_a) hwa)) hc hy
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_listInd (concl a : Term) :
     Prf (premsOf (cons concl (cons (numeralM 20) (cons a nil))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_premsOf_listInd ∈ axioms by simp [axioms])) concl) a
@@ -913,6 +962,7 @@ theorem prf_premsOf_listInd (concl a : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- QCONF (tag 19, [P,C]): confinamiento ∀, en `Prf`. -/
 theorem prf_lineWF_qconf (concl P Cc : Term) (hwP : Prf (hasWitF P)) :
     Prf (lineWF (cons concl (cons (numeralM 19) (cons P (cons Cc (nil))))) ⇔
@@ -927,6 +977,7 @@ theorem prf_lineWF_qconf (concl P Cc : Term) (hwP : Prf (hasWitF P)) :
   have h_Cc : Prf (nthc (cons concl (cons (numeralM 19) (cons P (cons Cc (nil))))) (numeralM 3) =eq Cc) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
   have hlenc : Prf (lenc (cons concl (cons (numeralM 19) (cons P (cons Cc (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_iff_transport (prf_iff_drop_left_conj (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) (prf_congr_hasWitF (prf_eq_symm h_P) hwP)) hc (prf_congr_bin (prf_congr_un (prf_congr_bin (prf_congr_liftfc_a2_loc (h_P)) (h_Cc))) (prf_congr_bin (h_P) (prf_congr_un (h_Cc))))
+set_option linter.unusedSimpArgs false in
 theorem prf_premsOf_qconf (concl P C : Term) :
     Prf (premsOf (cons concl (cons (numeralM 19) (cons P (cons C nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_qconf ∈ axioms by simp [axioms])) concl) P) C
@@ -938,6 +989,7 @@ theorem prf_premsOf_qconf (concl P C : Term) :
 
 /-! ### Las siete mitades `→`, generadas del mismo esquema (ADR-020) -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_q1_imp (concl A t : Term) :
     Prf (lineWF (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) ⇒
       (concl =eq implc (forallc (A)) (substfc (zero) (t) (A)))) := by
@@ -952,6 +1004,7 @@ theorem prf_lineWF_q1_imp (concl A t : Term) :
   have hlenc : Prf (lenc (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_imp_transport (prf_imp_and_right (prf_imp_and_right (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag))))) hc (prf_congr_bin (prf_congr_un (h_A)) (prf_eq_trans (prf_congr_substfc_a2_loc (h_t)) (prf_congr_substfc_a3_loc (h_A))))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_q2_imp (concl A t : Term) :
     Prf (lineWF (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) ⇒
       (concl =eq implc (substfc (zero) (t) (A)) (exc (A)))) := by
@@ -966,6 +1019,7 @@ theorem prf_lineWF_q2_imp (concl A t : Term) :
   have hlenc : Prf (lenc (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_imp_transport (prf_imp_and_right (prf_imp_and_right (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag))))) hc (prf_congr_bin (prf_eq_trans (prf_congr_substfc_a2_loc (h_t)) (prf_congr_substfc_a3_loc (h_A))) (prf_congr_un (h_A)))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_q3_imp (concl A B : Term) :
     Prf (lineWF (cons concl (cons (numeralM 11) (cons A (cons B (nil))))) ⇒
       (concl =eq implc (forallc (implc (A) (liftfc (zero) (B)))) (implc (exc (A)) (B)))) := by
@@ -980,6 +1034,7 @@ theorem prf_lineWF_q3_imp (concl A B : Term) :
   have hlenc : Prf (lenc (cons concl (cons (numeralM 11) (cons A (cons B (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_imp_transport (prf_imp_and_right (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag)))) hc (prf_congr_bin (prf_congr_un (prf_congr_bin (h_A) (prf_congr_liftfc_a2_loc (h_B)))) (prf_congr_bin (prf_congr_un (h_A)) (h_B)))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_leibniz_imp (concl A t1 t2 : Term) :
     Prf (lineWF (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil)))))) ⇒
       (concl =eq implc (eqc (t1) (t2)) (implc (substfc (zero) (t1) (A)) (substfc (zero) (t2) (A))))) := by
@@ -1013,6 +1068,7 @@ que guardar.* -/
 theorem prf_imp_and_left {A P Q : Formula} (h : Prf (A ⇒ Formula.and P Q)) : Prf (A ⇒ P) :=
   prf_syll h (Prf.incl (Prfᵢ.c2 P Q))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_q1_hasWit (concl A t : Term) :
     Prf (lineWF (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) ⇒
       hasWit (nthc (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) (numeralM 3))) := by
@@ -1026,6 +1082,7 @@ theorem prf_lineWF_q1_hasWit (concl A t : Term) :
   exact prf_imp_and_left (prf_imp_and_right (prf_imp_and_right
     (prf_and_elim_left (prf_mp hax htag))))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_q2_hasWit (concl A t : Term) :
     Prf (lineWF (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) ⇒
       hasWit (nthc (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) (numeralM 3))) := by
@@ -1039,6 +1096,7 @@ theorem prf_lineWF_q2_hasWit (concl A t : Term) :
   exact prf_imp_and_left (prf_imp_and_right (prf_imp_and_right
     (prf_and_elim_left (prf_mp hax htag))))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_leibniz_hasWitF (concl A t1 t2 : Term) :
     Prf (lineWF (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil)))))) ⇒
       hasWitF (nthc (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil))))))
@@ -1054,6 +1112,8 @@ theorem prf_lineWF_leibniz_hasWitF (concl A t1 t2 : Term) :
   exact prf_imp_and_left (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag)))
 
 
+set_option maxRecDepth 16000 in
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_ind_imp (concl a : Term) :
     Prf (lineWF (cons concl (cons (numeralM 18) (cons a (nil)))) ⇒
       (concl =eq implc (substfc (zero) (termCodeM zero) (a)) (implc (forallc (implc (a) (substfc (zero) (termCodeM (succ (.var 0))) (liftfc (succ zero) (a))))) (forallc (a))))) := by
@@ -1069,6 +1129,7 @@ theorem prf_lineWF_ind_imp (concl a : Term) :
   have hlenc : Prf (lenc (cons concl (cons (numeralM 18) (cons a (nil)))) =eq numeralM 3) := prf_lenc_3_loc _ _ _
   exact prf_lineWF_imp_transport (prf_imp_and_right (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag)))) hc hy
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_qconf_imp (concl P Cc : Term) :
     Prf (lineWF (cons concl (cons (numeralM 19) (cons P (cons Cc (nil))))) ⇒
       (concl =eq implc (forallc (implc (liftfc (zero) (P)) (Cc))) (implc (P) (forallc (Cc))))) := by
@@ -1083,6 +1144,7 @@ theorem prf_lineWF_qconf_imp (concl P Cc : Term) :
   have hlenc : Prf (lenc (cons concl (cons (numeralM 19) (cons P (cons Cc (nil))))) =eq numeralM 4) := prf_lenc_4_loc _ _ _ _
   exact prf_lineWF_imp_transport (prf_imp_and_right (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag)))) hc (prf_congr_bin (prf_congr_un (prf_congr_bin (prf_congr_liftfc_a2_loc (h_P)) (h_Cc))) (prf_congr_bin (h_P) (prf_congr_un (h_Cc))))
 
+set_option linter.unusedSimpArgs false in
 theorem prf_lineWF_listInd_imp (concl a : Term) :
     Prf (lineWF (cons concl (cons (numeralM 20) (cons a (nil)))) ⇒
       (concl =eq implc (substfc (zero) (termCodeM nil) (a)) (implc (forallc (forallc (implc (liftfc (succ zero) (a)) (substfc (zero) (termCodeM (cons (.var 1) (.var 0))) (liftfc (succ (succ zero)) (liftfc (succ zero) (a))))))) (forallc (a))))) := by

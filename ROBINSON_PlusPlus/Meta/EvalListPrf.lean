@@ -26,9 +26,6 @@ open ROBINSON_PlusPlus.Meta.NumListPrf
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.DotConsPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.EvalListPrf
 
 /-!

@@ -17,9 +17,6 @@ open ROBINSON_PlusPlus.Meta.Representability2Prf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 
 /-!
@@ -39,6 +36,7 @@ theorem liftTerm_exc (Ac : Term) (hAc : ∀ c, liftTerm c Ac = Ac) :
   intro c
   simp only [exc, cons, nil, zero, succ, liftTerm, liftTerms, hAc c]
 
+set_option linter.unusedSimpArgs false in
 /-- Clausura de `provFromCode (exc Ac)` bajo `liftFormula 0` (para `Ac` cerrado a todo nivel,
     como `formCode psi` via `liftTerm_formCode`). -/
 theorem liftFormula_provFromCode_exc (Ac : Term) (hAc : ∀ c, liftTerm c Ac = Ac) :
@@ -76,6 +74,7 @@ de `d2_prf`. (✏️ 2026‑10‑14, ADR‑134: desde el 2026‑07‑10 este ens
 `pcc_exIntro_code'`, con testigo abierto, y `pcc_exIntro_code` es su corolario; desde ADR‑020 los
 dos piden además las guardas `hwF`/`hwT`, así que `w` tampoco es del todo arbitrario.) -/
 
+set_option linter.unusedSimpArgs false in
 /-- **∃‑intro a nivel de código** (reflexión de la regla Q2): para `Ac` cerrado a todo nivel
     (`hAc`) y testigo `w` ABIERTO, con las guardas de ADR‑020 `hwF : Prf (hasWitF Ac)` y
     `hwT : Prf (hasWit (liftTerm 0 w))`, de la demostrabilidad del código sustituido

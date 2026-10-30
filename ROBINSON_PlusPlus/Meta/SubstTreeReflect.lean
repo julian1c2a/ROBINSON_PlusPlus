@@ -74,10 +74,6 @@ open ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf
 open ROBINSON_PlusPlus.Meta.LineWFAssemblePrf ROBINSON_PlusPlus.Meta.NatMulPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.SubstTreeReflect
 
 /-! ## §1 · EL ÁRBOL, CON NODO `sub` -/
@@ -303,11 +299,13 @@ theorem prf_hasWit_dotN (t : Term) : ∀ T : STree, Prf (hasWit (T.dotN t))
 /-- La condición estructural asociada a un árbol con sustituciones. -/
 def condOfS (T : STree) : Formula := carc (.var 0) =eq T.objAt (.var 0)
 
+set_option linter.unusedSimpArgs false in
 theorem substFormula_condOfS (T : STree) :
     substFormula 0 (.var 0) (condOfS T) = condOfS T := by
   simp only [condOfS, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
     ite_true, substTerm_objAt_var0 T]
 
+set_option linter.unusedSimpArgs false in
 theorem substFormula_condOfS_at (T : STree) (t : Term) :
     substFormula 0 t (condOfS T) = (carc t =eq T.objAt t) := by
   simp only [condOfS, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
@@ -717,6 +715,7 @@ theorem pcc_condDS_of_stree (T : STree) (t : Term) {n : Nat} (hmax : Nat.le T.ma
 
 La obligación administrativa `hC` del chasis, para una condición guardada. -/
 
+set_option linter.unusedSimpArgs false in
 theorem substFormula_guardedCond_var0 :
     ∀ (gs : List GuardSlot) (C : Formula), substFormula 0 (.var 0) C = C →
       substFormula 0 (.var 0) (guardedCond gs C) = guardedCond gs C
@@ -735,7 +734,7 @@ theorem substFormula_guardedCond_var0 :
 /-- ⭐ **EL CIERRE DE UN TAG DE SUSTITUCIÓN**, genérico: basta declarar su árbol, su lista de
     guardas y descargar las dos obligaciones locales. -/
 theorem pcc_lineWF_tracked_of_stree {k n : Nat} (T : STree) (t : Term)
-    (gs : List GuardSlot) (hmax : Nat.le T.maxLeaf n) (h1n : 1 < n)
+    (gs : List GuardSlot) (h1n : 1 < n)
     (hax : Prf (Formula.forall (Formula.impl (tagF k)
       (lwfVar ⇔ Formula.and (lencF n) (guardedCond gs (condOfS T))))))
     (hcond : Hcond n t (guardedCond gs (condOfS T))) :
@@ -752,11 +751,13 @@ exactamente los hijos del nodo `sub`**. `treeQ1 = bin 5 (un 6 (leaf 2)) (sub (le
 y la cascada del tag 9 es `[witF 2, wit 3]` — la `witF` sobre la casilla 2 (el cuerpo del
 `substfc`) y la `wit` sobre la 3 (el sustituyendo). `SGuards` las pide **ahí y sólo ahí**. -/
 
+set_option linter.unusedSimpArgs false in
 theorem substF_wit_slot (t : Term) (i : Nat) :
     substFormula 0 t (GuardSlot.wit i).toF = hasWit (nthc t (numeralM i)) := by
   simp only [GuardSlot.toF, substF_hasWit, nthc, substTerm, substTerms, substTerm_numeralM,
     FOL.substTerm_liftTerm, ite_true]
 
+set_option linter.unusedSimpArgs false in
 theorem substF_witF_slot (t : Term) (i : Nat) :
     substFormula 0 t (GuardSlot.witF i).toF = hasWitF (nthc t (numeralM i)) := by
   simp only [GuardSlot.toF, substF_hasWitF, nthc, substTerm, substTerms, substTerm_numeralM,
@@ -784,7 +785,7 @@ theorem pcc_core_q1 (t : Term) :
 theorem pcc_lineWF_tracked_q1_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 9)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
-  pcc_lineWF_tracked_of_stree (k := 9) (n := 4) treeQ1 t [.witF 2, .wit 3] Nat.le.refl (by omega)
+  pcc_lineWF_tracked_of_stree (k := 9) (n := 4) treeQ1 t [.witF 2, .wit 3] (by omega)
     (prf_ax (show ax_lineWF_q1 ∈ axioms by simp [axioms]))
     (hcond_absorbe_2 t 4 (.witF 2) (.wit 3) (condOfS treeQ1)
       (pcc_hGuardF 2 4 t (by omega)) (pcc_hGuardT 3 4 t (by omega)) (pcc_core_q1 t))
@@ -818,7 +819,7 @@ theorem pcc_lineWF_tracked_q2_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 10)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 10) (n := 4) treeQ2 t [.witF 2, .wit 3]
-    Nat.le.refl (by omega)
+    (by omega)
     (prf_ax (show ax_lineWF_q2 ∈ axioms by simp [axioms]))
     (hcond_absorbe_2 t 4 (.witF 2) (.wit 3) (condOfS treeQ2)
       (pcc_hGuardF 2 4 t (by omega)) (pcc_hGuardT 3 4 t (by omega)) (pcc_core_q2 t))
@@ -853,7 +854,7 @@ theorem pcc_lineWF_tracked_leibniz_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 13)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 13) (n := 5) treeLeibniz t [.witF 2, .wit 3, .wit 4]
-    Nat.le.refl (by omega)
+    (by omega)
     (prf_ax (show ax_lineWF_leibniz ∈ axioms by simp [axioms]))
     (hcond_absorbe_3 t 5 (.witF 2) (.wit 3) (.wit 4) (condOfS treeLeibniz)
       (pcc_hGuardF 2 5 t (by omega)) (pcc_hGuardT 3 5 t (by omega))
@@ -888,7 +889,7 @@ theorem pcc_lineWF_tracked_q3_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 11)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 11) (n := 4) treeQ3 t [.witF 3]
-    Nat.le.refl (by omega)
+    (by omega)
     (prf_ax (show ax_lineWF_q3 ∈ axioms by simp [axioms]))
     (hcond_absorbe_1 t 4 (.witF 3) (condOfS treeQ3)
       (pcc_hGuardF 3 4 t (by omega)) (pcc_core_q3 t))
@@ -921,7 +922,7 @@ theorem pcc_lineWF_tracked_qconf_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 19)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 19) (n := 4) treeQconf t [.witF 2]
-    Nat.le.refl (by omega)
+    (by omega)
     (prf_ax (show ax_lineWF_qconf ∈ axioms by simp [axioms]))
     (hcond_absorbe_1 t 4 (.witF 2) (condOfS treeQconf)
       (pcc_hGuardF 2 4 t (by omega)) (pcc_core_qconf t))
@@ -1026,7 +1027,7 @@ theorem pcc_lineWF_tracked_ind_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 18)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 18) (n := 3) treeInd t [.witF 2]
-    Nat.le.refl (by omega)
+    (by omega)
     (prf_ax (show ax_lineWF_ind ∈ axioms by simp [axioms]))
     (hcond_absorbe_1 t 3 (.witF 2) (condOfS treeInd)
       (pcc_hGuardF 2 3 t (by omega)) (pcc_core_ind t))
@@ -1036,7 +1037,7 @@ theorem pcc_lineWF_tracked_listInd_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 20)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 20) (n := 3) treeListInd t [.witF 2]
-    Nat.le.refl (by omega)
+    (by omega)
     (prf_ax (show ax_lineWF_listInd ∈ axioms by simp [axioms]))
     (hcond_absorbe_1 t 3 (.witF 2) (condOfS treeListInd)
       (pcc_hGuardF 2 3 t (by omega)) (pcc_core_listInd t))

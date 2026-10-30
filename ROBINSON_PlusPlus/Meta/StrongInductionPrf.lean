@@ -17,9 +17,6 @@ open ROBINSON_PlusPlus.Meta.NatMulPrf
 open ROBINSON_PlusPlus.Meta.CantorMonoPrf
 open FOL
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
 /-!
@@ -85,6 +82,7 @@ theorem substFormula_liftFormula (φ : Formula) (c : Nat) (s : Term) :
 def PSI (Φ : Formula) : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (.var 1)) (liftFormula 1 Φ))
 
+set_option linter.unusedSimpArgs false in
 /-- `ψ(t) = ∀m. m < t ⇒ φ(m)`. -/
 theorem psi_at (Φ : Formula) (t : Term) :
     substFormula 0 t (PSI Φ)
@@ -285,6 +283,7 @@ theorem PSI_inst4 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formul
       Nat.reduceSub, reduceIte, ite_true]
   rwa [e] at h
 
+set_option linter.unusedSimpArgs false in
 theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
     (step : Prf (Formula.forall (Formula.impl (PSI Φ) Φ))) :
     ∀ t : Term, Prf (substFormula 0 t Φ) := by

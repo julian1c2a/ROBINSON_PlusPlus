@@ -38,8 +38,6 @@ open ROBINSON_PlusPlus.Meta.DotConsPrf
 open ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 
 /-!

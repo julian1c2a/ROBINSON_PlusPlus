@@ -15,9 +15,6 @@ open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.Representability2Prf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.DerivCondPrf
 
 /-!
@@ -37,6 +34,7 @@ theorem liftTerm_numeral (c : Nat) : ∀ n : Nat, liftTerm c (numeral n) = numer
       have ih := liftTerm_numeral c n
       simp only [numeral, succ, liftTerm, liftTerms, ih]
 
+set_option linter.unusedSimpArgs false in
 theorem liftTerm_charsCode (c : Nat) : ∀ l : List Char, liftTerm c (charsCode l) = charsCode l
   | [] => rfl
   | _ :: cs => by
@@ -55,6 +53,7 @@ theorem substTerm_numeral (v : Nat) (s : Term) : ∀ n : Nat, substTerm v s (num
       have ih := substTerm_numeral v s n
       simp only [numeral, succ, substTerm, substTerms, ih]
 
+set_option linter.unusedSimpArgs false in
 theorem substTerm_charsCode (v : Nat) (s : Term) :
     ∀ l : List Char, substTerm v s (charsCode l) = charsCode l
   | [] => rfl
@@ -99,6 +98,7 @@ theorem liftTerm_formCode (c : Nat) : ∀ φ : Formula, liftTerm c (formCode φ)
   | .ex a => by
       simp only [formCode, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeral, liftTerm_formCode c a]
 
+set_option linter.unusedSimpArgs false in
 /-- `provCodeC' φ` es **cerrada**: invariante bajo `liftFormula`. -/
 theorem liftFormula_provCodeC' (c : Nat) (φ : Formula) :
     liftFormula c (provCodeC' φ) = provCodeC' φ := by
@@ -107,6 +107,7 @@ theorem liftFormula_provCodeC' (c : Nat) (φ : Formula) :
     Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode]
 
+set_option linter.unusedSimpArgs false in
 theorem d2_prf (A B : Formula) :
     Prf (provCodeC' (Formula.impl A B) ⇒ (provCodeC' A ⇒ provCodeC' B)) := by
   -- elimina el ∃ externo de `provCodeC'(A⇒B)`; testigo `p` = `#0`

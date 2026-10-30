@@ -26,9 +26,6 @@ open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1600000
-
 namespace ROBINSON_PlusPlus.Meta.EvalLtPrf
 
 /-!

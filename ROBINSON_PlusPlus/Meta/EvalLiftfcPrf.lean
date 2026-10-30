@@ -60,9 +60,6 @@ open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.CodeWitnessPrf.E
 open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.StrongInductionPrf
 open ROBINSON_PlusPlus.Meta.CodeCtorKit ROBINSON_PlusPlus.Meta.MpCodePrf
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 
 /-! ## §1 · LA IMAGEN DOTADA DE `liftfc`, Y EL OBJETIVO
@@ -111,6 +108,7 @@ theorem substF_targetLiftfc (k : Nat) (u v X : Term) :
 Mismo control que `Meta/EvalLiftcPrf.lean` pone sobre `liftcT`/`liftscT`. Sin él, un objetivo
 como éste puede ser cierto por `rfl` y no decir nada. -/
 
+set_option linter.unusedVariables false in
 example (v X : Term) : True := by
   fail_if_success
     exact (rfl : liftfcT (tcFn v) (tcFn X) = tcFn (liftfc v X))
@@ -621,6 +619,7 @@ theorem clausesL_imp (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)
         (prf_or_elim_imp (ramaL_bin wF wT c X 8 h8)
                          (ramaL_un wF wT c X 9 h9)))))))
 
+set_option linter.unusedSimpArgs false in
 /-- ⛔ ADR‑019: `psi_lift_form3` es GENÉRICO en `Φ` y vive en `Meta/StrongInductionPrf.lean`.
     Aquí sólo se pliega el resultado en la abreviatura local `PSIatL`. -/
 theorem psi_l3L : liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI PHIliftfc)))

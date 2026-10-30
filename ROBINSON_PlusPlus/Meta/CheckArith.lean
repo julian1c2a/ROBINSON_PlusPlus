@@ -20,8 +20,6 @@ open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
 open ROBINSON_PlusPlus.Meta.SubstArith
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.CheckArith
 
 /-!

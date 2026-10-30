@@ -7,7 +7,7 @@
 [![Build](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml/badge.svg)](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**Last updated:** 2026-10-30 — [ADR‑222](DECISIONS.md) (T23): el segundo núcleo, en «lo que se supone». Antes, 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, por el puente de FOL a `Prf`. Antes, 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): el control nuevo, `check-choice.bash`. Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
+**Last updated:** 2026-10-30 — [ADR‑228](DECISIONS.md): los 32, por los cuatro núcleos independientes. Antes, el mismo día — [ADR‑222](DECISIONS.md) (T23): el segundo núcleo, en «lo que se supone». Antes, 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, por el puente de FOL a `Prf`. Antes, 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): el control nuevo, `check-choice.bash`. Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
 capas, la instalación con el hermano FOL y el toolchain exacto, los controles, los documentos). Lo de antes, en la
 historia de git.
 
@@ -38,8 +38,8 @@ completa —32 titulares, con la hipótesis de cada uno, quién la descarga y qu
 **La teoría** de esos teoremas, T_Prf ([AXIOMS.md](AXIOMS.md) §0), es lo que deriva `Prf`: los 120 axiomas de la
 lista de `Minimal/`, los esquemas lógicos, y la inducción y la inducción de listas para toda fórmula. Contiene a PA
 (no es Q). **Lo que se supone**: el núcleo de Lean y sus tres axiomas, y nada más: 0 `axiom` de Lean en el build, y
-`leanchecker` re‑comprueba cada declaración en la CI, y cuatro núcleos independientes, el cierre de los 12 titulares de
-la clase (i) (ADR‑222). La consistencia que da `consistencia` es RELATIVA a Lean (PRA ⊢
+`leanchecker` re‑comprueba cada declaración en la CI, y cuatro núcleos independientes, el cierre de los 32 titulares,
+el modelo incluido (ADR‑222, ADR‑228). La consistencia que da `consistencia` es RELATIVA a Lean (PRA ⊢
 Con(Lean) → Con(T_Prf)); absoluta no puede ser ([TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §4).
 
 ## Las capas

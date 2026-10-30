@@ -86,11 +86,6 @@ open ROBINSON_PlusPlus.Meta.ForallElimCodePrf ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 4000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.EvalSubstfcPrf
 
 /-! ############################################################################
@@ -647,6 +642,7 @@ theorem clauses_imp (hbot : CasoBot) (hatom : CasoAtom) (heq : CasoEq)
 
 /-! ### El `PSI` levantado CUATRO veces (uno por binder interno) -/
 
+set_option linter.unusedSimpArgs false in
 /-- ⛔ ADR-019: los tres primeros escalones NO se reescriben aquí. `psi_lift_form`,
     `psi_lift_form2` y `psi_lift_form3` de `Meta/StrongInductionPrf.lean` son GENÉRICOS en `Φ`,
     y este frente es sólo una instancia con `Φ := PHIsubstfc`. El cuarto sí necesita una línea
@@ -1571,6 +1567,7 @@ example (v s f : Term) : True := by
     exact (rfl : substfcT (tcFn v) (tcFn s) (tcFn f) = tcFn (substfc v s f))
   trivial
 
+set_option linter.unusedVariables false in
 /-- El predicado de FORMULA NO es el de TERMINO con las listas fusionadas. -/
 example (wF wT X : Term) : True := by
   fail_if_success exact (rfl : isFormCodeE2 wF wT X = isTermCodeE1 wT X)

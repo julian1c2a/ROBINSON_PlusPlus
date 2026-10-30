@@ -14,9 +14,6 @@ open ROBINSON_PlusPlus.Meta.Representability
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.TcArithPrf
 
 /-!
@@ -39,6 +36,7 @@ theorem prf_tc_zero : Prf (tcFn zero =eq termCode zero) := by
   simp only [ax_tc_zero, numeralM_eq, strCodeM_eq] at h
   simpa only [termCode, termsCode, zero, nil] using h
 
+set_option linter.unusedSimpArgs false in
 /-- `tcFn (σ x) = ⌜σ·⌝[tcFn x]`. -/
 theorem prf_tc_succ (x : Term) :
     Prf (tcFn (succ x) =eq

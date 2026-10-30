@@ -29,7 +29,6 @@ leído por `gg` sólo sale `¬¬ ∃p …`, y quitar esa doble negación es el p
 
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
-set_option linter.unusedSimpArgs false
 
 open FOL FOL.Metamath.Semantics ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ModeloCodigo ROBINSON_PlusPlus.Meta.ModeloEstandar
@@ -371,6 +370,7 @@ theorem M_premsOf_de (hM : Estandar M) (x : Nat) (hw : lineWFN Vm x) :
   | 20, _, hT => have hlen : lenN x = 3 := hT.1; pr3 ax_premsOf_listInd
   | k + 21, hK, _ => exact absurd hK (by omega)
 
+set_option linter.unusedSimpArgs false in
 /-- 🏁 **Si `p` es una cadena válida de verdad desde `c`, `M` la cree**: la vuelta de `M_cadena`. -/
 theorem M_cadena_de (hM : Estandar M) : ∀ (p c : Nat), chainOkN Vm c p → M.rel sym!"chainOk" [c, p] := by
   intro p

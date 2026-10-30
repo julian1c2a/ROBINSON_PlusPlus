@@ -1,0 +1,20 @@
+import json, sys
+# prefijo.py IN OUT K — las líneas hasta el K-ésimo registro de constante (incluido); imprime su nombre
+ruta, salida, K = sys.argv[1], sys.argv[2], int(sys.argv[3])
+nombres = {0: ""}; n = 0; ult = None
+CL = ("axiom", "def", "thm", "opaque", "quot", "inductive")
+with open(ruta, encoding="utf-8") as h, open(salida, "w", encoding="utf-8", newline="\n") as w:
+    for linea in h:
+        w.write(linea)
+        o = json.loads(linea)
+        if "in" in o:
+            if "str" in o: pre, s = o["str"]["pre"], o["str"]["str"]
+            else: pre, s = o["num"]["pre"], str(o["num"]["i"])
+            b = nombres[pre]; nombres[o["in"]] = b + "." + s if b else s
+            continue
+        for c in CL:
+            if c in o:
+                n += 1
+                ult = nombres[o[c]["name"]] if c != "inductive" else nombres[o[c]["types"][0]["name"]]
+        if n >= K: break
+print(n, ult)

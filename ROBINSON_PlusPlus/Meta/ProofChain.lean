@@ -24,8 +24,6 @@ open ROBINSON_PlusPlus.Meta.Provability
 open ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.CheckArith
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.ProofChain
 
 /-!

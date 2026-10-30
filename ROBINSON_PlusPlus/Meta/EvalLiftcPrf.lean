@@ -212,11 +212,6 @@ open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS
   (hasWit liftF_isTC1 substF_isTC1 substF_wfAll1 liftF_hasWit substF_hasWit CRIT_hasWit_real)
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 4000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.EvalLiftcPrf
 
 /-! ## §0 · PUENTES DE CONSUMO — `net-0`; **cinco por `rfl` y uno por `.symm`**
@@ -830,11 +825,13 @@ theorem CRIT_hasWit_descenso (t : Term) : Prf (targetLift (termCodeM t)) :=
 
 /-! ### CONTROLES NEGATIVOS: los enunciados no son reflexividades disfrazadas -/
 
+set_option linter.unusedVariables false in
 example (s : Term) : True := by
   fail_if_success
     exact (rfl : liftcT (termCode zero) (tcFn s) = tcFn (liftc zero s))
   trivial
 
+set_option linter.unusedVariables false in
 example (s : Term) : True := by
   fail_if_success
     exact (rfl : liftscT (termCode zero) (tcFn s) = tcFn (liftsc zero s))

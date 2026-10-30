@@ -28,11 +28,17 @@
 # Sin la herramienta, sin la exportación o sin una tabla, rojo: un control que no mide no da verde.
 #
 # ⚠️ Fuera de la CI: en la máquina del propietario, Windows («Control de aplicaciones») bloquea `leanexport`,
-# `lean4lean`, `con-leche` y `con-ron` (medido el 2026-10-30). No se rodea: corre en la CI (Linux).
+# `lean4lean`, `con-leche` y `con-ron` (medido el 2026-10-30). ✏️ 2026-10-30 (ADR-228): corren los binarios LINUX del
+# mismo toolchain en WSL, sobre los `.olean` de la compilación de Windows (`leanexport` los lee; mismo toolchain):
+# así se midió ADR-228. La CI sigue siendo la que decide.
 # ⚠️ Se corren directamente, no por `lake check`: `lake check` aísla con `bwrap`, que en el runner de GitHub no
 # arranca («loopback: Failed RTM_NEWADDR: Operation not permitted», y lo cuenta como «kernel rejected the solution»), y
 # no ve el hermano `../FOL`. Los argumentos de cada núcleo son los de `bundledKernels` y `runExternalKernel` de
-# Lake/CLI/Check.lean (v4.35.0), con la misma configuración de nanoda (más pila para sus hilos: SEGUNDO_NUCLEO_PILA).
+# Lake/CLI/Check.lean (v4.35.0), con la misma configuración de nanoda menos el número de hilos (abajo).
+# ✏️ 2026-10-30 (ADR-228): nanoda, con los 32, agota la pila de sus hilos (también con RUST_MIN_STACK de 1 GiB: los
+# crea con su propio tamaño; medido), en `v_allIn_nil`, `v_chainOk_nil`, los `v_lineWF_*`, `ev_hasWit`… Con UN hilo
+# comprueba en el principal, cuya pila es la del proceso: con `ulimit -s unlimited`, ACEPTA el cierre entero (medido en
+# WSL: 527 s, 2,7 GB). Por eso los 32 van con un hilo y la pila del proceso sin límite; los 12, con cuatro (les bastan).
 
 set -uo pipefail
 export PATH="/usr/bin:$PATH"
@@ -42,7 +48,7 @@ OUT=${1:-$(mktemp -d)}
 mkdir -p "$OUT" || exit 2
 RESUMEN="${GITHUB_STEP_SUMMARY:-/dev/null}"
 LIMITE=${SEGUNDO_NUCLEO_LIMITE:-1200}          # segundos por núcleo y fichero
-PILA=${SEGUNDO_NUCLEO_PILA:-1073741824}       # bytes de pila por hilo de nanoda (RUST_MIN_STACK)
+LIMITE_NANODA=${SEGUNDO_NUCLEO_LIMITE_NANODA:-1800}   # nanoda con los 32 va con UN hilo: más tiempo
 DECL=doc/control/segundo-nucleo.tsv
 NUCLEOS="lean paranoid lean4lean nanoda con-leche con-ron"
 FAIL=0
@@ -121,10 +127,15 @@ corre() {
     lean4lean) /usr/bin/time -v -o "$t" timeout "$LIMITE" "$BIN/lean4lean" --import "$f" > "$log" 2>&1 ;;
     nanoda)
       arg="$OUT/$c-nanoda-$e.json"
+      local hilos=4
+      [ "$c" = titulares ] && hilos=1
       python3 -c 'import json, sys; print(json.dumps({"use_stdin": False, "export_file_path": sys.argv[1],
         "permitted_axioms": [a for a in sys.argv[2].split(",") if a], "unpermitted_axiom_hard_error": True,
-        "num_threads": 4, "nat_extension": True, "string_extension": True}))' "$f" "$ESP" > "$arg"
-      RUST_MIN_STACK="$PILA" /usr/bin/time -v -o "$t" timeout "$LIMITE" "$BIN/nanoda_bin" "$arg" > "$log" 2>&1 ;;
+        "num_threads": int(sys.argv[3]), "nat_extension": True, "string_extension": True}))' "$f" "$ESP" "$hilos" > "$arg"
+      # la pila del proceso, sin límite (o el máximo que permita el sistema): es la del hilo principal
+      ( ulimit -s unlimited 2> /dev/null || ulimit -s "$(ulimit -Hs)"
+        echo "nanoda: $hilos hilo(s), pila del proceso: $(ulimit -s)" > "$log"
+        /usr/bin/time -v -o "$t" timeout "$LIMITE_NANODA" "$BIN/nanoda_bin" "$arg" >> "$log" 2>&1 ) ;;
     con-leche) /usr/bin/time -v -o "$t" timeout "$LIMITE" "$BIN/con-leche" "$f" > "$log" 2>&1 ;;
     con-ron)   /usr/bin/time -v -o "$t" timeout "$LIMITE" "$BIN/con-ron" "$f" > "$log" 2>&1 ;;
   esac

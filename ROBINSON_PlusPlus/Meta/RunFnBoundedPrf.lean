@@ -15,9 +15,6 @@ open ROBINSON_PlusPlus.Meta.NumListPrf
 open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.BoundedInPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 
 /-!
@@ -79,6 +76,7 @@ theorem prf_runFn_nil_cons (line rest : Term) :
       (prf_congr_cons_tail (prf_concat_nil_eq (runFn nil rest)))
   exact prf_eq_trans h1 (prf_eq_trans h2 (prf_eq_trans h3 h4))
 
+set_option linter.unusedSimpArgs false in
 /-- **`lenc (runFn nil p) =eq lenc p`** (el map preserva la longitud). Inducción de listas. -/
 theorem prf_lenc_runFn (p : Term) : Prf (lenc (runFn nil p) =eq lenc p) := by
   have key : Prf (Formula.forall (Formula.eq (lenc (runFn nil (.var 0))) (lenc (.var 0)))) := by
@@ -134,6 +132,7 @@ def nthRunPred : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 1)))
     (Formula.eq (nthc (runFn nil (.var 1)) (.var 0)) (carc (nthc (.var 1) (.var 0)))))
 
+set_option linter.unusedSimpArgs false in
 /-- Caso base del predicado: `p = nil` (por explosión, `i < lenc nil = 0`). -/
 theorem nthRunPred_base : Prf (substFormula 0 nil nthRunPred) := by
   refine Prf.gen _ ?_
@@ -145,6 +144,7 @@ theorem nthRunPred_base : Prf (substFormula 0 nil nthRunPred) := by
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
       (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 
+set_option linter.unusedSimpArgs false in
 /-- Paso `cons` del predicado. Confinación `qconf` (la HI es `∀i`, sin `i` libre) + `PrfH_spec`
     para instanciar la HI en `pred i`; case-split de `i` con `prf_zero_or_eq_succ_pred`. -/
 theorem nthRunPred_step :
@@ -220,12 +220,14 @@ def boundedCarcIn (y p : Term) : Formula :=
   Formula.ex (land (lt (.var 0) (liftTerm 0 (lenc p)))
                    (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)))
 
+set_option linter.unusedSimpArgs false in
 /-- Clausura De Bruijn de `boundedCarcIn` (vía `liftTerm_comm_zero`; NO es defeq). -/
 theorem liftFormula_boundedCarcIn (y p : Term) :
     liftFormula 0 (boundedCarcIn y p) = boundedCarcIn (liftTerm 0 y) (liftTerm 0 p) := by
   simp only [boundedCarcIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc, carc,
     Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
 
+set_option linter.unusedSimpArgs false in
 /-- ⇐ : `(∃ i < lenc p. carc (nthc p i) =eq y) ⇒ In y (runFn nil p)`. -/
 theorem prf_In_runFn_of_boundedCarcIn (y p : Term) :
     Prf (boundedCarcIn y p ⇒ In y (runFn nil p)) := by
@@ -247,6 +249,7 @@ theorem prf_In_runFn_of_boundedCarcIn (y p : Term) :
   · exact PrfH_eq_trans
       (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_runFn (liftTerm 0 p) (.var 0)) _) hlt) hcarc
 
+set_option linter.unusedSimpArgs false in
 /-- ⇒ : `In y (runFn nil p) ⇒ (∃ i < lenc p. carc (nthc p i) =eq y)`. -/
 theorem prf_boundedCarcIn_of_In_runFn (y p : Term) :
     Prf (In y (runFn nil p) ⇒ boundedCarcIn y p) := by

@@ -28,8 +28,6 @@ open ROBINSON_PlusPlus.Meta.Representability2
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.Diagonal
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.DiagonalTwo
 
 /-!
@@ -72,6 +70,7 @@ def godelBeta' : Formula := substFormula 0 diagTerm godelPred'
 /-- **Sentencia de Gödel estructural** `G' = β'(⌜β'⌝)`. -/
 noncomputable def godelC' : Formula := selfApp godelBeta'
 
+set_option linter.unusedSimpArgs false in
 /-- Composición de sustituciones para `godelPred'` (sin var libre ≥ 1): se reduce
     con `substTerm_lift_comm`. -/
 theorem godel_comp' (s : Term) :

@@ -14,9 +14,6 @@ open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.NatOrderPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.NatMulPrf
 
 /-!
@@ -39,6 +36,7 @@ cerrados desde el 2026‑09‑10: `pcc_lineWF_tracked`, en `Meta/SubstTreeReflec
 
 /-! ### Las leyes, por instanciación directa de los axiomas -/
 
+set_option linter.unusedSimpArgs false in
 /-- `n · 0 = 0` — `ax8_mul_zero`. -/
 theorem prf_mul_zero (n : Term) : Prf (mul n zero =eq zero) := by
   have hh := prf_spec (prf_ax (show ax8_mul_zero ∈ axioms by simp [axioms])) n
@@ -46,6 +44,7 @@ theorem prf_mul_zero (n : Term) : Prf (mul n zero =eq zero) := by
     FOL.substTerm_liftTerm] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- `n · σm = n · m + n` — `ax9_mul_succ`. -/
 theorem prf_mul_succ (n m : Term) : Prf (mul n (succ m) =eq add (mul n m) n) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax9_mul_succ ∈ axioms by simp [axioms])) n) m
@@ -53,6 +52,7 @@ theorem prf_mul_succ (n m : Term) : Prf (mul n (succ m) =eq add (mul n m) n) := 
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- `n · m = m · n` — `ax10_mul_comm`. -/
 theorem prf_mul_comm (n m : Term) : Prf (mul n m =eq mul m n) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax10_mul_comm ∈ axioms by simp [axioms])) n) m
@@ -163,6 +163,7 @@ Los dos son instanciación directa: `ax17_div_mod_eq` y `ax21_mod2_range` están
 (✏️ 2026‑10‑14: decía «los tres», con `ax24_mod2_of_even`, que también está en la lista, pero su
 puente no se escribió aquí ni en otro módulo.) Son el cimiento del cálculo con `pair = div2 ∘ cantor_poly`. -/
 
+set_option linter.unusedSimpArgs false in
 /-- `div2(n)·2 + mod2(n) = n` — `ax17_div_mod_eq`. -/
 theorem prf_div_mod_eq (n : Term) :
     Prf (add (mul (div2 n) two) (mod2 n) =eq n) := by
@@ -171,6 +172,7 @@ theorem prf_div_mod_eq (n : Term) :
     succ, zero, FOL.substTerm_liftTerm] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- `mod2 n = 0 ∨ mod2 n = 1` — `ax21_mod2_range`. -/
 theorem prf_mod2_range (n : Term) :
     Prf (lor (mod2 n =eq zero) (mod2 n =eq one)) := by
@@ -243,6 +245,7 @@ theorem prf_add_le_mono (x y u v : Term) :
   exact PrfH.mp _ _ _
     (PrfH.mp _ _ _ (prf_to_prfH (prf_le_trans (add x u) (add y u) (add y v)) _) h1) h2
 
+set_option linter.unusedSimpArgs false in
 /-- **Monotonía multiplicativa**: `x ≤ y ⟹ x·c ≤ y·c`. -/
 theorem prf_mul_le_mono_right (x y c : Term) : Prf (le x y ⇒ le (mul x c) (mul y c)) := by
   have key : Prf (Formula.forall (Formula.impl (le (liftTerm 0 x) (liftTerm 0 y))
@@ -284,6 +287,7 @@ theorem prf_mul_le_mono_right (x y c : Term) : Prf (le x y ⇒ le (mul x c) (mul
 ellos, la cancelación (`x·c < y·c ⟹ x < y`) sale por tricotomía: los otros dos casos
 (`x = y` y `y < x`) contradicen la hipótesis vía irreflexividad. Recuérdese `neg A = A ⇒ ⊥`. -/
 
+set_option linter.unusedSimpArgs false in
 /-- `¬ (a < a)` — `ax18_lt_irrefl`. -/
 theorem prf_lt_irrefl (a : Term) : Prf (neg (lt a a)) := by
   have hh := prf_spec (prf_ax (show ax18_lt_irrefl ∈ axioms by simp [axioms])) a
@@ -291,6 +295,7 @@ theorem prf_lt_irrefl (a : Term) : Prf (neg (lt a a)) := by
     FOL.substTerm_liftTerm] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- Tricotomía — `ax19_lt_trichotomy`. -/
 theorem prf_lt_trichotomy (a b : Term) :
     Prf (lor (lt a b) (lor (a =eq b) (lt b a))) := by

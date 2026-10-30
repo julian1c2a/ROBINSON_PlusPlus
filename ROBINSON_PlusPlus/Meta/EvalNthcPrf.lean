@@ -32,10 +32,6 @@ open ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.DotConsPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.EvalNthcPrf
 
 /-!
@@ -219,6 +215,7 @@ noncomputable def nthcEvalPred : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 1)))
     (provFromCode (evalNthcCode (.var 1) (.var 0))))
 
+set_option linter.unusedSimpArgs false in
 /-- Caso base: `p = nil` (vacuo, `i < lenc nil = 0`). -/
 theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
   refine Prf.gen _ ?_
@@ -291,6 +288,8 @@ theorem substtc_inv_nthcT {X Y : Term}
     ∀ W, Prf (substtc zero W (nthcT X Y) =eq nthcT X Y) :=
   fun W => prf_eq_trans (prf_substtc_nthcT zero W X Y) (prf_congr_nthcT (hX W) (hY W))
 
+set_option maxRecDepth 8000 in
+set_option linter.unusedSimpArgs false in
 /-- **Paso `cons`** de la inducción acotada: análisis de casos `i = 0 / σ(pred i)`
     (`prf_zero_or_eq_succ_pred`), reflejando `pcc_nthc_zero_code` (base) y `pcc_nthc_succ_code` + HI
     (`pcc_eq_trans_code_imp`) en el caso sucesor, transportando por igualdad de código bajo contexto

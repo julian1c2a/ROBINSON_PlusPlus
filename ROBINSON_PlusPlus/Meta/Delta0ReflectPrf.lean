@@ -28,11 +28,8 @@ open ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 open ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 open ROBINSON_PlusPlus.Meta.EvalLtPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1600000
 -- ADR-020: la guarda de `pcc_exIntro_code_open` va sobre el codigo LIFTEADO, y comprobar
 -- que `liftTerm 0 (exBodyc ...)` es el nodo `eqc` esperado agota la pila por defecto.
-set_option maxRecDepth 8000
 
 namespace ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 
@@ -63,6 +60,7 @@ theorem liftTerm_exc_open (Ac : Term) : ∀ c, liftTerm c (exc Ac) = exc (liftTe
   intro c
   simp only [exc, cons, nil, zero, succ, liftTerm, liftTerms]
 
+set_option linter.unusedSimpArgs false in
 /-- **∃‑intro a nivel de código, con `Ac` ABIERTO** (reflexión de Q2 sin clausura): para `Ac`, `w`
     **arbitrarios**, `Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))`.
 
@@ -138,6 +136,7 @@ theorem pcc_exIntro_code_open (Ac w : Term)
           (prf_to_prfH (prf_In_mono_right_imp Ain (cons (carc q2line) nil) Cp) Γ) hpIn
   exact PrfH_and_intro hChainR hInB
 
+set_option linter.unusedSimpArgs false in
 /-- **GEN a nivel de código** (reflexión de la regla GEN, ahora que la línea 17 es sólida): para
     `body` **arbitrario** (abierto), `Prf (provFromCode body ⇒ provFromCode (forallc body))`.
 
@@ -193,6 +192,7 @@ theorem pcc_gen_code (body : Term) :
 
 /-! ### `<` desde el testigo, código rastreado (`pcc_lt_intro` sin clausura) -/
 
+set_option maxRecDepth 8000 in
 /-- **Reflexión de `<` con `a`, `b` ABIERTOS, en forma implicación**: de `Prov(⌜ ȧ + σK = ḃ ⌝)` sale
     `Prov(⌜ ȧ < ḃ ⌝)`, sin exigir `a`, `b` cerrados. Es `pcc_lt_intro` con el `∃`‑intro ABIERTO. -/
 theorem pcc_lt_intro_open_imp (a b K : Term) (hwK : Prf (hasWit (liftTerm 0 K))) :

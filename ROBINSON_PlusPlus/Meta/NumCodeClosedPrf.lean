@@ -19,9 +19,6 @@ open ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 
 /-!

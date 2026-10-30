@@ -4082,7 +4082,8 @@ de la enmienda —que §3.41.4 midió con siete `rfl` y que parecía arbitraria�
 
 * ⚠️ **`Nat.le.refl` como prueba de `T.maxLeaf ≤ n` unifica `n := T.maxLeaf`**, no `n := 4`, y
   el error aparece tres líneas más abajo como un contexto que no casa. Hay que fijar `(n := 4)`
-  explícitamente.
+  explícitamente. ✏️ 2026‑10‑30 (ADR‑230): en `pcc_lineWF_tracked_of_stree` esa hipótesis ya no está —su prueba no la
+  usaba— y las siete llamadas no pasan `Nat.le.refl`; la trampa sigue valiendo para `pcc_condDS_of_stree`.
 * ⚠️ **`have : PrfH _ (…)` no infiere el contexto** (trampa ya registrada). En `leibniz` la
   tupla de `SGuards` se construye **inline**, donde el tipo esperado sí es concreto y el `simpa`
   tiene un objetivo cerrado.

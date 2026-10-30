@@ -1,0 +1,22 @@
+import json, sys
+# axiomiza.py IN OUT nombre,nombre,... — convierte esos thm en axiom (diagnóstico: para ver el SIGUIENTE fallo)
+ruta, salida, lista = sys.argv[1], sys.argv[2], set(a for a in sys.argv[3].split(",") if a)
+nombres = {0: ""}
+hechos = []
+with open(ruta, encoding="utf-8") as h, open(salida, "w", encoding="utf-8", newline="\n") as w:
+    for linea in h:
+        o = json.loads(linea)
+        if "in" in o:
+            if "str" in o:
+                pre, s = o["str"]["pre"], o["str"]["str"]
+            else:
+                pre, s = o["num"]["pre"], str(o["num"]["i"])
+            base = nombres[pre]
+            nombres[o["in"]] = base + "." + s if base else s
+        elif "thm" in o and nombres[o["thm"]["name"]] in lista:
+            t = o["thm"]
+            o = {"axiom": {"name": t["name"], "levelParams": t["levelParams"], "type": t["type"], "isUnsafe": False}}
+            hechos.append(nombres[t["name"]])
+            linea = json.dumps(o, ensure_ascii=False, separators=(",", ":")) + "\n"
+        w.write(linea)
+print("axiomizados:", len(hechos), "de", len(lista))

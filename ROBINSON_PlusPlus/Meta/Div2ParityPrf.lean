@@ -19,8 +19,6 @@ open ROBINSON_PlusPlus.Meta.NatMulPrf
 open ROBINSON_PlusPlus.Meta.CantorMonoPrf
 open ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.Div2ParityPrf
 
 /-!

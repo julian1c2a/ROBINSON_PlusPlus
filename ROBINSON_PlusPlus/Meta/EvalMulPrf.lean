@@ -22,8 +22,6 @@ open ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.EvalArithPrf
 
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.EvalMulPrf
 
 /-!

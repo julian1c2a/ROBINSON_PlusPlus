@@ -63,8 +63,6 @@ open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs ROBINSON_PlusPlus.Meta.LiftcCodePrf
 open ROBINSON_PlusPlus.Meta.EvalNthcPrf ROBINSON_PlusPlus.Meta.EvalListPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
 /-! ## §1 · LA FORMA, COMPROBADA CONTRA EL ORIGINAL
@@ -527,6 +525,7 @@ theorem hbl_lenc : ∀ (k : Nat) (q : Term), liftTerm k (lenc q) = lenc (liftTer
 theorem hbs_lenc : ∀ (v : Nat) (s q : Term), substTerm v s (lenc q) = lenc (substTerm v s q) := by
   intro v s q; simp only [lenc, substTerm, substTerms]
 
+set_option linter.unusedSimpArgs false in
 theorem hPl_wfAll1Psi :
     ∀ (k : Nat) (q : Term), liftTerm k (wfAll1Psi q) = wfAll1Psi (liftTerm k q) := by
   intro k q
@@ -536,6 +535,7 @@ theorem hPl_wfAll1Psi :
     cons, nil, zero, succ, numeralM, liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode,
     liftTerm_termCode]
 
+set_option linter.unusedSimpArgs false in
 theorem hPs_wfAll1Psi :
     ∀ (v : Nat) (s q : Term), substTerm v s (wfAll1Psi q) = wfAll1Psi (substTerm v s q) := by
   intro v s q
@@ -1207,6 +1207,7 @@ theorem prf_condD_hasWit_eq (t : Term) (i : Nat) :
   rw [← h]
   exact prf_substfc_arith_open 0 (tcFn t) _
 
+set_option linter.unusedSimpArgs false in
 /-- ⭐⭐⭐ **`DEUDA_hGuardT` PROBADA**, para toda casilla `i` bajo la longitud canónica `n`.
 
     La cota `i < n` **no es un artefacto**: el transporte `(nthc t ı̇)˙ → nthcT ṫ ı̄` es

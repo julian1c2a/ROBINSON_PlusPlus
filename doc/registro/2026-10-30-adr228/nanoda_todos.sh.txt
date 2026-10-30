@@ -1,0 +1,15 @@
+#!/bin/bash
+# nanoda_todos.sh EXPORT N — bisecar el primer fallo de nanoda (4 hilos), axiomizarlo, repetir
+S=$(dirname "$0"); f=$1; N=${2:-40}; lista=""
+cp "$f" /tmp/nt.ndjson
+for i in $(seq 1 $N); do
+  r=$(bash $S/biseca.sh /tmp/nt.ndjson "$lista" 2>/dev/null | grep "PRIMER FALLO")
+  n=$(printf '%s' "$r" | sed -n 's/PRIMER FALLO: K=[0-9]* [0-9]* \([^ ]*\) .*/\1/p')
+  k=$(printf '%s' "$r" | sed -n 's/PRIMER FALLO: K=\([0-9]*\) .*/\1/p')
+  tot=$(grep -cE '^\{"(axiom|def|thm|opaque|quot|inductive)"' /tmp/nt.ndjson)
+  if [ -z "$n" ] || [ "$k" = "$tot" -a -z "$(printf '%s' "$r" | grep overflow)" ]; then echo "FIN: $r"; break; fi
+  echo "$i K=$k $n"
+  lista="$lista,$n"
+  python3 $S/axiomiza.py "$f" /tmp/nt.ndjson "$lista" > /dev/null
+done
+echo "LISTA $lista"

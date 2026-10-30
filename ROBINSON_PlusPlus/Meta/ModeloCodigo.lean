@@ -28,7 +28,6 @@ Sin semántica: no importa `FOL.Semantics`. Pasó por `sondeos/ModeloNat.lean` (
 
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
-set_option linter.unusedSimpArgs false
 
 namespace ROBINSON_PlusPlus.Meta.ModeloCodigo
 

@@ -1,0 +1,50 @@
+== 1. lean4lean, axiomizando lo que falla (bucle.sh) sobre el cierre de los 32 ANTES de reescribir v_tc_zero
+1 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_tc_zero :: (kernel) deep recursion detected, use `set_option maxRecDepth <num>` to increase
+FIN tras 1: [anonymous]:defnDecl ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_formCodeM._f: lean4lean took 1121
+checked 6327 declarations
+LISTA ,ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_tc_zero
+
+[exited with code 0]
+
+== 2. los cuatro, con v_tc_zero axiomizado (nucleos.sh; con-leche y con-ron no admiten axiomas nuevos)
+== lean4lean rc=0 19.47 s 116068 KB :: [anonymous]:defnDecl ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_formCodeM._f: lean4lean took 1089 checked 6327 declarations 
+== nanoda rc=134 7.86 s 2780872 KB ::  thread 'thread_3' (1643) has overflowed its stack fatal runtime error: stack overflow, aborting 
+== con-leche rc=2 0.82 s 106620 KB :: con-leche: not implemented yet: non-standard axiom (ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_tc_zero) [at axiom ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_tc_zero, fold position 5306] (--verified) t=0.8s 
+== con-ron rc=2 0.57 s 195928 KB :: con-ron: declined: non-standard axiom [at axiom ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_tc_zero, fold position 5306] (--verified) t=0.564s 
+
+[exited with code 0]
+
+== 3. los cuatro, DESPUÉS de reescribir v_tc_zero (nucleos.sh sobre la exportación nueva, 48005164 bytes)
+rc=0 48005164 bytes
+== lean4lean rc=0 21.03 s 116008 KB :: [anonymous]:defnDecl ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_formCodeM._f: lean4lean took 1129 checked 6328 declarations 
+== nanoda rc=134 8.05 s 2761584 KB ::  thread 'thread_1' (2481) has overflowed its stack fatal runtime error: stack overflow, aborting 
+== con-leche rc=0 3.48 s 266336 KB :: con-leche: accepted 6331 declarations (--verified) 
+== con-ron rc=0 1.76 s 713372 KB :: con-ron: accepted 6331 declarations (--verified) 
+
+[exited with code 0]
+
+== 4. nanoda con hilos y pila distintos (nanoda_var.sh)
+hilos=1 pila=8192 rc=134 ::  thread 'main' (2559) has overflowed its stack fatal runtime error: stack overflow, aborting Command terminated by signal 6 6.21 s 420840 KB 
+hilos=1 pila=unlimited rc=0 :: Checked 6680 declarations with no typechecker errors, 1 pretty printer errors: [     "Unable to print axioms", ] 527.32 s 2709156 KB 
+hilos=4 pila=unlimited rc=134 ::  thread 'thread_1' (2578) has overflowed its stack fatal runtime error: stack overflow, aborting Command terminated by signal 6 8.33 s 2774284 KB 
+
+[exited with code 0]
+
+== 5. nanoda, 4 hilos: los primeros que agotan su pila (nanoda_todos.sh; parado a mano en el 9.º: no hace falta la lista entera)
+1 K=5319 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_allIn_nil
+2 K=5324 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_chainOk_nil
+3 K=5333 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_thy
+4 K=5360 ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_hasWitF
+5 K=5363 ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_hasWit
+6 K=5365 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_q1
+7 K=5369 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_q2
+8 K=5372 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_q3
+9 K=5376 ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_leibniz
+
+[killed]
+
+== 6. nanoda, 1 hilo, sobre el MUTANTE (mutante_nanoda.sh)
+  mutante: el valor de Decidable.reflects_decide (el primer thm) es ahora su tipo
+rc=101  thread 'main' (4561) panicked at src/tc.rs:955:71: assertion failed: self.def_eq(u, v) note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace Command exited with non-zero status 101 0.59 s 70380 KB 
+
+[exited with code 0]

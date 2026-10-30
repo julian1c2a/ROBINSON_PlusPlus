@@ -23,9 +23,6 @@ open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.EvalArithPrf
 
 /-!
@@ -488,6 +485,7 @@ theorem pcc_eval_add_succ_imp (a b : Term) :
 `evalAddCode` es transparente a `substTerm`/`liftTerm` (sus constantes — `numeral 4`, `strCode +`,
 `cons`, `nil` — son cerradas). Esos dos lemas de transporte hacen la inducción rutinaria. -/
 
+set_option linter.unusedSimpArgs false in
 /-- `substTerm` atraviesa `evalAddCode` (las constantes de código son cerradas). -/
 theorem substTerm_evalAddCode (v : Nat) (s X Y : Term) :
     substTerm v s (evalAddCode X Y)
@@ -495,6 +493,7 @@ theorem substTerm_evalAddCode (v : Nat) (s X Y : Term) :
   simp only [evalAddCode, eqCodeFn, addcT, succcT, funcc, tcFn, add, cons, nil, zero, succ,
     substTerm, substTerms, substTerm_numeral, substTerm_strCode]
 
+set_option linter.unusedSimpArgs false in
 /-- `liftTerm` atraviesa `evalAddCode`. -/
 theorem liftTerm_evalAddCode (k : Nat) (X Y : Term) :
     liftTerm k (evalAddCode X Y) = evalAddCode (liftTerm k X) (liftTerm k Y) := by

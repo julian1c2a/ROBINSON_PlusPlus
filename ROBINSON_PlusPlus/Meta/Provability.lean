@@ -12,8 +12,6 @@ import FOL.Theorems.Quantifiers
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.Provability
 
 /-!

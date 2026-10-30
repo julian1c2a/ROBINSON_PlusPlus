@@ -25,8 +25,6 @@ open ROBINSON_PlusPlus.Meta.ProofChain
 open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 open FOL
 
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.DiagonalNumeral
 
 /-!

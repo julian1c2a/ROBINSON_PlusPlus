@@ -22,9 +22,6 @@ open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.NatOrderPrf
 open ROBINSON_PlusPlus.Meta.NatMulPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
 /-!
@@ -49,6 +46,7 @@ Cadena de definiciones (`Minimal/Axioms.lean`):
 
 /-! ### Paso 1 — el puente `cons ↔ pair` (el único que no es definicional) -/
 
+set_option linter.unusedSimpArgs false in
 /-- **`cons h t = σ (pair h t)`** — instancia de `ax_L0_cons_def` (salida (5) de ADR-093). Es el
     puente entre el constructor de listas (opaco) y la aritmética de Cantor. -/
 theorem prf_cons_def (h t : Term) : Prf (cons h t =eq succ (pair h t)) := by
@@ -195,6 +193,7 @@ theorem prf_le_double_self_mul_succ {a k : Term} (h : Prf (a =eq succ k)) :
   prf_le_subst2 (prf_eq_symm (prf_mul_succ a a))
     (prf_mp (prf_add_le_mono_right a (mul a a) a) (prf_le_self_mul_self h))
 
+set_option linter.unusedSimpArgs false in
 /-- **`a ≤ a·a` para TODO `a`** — por inducción; el paso no usa la hipótesis (`σk ≤ σk·σk` es
     `prf_le_mul_succ`) y la base es `0·0 = 0`. Sustituye a la hipótesis `a = σk` de
     `prf_le_self_mul_self` donde `a` puede ser `0`. -/

@@ -73,9 +73,6 @@ open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS
 open ROBINSON_PlusPlus.Meta.HasWitTcFnPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxRecDepth 8000
-
 namespace ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 
 /-! ## §1 · El predicado de la mitad de LISTA
@@ -143,6 +140,7 @@ theorem PHIT_at (t : Term) :
 
 /-! ### Los tres colapsos, uno por binder -/
 
+set_option linter.unusedSimpArgs false in
 theorem PHIT_spec1 (t w : Term) :
     substFormula 0 w (Formula.forall (Formula.forall
       (BODY (.var 2) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 (liftTerm 0 t))))))
@@ -153,6 +151,7 @@ theorem PHIT_spec1 (t w : Term) :
   simp only [substFormula, substF_BODY, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
     Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3]
 
+set_option linter.unusedSimpArgs false in
 theorem PHIT_spec2 (t w v : Term) :
     substFormula 0 v (Formula.forall
       (BODY (liftTerm 0 (liftTerm 0 w)) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
@@ -209,6 +208,7 @@ theorem prf_hasWit_varc (m : Term) : Prf (hasWit (varc m)) := by
   exact prf_mp (prf_wfAll1_cons (varc m) nil)
     (prf_and_intro (prf_isTermCodeE1_var (cons (varc m) nil) m) prf_wfAll1_nil)
 
+set_option linter.unusedSimpArgs false in
 /-- Tricotomía del orden, en `Prf` (`ax19_lt_trichotomy`). -/
 theorem prf_lt_trich (a b : Term) :
     Prf (lor (lt a b) (lor (Formula.eq a b) (lt b a))) := by
@@ -409,6 +409,7 @@ theorem nilOrCons_at (Y : Term) :
   simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, substFormula, substTerm,
     substTerms, ite_true]
 
+set_option linter.unusedSimpArgs false in
 theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
   refine prf_list_induction nilOrCons ?base ?step
   · rw [nilOrCons_at]
@@ -441,6 +442,7 @@ private def CTXa (W a as : Term) : List Formula :=
   [lt (.var 0) (lenc (cons (liftTerm 0 a) (liftTerm 0 as))),
    land (In (liftTerm 0 a) (liftTerm 0 W)) (argsIn (liftTerm 0 W) (liftTerm 0 as))]
 
+set_option linter.unusedSimpArgs false in
 /-- **INTRODUCCIÓN de `argsIn` sobre `cons`**: cabeza en el testigo + cola ya cubierta.
     Misma estructura que `prf_wfAll1_cons`: corte del índice con `prf_zero_or_eq_succ_pred`. -/
 theorem prf_argsIn_cons_intro (W a as : Term) :
@@ -512,6 +514,7 @@ theorem PrfH_congr_hasWitArgs {Γ : List Formula} {a b : Term}
   exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
     (A := hasWitArgs (.var 0)) h ((e a) ▸ hw)
 
+set_option linter.unusedSimpArgs false in
 /-- La lista VACÍA tiene testigo (el vacío). -/
 theorem prf_hasWitArgs_nil : Prf (hasWitArgs nil) := by
   refine prf_ex_intro nil ?_
@@ -552,6 +555,7 @@ sola constante, la de aquí; la copia de `sondeos/MergeTestigos.lean` sigue fuer
 la COLA, y hay que fusionarlos. La ruta es pasar a forma de PERTENENCIA (donde `concat` es un
 axioma), fusionar allí, y volver: ni un índice partido. -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_in_nthc (L i : Term) :
     Prf (Formula.impl (lt i (lenc L)) (In (nthc L i) L)) := by
   refine prf_deduction ?_
@@ -613,6 +617,7 @@ theorem prf_isTermCodeE1_mono_of (w w' X : Term)
 `In` sobre `concat` es un axioma (`ax_L3_in_concat`), así que en forma de pertenencia el caso
 sale por `or_elim` sobre las dos mitades. Ni un índice partido. -/
 
+set_option linter.unusedSimpArgs false in
 /-- `ax_L3_in_concat` instanciado, en `Prf`. -/
 theorem prf_in_concat (x L M : Term) :
     Prf (In x (concat L M) ⇔ lor (In x L) (In x M)) := by
@@ -698,6 +703,7 @@ que es más barato que dentro del paso—, y el testigo de la lista es el `conca
 `prf_wfAll1_concat` para la buena formación, y la monotonía generalizada para que cada mitad
 siga cubriendo lo suyo. -/
 
+set_option linter.unusedSimpArgs false in
 theorem prf_hasWitArgs_cons (a as : Term) :
     Prf (Formula.impl (hasWit a) (Formula.impl (hasWitArgs as) (hasWitArgs (cons a as)))) := by
   refine prf_ex_elim_imp ?_
@@ -917,6 +923,7 @@ theorem PHIF_at (t : Term) :
   simp only [PHIF, PHIFbody, substFormula, substF_BODYF, substTerm, Nat.reduceAdd,
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
+set_option linter.unusedSimpArgs false in
 theorem PHIF_spec1 (t wF : Term) :
     substFormula 0 wF (Formula.forall (Formula.forall (Formula.forall
       (BODYF (.var 3) (.var 2) (.var 1) (.var 0)
@@ -928,6 +935,7 @@ theorem PHIF_spec1 (t wF : Term) :
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
     Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h4]
 
+set_option linter.unusedSimpArgs false in
 theorem PHIF_spec2 (t wF wT : Term) :
     substFormula 0 wT (Formula.forall (Formula.forall
       (BODYF (liftTerm 0 (liftTerm 0 (liftTerm 0 wF))) (.var 2) (.var 1) (.var 0)
@@ -940,6 +948,7 @@ theorem PHIF_spec2 (t wF wT : Term) :
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
     Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3, hw]
 
+set_option linter.unusedSimpArgs false in
 theorem PHIF_spec3 (t wF wT v : Term) :
     substFormula 0 v (Formula.forall
       (BODYF (liftTerm 0 (liftTerm 0 wF)) (liftTerm 0 (liftTerm 0 wT)) (.var 1) (.var 0)

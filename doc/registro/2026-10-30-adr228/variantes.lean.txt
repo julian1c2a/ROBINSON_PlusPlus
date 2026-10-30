@@ -1,0 +1,76 @@
+-- ADR-228, 2026-10-30: las variantes que se midieron, en un módulo de prueba (`TcTest`, compilado con `lake env lean -o`
+-- en Windows y exportado con `leanexport` en WSL; ver LEEME.txt). Tres tandas; sus resultados, en variantes-resultados.txt.
+import ROBINSON_PlusPlus.Meta.ModeloCodificacion
+open FOL FOL.Metamath.Semantics ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.ModeloCodigo
+open ROBINSON_PlusPlus.Meta.ModeloEstandar ROBINSON_PlusPlus.Meta.ModeloCodificacion
+
+namespace TcTest
+variable {V : Nat}
+
+-- ── Tanda 1: `v_tc_zero` ────────────────────────────────────────────────────────────────────────────────────────────
+-- el objetivo tras `abre` es `tcFnN 0 = consN 1 (consN (codeNatStr sym!"0") (consN 0 0))`
+theorem goal_after_abre : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_zero := by
+  intro v; unfold ax_tc_zero; abre; rfl                       -- la prueba de antes
+theorem t1 : tcFnN 0 = consN 1 (consN (codeNatStr zero_sym) (consN 0 0)) := rfl
+theorem t2 : tcFnN 0 = consN 1 (consN (codeNatStr zero_sym) (consN 0 0)) := tcFnN.eq_1
+theorem va : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_zero := by   -- la que entra en el módulo
+  intro v
+  show evalTerm (MNV V) v (tcFn zero) =
+    evalTerm (MNV V) v (cons (numeralM 1) (cons (strCodeM zero_sym) (cons nil nil)))
+  rw [ev_tcFn, ev_cons, ev_cons, ev_cons, ev_numeralM, ev_strCodeM, ev_nil, ev_zero]
+  exact tcFnN.eq_1
+theorem vb : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_zero := by
+  intro v; unfold ax_tc_zero; abre; exact tcFnN.eq_1
+theorem vc : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_zero := by
+  intro v
+  rw [ax_tc_zero]
+  show evalTerm (MNV V) v (tcFn zero) =
+    evalTerm (MNV V) v (cons (numeralM 1) (cons (strCodeM zero_sym) (cons nil nil)))
+  rw [ev_tcFn, ev_cons, ev_cons, ev_cons, ev_numeralM, ev_strCodeM, ev_nil, ev_zero]
+  exact tcFnN.eq_1
+
+-- ── Tanda 2: `v_allIn_nil` y `v_chainOk_nil`, el primer fallo de nanoda con cuatro hilos ─────────────────────────────
+theorem a0 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_allIn_nil := by
+  intro v c; abre; exact allInN_zero c
+theorem a1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_allIn_nil := by
+  intro v c
+  show (MNV V).rel sym!"allIn" [evalTerm (MNV V) (shiftEnv v c) (.var 0), evalTerm (MNV V) (shiftEnv v c) nil]
+  rw [MN_allIn]
+  exact allInN_zero c
+theorem a2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_allIn_nil := by
+  intro v c
+  show (MNV V).rel sym!"allIn" [evalTerm (MNV V) (shiftEnv v c) (.var 0), evalTerm (MNV V) (shiftEnv v c) nil]
+  rw [MN_allIn, ev_nil]
+  exact allInN_zero c
+theorem c2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_nil := by
+  intro v c
+  show (MNV V).rel sym!"chainOk" [evalTerm (MNV V) (shiftEnv v c) (.var 0), evalTerm (MNV V) (shiftEnv v c) nil]
+  rw [MN_chainOk, ev_nil]
+  exact chainOkN_zero _ c
+theorem m1 (c l : Nat) : (MNV V).rel sym!"allIn" [c, l] = allInN c l := rfl
+theorem m2 (c l : Nat) : (MNV V).rel sym!"chainOk" [c, l] = chainOkN V c l := rfl
+
+-- ── Tanda 3: aislar el paso ─────────────────────────────────────────────────────────────────────────────────────────
+theorem b1 (v : Nat → Nat) (c : Nat) : evalFormula (MNV V) (shiftEnv v c) (allIn (.var 0) nil) =
+    (MNV V).rel sym!"allIn" [evalTerm (MNV V) (shiftEnv v c) (.var 0), evalTerm (MNV V) (shiftEnv v c) nil] := rfl
+theorem b2 (v : Nat → Nat) (c : Nat) :
+    (MNV V).rel sym!"allIn" [evalTerm (MNV V) (shiftEnv v c) (.var 0), evalTerm (MNV V) (shiftEnv v c) nil] = allInN c 0 := by
+  rw [MN_allIn, ev_nil]; rfl
+theorem b3 (v : Nat → Nat) : evalFormula (MNV V) v ax_allIn_nil = ∀ c, evalFormula (MNV V) (shiftEnv v c) (allIn (.var 0) nil) := rfl
+theorem b5 (c : Nat) : allInN c 0 := allInN_zero c
+theorem b6 (v : Nat → Nat) (c : Nat) : evalTerm (MNV V) (shiftEnv v c) nil = 0 := ev_nil _
+theorem b7 (v : Nat → Nat) (c : Nat) : evalTerm (MNV V) (shiftEnv v c) (.var 0) = c := rfl
+theorem e1 (M : Model Nat) (w : Nat → Nat) :
+    evalFormula M w (Formula.atom sym!"allIn" [Term.var 0, Term.var 1]) = M.rel sym!"allIn" [w 0, w 1] := rfl
+theorem e2 (w : Nat → Nat) :
+    evalFormula (MNV V) w (Formula.atom sym!"allIn" [Term.var 0, Term.var 1]) = (MNV V).rel sym!"allIn" [w 0, w 1] := rfl
+theorem e3 (w : Nat → Nat) :
+    evalFormula (MNV V) w (allIn (.var 0) (.var 1)) = (MNV V).rel sym!"allIn" [w 0, w 1] := rfl
+theorem e4 (w : Nat → Nat) : evalTerm (MNV V) w nil = 0 := rfl
+theorem e5 (w : Nat → Nat) :
+    evalFormula (MNV V) w (Formula.atom sym!"allIn" [.var 0, nil]) = (MNV V).rel sym!"allIn" [w 0, evalTerm (MNV V) w nil] := rfl
+theorem e6 (M : Model Nat) (w : Nat → Nat) :
+    evalFormula M w (Formula.eq (Term.var 0) (Term.var 1)) = (w 0 = w 1) := rfl
+theorem e7 (M : Model Nat) (w : Nat → Nat) :
+    evalFormula M w (Formula.atom [] [Term.var 0]) = M.rel [] [w 0] := rfl
+end TcTest

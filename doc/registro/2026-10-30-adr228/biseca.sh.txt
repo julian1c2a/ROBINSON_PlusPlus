@@ -1,0 +1,19 @@
+#!/bin/bash
+# biseca.sh EXPORT EXTRA — el primer prefijo que nanoda no acepta
+set -u
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+S=$(dirname "$0"); f=$1; EXTRA=${2:-}
+tot=$(python3 -c "import sys,json; print(sum(1 for l in open(sys.argv[1]) if any(k in l[:12] for k in ('\"axiom','\"def','\"thm','\"opaque','\"quot','\"inductive'))))" "$f")
+echo "registros: $tot"
+ok() {  # ok K → 0 si nanoda acepta el prefijo K
+  python3 $S/prefijo.py "$f" /tmp/pref.ndjson $1 > /tmp/pref.name
+  python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":"/tmp/pref.ndjson","permitted_axioms":["propext","Quot.sound","Classical.choice"]+[a for a in sys.argv[1].split(",") if a],"unpermitted_axiom_hard_error":True,"num_threads":4,"nat_extension":True,"string_extension":True}))' "$EXTRA" > /tmp/pref.json
+  RUST_MIN_STACK=1073741824 timeout 300 "$BIN/nanoda_bin" /tmp/pref.json > /tmp/pref.log 2>&1
+}
+lo=0; hi=$tot
+while [ $((hi - lo)) -gt 1 ]; do
+  mid=$(( (lo + hi) / 2 ))
+  if ok $mid; then lo=$mid; else hi=$mid; fi
+  echo "  [$lo, $hi] $(cat /tmp/pref.name)"
+done
+ok $hi; echo "PRIMER FALLO: K=$hi $(cat /tmp/pref.name) :: $(tail -c 200 /tmp/pref.log | tr '\n' ' ')"

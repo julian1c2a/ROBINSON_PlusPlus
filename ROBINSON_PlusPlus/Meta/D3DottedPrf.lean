@@ -18,9 +18,6 @@ open ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.D3DottedPrf
 
 /-!
@@ -52,6 +49,7 @@ sale de `hC_dot_of_chainOkBDot` (`Meta/D3ChainDotPrf.lean`). `d3_prf_real` pasa 
 noncomputable def bodyF (φ : Formula) : Formula :=
   land (chainOk nil (.var 0)) (In (formCode φ) (runFn nil (.var 0)))
 
+set_option linter.unusedSimpArgs false in
 /-- **Keystone estructural**: `formCode (provCodeC' φ) = exc (formCode (bodyF φ))`.
     (`provCodeC' φ = ∃p. bodyF`, y `formCode` de un `∃` es `exc` del código del cuerpo.) -/
 theorem formCode_provCodeC'_eq (φ : Formula) :
@@ -60,6 +58,7 @@ theorem formCode_provCodeC'_eq (φ : Formula) :
     chainOk, In, runFn, nil, zero, formCode, exc, numeral, Nat.reduceAdd, Nat.reduceLT,
     Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm, liftTerm_formCode]
 
+set_option linter.unusedSimpArgs false in
 /-- **D3 reducida a la reflexión PUNTEADA del cuerpo** (keystone de la ruta B): dada
     `hbody : bodyF φ ⇒ provFromCode (substfc 0 (tcFn #0) (formCode (bodyF φ)))` —la reflexión del
     cuerpo Δ₀ con `p` **dotado** (`num p = tcFn p`)— se obtiene `d3_prf`

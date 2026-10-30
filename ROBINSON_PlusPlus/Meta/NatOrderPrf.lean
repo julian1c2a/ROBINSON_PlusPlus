@@ -20,9 +20,6 @@ open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.NatArithPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.NatOrderPrf
 
 /-!
@@ -86,6 +83,7 @@ Lo que hay que probar por inducción es sólo lo que **no** es axioma (p. ej. `0
 `add` recurre por la derecha). Se deja la instanciación directa.
 ✏️ 2026‑10‑12 (ADR‑134): el ejemplo no vale: con `ax6_add_comm`, `0 + n = n` sale sin inducción (`ax4`). -/
 
+set_option linter.unusedSimpArgs false in
 /-- **Asociatividad de `+`** en `Prf` — instancia de `ax7_add_assoc`. -/
 theorem prf_add_assoc (a b c : Term) :
     Prf (add (add a b) c =eq add a (add b c)) := by
@@ -95,6 +93,7 @@ theorem prf_add_assoc (a b c : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- **Conmutatividad de `+`** en `Prf` — instancia de `ax6_add_comm`. -/
 theorem prf_add_comm (a b : Term) : Prf (add a b =eq add b a) := by
   have hh := prf_spec (prf_spec
@@ -138,6 +137,7 @@ theorem PrfH_eq_congr_add1 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
     simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (add t₁ c)) Γ)
 
+set_option linter.unusedSimpArgs false in
 /-- Sustitución en el primer argumento de `≤`, en contexto. -/
 theorem PrfH_le_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a₁ =eq a₂))
     (hle : PrfH Γ (le a₁ b)) : PrfH Γ (le a₂ b) := by
@@ -147,6 +147,7 @@ theorem PrfH_le_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a�
     simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
 
+set_option linter.unusedSimpArgs false in
 /-- Sustitución en el 1er argumento de `≤`, a nivel `Prf`. -/
 theorem prf_le_subst1 {a₁ a₂ b : Term} (h : Prf (a₁ =eq a₂)) (hle : Prf (le a₁ b)) :
     Prf (le a₂ b) := by
@@ -156,6 +157,7 @@ theorem prf_le_subst1 {a₁ a₂ b : Term} (h : Prf (a₁ =eq a₂)) (hle : Prf 
     simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS a₂) ▸ prf_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
 
+set_option linter.unusedSimpArgs false in
 /-- Sustitución en el 2º argumento de `≤`, a nivel `Prf`. -/
 theorem prf_le_subst2 {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hle : Prf (le a b₁)) :
     Prf (le a b₂) := by
@@ -165,6 +167,7 @@ theorem prf_le_subst2 {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hle : Prf 
     simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b₂) ▸ prf_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
 
+set_option linter.unusedSimpArgs false in
 /-- Sustitución en el segundo argumento de `≤`, en contexto. -/
 theorem PrfH_le_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
     (hle : PrfH Γ (le a b₁)) : PrfH Γ (le a b₂) := by

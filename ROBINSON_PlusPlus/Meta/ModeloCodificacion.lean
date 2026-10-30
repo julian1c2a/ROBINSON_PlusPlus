@@ -10,7 +10,9 @@ import ROBINSON_PlusPlus.Meta.ModeloEstandar
 
 Cada uno de los 85 de `codingAxioms` con el mismo molde: `intro` de los binders, `abre`, y el lema de
 `Meta/ModeloCodigo.lean` que dice lo que el axioma dice; `lineWF` es, por construcción, `etiqueta < 21 ∧ lineWFT V etiqueta`, y de ahí
-salen también `ax_lineWF_inv` y `ax_lineWF_cons`.
+salen también `ax_lineWF_inv` y `ax_lineWF_cons`. ✏️ 2026‑10‑30 (ADR‑228): menos `v_tc_zero`, que va como el ancla, por
+`rw` con lemas ∀: su `abre` era lo único del cierre de los 32 titulares que lean4lean, con‑leche y con‑ron no
+aceptaban (los tres se quedaban sin recursos; ahora aceptan el cierre entero).
 
 **El ancla** (`v_ancla`): en `MNV V₀`, `axiomsCodeT` vale `V₀`, que es por definición el valor del lado derecho de
 `ax_axiomsCodeT_def`. Va por `rw` con lemas ∀ —⛔ ni `simp`, ni `decide`, ni un `rfl` que alcance el numeral
@@ -122,10 +124,32 @@ theorem v_nthc_zero : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_nthc_zero :=
 theorem v_nthc_succ : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_nthc_succ := by
   intro v a b i; abre; exact nthN_cs a b i
 
-/-! ### `tcFn` y `runFn` (4) -/
+/-! ### La evaluación, constructor a constructor: lemas ∀ por `rfl` (los usan `v_tc_zero` y el ancla, §4) -/
+
+theorem ev_concat (v : Nat → Nat) (a b : Term) :
+    evalTerm (MNV V) v (concat a b) = concatN (evalTerm (MNV V) v a) (evalTerm (MNV V) v b) := rfl
+theorem ev_cons (v : Nat → Nat) (a b : Term) :
+    evalTerm (MNV V) v (cons a b) = consN (evalTerm (MNV V) v a) (evalTerm (MNV V) v b) := rfl
+theorem ev_nil (v : Nat → Nat) : evalTerm (MNV V) v nil = 0 := rfl
+theorem ev_zero (v : Nat → Nat) : evalTerm (MNV V) v zero = 0 := rfl
+theorem ev_substfc (v : Nat → Nat) (a b c : Term) :
+    evalTerm (MNV V) v (substfc a b c) = substfcN (evalTerm (MNV V) v a) (evalTerm (MNV V) v b) (evalTerm (MNV V) v c) := rfl
+theorem ev_tcFn (v : Nat → Nat) (a : Term) : evalTerm (MNV V) v (tcFn a) = tcFnN (evalTerm (MNV V) v a) := rfl
+theorem ev_axiomsCodeT (v : Nat → Nat) : evalTerm (MNV V) v axiomsCodeT = V := rfl
+
+/-! ### `tcFn` y `runFn` (4)
+
+⛔ `v_tc_zero` NO va por el molde (`abre`): todo es cerrado, y la prueba de ese `simp` pide comparar términos que
+los núcleos independientes evalúan, y `consN` va por `triN`, recursión UNARIA (lean4lean, «deep recursion»; nanoda,
+la pila; con‑leche y con‑ron, «fuel exhausted»: ADR‑222 §4). Va como el ancla: `rw` con lemas ∀ y la ecuación de
+`tcFnN` en `0` (✏️ 2026‑10‑30, ADR‑228; medido con los cuatro). -/
 
 theorem v_tc_zero : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_zero := by
-  intro v; unfold ax_tc_zero; abre; rfl
+  intro v
+  show evalTerm (MNV V) v (tcFn zero) =
+    evalTerm (MNV V) v (cons (numeralM 1) (cons (strCodeM zero_sym) (cons nil nil)))
+  rw [ev_tcFn, ev_cons, ev_cons, ev_cons, ev_numeralM, ev_strCodeM, ev_nil, ev_zero]
+  exact tcFnN.eq_1
 theorem v_tc_succ : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_succ := by
   intro v n; abre; rfl
 theorem v_runFn_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_runFn_nil := by
@@ -262,18 +286,8 @@ theorem v_lineWF_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_con
 
 Su lado derecho no nombra `axiomsCodeT`, y `(MNV V)` interpreta `axiomsCodeT` por `V₀`, que es por definición el valor
 de ese lado derecho. Cada paso instancia un lema universal; el único `rfl` (`V₀_def`) compara dos expresiones
-IDÉNTICAS tras desplegar `V₀` un nivel. -/
-
-theorem ev_concat (v : Nat → Nat) (a b : Term) :
-    evalTerm (MNV V) v (concat a b) = concatN (evalTerm (MNV V) v a) (evalTerm (MNV V) v b) := rfl
-theorem ev_cons (v : Nat → Nat) (a b : Term) :
-    evalTerm (MNV V) v (cons a b) = consN (evalTerm (MNV V) v a) (evalTerm (MNV V) v b) := rfl
-theorem ev_nil (v : Nat → Nat) : evalTerm (MNV V) v nil = 0 := rfl
-theorem ev_zero (v : Nat → Nat) : evalTerm (MNV V) v zero = 0 := rfl
-theorem ev_substfc (v : Nat → Nat) (a b c : Term) :
-    evalTerm (MNV V) v (substfc a b c) = substfcN (evalTerm (MNV V) v a) (evalTerm (MNV V) v b) (evalTerm (MNV V) v c) := rfl
-theorem ev_tcFn (v : Nat → Nat) (a : Term) : evalTerm (MNV V) v (tcFn a) = tcFnN (evalTerm (MNV V) v a) := rfl
-theorem ev_axiomsCodeT (v : Nat → Nat) : evalTerm (MNV V) v axiomsCodeT = V := rfl
+IDÉNTICAS tras desplegar `V₀` un nivel. Los lemas universales (`ev_concat` … `ev_axiomsCodeT`) están en §3, antes de
+`v_tc_zero`, que también los usa (✏️ 2026‑10‑30, ADR‑228). -/
 
 theorem V₀_def : V₀ = concatN (codeNatList axiomsBase)
     (consN (substfcN 0 (tcFnN (codeNat (psiD axiomsBase))) (codeNat (psiD axiomsBase))) 0) := rfl

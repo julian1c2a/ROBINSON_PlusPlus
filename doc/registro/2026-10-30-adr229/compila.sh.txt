@@ -1,0 +1,15 @@
+#!/bin/bash
+# compila.sh RAIZ LISTA LOGS [P] — `lean` sobre cada fichero de LISTA (sin -o: no toca los .olean), un log por fichero
+RAIZ=$1; LISTA=$2; LOGS=$3; P=${4:-6}
+mkdir -p "$LOGS"
+export LEAN_PATH='E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean;c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.35.0\lib\lean'
+export LEAN_NUM_THREADS=2
+LEAN=/c/Users/julia/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean
+cd "$RAIZ" || exit 2
+uno() {
+  f=$1; log="$LOGS/$(echo "$f" | sed 's|/|__|g').log"
+  s=$(date +%s); "$LEAN" "$f" > "$log" 2>&1; rc=$?; e=$(( $(date +%s) - s ))
+  echo "$rc ${e}s $f $(grep -cE '^[^ ]*\.lean:[0-9]+:[0-9]+: (warning|error):' "$log")"
+}
+export -f uno; export LOGS LEAN
+tr -d '\r' < "$LISTA" | xargs -P "$P" -I{} bash -c 'uno "$@"' _ {}

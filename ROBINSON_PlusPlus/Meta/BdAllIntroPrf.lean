@@ -31,9 +31,6 @@ open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 /-!
@@ -301,6 +298,7 @@ noncomputable def bdAllPred (CF : Term → Formula) (bndF PsiF : Term → Term) 
       (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (.var 0)))
         (PsiF (liftTerm 0 p)))))
 
+set_option linter.unusedSimpArgs false in
 /-- **INTRODUCCIÓN del `∀` acotado a nivel de código** (§40, keystone de `hC_dot`).
 
     **Parametrizada sobre `p`** (`CF`/`bndF`/`PsiF` son funciones de `p`, con las conmutaciones de

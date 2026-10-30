@@ -31,8 +31,6 @@ open ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.LineWFThyPrf
 
 /-!

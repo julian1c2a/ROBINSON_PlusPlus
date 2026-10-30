@@ -1,0 +1,6 @@
+#!/bin/bash
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+S=$(dirname "$0")
+python3 $S/exportacion.py mutante ~/sn/tit2.ndjson ~/sn/tit2-mut.ndjson
+python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":sys.argv[1],"permitted_axioms":["propext","Quot.sound"],"unpermitted_axiom_hard_error":True,"num_threads":1,"nat_extension":True,"string_extension":True}))' ~/sn/tit2-mut.ndjson > /tmp/mut.json
+( ulimit -s unlimited; /usr/bin/time -f "%e s %M KB" timeout 1200 "$BIN/nanoda_bin" /tmp/mut.json > /tmp/mut.log 2>&1; echo "rc=$? $(tail -c 300 /tmp/mut.log | tr '\n' ' ')" )

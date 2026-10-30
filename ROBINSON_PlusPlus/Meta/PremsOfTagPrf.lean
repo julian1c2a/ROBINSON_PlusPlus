@@ -53,9 +53,6 @@ open ROBINSON_PlusPlus.Meta.ListEtaPrf
 open ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.LineWFAssemblePrf ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxRecDepth 20000
-
 namespace ROBINSON_PlusPlus.Meta.PremsOfTagPrf
 
 /-! ## §1 · LOS DOS LEMAS GENÉRICOS -/
@@ -116,6 +113,7 @@ theorem prf_eta_of_tag {k m : Nat} {D : Formula} (t : Term)
     exact PrfH_congr_cons_tail (PrfH_congr_cons_head htagc)
   exact PrfH_eq_trans heta hshape
 
+set_option linter.unusedSimpArgs false in
 /-- ⭐⭐ `premsOf` EVALUADO a nivel OBJETO, genérico en el tag, la aridad y el valor. -/
 theorem prf_premsOf_of_tag {k m : Nat} {D : Formula} (t R : Term)
     (hax : Prf (Formula.forall (Formula.impl (tagF k) (lwfVar ⇔ D))))

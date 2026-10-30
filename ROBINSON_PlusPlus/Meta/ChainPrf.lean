@@ -18,8 +18,6 @@ open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Meta.ChainPrf
 
 /-!
@@ -47,6 +45,7 @@ theorem PrfH_leibniz_subst {Γ : List Formula} {A : Formula} {t₁ t₂ : Term}
     (h : PrfH Γ (t₁ =eq t₂)) (hA : PrfH Γ (substFormula 0 t₁ A)) : PrfH Γ (substFormula 0 t₂ A) :=
   PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.leibniz A t₁ t₂)) h) hA
 
+set_option linter.unusedSimpArgs false in
 /-- Transitividad de `=eq` en `PrfH`. -/
 theorem PrfH_eq_trans {Γ : List Formula} {a b c : Term}
     (h1 : PrfH Γ (a =eq b)) (h2 : PrfH Γ (b =eq c)) : PrfH Γ (a =eq c) := by
@@ -110,6 +109,7 @@ theorem PrfH_eq_subst_in {Γ : List Formula} {x t₁ t₂ : Term}
     intro s; simp only [f, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ hin)
 
+set_option linter.unusedSimpArgs false in
 /-- `In x t → In x (cons hd t)` en `PrfH` (vía `ax_L2` + `j2` + `iff` mpr). -/
 theorem PrfH_in_cons_tail {Γ : List Formula} (hd : Term) {x t : Term} (hx : PrfH Γ (In x t)) :
     PrfH Γ (In x (cons hd t)) := by
@@ -203,6 +203,7 @@ theorem PrfH_iff_mpr {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) 
     PrfH Γ A :=
   PrfH.mp Γ _ _ (prf_to_prfH (prf_and_elim_right hiff) Γ) hb
 
+set_option linter.unusedSimpArgs false in
 /-- Simetría de `=eq` en `PrfH`. -/
 theorem PrfH_eq_symm {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b)) : PrfH Γ (b =eq a) := by
   let f : Formula := Formula.eq (.var 0) (liftTerm 0 a)
@@ -256,6 +257,7 @@ theorem prf_congr_concat_first {u₁ u₂ t : Term} (h : Prf (u₁ =eq u₂)) :
     intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS u₂) ▸ prf_leibniz_subst (A := f) h ((hS u₁) ▸ prf_refl (concat u₁ t))
 
+set_option linter.unusedSimpArgs false in
 /-- **Asociatividad de `concat` en `Prf`**: `(L ++ M) ++ N =eq L ++ (M ++ N)`.
     Inducción de listas sobre `L` (profundidad 1; `M`,`N` con `liftTerm 0`, normaliza con `norm21`). -/
 theorem prf_concat_assoc (M N L : Term) :
@@ -307,6 +309,7 @@ theorem prf_concat_nil_right (X : Term) : Prf (concat X nil =eq X) := by
   show Prf (concat X nil =eq X)
   simpa [substFormula, substTerm, substTerms, concat, nil, zero, FOL.substTerm_liftTerm] using hX
 
+set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `In` (contexto izq.)** en `Prf`: `Prf (In x c) → Prf (In x (concat c0 c))`.
     Inducción de listas sobre `c0`; `x`,`c` van con `liftTerm 0` (evitan capturar el
     slot de la lista). -/
@@ -355,6 +358,7 @@ theorem PrfH_congr_cons_head {Γ : List Formula} {hd₁ hd₂ t : Term}
     intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS hd₂) ▸ PrfH_leibniz_subst (A := f) h ((hS hd₁) ▸ prf_to_prfH (prf_refl (cons hd₁ t)) Γ)
 
+set_option linter.unusedSimpArgs false in
 /-- `In x (cons hd t)` se descompone en `(x =eq hd) ∨ In x t` (cierre `Prf` de `ax_L2`). -/
 theorem prf_in_cons_iff (x hd t : Term) :
     Prf (In x (cons hd t) ⇔ lor (x =eq hd) (In x t)) := by
@@ -363,6 +367,7 @@ theorem prf_in_cons_iff (x hd t : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- `In x nil ⇒ ⊥` (cierre `Prf` de `ax_L1`). -/
 theorem prf_not_in_nil (x : Term) : Prf (Formula.impl (In x nil) Formula.bottom) := by
   have hh := prf_spec (prf_ax (show ax_L1_in_nil ∈ axioms by simp [axioms])) x
@@ -370,6 +375,7 @@ theorem prf_not_in_nil (x : Term) : Prf (Formula.impl (In x nil) Formula.bottom)
     FOL.substTerm_liftTerm] at hh
   exact hh
 
+set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `In` por la derecha** en `Prf`: `Prf (In x L) → Prf (In x (concat L M))`.
     Inducción de listas sobre `L`; `base` vía explosión (`In x nil` es falso), `step`
     vía `or_elim` sobre la descomposición de `ax_L2`. -/
@@ -423,6 +429,7 @@ theorem prf_In_mono_right_imp (x M L : Term) :
 theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat L M)) :=
   prf_mp (prf_In_mono_right_imp x M L) h
 
+set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `allIn` (contexto izq.)** en `Prf` (implicación): `allIn c M ⇒ allIn (c0 ++ c) M`.
     Inducción sobre `M`; usa `prf_In_mono_imp`. -/
 theorem prf_allIn_mono_imp (c c0 M : Term) :
@@ -511,6 +518,7 @@ theorem prfCompPred_spec {s p : Term} (h : Prf (substFormula 0 p (prfCompPred s)
   simpa [prfCompPred, substFormula, substTerm, substTerms, runFn, concat,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
+set_option linter.unusedSimpArgs false in
 /-- **Compositividad de `runFn` en `Prf`** (keystone de `d2_prf`):
     `runFn c (p ++ s) =eq runFn (runFn c p) s`. Inducción de listas sobre `p`
     (acumulador `c` generalizado como `∀` object; normalización vía `norm32`). -/
@@ -564,6 +572,7 @@ theorem prfMonoPred_spec {c0 p : Term} (h : Prf (substFormula 0 p (prfMonoPred c
   simpa [prfMonoPred, substFormula, substTerm, substTerms, chainOk, concat,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
+set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `chainOk` en el contexto** en `Prf` (implicación, keystone d2):
     `chainOk c p ⇒ chainOk (c0 ++ c) p`. Inducción sobre `p` (acumulador `∀c`;
     usa `lineOk_mono`, `concat_assoc`, patrón confinación/`norm32`/`norm_s`). -/
@@ -621,6 +630,7 @@ theorem prfWeakPred_spec {p : Term} (h : Prf (substFormula 0 p prfWeakPred)) (c 
   simpa [prfWeakPred, substFormula, substTerm, substTerms, runFn, concat, nil, zero,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
+set_option linter.unusedSimpArgs false in
 /-- **Debilitamiento de `runFn` en `Prf`**: `runFn c p =eq c ++ runFn nil p`. Inducción sobre
     `p` (acumulador `∀c`; usa `concat_assoc`, patrón confinación). -/
 theorem prf_runFn_weaken (c p : Term) : Prf (runFn c p =eq concat c (runFn nil p)) := by
@@ -683,6 +693,7 @@ theorem prfCompChainPred_spec {s p : Term} (h : Prf (substFormula 0 p (prfCompCh
   simpa [prfCompChainPred, substFormula, substTerm, substTerms, chainOk, runFn, concat, land, iff,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
+set_option linter.unusedSimpArgs false in
 /-- **Composición de `chainOk` en `Prf`** (keystone d2): `chainOk c (p++s) ⇔
     chainOk c p ∧ chainOk (runFn c p) s`. Inducción sobre `p` (acumulador `∀c`;
     patrón confinación/`norm32`/`norm_s`). -/

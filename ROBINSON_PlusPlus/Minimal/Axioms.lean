@@ -8,8 +8,6 @@ import FOL.FOL        -- Term, Formula, Derives (⊢), notaciones ≐ ∧ ∨ ¬
 import ROBINSON_PlusPlus.Minimal.SymLit  -- `sym!"…"`: los literales de símbolo, `List Char` (D7)
 import FOL.Theorems.Eq -- derive_eq_symm, derive_eq_trans, substTerm_liftTerm
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Minimal.Axioms
 
 -- ## Notations & local aliases

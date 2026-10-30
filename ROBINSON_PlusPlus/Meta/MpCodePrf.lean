@@ -20,9 +20,6 @@ open ROBINSON_PlusPlus.Meta.TrackedCorePrf
 open ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 
-set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
-
 namespace ROBINSON_PlusPlus.Meta.MpCodePrf
 
 /-!
@@ -51,6 +48,7 @@ theorem liftTerm_implc_open (Ac Bc : Term) :
   intro c
   simp only [implc, cons, nil, zero, succ, liftTerm, liftTerms]
 
+set_option linter.unusedSimpArgs false in
 /-- **MP a nivel de código, con códigos ABIERTOS** (§25.3):
     `Prov(⌜Ac ⇒ Bc⌝) ⇒ (Prov(⌜Ac⌝) ⇒ Prov(⌜Bc⌝))`, **sin** exigir `Ac`, `Bc` cerrados.
 

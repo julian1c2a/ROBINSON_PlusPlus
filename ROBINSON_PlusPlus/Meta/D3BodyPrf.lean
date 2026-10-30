@@ -54,9 +54,6 @@ open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 open ROBINSON_PlusPlus.Meta.DotConsPrf ROBINSON_PlusPlus.Meta.PremsOfTagPrf
 open ROBINSON_PlusPlus.Meta.PremsOfDotPrf
 
-set_option linter.unusedSimpArgs false
-set_option maxRecDepth 20000
-
 namespace ROBINSON_PlusPlus.Meta.D3BodyPrf
 
 
