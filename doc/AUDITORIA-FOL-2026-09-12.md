@@ -1,5 +1,7 @@
 # AUDITORÍA UNIFICADA DE FOL — y su engarce con ROBINSON_PlusPlus
 
+**Last updated:** 2026-09-12 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 **Fecha:** 2026‑09‑12 · **Autor:** auditoría automatizada, síntesis · **Alcance:** los dos repos hermanos
 `E:/dropbox/github/lean4/FOL` (HEAD `ef54c6f`, árbol limpio) y `E:/dropbox/github/lean4/ROBINSON_PlusPlus`
 (HEAD `47d7348`, **un fichero modificado sin commitear**).

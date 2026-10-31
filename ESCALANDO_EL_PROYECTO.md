@@ -1,6 +1,6 @@
 # Escalando el proyecto: ROBINSON_PlusPlus ↔ DeepArithmetic (sobre FOL⁼)
 
-**Última actualización:** 2026-07-08
+**Last updated:** 2026-07-08 *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor:** Julián Calderón Almendros
 
 > ✏️ **2026‑10‑14 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es un estudio del 2026‑07‑08, y no se ha re‑medido.

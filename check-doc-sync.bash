@@ -13,16 +13,28 @@
 #
 # ✏️ 2026-10-18 (ADR-166, T04): [B] es otro: toda cita con forma de identificador o de ruta (b-citas.awk), absuelta
 # sólo por un marcador a 100 bytes (no por una fecha), con la deuda POR CITA en doc/control/b-deuda.tsv.
+# ✏️ 2026-10-31 (T21, ADR-235): y también la absuelve, si la declara un sondeo, que la línea nombre ese sondeo (ya en
+# ADR-166); desde ADR-167 (2026-10-19), el techo de la tabla es la de la base verificada (B_BASE_REF), y el marcador no
+# cuenta negado, como sustantivo ni a través de otra cita o de un fin de oración.
 # ✏️ 2026-10-18 (ADR-163, T15): y [L], el universo de los módulos (el cierre de imports del barril = el disco = git).
-# ✏️ 2026-10-14 (ADR-135): hoy rompen [A], [B], [C], [D], [E], [F], [H], [M] y [T]; sólo [A2] es aviso. Lo que
-# sigue es la cabecera de entonces:
+# ✏️ 2026-10-31 (T24, ADR-233): y [E], con DOS tablas de deuda —E_DEUDA, la de contenido (marca vieja), y
+# E_DEUDA_FORMATO, la de formato (sin marca; vacía)— y un TECHO en la base verificada, como [A2] y [B].
+# ✏️ 2026-10-31 (T21, ADR-235): hoy rompen todos los bloques —[L], [EOL], [H] (el PATH higiénico), [A], [A2], [E],
+# [B], [I], [N], [C], [D], [F], [H] (el catálogo de sondeos/), [M] y [T]— y la VERDAD DEL CÓDIGO si no puede medir;
+# ninguno es sólo aviso. La nota del 2026-10-14 (ADR-135) decía «hoy rompen [A], [B], [C], [D], [E], [F], [H], [M] y
+# [T]; sólo [A2] es aviso»: [A2] rompe desde ADR-169 (2026-10-19). Lo que sigue es la cabecera del 2026-08-23, cuando
+# [B] era aviso (lo fue hasta ADR-084):
 # [A], [C] y [D] son OBJETIVOS y rompen el check. [B] es un AVISO que pide juicio:
 # hay menciones legítimas de símbolos inexistentes (históricas, planificadas, descartadas).
 #
 # Uso:
 #   bash check-doc-sync.bash            # comprobación completa
-#   bash check-doc-sync.bash --quick    # sin `lake build` (usa el conteo de módulos)
-#   bash check-doc-sync.bash --fix-hint # además, sugiere el sed de cada corrección
+#   bash check-doc-sync.bash --quick    # sin `lake build`: no mide los jobs ([A] y [A2] no los comparan, y --a2-deuda
+#                                       # se niega, en rojo); [B] sigue pidiendo `lake` y el build hecho (✏️ 2026-10-31,
+#                                       # T21, ADR-235: decía «usa el conteo de módulos»; [B] pide `lake` desde ADR-166)
+#   bash check-doc-sync.bash --fix-hint # además, si sale rojo, dos sed genéricos para revisar a mano: los jobs (si se
+#                                       # midieron) y los módulos activos, sobre *.md doc/*.md (también las líneas
+#                                       # de historia)
 #   bash check-doc-sync.bash --b-deuda  # además, baja doc/control/b-deuda.tsv a la deuda de hoy, si nada sube (ADR-166)
 #   bash check-doc-sync.bash --b-deuda-inicial  # crea esa tabla, sólo si no existe (se hizo una vez, ADR-166)
 #   bash check-doc-sync.bash --b-deuda-rehacer  # la rehace, sólo en el commit que cambia el núcleo de [B] (y sube, como
@@ -30,8 +42,12 @@
 #   bash check-doc-sync.bash --a2-deuda  # además, baja doc/control/a2-deuda.tsv (las cifras viejas del cuerpo, [A2];
 #                                        # ADR-169), si nada sube
 #   bash check-doc-sync.bash --a2-deuda-inicial  # crea esa tabla, sólo si no existe (se hizo una vez, ADR-169)
+#   bash check-doc-sync.bash -h, --help          # esta ayuda (los comentarios del principio)
+# Variables: M_DOC=fichero y T_DOC=fichero, modos de prueba de [M] y [T] (dicen qué fichero miran y nunca dan verde);
+#   B_BASE_REF=ref, la base verificada del techo de [A2], [E] y [B] (por omisión refs/remotes/origin/master).
 #
-# Salida: 0 si todo cuadra, 1 si hay desincronización.
+# Salida: 0 si todo cuadra (y con -h); 1 si hay desincronización o algo no se pudo medir (siempre, con M_DOC o T_DOC);
+# 2 con una opción desconocida.
 
 set -uo pipefail
 cd "$(dirname "$0")"
@@ -198,7 +214,8 @@ printf "  axiom de Lean   : %s\n" "$AXIOMS"
 printf "  sorry           : %s\n" "$SORRY"
 [ -n "$JOBS" ] && printf "  build jobs      : %s\n" "$JOBS"
 [ "$LAKE_MISSING" = "1" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake' no está en el PATH de este shell."
-[ "$LAKE_MISSING" = "1" ] && echo "                     Lánzalo desde PowerShell, o usa --quick para decirlo a propósito."
+# ✏️ 2026-10-31 (T21, ADR-235): decía «o usa --quick para decirlo a propósito»; desde ADR-166, [B] pide lake también con --quick.
+[ "$LAKE_MISSING" = "1" ] && echo "                     Lánzalo desde PowerShell: --quick no basta (no mide los jobs, y [B] sigue pidiendo lake)."
 [ "$LAKE_MISSING" = "2" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake build' no dijo 'Build completed successfully'."
 [ "$SORRY_MISSING" = "1" ] && echo "  ⚠️  sorry         : SIN MEDIR — check-sorry.bash no dijo ni 'No sorry found' ni 'Total: N sorry'."
 [ "$AXIOMS_MISSING" = "1" ] && echo "  ⚠️  axiom de Lean : SIN MEDIR — el autotest de cuenta_axiomas no dio 9 (¿strip-lean.awk, LC_ALL?)."
@@ -603,6 +620,14 @@ echo "════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) �
 # falso. Se declara, como en `check-warnings.bash` (ADR-065), y el control **ROMPE EN LOS DOS
 # SENTIDOS**: si un doc NO declarado falla, rojo; y si un doc declarado ya está bien, también
 # rojo — *la deuda se saldó, quítala de la tabla*. Así la cifra sólo puede BAJAR.
+# ✏️ 2026-10-31 (T24, ADR-233): DOS tablas, porque son dos deudas distintas. E_DEUDA es la de CONTENIDO: el documento
+# tiene su marca y es más vieja que su último commit (su cuerpo no se ha revisado desde entonces). E_DEUDA_FORMATO, la de
+# FORMATO: no tiene marca (o la tenía en español, «Última actualización», que [E] no lee). Cada documento tiene que
+# fallar por la razón de su tabla. La de formato se pagó el 2026-10-31 con la fecha de la última revisión REAL de cada
+# documento —la suya, si la decía en español; si no, la de su último commit con diez líneas nuevas o más, sin las tres
+# pasadas en lote de notas y rótulos (ADR-134, ADR-196, ADR-225)—, nunca la de hoy: así pasan a la de contenido, que es
+# lo que son. Y un TECHO, como el de [B] desde ADR-167: las dos tablas juntas no pueden tener un documento que no tenga
+# la base verificada (un número de tope dejaba cambiar uno por otro).
 read -r -d '' E_DEUDA <<'EOF'
 REFERENCE.md
 # CURRENT-STATUS-PROJECT.md — SALDADA el 2026-10-21 (ADR-182, T26): reescrito entero, con su marca.
@@ -617,7 +642,7 @@ doc/REFERENCE-Kernel.md
 cuarentena/README.md
 # ── ampliación del universo, 2026-09-22 (ADR-084): los 21 defectos de los 25
 #    documentos que `[E]` nunca había mirado. La cifra sólo puede BAJAR.
-.claude/commands/docsync.md
+# .claude/commands/docsync.md — SALDADA el 2026-10-31 (ADR-235, T21): revisado entero, cada afirmación contra el código.
 AI-GUIDE.md
 CHANGELOG.md
 DISCUSIONES.md
@@ -644,6 +669,10 @@ doc/PLAN-COMPLETITUD-FINITISTA.md
 ESCALANDO_EL_PROYECTO.md
 NAMING-CONVENTIONS.md
 EOF
+read -r -d '' E_DEUDA_FORMATO <<'EOF'
+# ── vacía desde el 2026-10-31 (T24, ADR-233): los 18 que no tenían marca la llevan, con la fecha de su última revisión
+#    real, y están en E_DEUDA. Un documento sin marca nuevo no se declara aquí: se le pone la suya.
+EOF
 
 # ⛔ GUARDA DEL CLON SUPERFICIAL (2026-09-18, ADR-072). En `--depth 1`, `git log -1 -- <f>`
 # devuelve HEAD para TODOS los ficheros ⇒ este control mediría basura y la CI se pondría roja
@@ -668,7 +697,8 @@ fi
 E_UNIVERSO="$DOCS $(git ls-files '*.md' 2>/dev/null | grep -v '^doc/book/')"
 E_BAD=0      # documentos que fallan y NO estaban declarados
 E_SALDADA=0  # documentos declarados que ya están bien ⇒ hay que quitarlos de la tabla
-E_DECL=0     # deuda declarada que sigue vigente
+E_DECL=0     # deuda declarada que sigue vigente (de contenido)
+E_DECL_F=0   # deuda declarada que sigue vigente (de formato)
 for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
   [ -e "$d" ] || continue
   GIT_DATE=$(git log -1 --format=%ad --date=short -- "$d" 2>/dev/null)
@@ -690,6 +720,11 @@ for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
     [ -n "$t" ] || continue
     [ "$t" = "$d" ] && EN_TABLA=1
   done <<< "$E_DEUDA"
+  EN_FORMATO=0
+  while IFS= read -r t; do
+    [ -n "$t" ] || continue
+    [ "$t" = "$d" ] && EN_FORMATO=1
+  done <<< "$E_DEUDA_FORMATO"
 
   ESTADO="ok"
   MOTIVO=""
@@ -701,17 +736,59 @@ for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
     ESTADO="mal"; MOTIVO="la marca dice $LU y el último commit que lo tocó es $GIT_DATE (hoy, si tiene cambios sin commitear)"
   fi
 
-  if [ "$ESTADO" = "mal" ] && [ "$EN_TABLA" = "0" ]; then
+  if [ "$ESTADO" = "mal" ] && [ "$EN_TABLA" = "0" ] && [ "$EN_FORMATO" = "0" ]; then
     echo "  ❌ $d: $MOTIVO"
     E_BAD=$((E_BAD+1))
+  elif [ "$ESTADO" = "mal" ] && [ "$EN_TABLA" = "1" ] && [ -z "$LU" ]; then
+    echo "  ❌ $d: no tiene marca: es deuda de FORMATO, no de contenido. Ponle la de su última revisión real (T24)."
+    E_BAD=$((E_BAD+1))
+  elif [ "$ESTADO" = "mal" ] && [ "$EN_FORMATO" = "1" ] && [ -n "$LU" ]; then
+    echo "  ❌ $d: ya tiene marca: su deuda es de CONTENIDO. Pásalo de E_DEUDA_FORMATO a E_DEUDA."
+    E_BAD=$((E_BAD+1))
+  elif [ "$ESTADO" = "mal" ] && [ "$EN_FORMATO" = "1" ]; then
+    E_DECL_F=$((E_DECL_F+1))
   elif [ "$ESTADO" = "mal" ]; then
     E_DECL=$((E_DECL+1))
-  elif [ "$EN_TABLA" = "1" ]; then
-    echo "  ❌ $d: la deuda ESTÁ SALDADA — quítalo de la tabla E_DEUDA de este script."
+  elif [ "$EN_TABLA" = "1" ] || [ "$EN_FORMATO" = "1" ]; then
+    echo "  ❌ $d: la deuda ESTÁ SALDADA — quítalo de su tabla (E_DEUDA o E_DEUDA_FORMATO) de este script."
     E_SALDADA=$((E_SALDADA+1))
   fi
 done
-echo "  deuda declarada: $E_DECL   ·   sin declarar: $E_BAD   ·   saldadas sin quitar: $E_SALDADA"
+# el TECHO (T24, ADR-233): las dos tablas juntas, contenidas en las de la base verificada (la misma que [A2] y [B]); sin
+# ella, rojo. De la base se leen las dos (la de formato no existía antes del 2026-10-31: vacía).
+e_lista() { LC_ALL=C awk -v v="$1" '$0 ~ ("^read -r -d .. " v " <<") { f = 1; next } f && /^EOF$/ { exit } f' \
+              | grep -v '^#' | grep . | LC_ALL=C sort -u; }
+E_HOY=$( { printf '%s\n' "$E_DEUDA" | grep -v '^#'; printf '%s\n' "$E_DEUDA_FORMATO" | grep -v '^#'; } | grep . | LC_ALL=C sort -u)
+E_BASE_REF="${B_BASE_REF:-refs/remotes/origin/master}"
+case "$E_BASE_REF" in 0000000*) E_BASE_REF=refs/remotes/origin/master ;; esac
+E_BASE=$(GIT_NO_REPLACE_OBJECTS=1 git rev-parse -q --verify "$E_BASE_REF^{commit}" 2>/dev/null)
+E_TECHO_TXT=""
+if [ -z "$E_BASE" ]; then
+  echo "  ❌ no hay BASE VERIFICADA ($E_BASE_REF): sin ella la deuda de [E] no tiene techo (¿falta un git fetch?)."
+  E_BAD=$((E_BAD+1))
+elif ! git merge-base --is-ancestor "$E_BASE" HEAD 2>/dev/null; then
+  echo "  ❌ HEAD no desciende de la base verificada ($E_BASE_REF): rebase sobre ella."
+  E_BAD=$((E_BAD+1))
+else
+  E_BASE_SCRIPT=$(GIT_NO_REPLACE_OBJECTS=1 git show "$E_BASE:check-doc-sync.bash" 2>/dev/null)
+  E_TECHO=$( { printf '%s\n' "$E_BASE_SCRIPT" | e_lista E_DEUDA; printf '%s\n' "$E_BASE_SCRIPT" | e_lista E_DEUDA_FORMATO; } \
+             | grep . | LC_ALL=C sort -u)
+  # (una base con la tabla VACÍA —la meta de la deuda— da un techo vacío, que vale: lo que no se puede medir es una base
+  # SIN la tabla. La revisión adversarial de T21 lo vio: con `-z "$E_TECHO"` la deuda saldada habría dado «no pude medir».)
+  if ! grep -q "^read -r -d '' E_DEUDA <<" <<< "$E_BASE_SCRIPT"; then
+    echo "  ❌ NO PUDE MEDIR el techo: la base verificada $(git rev-parse --short "$E_BASE") no tiene la tabla E_DEUDA."
+    E_BAD=$((E_BAD+1))
+  else
+    E_SUBE=$(LC_ALL=C comm -23 <(printf '%s\n' "$E_HOY") <(printf '%s\n' "$E_TECHO"))
+    if [ -n "$E_SUBE" ]; then
+      echo "  ❌ la deuda de [E] SUBE: estos documentos no están en las tablas de la base verificada ($(git rev-parse --short "$E_BASE")):"
+      printf '%s\n' "$E_SUBE" | sed 's/^/      /'
+      E_BAD=$((E_BAD+1))
+    fi
+    E_TECHO_TXT=" · techo: los $(printf '%s\n' "$E_TECHO" | grep -c .) de la base verificada, $(git rev-parse --short "$E_BASE")"
+  fi
+fi
+echo "  deuda declarada: $E_DECL de contenido y $E_DECL_F de formato$E_TECHO_TXT   ·   sin declarar: $E_BAD   ·   saldadas sin quitar: $E_SALDADA"
 if [ "$E_BAD" = "0" ] && [ "$E_SALDADA" = "0" ]; then
   echo "  ✓ ninguna marca de tiempo miente fuera de la deuda declarada"
 else
@@ -762,6 +839,9 @@ b_adr_texto_base() { git show "$B_BASE:DECISIONS.md" 2>/dev/null | awk -v a="## 
 B_DOCS_LISTA="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 # (2026-10-14, ADR-135; T09: TEOREMAS-E-HIPOTESIS.md entra en el universo: es normativo y nadie lo miraba)
 B_DOCS_LISTA="$B_DOCS_LISTA TEOREMAS-E-HIPOTESIS.md"
+# (2026-11-01, ADR-235; T21: PLAN-PRUEBAS.md entra, con sus citas muertas adjudicadas —catorce, cada una con su
+# marcador de estado o en texto plano—; ADR-185 lo había dejado fuera hasta entonces)
+B_DOCS_LISTA="$B_DOCS_LISTA PLAN-PRUEBAS.md"
 # (la lista es EXPLÍCITA: un documento que desaparece es rojo, no sale del universo con su deuda; y un REFERENCE nuevo
 # tiene que entrar en ella)
 B_DOCS_LISTA="$B_DOCS_LISTA doc/REFERENCE-Arithmetic.md doc/REFERENCE-Full.md doc/REFERENCE-Godelization.md"

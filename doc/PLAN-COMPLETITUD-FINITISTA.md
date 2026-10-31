@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-10-05 (D7 ejecutada (ADR‑129 de RPP): notas fechadas en el banner, §7, §7.5, §7.2, §7.4 y §7.3, y el resultado medido al final de §7.3; antes, 2026-09-27, notas fechadas de ADR‑110: bajo el banner de la vía W, en §6.3 y en §7; antes, 2026-09-18 12:30) · **Autor:** Julián Calderón Almendros
+**Last updated:** 2026-10-05 (D7 ejecutada (ADR‑129 de RPP): notas fechadas en el banner, §7, §7.5, §7.2, §7.4 y §7.3, y el resultado medido al final de §7.3; antes, 2026-09-27, notas fechadas de ADR‑110: bajo el banner de la vía W, en §6.3 y en §7; antes, 2026-09-18 12:30) · **Autor:** Julián Calderón Almendros *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:

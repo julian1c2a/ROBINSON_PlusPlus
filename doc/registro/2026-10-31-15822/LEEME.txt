@@ -1,0 +1,13 @@
+ADR-236, 2026-10-31: leanprover/lean4#15822 (la abrió ADR-172, T77), CERRADA el 2026-10-20 por el PR #15824.
+
+versiones.txt   las dos reproducciones de T77 (doc/registro/2026-10-20-t77/: Mini.lean.txt, la de la issue; Mwe.lean.txt,
+                la de sondeos/IteSimboloNucleo.lean), sin imports, con el «lean» plano de cuatro toolchains de Windows
+                (elan): v4.35.0 (el del proyecto), v4.36.0-rc2, nightly-2026-10-20 y nightly-2026-10-30.
+
+Lo medido:
+  · v4.35.0, v4.36.0-rc2 y nightly-2026-10-20: «(kernel) declaration type mismatch» en las dos: el defecto sigue.
+  · nightly-2026-10-30 (4.37.0-nightly): «`dsimp` made no progress» en las dos. El arreglo cambió lo que hace
+    `dsimp only [f] at h`: ya no despliega `f` bajo el `match` atascado, así que no produce la prueba que el núcleo
+    rechazaba.
+  · Según git (gh api compare): el commit del arreglo, b0de56e, está en el master de Lean y NO en las ramas de
+    v4.36.0-rc1 ni rc2 (divergen): llegará con v4.37, salvo que se traslade a la 4.36.

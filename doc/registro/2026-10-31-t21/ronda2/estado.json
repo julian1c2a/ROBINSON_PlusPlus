@@ -1,0 +1,50 @@
+[
+ {
+  "file": "README.md",
+  "line": 79,
+  "problem": "Falso según el código: dice que scripts/segundo-nucleo.bash se lanza a mano «en WSL si Windows bloquea sus binarios». El script llama a lake, y en WSL no se corre lake. ADR-228 midió en WSL pasando los binarios de Linux a mano, sin el script. En la máquina del propietario el script no se puede lanzar ni en Windows ni en WSL. Además, `segundo-nucleo.bash` y `presupuesto-ci.bash` van sin su ruta versionada (scripts/…): [B] sólo los absuelve por sufijo.",
+  "evidence": "scripts/segundo-nucleo.bash: «command -v lake … || exit 2», «PREFIJO=$(lake env lean --print-prefix …)» y «lake env \"$BIN/leanexport\" …». doc/registro/2026-10-30-adr228/LEEME.txt: «exporta.sh pone su LEAN_PATH en .lake/build/lib/lean de RPP y de FOL … No se corre `lake` en WSL». Esa medición usó exporta.sh.txt y nucleos.sh.txt con los binarios directos. La cabecera del script dice «corren los binarios LINUX del mismo toolchain en WSL», no que corra el script.",
+  "fix": "master de FOL, pasa estos scripts, que también se lanzan a mano desde la raíz (`scripts/presupuesto-ci.bash`, sobre las salidas de GNU time del build y de leanchecker; `scripts/segundo-nucleo.bash`, no donde Windows bloquea sus binarios, como en la máquina del propietario, ni en WSL, porque llama a lake: allí sus núcleos de Linux se pasan a mano, como en `doc/registro/2026-10-30-adr228/LEEME.txt`):",
+  "severity": "media"
+ },
+ {
+  "file": "README.md",
+  "line": 94,
+  "problem": "Exagera lo que comprueba el control. thaws-fol.bash no mira que el ADR «recoja la decisión del propietario»: sólo que su sección exista y contenga la palabra «propietario» o «usuario». Un ADR que nombra al propietario de paso también pasa.",
+  "evidence": "scripts/thaws-fol.bash, adr_decide: la sección se busca con awk «## ADR-NNN:» y después se hace «grep -qiE 'propietario|usuario' <<< \"$t\"». La cabecera del propio script lo dice así: «que recoja una decisión (la palabra «propietario» o, en los antiguos, «usuario»)».",
+  "fix": "| «bash scripts/thaws-fol.bash ../FOL» | cada thaw de FOL (toda la historia de su `frozen_files.txt`) se apoya en un ADR de RPP que existe y nombra al propietario (la palabra «propietario» o, en los antiguos, «usuario», en su sección): el que cita su mensaje o, si es de antes de la regla, el de doc/control/thaws-fol.tsv; su alcance declarado (prosa o código), re‑medido con scripts/prosa.py; y `git-lock.bash` y los ganchos de .githooks/, los mismos en RPP y en FOL (T14, ADR‑234) |",
+  "severity": "baja"
+ },
+ {
+  "file": "README.md",
+  "line": 84,
+  "problem": "El alcance es ambiguo dentro de la misma celda. «RPP» significa primero el repositorio entero («los `.lean` de RPP, `sondeos/` incluidos») y luego sólo la librería («ningún agujero de confianza … en RPP, FOL y TheoryFramework»). El censo de confianza no mira sondeos/, y el de las órdenes que evalúan el ancla mira la librería y sondeos/, no FOL.",
+  "evidence": "check-sorry.bash: AG_ALCANCE=\"ROBINSON_PlusPlus.lean ROBINSON_PlusPlus ../FOL/FOL.lean ../FOL/FOL ../FOL/TheoryFramework.lean ../FOL/TheoryFramework\" (sin sondeos/; el script imprime «en todo lo que compila el build»). EV_ALCANCE=\"ROBINSON_PlusPlus.lean ROBINSON_PlusPlus sondeos\".",
+  "fix": "| `bash check-sorry.bash` | por texto: ningún `sorry` (ni «admit», «stop» o «sorryAx») en los `.lean` de RPP, `sondeos/` incluidos (el de FOL y TheoryFramework lo mira `check-estratos.bash`, por entorno); ningún agujero de confianza («native_decide», «implemented_by»…) en lo que compila el build (RPP, FOL y TheoryFramework; `sondeos/` no); y ninguna orden («#eval», «#reduce», «#guard», «run_cmd»…) que evalúe el ancla, en RPP y `sondeos/` |",
+  "severity": "baja"
+ },
+ {
+  "file": "CURRENT-STATUS-PROJECT.md",
+  "line": 24,
+  "problem": "El editor da este alcance de [L] por «exacto», pero falta una de sus dos direcciones: todo módulo del cierre tiene que estar en git (si no, compila aquí y la CI no lo tiene). Además, «en el disco y en git» se lee como intersección, cuando el control mira el disco o git.",
+  "evidence": "check-doc-sync.bash [L]: L_SUELTOS = (git ∪ disco) − cierre, rojo; L_SINGIT = cierre − git, rojo («está en el cierre y NO en git: aquí compila, y la CI no lo tiene (git add)»). README.md:110 sí da las dos: «falla si uno no está importado o no está en git».",
+  "fix": "`check-doc-sync.bash` `[A]` y `[L]` (el cierre de imports del barril, el disco y git son el mismo conjunto: todo `.lean` de `ROBINSON_PlusPlus/`, en el disco o en git, está en el cierre, y todo módulo del cierre, en git)",
+  "severity": "baja"
+ },
+ {
+  "file": "README.md",
+  "line": 91,
+  "problem": "Estilo (b): la orden con su flag va entre comillas invertidas, cuando las herramientas y los flags van en texto plano. Además, la introducción (l. 79) invita a lanzarla a mano, y así, en local, falta el LEAN_NUM_THREADS=4 que exige la l. 102. (APLICA SÓLO lo sustantivo: el LEAN_NUM_THREADS=4 de leanchecker en local; las comillas invertidas de las órdenes se quedan)",
+  "evidence": "«`lake env leanchecker --verbose ROBINSON_PlusPlus FOL TheoryFramework`» no nombra ningún fichero versionado. README.md:102: «en local: `LEAN_NUM_THREADS=4 lake env leanchecker …` (con un hilo por procesador … necesita unos 25 GB; ADR‑181)».",
+  "fix": "| `bash scripts/leanchecker-cobertura.bash`, sobre el registro de «lake env leanchecker --verbose ROBINSON_PlusPlus FOL TheoryFramework» (en local, con LEAN_NUM_THREADS=4: ver debajo de la tabla) | el núcleo de Lean vuelve a pasar cada declaración de las tres librerías, y lo replayado son exactamente los módulos de sus fuentes, con un .olean por módulo |",
+  "severity": "baja"
+ },
+ {
+  "file": "README.md",
+  "line": 17,
+  "problem": "La glosa de M‑13 se queda corta. El alcance de una cifra es también sobre qué se midió, y el caso que dio origen a M‑13 es justo ese. Con «cuándo y dónde» pasaría un «0 warnings, medido hoy en la CI» que sólo cubre la lean_lib FOL.",
+  "evidence": "DECISIONS.md, M‑13: «Una cifra de control se REEJECUTA o se marca con su ALCANCE … «0 warnings» viajo por ADR-057/058/059 siendo la cifra de la `lean_lib FOL` **sola**».",
+  "fix": "y cada cifra que se publica la vuelve a medir un control o lleva su alcance: sobre qué, cuándo y dónde se midió (M‑13).",
+  "severity": "baja"
+ }
+]

@@ -1,0 +1,14 @@
+import sys
+# mut_cr.py HOOK — el mutante de R3-4-01: las listas leídas CON su \r (sin tr -d)
+p = sys.argv[1]
+s = open(p, encoding="utf-8", newline="").read()
+n = 0
+for lista in ("$FROZEN_LIST", "$LOCK_LIST"):
+    a = "done < <(tr -d '\\r' < \"" + lista + "\")"
+    n += s.count(a)
+    s = s.replace(a, "done < \"" + lista + "\"")
+a = "tr -d '\\r' < \"$FROZEN_LIST\" | grep -Fxq"
+n += s.count(a)
+s = s.replace(a, "grep -Fxq")
+open(p, "w", encoding="utf-8", newline="").write(s)
+print("sustituciones:", n)

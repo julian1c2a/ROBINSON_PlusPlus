@@ -1,0 +1,41 @@
+# T21 (ADR-235), 2026-11-01: [B] sobre PLAN-PRUEBAS.md, con una copia de check-doc-sync.bash que lo añadía a B_DOCS_LISTA (antes de adjudicar sus citas)
+════ [B] CITAS MUERTAS — ROJO, con trinquete POR CITA (T04, ADR-166) ════
+  ❌ B `AnclaEq` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:146
+  ❌ B `Peano` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:143
+  ❌ B `T_Prf` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:146
+  ❌ B `ax_mod2_alternation` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:134
+  ❌ B `canon_ne` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:85
+  ❌ B `goedel_second'` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (2) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:37
+      PLAN-PRUEBAS.md:129
+  ❌ B `implemented_by` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:62
+  ❌ B `prf_axiomsCodeT_eq` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (2) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:146
+      PLAN-PRUEBAS.md:146
+  ❌ B2 `/dev/null` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:143
+  ❌ B2 `CanonNeRefuta.lean` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:85
+  ❌ B2 `MedirF_Censo.lean` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:84
+  ❌ B2 `Meta/OmegaStrength.lean` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:130
+  ❌ B2 `NegVerifierModE.lean` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:82
+  ❌ B2 `Probe/Fuerza.lean` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:100
+  ❌ B2 `doc/control/thaws-fol.tsv` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:69
+  ❌ B2 `scripts/prosa.py` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:69
+  ❌ B2 `scripts/thaws-fol.bash` no existe y se cita sin marcar, en PLAN-PRUEBAS.md (1) — cita muerta NUEVA:
+      PLAN-PRUEBAS.md:69
+  techo: la tabla de la base verificada, 7662955 (refs/remotes/origin/master)
+  deuda declarada: 1625 citas muertas en 986 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1644
+

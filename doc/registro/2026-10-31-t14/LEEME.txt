@@ -1,0 +1,18 @@
+T14 (ADR-234), 2026-10-31: la congelación de FOL, verificable por máquina. Lo medido, con las órdenes que lo midieron.
+
+gancho.txt       `bash ../FOL/check-gancho.bash`: los ganchos versionados (.githooks/pre-commit y commit-msg), probados en
+                 un repositorio de juguete con las listas en CRLF (siete casos); y cuatro mutantes, cada uno en una copia
+                 en un directorio temporal: sin --no-renames (el renombre de un congelado pasa), un commit-msg que acepta
+                 todo (el thaw sin ADR pasa), las listas leídas con su \r (el defecto R3-4-01: pasan los tres primeros
+                 casos; el mutante lo hace mut_cr.py.txt, aquí, que quita los «tr -d '\r'») y una
+                 THAW_RE distinta en check-congelados.bash. Los cuatro, ROJOS.
+congelados-b.txt la regla (b) de ../FOL/check-congelados.bash en un repositorio de juguete: un thaw sin «ADR-NNN de RPP»
+                 en el mensaje, ROJO; el mismo con él, verde.
+prosa.txt        scripts/prosa.py sobre cada fichero descongelado de cada uno de los siete thaws de la historia de FOL:
+                 los de 0b62f88 (ADR-116, cinco módulos) y 9825404 (D2, SequentSound0), «sólo prosa», como se dijo; el
+                 resto cambia código (renombres, D7, la cuarentena), salvo tres ficheros sueltos de thaws de código
+                 (SequentSound0 en ca83ec8; Lindenbaum0 y Compacity0 en 14b1692).
+thaws.txt        `bash scripts/thaws-fol.bash`: los siete thaws, cada uno con su ADR (tres en el mensaje, cuatro en
+                 doc/control/thaws-fol.tsv), el alcance de la tabla re-medido y la herramienta igual en RPP y en FOL; y
+                 seis mutaciones (una fila de menos, un alcance falso, un ADR que no existe, una fila que no es un thaw,
+                 una fila que sobra, un gancho distinto en RPP): las seis, ROJAS, y la tabla y el gancho, restaurados.

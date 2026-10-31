@@ -1,5 +1,7 @@
 # FRENTE (a) — ¿vuelve la capa rastreada? (D3 y Gödel II)
 
+**Last updated:** 2026-08-22 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 > 🗄️ **HISTÓRICO** (✏️ 2026‑10‑28, [ADR‑196](DECISIONS.md), T55): el frente del 2026‑08‑19, tras retirar
 > `ax_tc_cons`. Está cerrado: D3 es teorema (`d3_prf_real`), Gödel II también (`goedel_second_prf`, y sin hipótesis
 > `goedel_II`), y `cuarentena/` está vacía. Lo de abajo es registro; lo vigente, [NEXT-STEPS.md](NEXT-STEPS.md) y

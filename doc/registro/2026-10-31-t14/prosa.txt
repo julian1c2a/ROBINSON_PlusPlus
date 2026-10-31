@@ -1,0 +1,34 @@
+# T14 (ADR-234), 2026-10-31: scripts/prosa.py sobre cada fichero descongelado de cada thaw de FOL (lo que thaws-fol.bash mide)
+62dc2d5 cuarentena/Inconsistencia.lean: código (el fichero sale: borrado o movido)
+ca83ec8 FOL/PrenexNF0.lean: CÓDIGO (línea de código 40: «def ImpAll (X Y : Formula) : Prop := ∀ Δ : List Formula, Δ ⊢₀ Formula.impl X Y» → «def ImpAll₀ (X Y : Formula) : Prop := ∀ Δ : List Formula, Δ ⊢₀ Formula.impl X Y»)
+ca83ec8 FOL/SequentSound0.lean: sólo prosa
+aced2a1 FOL/Rename.lean: CÓDIGO (línea de código 211: «section ConElección» → «mutual»)
+9825404 FOL/SequentSound0.lean: sólo prosa
+0b62f88 FOL/Soundness0.lean: sólo prosa
+0b62f88 FOL/Rename.lean: sólo prosa
+0b62f88 FOL/Compacity0.lean: sólo prosa
+0b62f88 FOL/Canonical0.lean: sólo prosa
+0b62f88 TheoryFramework/Instances/FOL.lean: sólo prosa
+14b1692 FOL/QFDecide0.lean: CÓDIGO (línea de código 103: «theorem subT_closed : ∀ (u : Term) {f : String} {ss : List Term},» → «theorem subT_closed : ∀ (u : Term) {f : List Char} {ss : List Term},»)
+14b1692 FOL/SkolemN0.lean: CÓDIGO (línea de código 19: «theorem not_occurs_vars (c : String) : ∀ n : Nat, Not (occursTerms c (vars n))» → «theorem not_occurs_vars (c : List Char) : ∀ n : Nat, Not (occursTerms c (vars n)»)
+14b1692 FOL/Craig0.lean: CÓDIGO (línea de código 60: «def predF (p : String) : Formula → Prop» → «def predF (p : List Char) : Formula → Prop»)
+14b1692 FOL/Interpolation0.lean: CÓDIGO (línea de código 367: «theorem predF_em (p : String) : ∀ (f : Formula), Or (predF p f) (Not (predF p f)» → «theorem predF_em (p : List Char) : ∀ (f : Formula), Or (predF p f) (Not (predF p»)
+14b1692 FOL/Fresh0.lean: CÓDIGO (línea de código 9: «def shift (s : String) : String :=  f" ++ s» → «def shift (s : List Char) : List Char :=  f' :: s»)
+14b1692 FOL/HenkinLimit0.lean: CÓDIGO (línea de código 11: «theorem occursTerm_lift (c : String) : ∀ (k : Nat) (t : Term),» → «theorem occursTerm_lift (c : List Char) : ∀ (k : Nat) (t : Term),»)
+14b1692 FOL/Henkin0.lean: CÓDIGO (línea de código 9: «def henkinAx (c : String) (A : Formula) : Formula :=» → «def henkinAx (c : List Char) (A : Formula) : Formula :=»)
+14b1692 FOL/Skolem0.lean: CÓDIGO (línea de código 6: «def updateFunc {D : Type} (M : Model D) (c : String) (F : List D → D) : Model D » → «def updateFunc {D : Type} (M : Model D) (c : List Char) (F : List D → D) : Model»)
+14b1692 FOL/Lindenbaum0.lean: sólo prosa
+14b1692 FOL/SkolemNF0.lean: CÓDIGO (línea de código 73: «skolemize 0 (Formula.forall (Formula.ex (Formula.atom  P" [Term.var 1, Term.var » → «skolemize 0 (Formula.forall (Formula.ex (Formula.atom [ P'] [Term.var 1, Term.va»)
+14b1692 FOL/SkolemHerbrand0.lean: CÓDIGO (línea de código 119: «theorem not_occurs_implChain {c : String} :» → «theorem not_occurs_implChain {c : List Char} :»)
+14b1692 FOL/HerbrandBlock0.lean: CÓDIGO (línea de código 71: «private def c : Term := Term.func  c" []» → «private def c : Term := Term.func [ c'] []»)
+14b1692 FOL/Soundness0.lean: CÓDIGO (línea de código 125: «def P : Formula := Formula.atom  P" []» → «def P : Formula := Formula.atom [ P'] []»)
+14b1692 FOL/Canonical0.lean: CÓDIGO (línea de código 117: «theorem termEqv_func_congr {S : Formula → Prop} (hMax : IsMaximalConsistent₀ S) » → «theorem termEqv_func_congr {S : Formula → Prop} (hMax : IsMaximalConsistent₀ S) »)
+14b1692 FOL/Compacity0.lean: sólo prosa
+14b1692 FOL/Rename.lean: CÓDIGO (línea de código 20: «theorem rename_neg (ρ : String → String) (A : Formula) :» → «theorem rename_neg (ρ : List Char → List Char) (A : Formula) :»)
+c104b75 FOL/Hauptsatz0.lean: CÓDIGO (línea de código 240: «if_neg (show ¬ v + 1 = w from by omega),» → «ite_eq_right (show ¬ v + 1 = w from by omega),»)
+c104b75 FOL/QFDecide0.lean: CÓDIGO (línea de código 16: «· rw [if_pos hs] at h» → «· rw [ite_eq_left hs] at h»)
+c104b75 FOL/SkolemN0.lean: CÓDIGO (línea de código 63: «rw [dif_pos h]» → «rw [dite_eq_left h]»)
+c104b75 FOL/Skolem0.lean: CÓDIGO (línea de código 18: «rw [if_neg hs, evalTerms_updateFunc M c F ts v (fun ht => h (Or.inr ht))]» → «rw [ite_eq_right hs, evalTerms_updateFunc M c F ts v (fun ht => h (Or.inr ht))]»)
+c104b75 FOL/Compacity0.lean: CÓDIGO (línea de código 83: «· subst hin; rw [if_pos rfl]» → «· subst hin; rw [ite_eq_left rfl]»)
+c104b75 FOL/Rename.lean: CÓDIGO (línea de código 243: «· rw [if_pos h]; exact hinj t s h» → «· rw [ite_eq_left h]; exact hinj t s h»)
+c104b75 FOL/Theorems/Eq.lean: CÓDIGO (línea de código 151: «set_option linter.unusedSimpArgs false» → «set_option linter.unusedSimpArgs false in»)

@@ -7,14 +7,14 @@
 [![Build](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml/badge.svg)](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**Last updated:** 2026-10-30 — [ADR‑228](DECISIONS.md): los 32, por los cuatro núcleos independientes. Antes, el mismo día — [ADR‑222](DECISIONS.md) (T23): el segundo núcleo, en «lo que se supone». Antes, 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, por el puente de FOL a `Prf`. Antes, 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): el control nuevo, `check-choice.bash`. Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
+**Last updated:** 2026-11-01 — [ADR‑235](DECISIONS.md) (T21): los controles, contra el código: la tabla, con los que faltaban y sus filas al día, y la cifra del build, con su alcance. Antes, 2026-10-30 — [ADR‑228](DECISIONS.md): los 32, por los cuatro núcleos independientes. Antes, el mismo día — [ADR‑222](DECISIONS.md) (T23): el segundo núcleo, en «lo que se supone». Antes, 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, por el puente de FOL a `Prf`. Antes, 2026-10-27 — [ADR‑193](DECISIONS.md) (T53): el control nuevo, `check-choice.bash`. Antes, el mismo día — [ADR‑192](DECISIONS.md) (T68): 120 axiomas (el verificador antiguo, fuera de T). Antes, el mismo día — [ADR‑191](DECISIONS.md) (T61b): 118 módulos activos; los titulares, sin `Classical.choice`. Antes, 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
 capas, la instalación con el hermano FOL y el toolchain exacto, los controles, los documentos). Lo de antes, en la
 historia de git.
 
 Los **teoremas de incompletitud de Gödel**, y con ellos Tarski, Rosser y Löb, formalizados en Lean 4 **sin Mathlib**,
 sobre una implementación propia de la lógica de primer orden con igualdad ([FOL](https://github.com/julian1c2a/FOL),
 un repositorio hermano). La disciplina: cada paso se demuestra desde la base o se declara pendiente con nombre y firma,
-y cada cifra que se publica la vuelve a medir un control.
+y cada cifra que se publica la vuelve a medir un control o lleva su alcance: sobre qué, cuándo y dónde se midió (M‑13).
 
 ## Lo demostrado
 
@@ -68,23 +68,38 @@ lake build "@FOL/FOL" "@FOL/TheoryFramework" # FOL entero, también desde aquí
 ```
 
 `lake env lean --version` tiene que decir 4.35.0: si dice otra cosa, el `lake` del PATH no es el de elan. Sin Mathlib
-y sin otras dependencias. En la CI (4 vCPU) el build de RPP tarda unos cinco minutos.
+y sin otras dependencias. En la CI (4 vCPU), el build de RPP tardó 185 s en su primera medida, en frío y sin caché
+(ADR‑203); cada run lo vuelve a medir con GNU time, y `scripts/presupuesto-ci.bash` lo pone en rojo si pasa de su
+presupuesto de tiempo o de memoria (`doc/control/presupuesto-ci.tsv`).
 
 ## Los controles
 
-Además del build, que ya comprueba los enunciados de los titulares (T07) y la pureza de la clase (i) (T08), cada push
-pasa estos scripts (`.github/workflows/build.yml`), que también se lanzan a mano desde la raíz:
+Además del build, que ya comprueba los enunciados de los titulares (T07) y la pureza de la clase (i) (T08), la CI
+(`.github/workflows/build.yml`), que corre con cada push a `master` o a una rama `ci/…`, cada día y con cada push al
+master de FOL, pasa estos scripts, que también se lanzan a mano desde la raíz (`scripts/presupuesto-ci.bash`, sobre las salidas de
+GNU time del build y de leanchecker; `scripts/segundo-nucleo.bash`, no donde Windows bloquea sus binarios, como en la
+máquina del propietario, ni en WSL, porque llama a lake: allí sus núcleos de Linux se pasan a mano, como en
+`doc/registro/2026-10-30-adr228/LEEME.txt`):
 
 | script | qué comprueba |
 |---|---|
-| `bash check-sorry.bash` | ningún `sorry` ni agujero de confianza («native_decide», «implemented_by»…) en lo que compila el build |
-| `bash check-footprints.bash` | el `#print axioms` de cada titular declarado, en los dos sentidos |
+| `bash check-sorry.bash` | por texto: ningún `sorry` (ni «admit», «stop» o «sorryAx») en los `.lean` de RPP, `sondeos/` incluidos (el de FOL y TheoryFramework lo mira `check-estratos.bash`, por entorno); ningún agujero de confianza («native_decide», «implemented_by»…) en lo que compila el build (RPP, FOL y TheoryFramework; `sondeos/` no); y ninguna orden («#eval», «#reduce», «#guard», «run_cmd»…) que evalúe el ancla, en RPP y `sondeos/` |
+| `bash check-footprints.bash` | el `#print axioms` de cada declaración de su tabla (de RPP, FOL y TheoryFramework; los 32 titulares entre ellas), con igualdad; y que todo `#print axioms` que imprime el árbol tenga su fila |
 | `bash check-choice.bash` | cada constante de RPP, FOL y TheoryFramework con `Classical.choice`, `noncomputable` o `String`, contra `doc/control/choice.tsv`, en los dos sentidos |
 | `bash check-estratos.bash` | por entorno: ningún `axiom` habita una noción de derivabilidad; `sorry`, confianza y `partial`, con señuelo |
-| `bash check-warnings.bash` | los avisos del build, declarados uno a uno |
-| `bash check-doc-sync.bash` | que los documentos digan lo que hay: cifras, citas muertas, marcas, catálogo |
+| `bash check-warnings.bash` | los avisos de los dos builds (RPP; FOL y TheoryFramework), por fichero y clase, contra una tabla vacía: cualquier aviso es rojo; y los set_option que apagan un linter o suben un límite, de fichero (ninguno desde ADR‑229) o con … in, en las tres librerías, contra `doc/control/opciones.tsv`, con igualdad. ✏️ 2026‑10‑31 (T21, ADR‑235): decía «los avisos del build, declarados uno a uno»; la tabla está vacía desde ADR‑227 y las opciones se censan desde ADR‑226 |
+| `bash check-doc-sync.bash` | que los documentos digan lo que hay —cifras (`[A]`, `[A2]`), citas muertas (`[B]`, `[M]`) y por número de línea (`[N]`), marcas de tiempo (`[D]`; `[E]`, con su deuda en dos tablas, de contenido y de formato, y un techo: ADR‑233), catálogos (`[C]`, `[H]`), titulares (`[T]`) y frases que un teorema desmiente (`[I]`)— y, del árbol, que la librería sea el cierre de imports (`[L]`), sin .olean huérfanos (`[F]`), sin CRLF en el índice (`[EOL]`) y con el PATH higiénico en cada script (`[H]`) |
 | `bash check-sondeos.bash --controles` | los once sondeos de control (`sondeos/CONTROLES.txt`) compilan |
-| `make probar-controles` | las herramientas que validan los controles (el despojador frente a su oráculo, `lineWFT`) |
+| `bash scripts/leanchecker-cobertura.bash`, sobre el registro de `lake env leanchecker --verbose ROBINSON_PlusPlus FOL TheoryFramework` (en local, con LEAN_NUM_THREADS=4: ver debajo de la tabla) | el núcleo de Lean vuelve a pasar cada declaración de las tres librerías, y lo replayado son exactamente los módulos de sus fuentes, con un .olean por módulo |
+| `bash scripts/segundo-nucleo.bash` | el cierre de los 32 titulares y el de los titulares de la clase (i), por seis núcleos (el de Lean, su versión paranoica y cuatro independientes), contra `doc/control/segundo-nucleo.tsv`: los seis aceptan los dos (ADR‑228; nanoda, con los 32, con un hilo); sus `axiom`, los de los footprints; y un mutante que todo núcleo que acepta tiene que rechazar |
+| `bash scripts/presupuesto-ci.bash` | el tiempo y la memoria del build y de leanchecker (GNU time), contra `doc/control/presupuesto-ci.tsv`: por encima, rojo |
+| «bash scripts/thaws-fol.bash ../FOL» | cada thaw de FOL (toda la historia de su `frozen_files.txt`) se apoya en un ADR de RPP que existe y nombra al propietario (la palabra «propietario» o, en los antiguos, «usuario», en su sección): el que cita su mensaje o, si es de antes de la regla, el de doc/control/thaws-fol.tsv; su alcance declarado (prosa o código), re‑medido con scripts/prosa.py; y `git-lock.bash` y los ganchos de .githooks/, los mismos en RPP y en FOL (T14, ADR‑234) |
+| `make probar-controles` | las herramientas que validan los controles: el despojador frente a su oráculo y `lineWFT` frente a su generador (en la CI, esas dos órdenes; los mutantes del despojador, que el objetivo también corre, sólo a mano) |
+
+En el workflow, además, que RPP y FOL tengan el mismo `lean-toolchain` (M‑3; si no, rojo); que el master de FOL sea el
+de `doc/control/fol-sha.txt` sólo avisa. ✏️ 2026‑10‑31 (T21, ADR‑235): la tabla no tenía `scripts/presupuesto-ci.bash`
+(ADR‑202) ni `scripts/leanchecker-cobertura.bash` y `scripts/segundo-nucleo.bash` (ADR‑222); la fila de los thaws de
+FOL es de hoy (T14, ADR‑234).
 
 `leanchecker`, en local: `LEAN_NUM_THREADS=4 lake env leanchecker ROBINSON_PlusPlus FOL TheoryFramework` (con un hilo
 por procesador replaya todos los módulos a la vez y necesita unos 25 GB; ADR‑181). En Windows, los `lake` y los
@@ -96,6 +111,10 @@ por procesador replaya todos los módulos a la vez y necesita unos 25 GB; ADR‑
 nuevo se crea en `ROBINSON_PlusPlus/<capa>/` y se importa desde su barril (`ROBINSON_PlusPlus/Meta.lean` o
 `ROBINSON_PlusPlus.lean`); `check-doc-sync.bash` `[L]` falla si uno no está importado o no está en git. El flujo
 entero, en [WORKFLOW.md](WORKFLOW.md); las reglas para quien escribe código o documentos, en [AI-GUIDE.md](AI-GUIDE.md).
+
+Los ganchos de git son los versionados en .githooks/ (pre-commit rechaza un commit que toque un fichero congelado o
+bloqueado; commit-msg, un thaw que no cite «ADR-NNN de RPP»), y los activa `bash git-lock.bash init` (core.hooksPath),
+una vez por clon (T14, ADR‑234).
 
 ## Documentos
 

@@ -1,5 +1,7 @@
 # Diseño: Predicado de demostrabilidad con **testigo rastreado** (cierre de D3 / Gödel II)
 
+**Last updated:** 2026-07-12 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 > **Estado:** propuesta de diseño (previa a tocar código). 2026‑07‑05.
 > **Autor:** Julián Calderón Almendros (con asistencia).
 > **Ámbito:** `ROBINSON_PlusPlus/Meta/*` — capa `Prf` (Hilbert finitario) de Gödel II.

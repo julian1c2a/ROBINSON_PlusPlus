@@ -1,0 +1,28 @@
+# T14 (ADR-234), 2026-10-31: check-gancho.bash de FOL, sobre los ganchos de verdad y sobre cuatro mutantes (copias en un directorio temporal)
+
+== los ganchos de verdad
+  ✓ 1. tocar el congelado                     rechaza
+  ✓ 2. tocar el bloqueado                     rechaza
+  ✓ 3. renombrar el congelado                 rechaza
+  ✓ 4. tocar el libre                         acepta
+  ✓ 5. un thaw sin citar el ADR               rechaza
+  ✓ 6. el thaw, citando su ADR de RPP         acepta
+  ✓ 7. el re-freeze                           acepta
+✓ los ganchos versionados hacen lo que dicen: 7 de 7 casos (listas en CRLF; activos por core.hooksPath)
+
+== mutante 1: pre-commit sin --no-renames
+  ✗ 3. renombrar el congelado                 acepta (esperado: rechaza)
+❌ los ganchos versionados NO hacen lo que dicen
+
+== mutante 2: commit-msg acepta todo
+  ✗ 5. un thaw sin citar el ADR               acepta (esperado: rechaza)
+❌ los ganchos versionados NO hacen lo que dicen
+
+== mutante 3: las listas leídas con su \r (R3-4-01)
+  ✗ 1. tocar el congelado                     acepta (esperado: rechaza)
+  ✗ 2. tocar el bloqueado                     acepta (esperado: rechaza)
+  ✗ 3. renombrar el congelado                 acepta (esperado: rechaza)
+❌ los ganchos versionados NO hacen lo que dicen
+
+== mutante 4: THAW_RE distinta en check-congelados.bash
+❌ THAW_RE distinta: commit-msg «THAW_RE='ADR(-|‑)[0-9]+(( y |, )ADR(-|‑)[0-9]+)* de RPP'», check-congelados.bash «THAW_RE=ADR»

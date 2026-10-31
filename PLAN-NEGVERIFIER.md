@@ -1,5 +1,7 @@
 # PLAN — `NegVerifier` (cerrar `⊬¬G`)
 
+**Last updated:** 2026-09-10 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 > 🗄️ **HISTÓRICO** (✏️ 2026‑10‑28, [ADR‑196](DECISIONS.md), T55): el plan de septiembre para cerrar `⊬¬G` con un
 > verificador negativo sobre la capa `⊢`. Esa capa se retiró con ADR‑115 (y el módulo `VerifierSound` con ADR‑160),
 > y `⊬¬G` se cerró por otro camino: `goedel_I_neg` (ADR‑121), por la solidez en el modelo estándar y W1. Lo de abajo

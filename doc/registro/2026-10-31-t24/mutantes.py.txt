@@ -1,0 +1,16 @@
+import sys
+# t24_mutantes.py N ENTRADA SALIDA — copia check-doc-sync.bash con la mutación N de [E] (T24, ADR-233)
+n, src, dst = sys.argv[1], sys.argv[2], sys.argv[3]
+s = open(src, encoding="utf-8", newline="").read()
+if n == "1":     # un documento de contenido, declarado como de formato
+    a = "doc/PLAN-COMPLETITUD-FINITISTA.md\nESCALANDO_EL_PROYECTO.md\nNAMING-CONVENTIONS.md\nEOF\nread -r -d '' E_DEUDA_FORMATO <<'EOF'\n"
+    assert s.count(a) == 1
+    s = s.replace(a, "doc/PLAN-COMPLETITUD-FINITISTA.md\nESCALANDO_EL_PROYECTO.md\nEOF\nread -r -d '' E_DEUDA_FORMATO <<'EOF'\nNAMING-CONVENTIONS.md\n")
+elif n == "3":   # la deuda SUBE: un documento que no está en la base
+    a = "NAMING-CONVENTIONS.md\nEOF\nread -r -d '' E_DEUDA_FORMATO"
+    assert s.count(a) == 1
+    s = s.replace(a, "NAMING-CONVENTIONS.md\nREADME.md\nEOF\nread -r -d '' E_DEUDA_FORMATO")
+else:
+    raise SystemExit("mutación desconocida")
+open(dst, "w", encoding="utf-8", newline="").write(s)
+print("mutación", n)

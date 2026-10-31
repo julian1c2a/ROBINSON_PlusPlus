@@ -1,5 +1,7 @@
 # FUNDAMENTACIÓN DE LAS MATEMÁTICAS EN UN ENTORNO DE PEANO Y FOL=
 
+**Last updated:** 2026-05-08 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 > ✏️ **2026‑10‑12 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es la especificación de junio de 2026 del sistema
 > `Minimal`, y no se ha re‑medido contra el árbol: buena parte de lo que construye —los teoremas de `Block1–8`, sobre
 > `⊢`, y Ax‑P— se retiró (ADR‑115; `ax_p_tfa`, el 2026‑09‑12). Su «sin un principio de inducción generalizado»

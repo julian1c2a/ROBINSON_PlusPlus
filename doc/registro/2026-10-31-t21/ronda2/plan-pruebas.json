@@ -1,0 +1,50 @@
+[
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/PLAN-PRUEBAS.md",
+  "line": 62,
+  "problem": "Falso según el código. V14 dice que dos sondeos de control, AnclaEqInconsistente e IteSimboloNucleo, fijan los mensajes con #guard_msgs. Sólo lo hace IteSimboloNucleo. El único #guard_msgs de AnclaEqInconsistente (su control 3) está dentro del comentario «/-! ### REGISTRO … -/». La corrección confirmada C19 de la auditoría ya traía el error (un grep que casa dentro de un comentario) y se aplicó tal cual.",
+  "evidence": "sondeos/AnclaEqInconsistente.lean: el «#guard_msgs in» va tras «/-! ### REGISTRO (desde ADR‑117 el ancla es una instancia, y la resolución de clases la encuentra: el error que el control 3 fijaba ya no sale)», y ese bloque se cierra con «-/» justo antes de «/-! ### Medición del footprint». Despojado: «LC_ALL=C awk -f strip-lean.awk sondeos/AnclaEqInconsistente.lean | grep -c '#guard'» da 0, y lo mismo sobre IteSimboloNucleo.lean da 23 líneas «#guard_msgs in». Los otros nueve de CONTROLES.txt no tienen ninguno. update-toolchain.bash sólo nombra «IteSimboloNucleo fija con #guard_msgs un mensaje del núcleo».",
+  "fix": "los 11 sondeos de control (`sondeos/CONTROLES.txt`) compilan con lake lean (con los leanOptions del build), cada uno en menos de 600 s y sin `sorry`; uno de ellos, `IteSimboloNucleo`, fija además con `#guard_msgs` los mensajes que mide (el de `AnclaEqInconsistente`, su control 3, quedó comentado en su sección de REGISTRO: desde ADR‑117 el error que fijaba ya no sale)",
+  "severity": "alta"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/PLAN-PRUEBAS.md",
+  "line": 132,
+  "problem": "La lista de controles de la CI que incumplen la regla «ninguna retro‑referencia» se lee como completa y le falta uno: scripts/lineWFT_generar.py. La CI lo corre en «Probar los controles» (V15), y usa retro‑referencias en dos sustituciones de re.sub. La lista de la auditoría (C29) tampoco lo traía.",
+  "evidence": "Busqué barra invertida seguida de cifra en los .bash/.yml/.py versionados. Salen las líneas de sed de check-footprints, check-doc-sync (dos), check-estratos, check-warnings, scripts/leanchecker-cobertura.bash, update-toolchain.bash y toolchain.yml, y además las dos de scripts/lineWFT_generar.py, en las tuplas de re.sub del tipo «r'nthN x (…)'», con la retro‑referencia en el reemplazo. build.yml, paso «Probar los controles»: «python3 scripts/lineWFT_generar.py». Lo demás que sale no cuenta: b-citas.awk lleva escapes octales y revisar.py y scripts/pruebas no corren en la CI.",
+  "fix": "y la incumplen líneas de controles de la CI —`check-footprints.bash`, `check-doc-sync.bash`, `check-estratos.bash`, `check-warnings.bash`, `scripts/leanchecker-cobertura.bash` y `scripts/lineWFT_generar.py` (dos sustituciones de re.sub, en el paso de V15)— y de las dos herramientas de V16, `update-toolchain.bash` y `toolchain.yml`",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/PLAN-PRUEBAS.md",
+  "line": 52,
+  "problem": "Inexacto. «(V2 sólo despoja RPP)»: el censo de agujeros de V2 también despoja FOL y TheoryFramework. Lo que sólo mira RPP es la búsqueda de sorry. Y «un sorry de RPP lo ven V2, V11 y V12» sólo vale para la librería: un sorry en sondeos/ o en scripts/ sólo lo ve V2 (y V14 si es de control).",
+  "evidence": "check-sorry.bash: la búsqueda de sorry recorre el árbol de RPP (find . sin .lake, _rpp ni Probe), y el censo de agujeros recorre AG_ALCANCE, que incluye ../FOL/FOL, ../FOL/TheoryFramework y sus barriles. check-estratos.bash, en la sección del sorry por entorno: «Sólo lo que el build compila: los sondeos y Probe/ no entran». check-warnings sólo mira los avisos de lake build.",
+  "fix": "> ⭐ Y por más de un sitio: un `sorry` de la librería de RPP lo ven V2 (el texto), V11 (el entorno) y V12 (su aviso); uno de FOL o de TheoryFramework, V11 y V12 (la búsqueda de `sorry` de V2 sólo mira el árbol de RPP); uno de `sondeos/` o `scripts/`, que el build no compila, sólo V2 (y V14, si es de control). Y `[A]` compara con los documentos la cifra de `sorry` de RPP.",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/PLAN-PRUEBAS.md",
+  "line": 116,
+  "problem": "V17 aparece entre los controles que se lanzan «Desde PowerShell». Fuera de la CI no corre desde PowerShell: Windows bloquea leanexport y tres de los núcleos, y se corre con los binarios Linux en WSL. Que necesite lake es cierto. Lo engañoso es meterlo bajo esa instrucción.",
+  "evidence": "Cabecera de scripts/segundo-nucleo.bash: «Fuera de la CI: en la máquina del propietario, Windows («Control de aplicaciones») bloquea leanexport, lean4lean, con-leche y con-ron (medido el 2026-10-30). ✏️ … (ADR-228): corren los binarios LINUX del mismo toolchain en WSL».",
+  "fix": "igual que V3, V11, V12, V14 y V19, que también lo necesitan (V17 también, pero fuera de la CI no corre desde PowerShell: Windows bloquea leanexport y tres de los núcleos, y se corre en WSL, ADR‑228).",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/PLAN-PRUEBAS.md",
+  "line": 35,
+  "problem": "Cifra ambigua. «compilaban 43 de 44» va colgada de «los de registro», pero 44 son todos los sondeos de aquel día, los 11 de control incluidos, y el modo informe los compila todos. Se lee como si hubiera 44 de registro, y hay 33.",
+  "evidence": "ADR‑181: «Los 44 sondeos (`bash check-sondeos.bash` …): compilan 43 y 43». sondeos/README.md: «sobre los 44 que quedan, compilan 43». Hoy, ls sondeos/*.lean da 44 y CONTROLES.txt nombra 11. check-sondeos.bash sin --controles recorre ls sondeos/*.lean.",
+  "fix": "(el 2026‑10‑21, ADR‑181, de los 44 sondeos —los 11 de control incluidos— compilaban 43; `A3IsFCBTracked` no, y `sondeos/README.md` lo tiene por reparar)",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/PLAN-PRUEBAS.md",
+  "line": 40,
+  "problem": "Marca. Se reescribió por dentro una nota fechada, «✏️ 2026‑10‑21 (ADR‑185)», sin su propia marca de hoy. Decía «y desde entonces se añadieron los demás pasos», que era falso, y ahora trae hechos del 27 al 31 (ADR‑193, 202, 222 y 234) como si los dijera la nota del 21. En el resto de la edición cada corrección lleva «✏️ 2026‑10‑31 (T21, ADR‑235): decía …».",
+  "evidence": "git diff: la frase «y desde entonces se añadieron los demás pasos. Hoy:» de la nota ✏️ 2026‑10‑21 cambia por «y los demás pasos o ya bloqueaban (…) o llegaron después: … y, tras esta nota, … y los thaws de FOL (ADR‑234). Hoy:», sin ningún ✏️ 2026‑10‑31.",
+  "fix": "> avisaba; es BLOQUEANTE desde ADR‑116 (2026‑10‑04), y desde entonces se añadieron los demás pasos *(✏️ 2026‑10‑31 (T21, ADR‑235): no todos: `lake build`, el build de FOL, estratos, footprints, doc‑sync y warnings ya bloqueaban; llegaron después leanchecker (el mismo ADR‑116), los sondeos de control (ADR‑141), probar-controles (ADR‑180) y, tras esta nota, `check-choice.bash` (ADR‑193), M‑3, el par registrado y el presupuesto (ADR‑202), la cobertura de leanchecker y el segundo núcleo (ADR‑222), y los thaws de FOL (ADR‑234))*. Hoy:",
+  "severity": "baja"
+ }
+]

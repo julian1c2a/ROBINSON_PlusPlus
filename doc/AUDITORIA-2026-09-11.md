@@ -1,5 +1,7 @@
 # Auditoría del proyecto — 2026-09-11 · **dos ciclos, en las dos direcciones**
 
+**Last updated:** 2026-09-11 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 **Alcance:** la **intención** declarada, la **documentación de salida**, el **plan de prueba** y el
 **código** — recorridos de arriba abajo y de abajo arriba, dos veces.
 **Estado del árbol al auditar:** `master`, limpio, **142 jobs · 128 módulos · 0 sorry · 5 `axiom`**.

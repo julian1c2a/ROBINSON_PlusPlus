@@ -2,6 +2,8 @@
 marp: true
 ---
 
+<!-- **Last updated:** 2026-09-04 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)* -->
+
 # Sobre el libro
 
 > ## ⚠️ NOTA HISTÓRICA — 2026-09-03

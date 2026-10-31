@@ -1,0 +1,114 @@
+export const meta = {
+  name: 't21-aplicar',
+  description: 'T21: aplicar las correcciones verificadas a las guías de RPP (un agente por documento) y revisarlas adversarialmente',
+  phases: [
+    { title: 'Aplicar', detail: 'un agente por grupo de ficheros, disjuntos' },
+    { title: 'Revisar', detail: 'un revisor escéptico por grupo, sin editar' },
+  ],
+}
+
+const RPP = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus'
+const DATOS = 'D:/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/t21'
+
+const REGLAS = `Repositorio: ${RPP} (Lean 4, el proyecto RPP; su hermano es E:/dropbox/github/lean4/FOL). El proyecto está en
+español. HOY es 2026-10-31. Se trata de T21 de la auditoría (doc/AUDITORIA-SUELO-2026-10-12.md): «guías que describen mal
+los controles». Otro flujo ya midió, contra el código, qué afirmaciones de cada documento son erróneas o están caducadas, y
+un verificador escéptico las confirmó, con el texto corregido. Tu trabajo es APLICARLAS en TUS ficheros.
+
+REGLAS (obligatorias):
+1. Edita SÓLO tus ficheros (abajo). Usa la herramienta Edit (sustituciones exactas); nada de sed. Conserva los finales de
+   línea del fichero. No hagas commits, no lances builds, no toques otros ficheros.
+2. Cada corrección confirmada trae «quote» (el texto de hoy), «fix» (el texto propuesto) y «reason» (la evidencia). Antes
+   de aplicarla, RELEE el texto actual del documento (puede haber cambiado un poco: otro agente ya puso hoy marcas
+   «**Last updated:**» en algunos ficheros, y el script de controles tiene cambios de hoy en su sección [E]) y, si dudas
+   de la corrección, COMPRUÉBALA en el código (build.yml, los scripts). Si la corrección es errónea, NO la apliques y
+   dilo en tu informe.
+3. Estilo: el del documento, conciso. Una rectificación de algo que FUE cierto lleva su nota fechada:
+   «✏️ 2026‑10‑31 (T21, ADR‑235): decía «…»». Una tabla que describe el estado de HOY se pone al día (y la nota, breve).
+   La historia bien fechada («hasta ADR‑X era aviso») no se borra.
+4. ⛔ Las CITAS entre comillas invertidas (\`…\`) las comprueba el control [B] de check-doc-sync.bash: dentro de \`…\` sólo
+   puede ir el nombre de una constante de Lean que exista, un módulo de Lean, o la ruta de un fichero VERSIONADO de RPP o
+   de FOL (o una orden entera sin identificadores con «_» o «.» que no existan). NO entre comillas invertidas: nombres de
+   opciones (set_option …, linter.…, maxHeartbeats), herramientas (lean4lean, nanoda, con-leche, leanexport), cosas de git
+   (core.hooksPath, .git/hooks/), flags. Para ésos, texto plano o «…». En caso de duda, texto plano.
+5. ⛔ No inventes cifras. Una cifra nueva sólo si la mide un control que nombras, y mejor sin cifra que con una a mano.
+6. La marca de cabecera «**Last updated:**»: en PLAN-PRUEBAS.md, WORKFLOW.md, README.md y CURRENT-STATUS-PROJECT.md (que NO
+   están en la deuda de [E]) súbela a «2026-10-31 — [ADR‑235](DECISIONS.md) (T21): <qué cambió, una frase>. Antes, …»
+   conservando la cadena que ya hay detrás. En AI-GUIDE.md y .claude/commands/docsync.md (que SÍ están en la deuda de
+   contenido de [E], E_DEUDA) NO cambies la fecha de su marca: no se revisa el documento entero.
+7. Los controles nuevos de hoy, que los documentos que enumeran controles tienen que nombrar donde corresponda (sin
+   reescribir lo demás):
+   - scripts/thaws-fol.bash (en la CI de RPP, el paso «Los thaws de FOL, autorizados»; T14, ADR‑234): cada thaw de FOL se
+     apoya en un ADR de RPP que existe y recoge la decisión del propietario (el del mensaje o, para los de antes de la
+     regla, doc/control/thaws-fol.tsv); el alcance declarado (prosa | código) se re-mide con scripts/prosa.py; y
+     git-lock.bash y .githooks/ son los mismos en RPP y en FOL.
+   - los ganchos VERSIONADOS: .githooks/pre-commit (congelados y bloqueados) y .githooks/commit-msg (un thaw cita
+     «ADR-NNN de RPP»); «bash git-lock.bash init» los activa con core.hooksPath (una vez por clon). En FOL, la CI los prueba
+     (check-gancho.bash) y check-congelados.bash exige el ADR en cada thaw (T14, ADR‑234).
+   - [E] de check-doc-sync.bash: dos tablas, E_DEUDA (contenido: marca vieja) y E_DEUDA_FORMATO (formato: sin marca; vacía
+     desde hoy), y un TECHO en la base verificada (T24, ADR‑233).
+   - check-warnings.bash: la tabla de avisos, VACÍA (ADR‑227), y el censo de opciones cuenta las de fichero y las «… in»
+     (ADR‑229; ninguna de fichero).
+   - scripts/segundo-nucleo.bash: los 32 titulares, aceptados por los seis núcleos (ADR‑228; nanoda, con un hilo).
+8. INFORME final (tu texto de vuelta): las correcciones aplicadas (fichero:línea, una línea cada una), las NO aplicadas
+   con su razón, y lo que añadiste por la regla 7 o por «missing».`
+
+const GRUPOS = [
+  { key: 'plan-pruebas', files: 'PLAN-PRUEBAS.md', extra: 'En la tabla V de §1, una fila nueva (V18) para scripts/thaws-fol.bash, y V4 tiene que decir bien qué hace [E] hoy. §3 y §5 también se corrigen si hay confirmadas.' },
+  { key: 'workflow', files: 'WORKFLOW.md', extra: 'La Parte 1 («(Opcional) git hook legacy») y la Parte 3 («Pre-commit hook», «Freeze permanente») describen ahora los ganchos versionados (.githooks/, core.hooksPath) y el commit-msg.' },
+  { key: 'ai-guide', files: 'AI-GUIDE.md', extra: 'Sus secciones del sistema de bloqueo (la línea de «bash git-lock.bash init» y el punto 4 del protocolo, hacia las líneas 270-300) describen ahora los ganchos versionados, como el AI-GUIDE de FOL (../FOL/AI-GUIDE.md, hacia la línea 280, ya lo dice: léelo).' },
+  { key: 'docsync', files: '.claude/commands/docsync.md y la CABECERA y la AYUDA de check-doc-sync.bash (sólo comentarios, el texto de uso y el mensaje de la línea ~201 que la corrección nombra; NADA de lógica). Tras editar check-doc-sync.bash, ejecuta «bash -n check-doc-sync.bash» y dilo en el informe.', extra: '' },
+  { key: 'estado', files: 'README.md y CURRENT-STATUS-PROJECT.md', extra: 'Si el README o CURRENT-STATUS enumeran los controles de la CI, tienen que nombrar el paso nuevo de scripts/thaws-fol.bash (T14).' },
+]
+
+const REVIEW_SCHEMA = {
+  type: 'object',
+  properties: {
+    problems: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          file: { type: 'string' },
+          line: { type: 'integer' },
+          problem: { type: 'string', description: 'qué está mal en lo editado HOY (falso según el código, cita [B] muerta, cifra sin medir, estilo, marca de cabecera mal, corrección confirmada que no se aplicó)' },
+          evidence: { type: 'string' },
+          fix: { type: 'string', description: 'el texto exacto que debería ir' },
+          severity: { type: 'string', enum: ['alta', 'media', 'baja'] },
+        },
+        required: ['file', 'line', 'problem', 'evidence', 'fix', 'severity'],
+      },
+    },
+    summary: { type: 'string' },
+  },
+  required: ['problems', 'summary'],
+}
+
+const out = await pipeline(
+  GRUPOS,
+  (g) => agent(`${REGLAS}
+
+TUS FICHEROS: ${g.files} (rutas relativas a ${RPP}).
+${g.extra}
+
+TUS DATOS están en el fichero JSON ${DATOS}/${g.key}.json (léelo ENTERO con la herramienta Read): un objeto con
+- "confirmed": las CORRECCIONES CONFIRMADAS (file, line, quote, confirmed, reason, fix): las que aplicas (regla 2);
+- "rejected": las que el verificador RECHAZÓ: NO las apliques; están para que no las repitas;
+- "missing": controles reales que el documento, si pretende enumerarlos, no nombra: añade sólo lo que encaje y sea cierto.
+Si no puedes leer ese fichero, NO edites nada y dilo.`, { label: `aplicar:${g.key}`, phase: 'Aplicar' }),
+  (informe, g) => agent(`Repositorio: ${RPP} (Lean 4; español). HOY 2026-10-31. Eres un REVISOR ESCÉPTICO de T21: otro agente
+acaba de editar ${g.files} para corregir lo que esos documentos decían mal de los controles del proyecto. NO EDITES NADA:
+sólo lee y busca problemas en lo editado hoy. Mira el diff con «git -C ${RPP} diff -- <fichero>» (los cambios de hoy, sin
+commitear; algunos de otro trabajo de hoy —las marcas «**Last updated:**» de T24 y la sección [E] del script— no son de
+este agente, pero revísalos igual si caen en tus ficheros).
+Para CADA hunk: (a) ¿lo que dice es CIERTO según el código (.github/workflows/build.yml, los scripts check-*.bash,
+scripts/*)? Compruébalo leyendo el código; (b) ¿hay algo entre comillas invertidas que NO sea una constante de Lean, un
+módulo o la ruta de un fichero versionado (git ls-files) de RPP o de FOL? (el control [B] lo daría por cita muerta; las
+opciones, herramientas, flags y cosas de git van en texto plano); (c) ¿una cifra nueva sin un control que la mida?;
+(d) ¿la marca de cabecera está bien? (PLAN-PRUEBAS, WORKFLOW, README y CURRENT-STATUS: «**Last updated:** 2026-10-31 — …
+Antes, …» con la cadena anterior intacta; AI-GUIDE y .claude/commands/docsync.md: su fecha NO cambia); (e) ¿se dejó sin
+aplicar alguna corrección confirmada sin decir por qué? Si tocó check-doc-sync.bash: sólo comentarios y textos, y
+«bash -n» limpio. El informe del editor fue:
+${informe}`, { label: `revisar:${g.key}`, phase: 'Revisar', schema: REVIEW_SCHEMA }).then(r => ({ grupo: g.key, informe, revision: r })),
+)
+return out.filter(Boolean)

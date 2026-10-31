@@ -9,7 +9,7 @@
 > La prosa de este documento (explicaciones, motivación) va en español para que quede
 > clara sin ambigüedad.
 
-**Última actualización:** 2026-09-26 — §9: subíndices de cálculo (`Prf₀` → `Prfᵢ`, ADR-102)
+**Last updated:** 2026-09-26 — §9: subíndices de cálculo (`Prf₀` → `Prfᵢ`, ADR-102) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor**: Julián Calderón Almendros
 
 ---

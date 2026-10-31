@@ -124,6 +124,13 @@ jobs:
             echo "::warning::el master de FOL ($HOY) no es el registrado en doc/control/fol-sha.txt ($REG): el par cambió"
           fi
 
+      # ⭐ 2026-10-31 (T14, ADR-234): cada THAW de FOL (toda la historia de su frozen_files.txt) se apoya en un ADR de RPP
+      # que existe y recoge la decisión del propietario —el que cita su mensaje o, si es de antes de la regla,
+      # doc/control/thaws-fol.tsv—; el alcance declarado (prosa | código), re-medido con scripts/prosa.py; y la herramienta
+      # de congelación (git-lock.bash, .githooks/), la misma en los dos repos.
+      - name: Los thaws de FOL, autorizados
+        run: bash scripts/thaws-fol.bash ../FOL
+
       # ⭐ 2026-10-28 (T40, ADR-202): la clave de caché lleva el hash de la LISTA de módulos de FOL, y el mismo hash va
       # en `restore-keys`: una caché con otra lista no se restaura nunca (un `.olean` de un módulo borrado volvería como
       # FANTASMA). Sustituye al prefijo que había que subir a mano (`lake-v2-`, ADR-115). Y se restaura ANTES de

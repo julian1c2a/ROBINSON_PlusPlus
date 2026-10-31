@@ -1,0 +1,50 @@
+[
+ {
+  "file": "AI-GUIDE.md",
+  "line": 359,
+  "problem": "«en la CI (`make sorry`)» da a entender que la CI ejecuta make. Ningún paso de build.yml usa make: llaman al script directamente. Lo mismo pasa en 361-364 con `make estratos`, `make footprints`, `make choice` y `make warnings`. Además son órdenes de una herramienta entre comillas invertidas (regla 4).",
+  "evidence": ".github/workflows/build.yml:241-242 («Check for sorry»: run: bash check-sorry.bash), :253-254, :260-261, :268-269, :286-287 (bash check-estratos/footprints/choice/warnings.bash). Makefile:19-45: los objetivos son alias locales del mismo script.",
+  "fix": "359: «… Rojo (sale con 1; con 2 si no puede medir); en la CI, y a mano con make sorry |». 361: «… Rojo; en la CI, y a mano con make estratos |». 362: «… Rojo; en la CI, y a mano con make footprints |». 363: «… Rojo; en la CI, y a mano con make choice |». 364: «… Rojo; en la CI, y a mano con make warnings |»",
+  "severity": "baja"
+ },
+ {
+  "file": "AI-GUIDE.md",
+  "line": 399,
+  "problem": "«no poder medir es rojo: sin lake … (salvo con --quick)» no está completo. Con --quick, [B] sigue pidiendo lake y el build hecho, así que --quick sin lake también da rojo. La cabecera de check-doc-sync.bash y PLAN-PRUEBAS, corregidas hoy en T21, lo dicen; aquí no, y quien lea esta frase espera un verde con --quick desde Git Bash.",
+  "evidence": "check-doc-sync.bash:914-923: sin lake, o con un volcado del entorno corto, «NO PUDE MEDIR [B]», B_FAIL=1, sin mirar QUICK. Cabecera :32-34 (T21, hoy): «[B] sigue pidiendo `lake` y el build hecho».",
+  "fix": "Antes de los bloques, **no poder medir es rojo**: sin lake o sin «Build completed successfully» (salvo con --quick; pero [B] pide lake y el build hecho también con --quick), y sin el autotest de la cuenta de axiom o sin el resumen de `check-sorry.bash` (también con --quick).",
+  "severity": "baja"
+ },
+ {
+  "file": "AI-GUIDE.md",
+  "line": 297,
+  "problem": "La nota de T14 tiene tres problemas. (1) `pre-commit` y `commit-msg` van entre comillas sin ser rutas: las rutas versionadas son `.githooks/pre-commit` y `.githooks/commit-msg`, como en la fila de init. (2) `init`, un subcomando, va entre comillas dos veces (líneas 298 y 300). (3) «`check-congelados.bash` exige el ADR en cada thaw» exagera: sólo mira los thaws de BASE..HEAD, y sólo que el mensaje cite «ADR-NNN de RPP». Que ese ADR exista lo mira RPP.",
+  "evidence": "../FOL/check-congelados.bash:66-89: COMMITS=$(git rev-list \"$BASE..HEAD\") y cita_adr sobre el mensaje. Su cabecera :11-15 dice: «Que ese ADR exista y recoja la decisión del propietario lo comprueba la CI de RPP».",
+  "fix": "   ✏️ 2026‑10‑31 (T14, ADR‑234): los ganchos están VERSIONADOS en `.githooks/` —`.githooks/pre-commit`, el de los congelados y bloqueados, y `.githooks/commit-msg`: un thaw cita en su mensaje el ADR de RPP que lo autoriza, «ADR-NNN de RPP»— y bash git-lock.bash init los activa con core.hooksPath (una vez por clon: git no activa ganchos solo). Corre el fichero versionado, no una copia en .git/hooks/ (la que escribía el init de antes, que en RPP leía las listas con su CR y, con core.autocrlf, no bloqueaba nada). La CI de RPP no mira los bloqueados ni los congelados de RPP: mira, con `scripts/thaws-fol.bash`, los thaws de FOL y que `git-lock.bash` y `.githooks/` sean los mismos que en FOL. En FOL, la CI prueba los ganchos (`check-gancho.bash`) y `check-congelados.bash` exige que cada thaw desde la base cite en su mensaje su ADR de RPP.",
+  "severity": "baja"
+ },
+ {
+  "file": "AI-GUIDE.md",
+  "line": 368,
+  "problem": "«se apoya en un ADR de RPP que existe y recoge la decisión del propietario» promete más de lo que mira el control. El script sólo comprueba que la sección del ADR existe y contiene la palabra «propietario» (o «usuario» en los antiguos). ADR‑234 y la cabecera del script lo dicen así: la voluntad no la comprueba nadie, sólo que está escrita. Es justo la clase de defecto que T21 viene a corregir.",
+  "evidence": "scripts/thaws-fol.bash:9-11 («que recoja una decisión (la palabra «propietario» o, en los antiguos, «usuario»)») y :48-53 (adr_decide: grep -qiE 'propietario|usuario'). El borrador de ADR‑234 §3 dice: «Nadie puede comprobar la VOLUNTAD del propietario; esto comprueba que está ESCRITA, y dónde».",
+  "fix": "cada thaw de FOL se apoya en un ADR de RPP que existe y recoge una decisión (lo mira por la palabra «propietario», o «usuario» en los antiguos) —el que cita su mensaje, «ADR-NNN de RPP», o, para los de antes de la regla, `doc/control/thaws-fol.tsv`—;",
+  "severity": "baja"
+ },
+ {
+  "file": "AI-GUIDE.md",
+  "line": 366,
+  "problem": "Dos detalles de la fila del segundo núcleo. Gramática: son dos cierres, así que es «los pasa», no «lo pasa». Además, «seis núcleos» es una cifra sin enumerar en un documento que [A] y [A2] no miran: si cambia NUCLEOS, caduca en silencio. Las otras cifras de diseño de la tabla («ocho familias», «cinco controles») sí van enumeradas.",
+  "evidence": "scripts/segundo-nucleo.bash:54: NUCLEOS=\"lean paranoid lean4lean nanoda con-leche con-ron\". doc/control/segundo-nucleo.tsv: 6×2 filas, todas «acepta». El «Los seis aceptan los dos cierres (ADR‑228)» es cierto y lo vigila esa tabla.",
+  "fix": "Exporta el cierre de los titulares (`TITULARES`) y el de la clase (i) (`PUROS`) y los pasa por seis núcleos —el de Lean, su versión paranoica, lean4lean, nanoda, con-leche y con-ron—, contra `doc/control/segundo-nucleo.tsv`, con un mutante (T23, ADR‑222). Los seis aceptan los dos cierres (ADR‑228; con los titulares, nanoda va con un hilo). Rojo; en la CI",
+  "severity": "baja"
+ },
+ {
+  "file": "AI-GUIDE.md",
+  "line": 407,
+  "problem": "La lista de lo que absuelve una cita en [B] se lee como cerrada («tiene que existir, o llevar un marcador…, o estar en la deuda»), y le falta un caso. b-citas.awk absuelve también la cita que declara un sondeo, archivado o no, si su línea nombra ese sondeo. La cabecera de check-doc-sync.bash lo añadió hoy en T21; esta fila se queda con la lista incompleta.",
+  "evidence": "b-citas.awk, cabecera: «o, si la declara un sondeo, que la línea nombre ese sondeo (`sondeos/X` o `X.lean`)», y examina(): if (clase == \"B\" && (k in sond) && nombra_sondeo(k)) return. check-doc-sync.bash:16-18 (✏️ 2026-10-31, T21).",
+  "fix": "toda cita entre comillas invertidas con forma de identificador o de ruta tiene que existir, o llevar un marcador a 100 bytes o menos, o, si la declara un sondeo (también uno archivado), que su línea nombre ese sondeo, o estar en la deuda por cita (`doc/control/b-deuda.tsv`).",
+  "severity": "baja"
+ }
+]

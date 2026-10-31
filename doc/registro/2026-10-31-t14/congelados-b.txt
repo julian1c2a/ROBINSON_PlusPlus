@@ -1,0 +1,11 @@
+# T14 (ADR-234), 2026-10-31: la regla (b) de check-congelados.bash de FOL, en un repositorio de juguete: un thaw sin ADR y el mismo con él
+
+== un thaw sin ADR
+❌ thaws que no citan el ADR de RPP que los autoriza («ADR-NNN de RPP» en el mensaje):
+      <sha> thaw de A sin autorización
+rc=1
+
+== el mismo, con su ADR
+✓ ningún congelado cambia sin su thaw (1 congelados en la base <sha>; 2 ficheros cambiados; autotest: «A»)
+✓ thaws desde la base: 1, y todos citan su ADR de RPP (autotest de los mensajes: «snns»)
+rc=0

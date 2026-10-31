@@ -17,7 +17,7 @@
 > 2026-08-22) y el pedagógico (`Sobre_el_libro.md`) — y **corrige** las afirmaciones que el
 > proyecto ha refutado desde entonces. El registro de correcciones está en §8.
 
-**Última actualización:** 2026-09-09 (2ª) — **Parte I escrita** y migración 3b completada;
+**Last updated:** 2026-09-09 (2ª) — **Parte I escrita** y migración 3b completada; *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 previo, **§3 reestructurado**: nueva **Parte I pedagógica**
 (los artículos de Gödel, los lenguajes, lo mínimo de Lean) y cinco partes en total; **nuevo §2.9**
 (ninguna parte empieza sin decir qué pregunta contesta) con los números de capítulo mecanizados;

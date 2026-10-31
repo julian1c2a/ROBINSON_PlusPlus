@@ -1,0 +1,29 @@
+# T24 (ADR-233), 2026-10-31: la sección [E] de check-doc-sync.bash con tres mutaciones (copias del script, o THOUGHTS.md sin su marca, restaurado).
+# (El ❌ de DECISIONS.md de las tres es ajeno a la mutación: estaba editado sin subir su marca; sube con este commit.)
+
+== mutación 1 (rc=1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  ❌ DECISIONS.md: la marca dice 2026-10-30 y el último commit que lo tocó es 2026-10-31 (hoy, si tiene cambios sin commitear)
+  ❌ NAMING-CONVENTIONS.md: ya tiene marca: su deuda es de CONTENIDO. Pásalo de E_DEUDA_FORMATO a E_DEUDA.
+  deuda declarada: 28 de contenido y 0 de formato · techo: los 29 de la base verificada, 7662955   ·   sin declarar: 2   ·   saldadas sin quitar: 0
+      ⚠️ El titular es una FRASE: [A] no lo ve. Al actualizar la marca, comprobar que lo
+      que el titular AFIRMA sigue siendo cierto, no sólo que sus cifras cuadren.
+
+== mutación 3 (rc=1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  ❌ DECISIONS.md: la marca dice 2026-10-30 y el último commit que lo tocó es 2026-10-31 (hoy, si tiene cambios sin commitear)
+  ❌ README.md: la deuda ESTÁ SALDADA — quítalo de su tabla (E_DEUDA o E_DEUDA_FORMATO) de este script.
+  ❌ la deuda de [E] SUBE: estos documentos no están en las tablas de la base verificada (7662955):
+      README.md
+  deuda declarada: 29 de contenido y 0 de formato · techo: los 29 de la base verificada, 7662955   ·   sin declarar: 2   ·   saldadas sin quitar: 1
+      ⚠️ El titular es una FRASE: [A] no lo ve. Al actualizar la marca, comprobar que lo
+      que el titular AFIRMA sigue siendo cierto, no sólo que sus cifras cuadren.
+
+== mutación 2: THOUGHTS.md pierde su marca (rc=1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  ❌ DECISIONS.md: la marca dice 2026-10-30 y el último commit que lo tocó es 2026-10-31 (hoy, si tiene cambios sin commitear)
+  ❌ THOUGHTS.md: no tiene marca: es deuda de FORMATO, no de contenido. Ponle la de su última revisión real (T24).
+  deuda declarada: 28 de contenido y 0 de formato · techo: los 29 de la base verificada, 7662955   ·   sin declarar: 2   ·   saldadas sin quitar: 0
+      ⚠️ El titular es una FRASE: [A] no lo ve. Al actualizar la marca, comprobar que lo
+      que el titular AFIRMA sigue siendo cierto, no sólo que sus cifras cuadren.
+

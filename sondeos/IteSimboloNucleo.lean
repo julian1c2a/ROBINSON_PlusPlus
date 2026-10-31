@@ -57,6 +57,13 @@ etiqueta `archivo/t66-2026-10-18`. (✏️ Con v4.35.0 vuelven a imprimirse: el 
    arregla, los `#guard_msgs` de §3 y §4 de este sondeo, que es de control, romperán: entonces la receta «`unfold`, no
    `dsimp`» deja de ser obligatoria. ⚠️ Romperán también si sólo cambia el MENSAJE: desde 4.35.0 el tipo esperado se
    imprime en vez de «failed to pretty print expression»; al subir de toolchain hay que distinguir los dos casos.
+   ✏️ 2026‑10‑31 (ADR‑236): la issue, CERRADA aguas arriba el 2026‑10‑20 por leanprover/lean4#15824 («smart
+   unfolding for mutual structural recursion with calls under a `match`»). MEDIDO con las dos reproducciones
+   (`doc/registro/2026-10-31-15822/`): en 4.35.0, 4.36.0-rc2 y la nightly del 2026‑10‑20 el núcleo sigue
+   rechazando; en la nightly del 2026‑10‑30 (4.37.0) ya no hay nada que rechazar, porque `dsimp only [f] at h`
+   «made no progress»: no despliega bajo el `match` atascado. Al subir a 4.37, los `#guard_msgs` de §3 y §4
+   romperán por ESO (el tercer caso: no el mensaje, sino que `dsimp` ya no actúa); la receta «`unfold`, no
+   `dsimp`» sigue valiendo, porque ahí `dsimp` no hace nada.
    ✏️ 2026‑10‑21 (T42b, ADR‑181): **al subir a 4.35.0 fue el segundo caso.** 12 de los 23 bloques rompieron SÓLO en
    eso —las 14 líneas «failed to pretty print expression» pasan a ser el tipo (165 líneas)—, con las MISMAS cabeceras
    de error, bloque a bloque (las 12 «(kernel)» de antes, y ni una más); se regeneraron del propio diff que

@@ -1,0 +1,11 @@
+T24 (ADR-233), 2026-10-31: la deuda de [E] (check-doc-sync.bash), partida en FORMATO y CONTENIDO, con techo.
+
+marcas.py.txt     el script que puso las marcas a los 18 documentos de la deuda de FORMATO: a los siete con la marca en
+                  español («**Última actualización:**», que [E] no lee), la misma fecha en la forma que lee; a los once
+                  sin marca, la fecha de su último commit con diez líneas nuevas o más, sin contar las tres pasadas en
+                  lote de notas y rótulos (4498df3, ADR-134; 037058a, ADR-196; 90104b6, ADR-225). La tabla SIN de
+                  arriba del script son las fechas medidas con esa regla (git log --numstat), nunca la de hoy.
+mutantes.py.txt   las copias de check-doc-sync.bash con una mutación de [E]: (1) un documento de contenido declarado
+                  como de formato; (3) un documento que no está en la base verificada, añadido a la tabla.
+mutaciones.txt    lo que dijo [E] con cada mutación, y con la (2): THOUGHTS.md sin su marca (y restaurado). Las tres,
+                  ROJAS, cada una con su mensaje.

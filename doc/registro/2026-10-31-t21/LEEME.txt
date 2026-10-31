@@ -1,0 +1,16 @@
+T21 (ADR-235), 2026-10-31 y 2026-11-01: las guías de RPP, medidas contra los controles y corregidas.
+
+medicion.json        el primer flujo (flujo-medir.js.txt): "verdad:controles", la tabla de verdad leída del código (58
+                     controles y subcontroles: paso de la CI, si bloquea, qué lo pone rojo, evidencia fichero:línea);
+                     "afirmaciones:<doc>", todas las afirmaciones de cada guía sobre los controles, con su veredicto
+                     (233; 120 marcadas); "verificar:<doc>", el verificador escéptico de cada guía (102 confirmadas, 18
+                     rechazadas), con el texto corregido.
+aplicacion.json      el segundo flujo (flujo-aplicar.js.txt): "aplicar:<doc>", el informe del agente que aplicó las
+                     confirmadas en su guía (ficheros disjuntos; las 102, ninguna fuera); "revisar:<doc>", el revisor
+                     escéptico del diff (39 problemas, uno grave: V14 y el #guard_msgs comentado de AnclaEqInconsistente).
+ronda2/              los problemas del revisor que se arreglaron (25; fuera, los de estilo —órdenes enteras entre comillas
+                     invertidas, que [B] acepta— y las dependencias del commit). El tercer flujo se cortó por el límite de
+                     uso sin editar nada (sus agentes sólo leyeron: comprobado en sus transcripciones), y los 25 los
+                     aplicó a mano el coordinador.
+plan-pruebas-en-B.txt [B] sobre PLAN-PRUEBAS.md con una copia del script que lo añadía a B_DOCS_LISTA: 17 citas muertas,
+                     tres de ficheros de hoy aún sin versionar; las otras catorce se adjudicaron, y PLAN-PRUEBAS.md entró.

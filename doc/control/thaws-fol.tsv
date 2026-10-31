@@ -1,0 +1,10 @@
+# doc/control/thaws-fol.tsv — los THAWS de FOL de antes de la regla de ADR-234 (T14) cuyo mensaje no cita el ADR de RPP
+# que los autoriza: aquí, con ese ADR (en DECISIONS.md o en doc/historia/DECISIONS-001-130.md), revisado a mano el
+# 2026-10-31. Lo lee scripts/thaws-fol.bash: el ADR tiene que existir y recoger una decisión; el ALCANCE (prosa |
+# código) se vuelve a medir con scripts/prosa.py y tiene que ser éste. Desde el 2026-10-31 un thaw cita su ADR en el
+# mensaje (el gancho commit-msg y check-congelados.bash de FOL): esta tabla no crece. Sólo con un ADR.
+# sha	fecha	ADR	alcance	nota
+62dc2d5	2026-09-23	ADR-099	código	(E) y (1) del cierre de FOL: cuarentena/Inconsistencia.lean sale de la cuarentena (ADR-099 §5) y folSystem se retira (§6)
+ca83ec8	2026-09-27	ADR-109	código	N1-N4: los renombres por la regla de subíndices (PrenexNF0 cambia de código; SequentSound0, sólo prosa)
+aced2a1	2026-09-27	ADR-110	código	D1/D3/D5/D7, las decisiones del propietario tras la auditoría de constructividad: Rename sin Classical.choice
+9825404	2026-09-28	ADR-110	prosa	D2: las tres localizaciones del WKL de SequentSound0, rectificadas (sólo comentarios)

@@ -1,0 +1,71 @@
+# lean4#15822 (ADR-236), 2026-10-31: las dos reproducciones de T77 (doc/registro/2026-10-20-t77/), con el «lean» plano de cada toolchain, sin imports
+
+== Mini · leanprover--lean4---v4.35.0
+Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)
+Mini.lean:17:8: error: (kernel) declaration type mismatch, 'bad' has type
+  ∀ (a t : T), f (T.node [a, t]) = 0 → f (T.node [a, t]) = 0
+but it is expected to have type
+  ∀ (a t : T),
+    f (T.node [a, t]) = 0 →
+      (match t with
+exit 1
+
+== Mwe · leanprover--lean4---v4.35.0
+Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)
+Mwe.lean:20:8: error: (kernel) declaration type mismatch, 'f_dsimp' has type
+  ∀ (c : Nat) (a t : T) (n : Nat), f (T.func c [a, t]) = some n → f (T.func c [a, t]) = some n
+but it is expected to have type
+  ∀ (c : Nat) (a t : T) (n : Nat),
+    f (T.func c [a, t]) = some n →
+      id
+exit 1
+
+== Mini · leanprover--lean4---v4.36.0-rc2
+Lean (version 4.36.0-rc2, x86_64-w64-windows-gnu, commit b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a, Release)
+Mini.lean:17:8: error: (kernel) declaration type mismatch, 'bad' has type
+  ∀ (a t : T), f (T.node [a, t]) = 0 → f (T.node [a, t]) = 0
+but it is expected to have type
+  ∀ (a t : T),
+    f (T.node [a, t]) = 0 →
+      (match t with
+exit 1
+
+== Mwe · leanprover--lean4---v4.36.0-rc2
+Lean (version 4.36.0-rc2, x86_64-w64-windows-gnu, commit b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a, Release)
+Mwe.lean:20:8: error: (kernel) declaration type mismatch, 'f_dsimp' has type
+  ∀ (c : Nat) (a t : T) (n : Nat), f (T.func c [a, t]) = some n → f (T.func c [a, t]) = some n
+but it is expected to have type
+  ∀ (c : Nat) (a t : T) (n : Nat),
+    f (T.func c [a, t]) = some n →
+      id
+exit 1
+
+== Mini · leanprover--lean4-nightly---nightly-2026-10-20
+Lean (version 4.37.0-nightly-2026-10-20, x86_64-w64-windows-gnu, commit c260aee449e6bda694d253413ba713249803b4cb, Release)
+Mini.lean:17:8: error: (kernel) declaration type mismatch, 'bad' has type
+  ∀ (a t : T), f (T.node [a, t]) = 0 → f (T.node [a, t]) = 0
+but it is expected to have type
+  ∀ (a t : T),
+    f (T.node [a, t]) = 0 →
+      (match t with
+exit 1
+
+== Mwe · leanprover--lean4-nightly---nightly-2026-10-20
+Lean (version 4.37.0-nightly-2026-10-20, x86_64-w64-windows-gnu, commit c260aee449e6bda694d253413ba713249803b4cb, Release)
+Mwe.lean:20:8: error: (kernel) declaration type mismatch, 'f_dsimp' has type
+  ∀ (c : Nat) (a t : T) (n : Nat), f (T.func c [a, t]) = some n → f (T.func c [a, t]) = some n
+but it is expected to have type
+  ∀ (c : Nat) (a t : T) (n : Nat),
+    f (T.func c [a, t]) = some n →
+      id
+exit 1
+
+== Mini · leanprover--lean4-nightly---nightly-2026-10-30
+Lean (version 4.37.0-nightly-2026-10-30, x86_64-w64-windows-gnu, commit f0fc2fc18852fa60ff43f0daa33020d825c92e72, Release)
+Mini.lean:19:2: error: `dsimp` made no progress
+exit 1
+
+== Mwe · leanprover--lean4-nightly---nightly-2026-10-30
+Lean (version 4.37.0-nightly-2026-10-30, x86_64-w64-windows-gnu, commit f0fc2fc18852fa60ff43f0daa33020d825c92e72, Release)
+Mwe.lean:22:2: error: `dsimp` made no progress
+exit 1

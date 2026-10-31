@@ -4,7 +4,7 @@
 > `Minimal`. Los módulos que cita (`Block4_C6_C7` y los bloques de los `teo_…`) se retiraron, y la lista de axiomas
 > de hoy es otra (120, [AXIOMS.md](AXIOMS.md)). Lo de abajo es registro.
 
-**Última actualización:** 2026-06-03 — ~~ax22~~, ~~ax23~~, ~~ax27~~, ~~ax28~~ ELIMINADOS; este doc queda como nota histórica.
+**Last updated:** 2026-06-03 — ~~ax22~~, ~~ax23~~, ~~ax27~~, ~~ax28~~ ELIMINADOS; este doc queda como nota histórica. *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor**: Julián Calderón Almendros
 
 Este documento analiza la necesidad y redundancia de ciertos axiomas que se han introducido de forma temporal en el sistema `Minimal`.

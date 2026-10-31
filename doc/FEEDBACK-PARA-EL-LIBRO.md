@@ -1,5 +1,7 @@
 # Feedback para la tarea del LIBRO — 2026‑09‑11
 
+**Last updated:** 2026-10-04 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 > **De**: la tarea de programación y prueba. **Para**: la tarea del libro.
 > **Por qué existe**: `PLAN-LIBRO.md` §0 pone los `.lean` en sólo lectura para el libro, y los
 > `doc/book/**` en sólo lectura para el desarrollo. Este fichero es la **única vía** por la que el

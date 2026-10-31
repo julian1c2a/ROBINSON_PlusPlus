@@ -57,7 +57,9 @@ de Hilbert propio de RPP, o sobre la verdad en su modelo. **`T_Prf`** es el conj
 ⇒ **`T_Prf` contiene a PA** (por lectura): los seis axiomas de Peano son axiomas de la lista, y la inducción vale para
 toda fórmula de un lenguaje que contiene el de PA; y el cálculo lógico de `Prf` es un Hilbert clásico estándar, y COMPLETO para
 su teoría: lo que vale en todo modelo de `AxiomasT` (los 120 y las instancias de los dos esquemas de inducción), `Prf`
-lo demuestra (`prf_completo`, `Meta/PuenteFOL.lean`; ✏️ 2026‑10‑28, ADR‑195: hasta hoy decía «no está demostrado»). **No es Q, ni «Q++ sin inducción», ni IΣ₁.** Lo que no tiene
+lo demuestra (`prf_completo`, `Meta/PuenteFOL.lean`; ✏️ 2026‑10‑28, ADR‑195: hasta hoy decía «no está demostrado»).
+«Todo modelo» es todo modelo con dominio en `Type`: la semántica de FOL no habla de otros, y para la completitud no
+hace falta (lo válido en todo modelo lo es en los de `Type`) (✏️ 2026‑10‑31, T73, ADR‑232). **No es Q, ni «Q++ sin inducción», ni IΣ₁.** Lo que no tiene
 esquema de inducción es la LISTA `axioms`, la que define `Minimal/`, no la teoría de los titulares. (La lista sola ya
 contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sale sin inducción de `ax2`, `ax5`, `ax13` y
 `ax19`, por lectura; y además tiene `ax6`, `ax7` y `ax10`–`ax12`, que Q no demuestra. En `Prf`, Q3 es

@@ -1,0 +1,166 @@
+export const meta = {
+  name: 't21-guias-controles',
+  description: 'T21: medir si las guías de RPP describen bien sus controles (verdad desde build.yml y los scripts; afirmaciones por documento; verificación adversarial)',
+  phases: [
+    { title: 'Verdad', detail: 'tabla de controles desde build.yml y los scripts' },
+    { title: 'Afirmaciones', detail: 'una lectura por documento' },
+    { title: 'Verificar', detail: 'refutar cada afirmación marcada como errónea' },
+  ],
+}
+
+const RPP = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus'
+const COMMON = `Repositorio: ${RPP} (Lean 4; RPP). Hermano: E:/dropbox/github/lean4/FOL.
+REGLAS: SOLO LECTURA. No edites, no crees ni borres ficheros, no hagas commits, no lances \`lake build\` ni ningún build
+(son caros). Puedes leer ficheros, usar Grep/Glob, y bash de sólo lectura (grep, sed -n, awk, git log/show/grep). Cita
+siempre fichero:línea. Lo que no puedas comprobar leyendo el código, dilo («no comprobable sin ejecutar»), no lo supongas.
+El proyecto está en español; las citas, tal cual.`
+
+const TRUTH_SCHEMA = {
+  type: 'object',
+  properties: {
+    controls: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', description: 'nombre corto: check-sorry, check-doc-sync[B], leanchecker, segundo-nucleo...' },
+          script_or_command: { type: 'string' },
+          ci_step: { type: 'string', description: 'nombre exacto del paso en build.yml, o "ninguno"' },
+          ci_job: { type: 'string' },
+          blocking_in_ci: { type: 'string', enum: ['bloquea', 'aviso', 'no corre en la CI', 'condicional'] },
+          what_it_checks: { type: 'string' },
+          red_conditions: { type: 'string', description: 'qué lo pone rojo (exit≠0) y qué sólo avisa' },
+          evidence: { type: 'string', description: 'fichero:línea' },
+        },
+        required: ['id', 'script_or_command', 'ci_step', 'blocking_in_ci', 'what_it_checks', 'red_conditions', 'evidence'],
+      },
+    },
+    notes: { type: 'string' },
+  },
+  required: ['controls', 'notes'],
+}
+
+const CLAIMS_SCHEMA = {
+  type: 'object',
+  properties: {
+    claims: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          file: { type: 'string' },
+          line: { type: 'integer' },
+          quote: { type: 'string', description: 'el texto exacto (recortado) del documento' },
+          claim: { type: 'string', description: 'lo que afirma sobre el control' },
+          verdict: { type: 'string', enum: ['correcta', 'errónea', 'caducada', 'incompleta', 'no comprobable'] },
+          evidence: { type: 'string', description: 'fichero:línea del código que lo decide, y qué dice' },
+          fix: { type: 'string', description: 'si no es correcta: el texto que debería decir (en español, con el estilo del documento)' },
+        },
+        required: ['file', 'line', 'quote', 'claim', 'verdict', 'evidence', 'fix'],
+      },
+    },
+    missing: {
+      type: 'array',
+      description: 'controles que existen (en la tabla de verdad) y el documento, que pretende enumerarlos, no nombra',
+      items: { type: 'object', properties: { control: { type: 'string' }, where: { type: 'string' } }, required: ['control', 'where'] },
+    },
+    summary: { type: 'string' },
+  },
+  required: ['claims', 'missing', 'summary'],
+}
+
+const VERDICT_SCHEMA = {
+  type: 'object',
+  properties: {
+    results: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          file: { type: 'string' },
+          line: { type: 'integer' },
+          quote: { type: 'string' },
+          confirmed: { type: 'boolean', description: 'true si la afirmación del documento ES de verdad errónea/caducada/incompleta' },
+          reason: { type: 'string', description: 'la evidencia independiente, fichero:línea' },
+          fix: { type: 'string', description: 'el texto corregido definitivo (español), o vacío si no hay que tocar nada' },
+        },
+        required: ['file', 'line', 'quote', 'confirmed', 'reason', 'fix'],
+      },
+    },
+  },
+  required: ['results'],
+}
+
+phase('Verdad')
+const truth = await agent(`${COMMON}
+
+TAREA: construir la TABLA DE VERDAD de los controles de RPP, leída del código, no de la prosa.
+1. ${RPP}/.github/workflows/build.yml: cada paso de cada job (build y libro), qué script ejecuta, si lleva
+   continue-on-error o un "|| true" o "exit 0" que lo haga aviso, y si corre en push/schedule/dispatch. Mira también
+   ${RPP}/.github/workflows/toolchain.yml.
+2. Cada script que esos pasos llaman (check-*.bash de la raíz, scripts/*.bash, scripts/*.py, Makefile si
+   aparece): qué comprueba y QUÉ lo pone rojo (exit≠0) frente a lo que sólo imprime un aviso. Lee el código, no sólo
+   la cabecera.
+3. ${RPP}/check-doc-sync.bash: cada SUBCONTROL ([A], [A2], [B], [C], [E], [I], [L], [N], [EOL], [H], [COBERTURA]... los
+   que haya): para cada uno, si pone FAIL=1 (rojo) o sólo avisa, y qué mira. Mira también las opciones (--quick,
+   --a2-deuda, etc.) y qué hace la CI con él (¿--quick?).
+4. Otros controles que existan y no corran en la CI (p. ej. scripts de la raíz no llamados por build.yml): márcalos
+   "no corre en la CI".
+Devuelve una fila por control y por subcontrol de check-doc-sync, con evidencia fichero:línea.`, { label: 'verdad:controles', phase: 'Verdad', schema: TRUTH_SCHEMA })
+
+const truthJson = JSON.stringify(truth)
+log(`tabla de verdad: ${truth ? truth.controls.length : 0} controles`)
+
+const DOCS = [
+  { key: 'plan-pruebas', what: `${RPP}/PLAN-PRUEBAS.md, ENTERO (sobre todo §1 «Qué se verifica, y con qué», la tabla V, §3 «Cuándo se ejecuta cada cosa», §4 y §5 «Lo que falta por montar»).` },
+  { key: 'workflow', what: `${RPP}/WORKFLOW.md, ENTERO (sobre todo «Gate de calidad», «Verificar estado», el hook de la Parte 1/3, la Parte 4 y la Parte 6).` },
+  { key: 'ai-guide', what: `${RPP}/AI-GUIDE.md: la tabla «Scripts Disponibles» (hacia la línea 341), §27 entero (hacia 362–497: su tabla de subcontroles [A]…, §27.1, §27.2, §27.3) y cualquier otra línea del fichero que diga que un control «avisa», «rompe», «bloquea», está o no en la CI (búscalo con grep: check-, aviso, avisa, rompe, bloquea, CI, verde, rojo).` },
+  { key: 'docsync', what: `${RPP}/.claude/commands/docsync.md ENTERO, y la CABECERA y la AYUDA de ${RPP}/check-doc-sync.bash (los comentarios iniciales, el texto de uso/--help, y lo que el propio script imprime como título de cada sección cuando ese título afirma algo, p. ej. «— ROJO» o «aviso»).` },
+  { key: 'estado', what: `${RPP}/README.md y ${RPP}/CURRENT-STATUS-PROJECT.md: cada fila o frase que diga qué control hay, qué comprueba, si bloquea, si corre en la CI o una cifra de un control (p. ej. la tabla de controles de CURRENT-STATUS, «Lo que se supone» del README). No juzgues cifras del build (jobs, módulos) salvo que sean de un control.` },
+]
+
+const results = await pipeline(
+  DOCS,
+  (d) => agent(`${COMMON}
+
+TAREA: en ${d.what}
+extrae TODA afirmación sobre los controles del proyecto (qué comprueba cada uno, si es rojo/bloqueante o aviso, si corre
+en la CI y en qué paso, cómo se ejecuta, qué cifras declara) y juzga cada una CONTRA EL CÓDIGO. Tienes una tabla de
+verdad hecha por otro agente (abajo): úsala como guía, pero compruébala en el código ante cualquier duda; si la tabla
+se equivoca, manda el código. Marca:
+- «correcta» si cuadra;
+- «errónea» si contradice el código;
+- «caducada» si fue cierta y ya no (di desde qué ADR o commit, si lo ves: git log -S puede ayudar);
+- «incompleta» si omite algo que el propio texto pretende cubrir (p. ej. una tabla que dice listar los controles de la
+  CI y se deja uno);
+- «no comprobable».
+Incluye también las CORRECTAS (para saber qué se miró), pero sé exhaustivo con las que no lo son, y propón el texto
+corregido. Ojo: una nota fechada que dice «hasta ADR‑X era aviso; desde ADR‑Y, rojo» es CORRECTA si así fue; no
+marques como errónea la historia bien fechada. Lista en "missing" los controles reales que el documento debería nombrar
+y no nombra (sólo si el documento pretende enumerarlos).
+
+TABLA DE VERDAD (JSON):
+${truthJson}`, { label: `afirmaciones:${d.key}`, phase: 'Afirmaciones', schema: CLAIMS_SCHEMA }),
+  (r, d) => {
+    if (!r) return null
+    const bad = r.claims.filter(c => c.verdict !== 'correcta')
+    if (bad.length === 0) return { doc: d.key, extract: r, verified: { results: [] } }
+    return agent(`${COMMON}
+
+TAREA: eres un VERIFICADOR ESCÉPTICO. Otro agente marcó estas afirmaciones de ${d.what} como erróneas, caducadas,
+incompletas o no comprobables. Para CADA una, compruébala tú, de forma independiente, en el código (build.yml, los
+scripts) y en el documento (relee la línea y su contexto: una nota fechada o un marcador de historia puede hacerla
+correcta). confirmed=true sólo si de verdad hay que corregir el documento. Si el agente propuso un texto, revísalo: tiene
+que ser CIERTO según el código y encajar con el estilo del documento (español, conciso, con la fecha 2026‑10‑31 y
+«(T21, ADR‑235)» si es una rectificación de algo que fue cierto: «✏️ 2026‑10‑31 (T21, ADR‑235): …»). Para las «no
+comprobable», di qué haría falta ejecutar.
+
+Además, «missing» del primer agente: ${JSON.stringify(r.missing)}
+
+AFIRMACIONES A VERIFICAR (JSON):
+${JSON.stringify(bad)}`, { label: `verificar:${d.key}`, phase: 'Verificar', schema: VERDICT_SCHEMA })
+      .then(v => ({ doc: d.key, extract: r, verified: v }))
+  },
+)
+
+return { truth, results: results.filter(Boolean) }

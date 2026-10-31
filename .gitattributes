@@ -19,3 +19,5 @@
 # ⚠️ Los scripts del libro (`doc/book/scripts/*.py`) también se ejecutan con
 # `python3` desde Git Bash y desde el Makefile: mismo motivo.
 *.py text eol=lf
+# los ganchos versionados de git-lock.bash (T14, ADR-234): sin extensión, y bash los lee; LF siempre
+.githooks/* text eol=lf

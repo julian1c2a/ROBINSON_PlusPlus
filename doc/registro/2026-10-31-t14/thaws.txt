@@ -1,0 +1,47 @@
+# T14 (ADR-234), 2026-10-31: scripts/thaws-fol.bash, sobre la historia de FOL y sobre seis mutaciones (la tabla o un gancho, cambiados y restaurados)
+
+== tal cual
+════ los thaws de FOL (toda la historia de frozen_files.txt) ════
+  ✓ c104b75 2026-10-30 · 7 descongelados · código · ADR-181 ADR-227 ADR-229 ADR-231 (en el mensaje)
+  ✓ 14b1692 2026-10-05 · 16 descongelados · código · ADR-129 (en el mensaje)
+  ✓ 0b62f88 2026-10-03 · 5 descongelados · prosa · ADR-115 ADR-116 (en el mensaje)
+  ✓ 9825404 2026-09-28 · 1 descongelados · prosa · ADR-110 (en doc/control/thaws-fol.tsv)
+  ✓ aced2a1 2026-09-27 · 1 descongelados · código · ADR-110 (en doc/control/thaws-fol.tsv)
+  ✓ ca83ec8 2026-09-27 · 2 descongelados · código · ADR-109 (en doc/control/thaws-fol.tsv)
+  ✓ 62dc2d5 2026-09-23 · 1 descongelados · código · ADR-099 (en doc/control/thaws-fol.tsv)
+════ la herramienta de congelación, la misma en RPP y en FOL ════
+  ✓ git-lock.bash
+  ✓ .githooks/pre-commit
+  ✓ .githooks/commit-msg
+✅ LOS 7 THAWS DE FOL, AUTORIZADOS POR ESCRITO (y el alcance de la tabla, medido); la herramienta, la misma
+
+== 1. sin la fila de 9825404
+rc=1
+  ❌ 9825404 2026-09-28: ni su mensaje cita un ADR de RPP que exista y recoja la decisión, ni está en doc/control/thaws-fol.tsv
+❌ HAY THAWS SIN AUTORIZACIÓN ESCRITA, O LA TABLA NO CUADRA
+
+== 2. 9825404 declarada código (es prosa)
+rc=1
+  ❌ 9825404: la tabla dice «código» y lo medido es «prosa»
+❌ HAY THAWS SIN AUTORIZACIÓN ESCRITA, O LA TABLA NO CUADRA
+
+== 3. un ADR que no existe
+rc=1
+  ❌ aced2a1: la tabla da «ADR-99999», que no existe o no recoge una decisión del propietario
+❌ HAY THAWS SIN AUTORIZACIÓN ESCRITA, O LA TABLA NO CUADRA
+
+== 4. una fila que no es un thaw
+rc=1
+  ❌ la fila «abcdef1» de doc/control/thaws-fol.tsv no es un thaw sin ADR en su mensaje
+❌ HAY THAWS SIN AUTORIZACIÓN ESCRITA, O LA TABLA NO CUADRA
+
+== 5. una fila de un thaw que ya cita su ADR
+rc=1
+  ❌ 0b62f88: su mensaje ya cita su ADR (ADR-115 ADR-116): la fila de doc/control/thaws-fol.tsv sobra
+  ❌ la fila «0b62f88» de doc/control/thaws-fol.tsv no es un thaw sin ADR en su mensaje
+❌ HAY THAWS SIN AUTORIZACIÓN ESCRITA, O LA TABLA NO CUADRA
+
+== 6. commit-msg distinto en RPP
+rc=1
+  ❌ .githooks/commit-msg y ../FOL/.githooks/commit-msg ya no son el mismo fichero: unifícalos
+❌ HAY THAWS SIN AUTORIZACIÓN ESCRITA, O LA TABLA NO CUADRA

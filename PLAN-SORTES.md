@@ -1,5 +1,7 @@
 # PLAN — Reparar la inconsistencia de `tcFn`
 
+**Last updated:** 2026-08-17 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
 **Creado:** 2026‑08‑19 · **Última medición:** 2026‑08‑19 (sondeos S1–S5 + piloto diagonal)
 **Contexto:** memoria `project-inconsistencia-tcfn-cons`, `AXIOMS.md`, `sondeos/README.md`.
 

@@ -1,6 +1,6 @@
 # Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-**Última actualización:** 2026-09-09 (§27.1, «un control que no comprueba nada»; banner de MANDATORIES)
+**Last updated:** 2026-09-09 (§27.1, «un control que no comprueba nada»; banner de MANDATORIES) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor:** Julián Calderón Almendros
 
 > Este documento define lo **universal**: aplica a cualquier proyecto Lean 4 que nazca
@@ -270,10 +270,11 @@ haber módulos "✅ Completos", el protocolo no se está siguiendo.
 
 > **Nota de plataforma**: en Windows/NTFS, `chmod a-w` (usado internamente por
 > `git-lock.bash`) **no impide realmente la escritura del fichero** — el lock es un
-> contrato social reforzado por el hook `pre-commit` (que sí bloquea el commit), no
+> contrato social reforzado por el hook `pre-commit` (que sí bloquea el commit cuando está activo: `bash git-lock.bash init`,
+> una vez por clon, porque git no activa ganchos solo; en RPP la CI no lo suple), no
 > una protección real del sistema de ficheros. No asumas que "está bloqueado" significa
 > "no se puede editar"; significa "el commit fallará si lo tocas sin desbloquearlo
-> antes".
+> antes", con el gancho activo.
 
 ### (20.) Protocolo de bloqueo de sesión
 
@@ -283,7 +284,7 @@ Como máximo un `.lean` desbloqueado en cada momento.
 bash git-lock.bash lock   ProjectName/Module.lean   # bloqueo temporal
 bash git-lock.bash unlock ProjectName/Module.lean   # desbloqueo temporal
 bash git-lock.bash list                             # lista bloqueados y congelados
-bash git-lock.bash init                             # instala/reinstala el hook pre-commit
+bash git-lock.bash init                             # activa los ganchos versionados (.githooks/, core.hooksPath)
 ```
 
 Protocolo de sesión:
@@ -293,6 +294,14 @@ Protocolo de sesión:
 3. **Fin de sesión**: bloquear todos los ficheros modificados. Commitear
    `locked_files.txt`.
 4. El hook `pre-commit` bloquea commits que toquen ficheros bloqueados o congelados.
+   ✏️ 2026‑10‑31 (T14, ADR‑234): los ganchos están VERSIONADOS en `.githooks/` —`.githooks/pre-commit`, el de los
+   congelados y bloqueados, y `.githooks/commit-msg`: un thaw cita en su mensaje el ADR de RPP que lo autoriza, «ADR-NNN de RPP»— y `init`
+   los activa con core.hooksPath (una vez por clon: git no activa ganchos solo). Corre el fichero versionado, no una
+   copia en .git/hooks/ (la que escribía el `init` de antes, que en RPP leía las listas con su CR y, con
+   core.autocrlf, no bloqueaba nada). La CI de RPP no mira los bloqueados ni los congelados de RPP: mira, con
+   `scripts/thaws-fol.bash`, los thaws de FOL y que `git-lock.bash` y `.githooks/` sean los mismos que en FOL. En
+   FOL, la CI prueba los ganchos (`check-gancho.bash`) y `check-congelados.bash` exige que cada thaw desde la base cite en su
+   mensaje su ADR de RPP (que ese ADR exista lo mira la CI de RPP).
 
 ### (21.) Protocolo de congelado (freeze) de módulos completos
 
@@ -345,13 +354,21 @@ mismo `deltaD`, `ax_axiomsCodeT_def`, el código de `godelBeta'` dentro de `gode
 | `bash git-lock.bash lock/unlock <file>` | Bloqueo temporal |
 | `bash git-lock.bash freeze/thaw <file>` | Congelado permanente / deshielo de emergencia |
 | `bash git-lock.bash list` | Lista de bloqueados y congelados |
-| `bash git-lock.bash init` | Instala/reinstala el hook pre-commit |
+| `bash git-lock.bash init` | Activa los ganchos versionados, `.githooks/pre-commit` y `.githooks/commit-msg`, con core.hooksPath: una vez por clon (T14, ADR‑234; ✏️ 2026‑10‑31: copiaba el gancho a .git/hooks/) |
 | `lake env lean scripts/ContratoGenerar.lean` | Regenera `Meta/ContratoTabla.lean`, la tabla del contrato de los enunciados de los titulares (T07, ADR‑165). ⛔ Sólo tras el ADR que diga qué enunciado o qué definición cambió |
 | `bash cierre-imports.bash` | El cierre de imports de las raíces: el universo de los módulos (`[L]`, `[A]` y `[C]` de `check-doc-sync.bash`; T15 y ADR‑163 de RPP). `--autotest` lo comprueba. (✏️ 2026‑10‑18: aquí estaban `new-module.bash` y `gen-root.bash`, retirados) |
-| `bash check-sorry.bash` | Localiza todos los `sorry` (excluyendo comentarios) |
+| `bash check-sorry.bash` | Busca como TOKEN `sorry`, `sorryAx`, `admit` y `stop`, sin comentarios ni literales (`strip-lean.awk`), en todo .lean del árbol de RPP (con `sondeos/`; sin .lake/, Probe/ ni _rpp/). Además, cero en las ocho familias de agujeros de confianza (native_decide, decide +native, unsafe, opaque, implemented_by, extern, ofReduceBool…, skipKernelTC…) en RPP, FOL y TheoryFramework, y ninguna orden `#eval`, `#reduce`, `#guard` ni run_cmd/run_elab/run_meta que evalúe el ancla. Rojo (sale con 1; con 2 si no puede medir); en la CI (el script; a mano, también `make sorry`) |
 | `bash check-doc-sync.bash` | **Comprueba que la documentación cuadra con el código** (§27). `--quick` omite el build |
+| `bash check-estratos.bash` | Censo POR ENTORNO: por cada noción de derivabilidad, sus constructores, los `axiom` que la habitan, su solidez, su completitud y su puente (la tabla de `REFERENCE.md` §0bis); ninguna constante con `sorryAx`, un axioma de confianza, implemented_by/extern o de una librería ajena; los `partial`, con igualdad; un señuelo; y la escalera de binders. Rojo; en la CI (el script; a mano, también `make estratos`) |
+| `bash check-footprints.bash` | El `#print axioms` de cada fila de su tabla, con igualdad, y [COBERTURA]: todo titular que el árbol imprime y todo `#print axioms` de la fuente tienen fila. Rojo; en la CI (el script; a mano, también `make footprints`) |
+| `bash check-choice.bash [--rehacer]` | Toda constante de RPP, FOL y TheoryFramework con `Classical.choice`, `noncomputable` o `String`, contra `doc/control/choice.tsv`, en los dos sentidos (con --rehacer la reescribe, sólo con un ADR; T53, ADR‑193). Rojo; en la CI (el script; a mano, también `make choice`) |
+| `bash check-warnings.bash [--generar-opciones]` | Los avisos de los dos builds contra su tabla, VACÍA desde ADR‑227 (todo aviso es rojo), y el censo de los set_option que apagan un linter o suben un límite, de fichero y «… in» (ADR‑229; ninguno de fichero), contra `doc/control/opciones.tsv`, con igualdad. Rojo; en la CI (el script; a mano, también `make warnings`) |
+| `bash check-sondeos.bash [--controles]` | Con --controles, compila los sondeos de `sondeos/CONTROLES.txt`: rojo, y en la CI. Sin él, todos, como informe (sale con 0) |
+| `bash scripts/segundo-nucleo.bash [DIR]` | Exporta el cierre de los titulares (`TITULARES`) y el de la clase (i) (`PUROS`) y los pasa por seis núcleos —el de Lean, su versión paranoica, lean4lean, nanoda, con-leche y con-ron—, contra `doc/control/segundo-nucleo.tsv`, con un mutante (T23, ADR‑222). Los seis aceptan los dos cierres (ADR‑228; con los titulares, nanoda va con un hilo). Rojo; en la CI |
+| `scripts/presupuesto-ci.bash`, `scripts/leanchecker-cobertura.bash` | En la CI: el tiempo y la memoria del build y de leanchecker contra `doc/control/presupuesto-ci.tsv` (T41, ADR‑202), y que leanchecker replaye los módulos de las fuentes y de los .olean (T23, ADR‑222). Rojos |
+| `bash scripts/thaws-fol.bash [../FOL]` | En la CI («Los thaws de FOL, autorizados»): cada thaw de FOL se apoya en un ADR de RPP que existe y recoge una decisión (lo mira por la palabra «propietario», o «usuario» en los antiguos) —el que cita su mensaje, «ADR-NNN de RPP», o, para los de antes de la regla, `doc/control/thaws-fol.tsv`—; el alcance que declara esa tabla (prosa o código), re-medido con `scripts/prosa.py`; y `git-lock.bash` y `.githooks/`, los mismos en RPP y en FOL (T14, ADR‑234). Rojo |
 | **`PLAN-PRUEBAS.md`** | 🆕 **qué garantiza cada control y qué NO garantiza ninguno** (auditoría F‑4). Léelo antes de fiarte de un verde |
-| `bash update-toolchain.bash [vX.Y.Z]` | PRUEBA el par (RPP, FOL) con otra versión de Lean —por defecto, la última estable— en worktrees aparte, SIN commit: builds, `leanchecker` y los controles, con la versión que corre comprobada (T42, ADR‑176). `--check`, sólo si hay otra; `--en-sitio`, en la CI. La vigilancia semanal, `.github/workflows/toolchain.yml` contra `doc/control/toolchain-vigilado.txt`. El bump, si se decide, por un ADR y a mano |
+| `bash update-toolchain.bash [vX.Y.Z]` | PRUEBA el par (RPP, FOL) con otra versión de Lean —por defecto, la última estable— en worktrees aparte, SIN commit: los builds (`lake build "@FOL/FOL" "@FOL/TheoryFramework"` y el de RPP), leanchecker y cinco controles —`check-footprints.bash`, `check-warnings.bash`, `check-estratos.bash`, `check-sorry.bash` y `check-sondeos.bash --controles`; no `check-choice.bash`, `check-doc-sync.bash` ni el segundo núcleo—, con la versión que corre comprobada (T42, ADR‑176). `--check`, sólo si hay otra; `--en-sitio`, en la CI. La vigilancia semanal, `.github/workflows/toolchain.yml` contra `doc/control/toolchain-vigilado.txt`. El bump, si se decide, por un ADR y a mano |
 | `make probar-controles [PYTHON=python3] [AWK=awk]` | Prueba las herramientas que VALIDAN los controles (T47, ADR‑180): `strip-lean.awk` frente al oráculo léxico (`scripts/pruebas/validar_strip.py`, sobre todo `.lean` versionado de RPP y FOL y 182 fixtures), `lineWFT` frente a su generador (`scripts/lineWFT_generar.py`) y los mutantes de `strip-lean.awk` frente al humo de `check-sorry` (`scripts/pruebas/mutantes_strip.py`, unos minutos). Las dos primeras corren también en la CI |
 | `make help` | Lista los targets del Makefile |
 
@@ -374,29 +391,45 @@ documento que se contradice a sí mismo, y quien lo lee después se cree la mita
 ```bash
 bash check-doc-sync.bash            # completo (incluye lake build)
 bash check-doc-sync.bash --quick    # sin build, para iterar
-bash check-doc-sync.bash --fix-hint # sugiere el sed de cada corrección
+bash check-doc-sync.bash --fix-hint # si sale rojo, sugiere dos sed genéricos: la cifra de jobs (si se midió) y la de módulos activos
 make docsync                        # equivalente
 ```
 
 **Qué comprueba:**
 
+Antes de los bloques, **no poder medir es rojo**: sin lake o sin «Build completed successfully» (salvo con --quick; pero [B] pide lake y el build hecho también con --quick), y
+sin el autotest de la cuenta de `axiom` o sin el resumen de `check-sorry.bash` (también con --quick).
+
 | | control | ¿rompe? |
 |---|---|---|
-| **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean, `sorry` y sondeos, también en negrita — contra el estado REAL. Exime un marcador de historia, no una fecha (ADR‑169). Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
+| **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, el conteo de Meta, cuarentena, `axiom` de Lean, `sorry` y sondeos, también en negrita — contra el estado REAL. Exime un marcador de historia, no una fecha (ADR‑169). Un patrón sin ninguna aparición es ROJO: **`control VACÍO`** (§27.1; ✏️ 2026‑10‑31 (T21, ADR‑235): avisaba hasta ADR‑223) | ✅ sí |
 | **[A2]** | **las mismas cifras en el CUERPO** (de la línea 101 al final, sin DECISIONS.md), con los mismos filtros — §27.2. Las viejas de hoy, en `doc/control/a2-deuda.tsv`, que sólo baja (`bash check-doc-sync.bash --a2-deuda`). ✏️ ADR‑169 | ✅ sí, con trinquete por línea |
 | **[I]** | **frases que un teorema vivo desmiente** («⊬¬G no existe» con `goedel_I_neg` declarado; Rosser o Löb «pendiente»), en los documentos y en los `.lean` de la librería, fuera de registro, citas y vallas. ADR‑169 | ✅ sí |
-| **[B]** | **citas muertas** en los docs autoritativos: toda cita entre comillas invertidas con forma de identificador o de ruta tiene que existir, o llevar un marcador a 100 bytes o menos, o estar en la deuda por cita (`doc/control/b-deuda.tsv`). ✏️ ADR‑166 | ✅ sí, con trinquete por cita |
-| **[E]** | 🆕 **frescura del TITULAR**: la fecha del banner de cada doc autoritativo contra la entrada más reciente del `CHANGELOG` — §27.3 | ⚠️ aviso |
+| **[B]** | **citas muertas** en los documentos de B_DOCS_LISTA —los autoritativos (✏️ 2026‑11‑01, T21, ADR‑235: también `PLAN-PRUEBAS.md`, con sus citas adjudicadas; ADR‑185 lo había dejado fuera hasta entonces)—: toda cita entre comillas invertidas con forma de identificador o de ruta tiene que existir, o llevar un marcador a 100 bytes o menos, o, si la declara un sondeo (también uno archivado), que su línea nombre ese sondeo, o estar en la deuda por cita (`doc/control/b-deuda.tsv`). ✏️ ADR‑166; ✏️ 2026‑10‑31 (T21, ADR‑235): decía «en los docs autoritativos» | ✅ sí, con trinquete por cita |
+| **[E]** | **frescura del TITULAR**: el primer sello `**Last updated:**` de todo .md versionado (salvo `doc/book/`) no puede ser anterior al último commit que tocó el documento (ni a hoy, si tiene cambios sin commitear), y un documento sin sello falla. La deuda vieja, en dos tablas —E_DEUDA, la de contenido (la marca, más vieja que el último commit), y E_DEUDA_FORMATO, la de formato (sin marca; vacía desde el 2026‑10‑31)—, rompe en los dos sentidos: un documento que falla fuera de su tabla es rojo, y uno de ellas que ya está bien, también; y tiene TECHO: las tablas de la base verificada (T24, ADR‑233) — §27.3. ✏️ 2026‑10‑31 (T21, ADR‑235): decía «contra la entrada más reciente del `CHANGELOG`» y «aviso»; rompe desde ADR‑072, y mira todo .md desde ADR‑084 | ✅ sí, con deuda declarada |
 | **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
-| **[D]** | **marcas de tiempo** (§22) presentes en los docs técnicos | ✅ sí |
+| **[D]** | **marcas de tiempo**: que `REFERENCE.md`, `doc/REFERENCE-*.md`, `CURRENT-STATUS-PROJECT.md` y `DEPENDENCIES.md` lleven `**Last updated:**` o `**Última actualización:**`. Sólo la etiqueta: ni la fecha, ni el formato `YYYY-MM-DD HH:MM` de §22, ni `CHANGELOG.md`; si la fecha está al día lo mira [E] | ✅ sí |
+| **[L]** | **la librería = el cierre de imports**: el cierre del barril (`cierre-imports.bash`, con su autotest) = los .lean de `ROBINSON_PlusPlus/` en el disco = los de `git ls-files`; todo módulo en `Minimal/`, `Meta/` o `Full/`; y `cierre-imports.bash`, con el mismo código que el de FOL. ✏️ ADR‑163 | ✅ sí |
+| **[EOL]** | ningún blob con CRLF (ni mixto) en el índice. ✏️ ADR‑200 | ✅ sí |
+| **[H]** (PATH) | todo .bash versionado, salvo `b-control.bash` y `doc/registro/`, lleva «export PATH="/usr/bin…» (§27.1, regla 2). ✏️ ADR‑201 | ✅ sí |
+| **[N]** | ninguna cita por número de línea en los autoritativos, salvo `DECISIONS.md` y `NEXT-STEPS.md` (§26). ✏️ ADR‑209 | ✅ sí |
+| **[F]** | ningún .olean sin su .lean, ni aquí ni en ../FOL | ✅ sí |
+| **[H]** (sondeos) | los `sondeos/*.lean` = las filas de `sondeos/README.md`, en los dos sentidos. ✏️ ADR‑084 | ✅ sí |
+| **[M]** | cada fila MANDATORY de `DECISIONS.md`, en UNA línea y con cuatro columnas, y cada cita de su columna «Verificación» existe. ✏️ ADR‑133 | ✅ sí |
+| **[T]** | los titulares de T_UNIVERSO están declarados y tienen UNA fila en `TEOREMAS-E-HIPOTESIS.md`, ninguna fila sobra, y T_UNIVERSO = `TITULARES` (`Meta/ContratoTitulares.lean`). ✏️ ADR‑135, ADR‑165 | ✅ sí |
 
-✏️ **2026‑10‑18 (ADR‑166, T04): [B] rompe**, con trinquete por cita. Hasta entonces era un aviso, «deliberadamente»,
-y su universo eran siete prefijos: un módulo retirado o un fichero borrado no los miraba nadie, y un marcador en
-cualquier punto de la línea, o una fecha, absolvía todas sus citas. Hoy, por cada cita reportada, se decide si el
+✏️ **2026‑10‑18 (ADR‑166, T04): [B] rehecho**, con trinquete por cita. Nació como aviso, «deliberadamente»; desde
+ADR‑084 (2026‑09‑22) rompía, con una deuda por CLAVE (B_DEUDA; con tope desde ADR‑116), y su universo eran siete
+prefijos: un módulo retirado o un fichero borrado no los miraba nadie, y un marcador en cualquier punto de la línea, o
+una fecha, absolvía todas sus citas *(✏️ 2026‑10‑31 (T21, ADR‑235): decía «[B] rompe» y «Hasta entonces era un
+aviso»)*. Hoy, por cada cita reportada, se decide si el
 texto afirma que *ya está* (→ corregir) o la menciona como historia u objetivo (→ un marcador **a 100 bytes o menos
 de la cita y en su misma celda**: «retirado», «archivado», «propuesto», «falta»…). ⛔ **Una fecha no es un
 marcador**: una línea fechada no dice que lo que cita esté retirado. Lo que ya estaba muerto el 2026‑10‑18 está en
-`doc/control/b-deuda.tsv`, que sólo baja (`bash check-doc-sync.bash --b-deuda`).
+`doc/control/b-deuda.tsv`, que sólo baja (`bash check-doc-sync.bash --b-deuda`), salvo en el commit que cambia el
+núcleo de [B] —que va solo: sube lo que el núcleo nuevo ve de más sobre los mismos documentos (ADR‑167)— o con un ADR
+nuevo que nombre cada entrada que sube (B_SUBE_ADR; lo usó ADR‑192, una vez) *(✏️ 2026‑10‑31 (T21, ADR‑235): decía
+sólo «que sólo baja»; subió por esas dos vías el 2026‑10‑19 y el 2026‑10‑27)*.
 
 ⚠️ **Y la regla de oro que ningún script sustituye: NO basta con arreglar el banner.** Al corregir,
 recorrer también las tablas resumen, las secciones de «Próximos pasos» y las notas de auditoría
@@ -420,13 +453,20 @@ por seis y se corrigió una sola vez. **Duplicar un titular es duplicar su caduc
 
 `[E]` compara la **fecha** del titular contra la entrada más reciente del `CHANGELOG`. Es una
 heurística —no lee la frase—, pero habría cazado los seis. Entra como **AVISO**, como `[A2]`.
+✏️ 2026‑10‑31 (T21, ADR‑235): **[E] ROMPE desde ADR‑072 (2026‑09‑18)**, y ya no mira el CHANGELOG (congelado,
+aprobaba siempre): compara el primer sello `**Last updated:**` de cada documento con la fecha del último commit que lo
+tocó, o con la de hoy si tiene cambios sin commitear (ADR‑121); desde ADR‑084 (2026‑09‑22), en todo .md versionado
+salvo `doc/book/`, con la deuda de entonces declarada en E_DEUDA y rojo en los dos sentidos (dos tablas y un techo
+desde ADR‑233: la tabla de §27). [A2] rompe desde ADR‑169 (§27.2).
 
 ⚠️ **Calibración del estreno, y hay que anotarla para que `[E]` no se convierta en ruido**
 (§27.1): en su primera ejecución tras adoptarlo señaló **cuatro** titulares por detrás del
 `CHANGELOG` — `doc/REFERENCE-Kernel.md` (julio), `doc/REFERENCE-Full.md`, `cuarentena/README.md` y
 `sondeos/README.md`. **Los cuatro son legítimos**: esos documentos no cambiaron ese día y su fecha
 es **correcta**, no obsoleta. ⇒ `[E]` **no dice «esto está mal», dice «míralo»**, y por eso es
-AVISO. Un titular por detrás es normal; **seis titulares idénticos** por detrás no lo era.
+AVISO *(✏️ 2026‑10‑31 (T21, ADR‑235): lo era; desde ADR‑072 la referencia es el último commit de CADA documento —uno
+que no cambió ya no sale— y [E] rompe: ver la nota de arriba)*. Un titular por detrás es normal; **seis titulares
+idénticos** por detrás no lo era.
 
 
 #### (27.2) 🆕 ⭐ El CUERPO, y por qué el límite de 100 líneas **no era un descuido** (2026‑09‑10h)
@@ -467,16 +507,18 @@ causas independientes, las tres silenciosas:
 
 | # | causa | efecto | arreglo |
 |---|---|---|---|
-| 1 | `lake` **no está en el PATH de Git Bash** | `JOBS` vacío ⇒ el control de jobs se **saltaba** | se distingue «no lo pedí» (`--quick`) de «no pude medirlo», y lo segundo **avisa** |
+| 1 | `lake` **no está en el PATH de Git Bash** | `JOBS` vacío ⇒ el control de jobs se **saltaba** | se distingue «no lo pedí» (`--quick`) de «no pude medirlo», y lo segundo **avisa** *(✏️ 2026‑10‑31 (T21, ADR‑235): desde el 2026‑09‑17 es ROJO; y los censos de `axiom` y de `sorry` sin medir son rojos también con --quick)* |
 | 2 | `bc` **no está instalado** (ni en Git Bash ni en el runner) | `AXIOMS` salía **vacío** | se cuenta con `wc -l`, sin dependencias |
 | 3 | lanzado desde **PowerShell**, `bash` hereda el PATH de Windows y `head`/`grep` resuelven a binarios **ajenos** (aquí, el HEAD de Quantum ESPRESSO en `ucrt64`) | los **cuatro** controles `[A]` salían **VACÍOS** | **PATH higiénico**: los `.bash` anteponen `/usr/bin` |
 
 ⇒ Tres reglas que salen de ahí, y que valen para cualquier control futuro:
 
-1. ⭐ **Un patrón que no encuentra su frase en ninguna parte NO está comprobando nada.** `check_num`
-   avisa ahora explícitamente: `control VACÍO`. Un control silencioso es peor que ninguno, porque
+1. ⭐ **Un patrón que no encuentra su frase en ninguna parte NO está comprobando nada.** [A] lo dice
+   —`control VACÍO`— y es ROJO *(✏️ 2026‑10‑31 (T21, ADR‑235): decía «check_num avisa ahora»; check_num salió con
+   ADR‑169, y el aviso pasó a rojo con ADR‑223)*. Un control silencioso es peor que ninguno, porque
    se cobra la confianza sin dar nada a cambio.
-2. ⭐ **Todo script `.bash` del proyecto antepone `/usr/bin` al PATH.** No es paranoia: está medido.
+2. ⭐ **Todo script `.bash` del proyecto antepone `/usr/bin` al PATH.** No es paranoia: está medido. Lo comprueba
+   [H] de `check-doc-sync.bash` (ADR‑201).
 3. ⭐ **Una herramienta que miente se arregla; la cifra, nunca.** `check-sorry.bash` daba
    «101 sorry en 87 ficheros» donde hay **0**: contaba las menciones en prosa (`cero \`sorry\``)
    de los docstrings. Ahora **elimina comentarios y literales de cadena antes de buscar**, y el
@@ -712,7 +754,8 @@ detectar y eliminar "elementos fantasma" (declaraciones borradas, renombradas o 
 `private` en el código que siguen documentadas como vigentes) → asegurar coherencia de
 fechas, jerarquía de dependencias y enlaces de navegación fuerte → actualizar el
 índice raíz → **`bash check-doc-sync.bash` (§27)**, cuyo control [B] es exactamente el
-detector de fantasmas mecanizado; desde ADR‑166 rompe: arreglar o marcar cada cita muerta.
+detector de fantasmas mecanizado; rompe desde ADR‑084, y desde ADR‑166 sobre toda cita con forma de identificador o
+de ruta: arreglar o marcar cada cita muerta.
 
 ### `guarda_y_sube`
 
@@ -722,7 +765,9 @@ preservando los bloqueos locales.
 **Pasos exactos:**
 
 1. Ejecutar `lake build` para garantizar que no hay errores de compilación,
-   **y `bash check-doc-sync.bash` (§27) para garantizar que la documentación no miente.**
+   **y `bash check-doc-sync.bash` (§27), que caza la documentación que se separa del código —cifras, citas muertas,
+   frases que un teorema vivo desmiente, marcas, catálogos—; que el resto de la prosa sea verdad no lo garantiza
+   ningún script (§27, la regla de oro).**
    Si el segundo falla, corregir ANTES de commitear — no después.
 2. Desbloquear los ficheros `.lean` en los que se ha trabajado:
    `bash git-lock.bash unlock modulo_1.lean ... modulo_n.lean`
@@ -763,7 +808,7 @@ Antes de dar por completa y al día la documentación de una sesión, verificar 
 `REFERENCE.md` (+ nodos), los ficheros `.lean` y el resto de documentación cumplen:
 
 - [ ] Puntos (0)–(27) de esta guía.
-- [ ] `bash check-doc-sync.bash` en verde (§27): desde ADR‑166, [B] rompe, así que sus citas muertas están arregladas o marcadas.
+- [ ] `bash check-doc-sync.bash` en verde (§27): [B] rompe (desde ADR‑084; por cita, desde ADR‑166), así que ninguna cita muerta es nueva; las de antes siguen declaradas en `doc/control/b-deuda.tsv`.
 - [ ] Reglas de exportación (§17 «Bloques de exportación», §18 «Barrels»).
 - [ ] `NAMING-CONVENTIONS.md` (diccionario de símbolos, REGLA 1–12 de formación de
       nombres, y §5–§8 de estructura de archivos/namespaces/variables/typeclasses).

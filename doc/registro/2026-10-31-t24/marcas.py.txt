@@ -1,0 +1,62 @@
+import re
+R = "/e/dropbox/github/lean4/ROBINSON_PlusPlus/"
+
+NOTA_ES = " *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*"
+SIN = {  # documento → fecha de su último commit con diez líneas nuevas o más, sin las tres pasadas en lote
+    ".claude/commands/docsync.md": "2026-09-11",
+    "doc/AUDITORIA-2026-09-11.md": "2026-09-11",
+    "doc/AUDITORIA-FOL-2026-09-12.md": "2026-09-12",
+    "doc/FEEDBACK-PARA-EL-LIBRO.md": "2026-10-04",
+    "GODEL-D3-TRACKED-DESIGN.md": "2026-07-12",
+    "GODEL-D-ARITHMETIZATION.md": "2026-06-14",
+    "PLAN-FRENTE-A.md": "2026-08-22",
+    "PLAN-NEGVERIFIER.md": "2026-09-10",
+    "PLAN-SORTES.md": "2026-08-17",
+    "Sobre_el_libro.md": "2026-09-04",
+    "TuplasFuncionesYListas.md": "2026-05-08",
+}
+ES = ["AI-GUIDE.md", "DISCUSIONES.md", "PLAN-LIBRO.md", "PLANNING.md", "doc/PLAN-COMPLETITUD-FINITISTA.md",
+      "ESCALANDO_EL_PROYECTO.md", "NAMING-CONVENTIONS.md"]
+
+
+def marca(f):
+    return (f"**Last updated:** {f} *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última "
+            f"revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*")
+
+
+def leer(p):
+    s = open(R + p, encoding="utf-8", newline="").read()
+    crlf = "\r\n" in s
+    return s.replace("\r\n", "\n"), crlf
+
+
+def escribir(p, s, crlf):
+    if crlf:
+        s = s.replace("\n", "\r\n")
+    open(R + p, "w", encoding="utf-8", newline="").write(s)
+
+
+for p in ES:
+    s, crlf = leer(p)
+    assert "**Last updated" not in s, p
+    lineas = s.split("\n")
+    i = next(k for k, l in enumerate(lineas) if "**Última actualización:**" in l)
+    lineas[i] = lineas[i].replace("**Última actualización:**", "**Last updated:**", 1) + NOTA_ES
+    escribir(p, "\n".join(lineas), crlf)
+    print("ES ", p, "línea", i + 1)
+
+for p, f in SIN.items():
+    s, crlf = leer(p)
+    assert "**Last updated" not in s, p
+    lineas = s.split("\n")
+    if lineas[0] == "---":
+        j = lineas.index("---", 1)          # el final del frontmatter
+        if p == "Sobre_el_libro.md":        # unas diapositivas (marp): la marca, en un comentario HTML
+            lineas[j + 1:j + 1] = ["", "<!-- " + marca(f) + " -->"]
+        else:
+            lineas[j + 1:j + 1] = ["", marca(f)]
+    else:
+        assert lineas[0].startswith("# "), p
+        lineas[1:1] = ["", marca(f)]
+    escribir(p, "\n".join(lineas), crlf)
+    print("SIN", p, f)

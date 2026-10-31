@@ -1,0 +1,58 @@
+[
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/WORKFLOW.md",
+  "line": 189,
+  "problem": "La nota ✏️ dice algo falso: «en junio, la CI compilaba y sólo avisaba de los sorry». En junio la CI no arrancaba.",
+  "evidence": "git log --follow de .github/workflows/build.yml: entre a0c8cba (2026-03-08, la plantilla) y 4f6f8e1 (2026-09-09) nadie lo tocó. La plantilla tenía «run: elan toolchain install $(cat lean-toolchain | cut -d: -f2)» en una línea, un YAML que no parsea («mapping values are not allowed here», «workflow file issue», 0 s). El mensaje de 4f6f8e1 dice «⛔ LA CI NO HA ARRANCADO NUNCA». build.yml:51-52: «Detectado 2026-09-09, en la primera ejecución real de este workflow». El primer build que corrió vino tras c5a8774 (2026-09-10, los dos checkouts).",
+  "fix": "# ✏️ 2026‑10‑31 (T21, ADR‑235): aquí sólo estaban lake build, check-sorry y git-lock list; en junio la CI no arrancaba\n# (su YAML no parseaba hasta el 2026‑09‑09, 4f6f8e1), y hasta ADR‑116 sólo avisó de los sorry.",
+  "severity": "media"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/WORKFLOW.md",
+  "line": 138,
+  "problem": "Llama «los controles que dependen del toolchain» a footprints, warnings, estratos, sorry y sondeos. check-sorry no depende del toolchain; check-choice y el segundo núcleo sí, y update-toolchain no los corre. La nota de 140-141 no lista los thaws de FOL entre lo que no pasa, aunque la CI los corre.",
+  "evidence": "check-sorry.bash no llama a lake (grep 'lake ' da 0): sólo strip-lean.awk y grep. check-choice.bash:117 usa «lake env lean \"$LEANFILE\"». scripts/segundo-nucleo.bash usa leanexport, lean4lean, nanoda… del toolchain v4.35 (build.yml:223-228). update-toolchain.bash:156-173 corre sólo los dos builds, leanchecker y footprints/warnings/estratos/sorry/sondeos. PLAN-PRUEBAS V16, editado hoy: «no V4, V15, V17, V18, V19 ni V20» (V18 = scripts/thaws-fol.bash).",
+  "fix": "# (T42, ADR‑176): builds de FOL y RPP, leanchecker (sin su cobertura) y cinco controles —footprints, warnings, estratos,\n# sorry y los sondeos de control—, con la versión que corre comprobada.\n# ✏️ 2026‑10‑31 (T21, ADR‑235): decía «leanchecker y los controles»: no pasa check-choice, check-doc-sync, el segundo\n# núcleo, el presupuesto, la prueba de los controles ni los thaws de FOL, que la CI sí (R3‑3‑08).",
+  "severity": "media"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/WORKFLOW.md",
+  "line": 59,
+  "problem": "La nota ✏️ da a entender que en junio la CI corría «Build» y un «Check for sorry» que sólo avisaba. El fichero tenía esos pasos, pero el workflow no arrancó nunca hasta el 2026-09-09.",
+  "evidence": "El mismo de arriba: 4f6f8e1 («LA CI NO HA ARRANCADO NUNCA»), el YAML de la plantilla a0c8cba sin parsear, y build.yml:51-52.",
+  "fix": "✏️ 2026‑10‑31 (T21, ADR‑235): decía sólo `lake build`, que en junio era todo el gate: la CI de la plantilla («Build» y un «Check for sorry» que sólo avisaba) no arrancó hasta el 2026‑09‑09, porque su YAML no parseaba (4f6f8e1).",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/WORKFLOW.md",
+  "line": 54,
+  "problem": "El hunk editado hoy sigue mandando «actualizar … `CHANGELOG.md`», y CHANGELOG.md está congelado desde ADR-142. La fila de la Parte 6 (línea 230), en la tabla que hoy se tocó, sigue diciendo «Historia cronológica de cambios».",
+  "evidence": "Cabecera de CHANGELOG.md: «🗄️ CONGELADO (2026‑10‑16, ADR‑142, T54): este registro se detiene en ADR‑113. El registro de cambios es DECISIONS.md (y git log)». AI-GUIDE, editado hoy en T21: «ya no mira el CHANGELOG (congelado, …)».",
+  "fix": "5. **Doc sync** al cerrar un bloque de trabajo: actualizar `REFERENCE.md`, `CURRENT-STATUS-PROJECT.md`, `NEXT-STEPS.md` y el ADR de `DECISIONS.md` según los cambios (`CHANGELOG.md` está congelado desde ADR‑142), y dejar `bash check-doc-sync.bash` en verde … (el resto igual). Y en la línea 230: | `CHANGELOG.md` | Historia cronológica de cambios hasta ADR‑113: CONGELADO desde ADR‑142 (el registro es `DECISIONS.md`, y git log). |",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/WORKFLOW.md",
+  "line": 14,
+  "problem": "«hoy v4.35.0» es una cifra nueva que ningún control compara. Es el mismo deterioro que se corrige aquí: el «v4.29.1» se quedó viejo sin que nada lo viera.",
+  "evidence": "check-doc-sync.bash no compara la versión de Lean de los documentos con lean-toolchain: lean-toolchain no aparece en él, y v4.35.0 sólo sale en un autotest de [N]. WORKFLOW.md no está en AUTHORITATIVE ni en B_DOCS_LISTA. Lo que sí rompe es el paso M-3 de la CI, que compara los dos lean-toolchain, no la prosa.",
+  "fix": "* **Lean 4, la versión de `lean-toolchain`** (v4.35.0 desde el 2026‑10‑21, ADR‑181; gestionado por elan), la MISMA en RPP y en FOL (M‑3): la CI de RPP da rojo si los dos `lean-toolchain` difieren. ✏️ 2026‑10‑31 (T21, ADR‑235): decía «v4.29.1», la versión de mayo (v4.31.0 desde julio).",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/WORKFLOW.md",
+  "line": 186,
+  "problem": "«Lo demás que bloquea en la CI» completa la lista local, pero se deja dos pasos que también bloquean: «El mismo toolchain en RPP y en FOL» (M-3) y la instalación de elan con su sha256.",
+  "evidence": "build.yml:105-112: el paso «El mismo toolchain en RPP y en FOL» hace exit 1 si los toolchains difieren. build.yml:158: «sha256sum -c -» del tarball de elan. Ninguno de los dos tiene continue-on-error.",
+  "fix": "# Lo demás que bloquea en la CI —el mismo toolchain en RPP y en FOL (M‑3), elan con su sha256, leanchecker y su cobertura,\n# el segundo núcleo (scripts/segundo-nucleo.bash: el cierre de los titulares, el modelo incluido, por núcleos\n# independientes del de Lean; ADR‑228), el presupuesto y la prueba de los controles—, en .github/workflows/build.yml; qué\n# comprueba cada control y qué no, en PLAN-PRUEBAS.md §1.",
+  "severity": "baja"
+ },
+ {
+  "file": "E:/dropbox/github/lean4/ROBINSON_PlusPlus/WORKFLOW.md",
+  "line": 92,
+  "problem": "La línea 92 no se editó, pero ahora contradice el texto de hoy. Dice que el flujo de git-lock «No se usa en sesiones IA», y la 52 (hoy) pone en el ciclo IA que un thaw de FOL tiene que citar su ADR por el gancho commit-msg y check-congelados.",
+  "evidence": "WORKFLOW.md:52 (hoy). AI-GUIDE «guarda_y_sube», pasos 2 y 6: unlock y lock de los ficheros trabajados. FOL tiene 39 congelados y 50 bloqueados (wc -l de sus listas). En RPP, frozen_files.txt está vacío y locked_files.txt sólo tiene una línea vacía.",
+  "fix": "Flujo histórico con bloqueos explícitos por archivo (ADR-003). **En RPP no se usa en sesiones IA** (no hay ficheros bloqueados ni congelados), pero la infraestructura sigue disponible; en FOL, sus congelados y bloqueados rigen todo commit (ver «Los ganchos» y «Freeze y thaw»).",
+  "severity": "baja"
+ }
+]
