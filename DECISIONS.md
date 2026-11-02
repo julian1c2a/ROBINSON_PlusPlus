@@ -5630,6 +5630,12 @@ citas vivas de `Probe/`, la etiqueta `archivo/probe-2026-11-02`, `doc/registro/2
    las de los documentos de registro, no (85 apariciones en 28 ficheros, censadas; ninguna a los cuatro). `simbolos.py`
    ya no mira `Probe/`.
 4. **De paso:** la auditoría daba pcc_congr_hole_code como entrada de la deuda de `[B]`; salió de ella con ADR‑142.
+5. ⚠️ **El push a `master` de este ADR (`06012c4`) dejó ROJO el job del libro** (run 41500902181; el job `lake build`,
+   el obligatorio, verde). Ese job sólo corre en el push a `master` (no en las ramas `ci/…`, ADR‑136) y sólo si el push
+   toca `doc/book/`: el cambio de `simbolos.py` lo tocó, y sus controles fallan por la deriva medida en ADR‑242 (§2.6:
+   los `\ident{}` sin declaración; el libro sigue en espera). No es obligatorio en la protección. El push siguiente no
+   toca `doc/book/` y lo omite. Que la rama `ci/…` no pueda ver este rojo es la diferencia entre las dos CI; cambiarla
+   (o dar el job por informe) lo decide el propietario.
 
 **Véase también:** ADR‑020, ADR‑141, ADR‑142, la auditoría (T48).
 
