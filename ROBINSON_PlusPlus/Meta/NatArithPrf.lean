@@ -55,7 +55,6 @@ theorem prf_nat_induction (Φ : Formula)
     : Prf (Formula.forall Φ) :=
   prf_mp (prf_mp (Prf.ind Φ) base) step
 
-set_option linter.unusedSimpArgs false in
 /-- **Identidad izquierda de `add`** en `Prf`: `0 + n = n` (por `prf_nat_induction`;
     ✏️ 2026‑10‑12, ADR‑134: decía «NO derivable sin inducción», y sí lo es: `ax6_add_comm` y `ax4_add_zero`). -/
 theorem prf_add_zero_left (n : Term) : Prf (add zero n =eq n) := by
@@ -65,8 +64,7 @@ theorem prf_add_zero_left (n : Term) : Prf (add zero n =eq n) := by
       exact prf_add_zero_t zero
     · refine Prf.gen _ ?_
       simp only [substFormula, substTerm, substTerms, add, succ, liftFormula, liftTerm, liftTerms,
-        zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, reduceIte,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+        zero, Nat.reduceAdd, Nat.reduceLT, reduceIte]
       refine prf_deduction ?_
       have ih : PrfH [Formula.eq (add zero (.var 0)) (.var 0)] (add zero (.var 0) =eq (.var 0)) :=
         prfH_hyp_self _
@@ -81,21 +79,20 @@ theorem norm11 (s t : Term) : substTerm 0 s (liftTerm 1 (liftTerm 0 t)) = liftTe
   rw [(FOL.liftTerm_comm_zero t 0).symm]
   exact FOL.substTerm_liftTerm (liftTerm 0 t) 0 s
 
-set_option linter.unusedSimpArgs false in
 /-- **`σm + n = σ(m + n)`** en `Prf` (add por la izquierda; inducción sobre `n`; ✏️ 2026‑10‑12, ADR‑134:
     decía «NO derivable sin inducción», y sí lo es: `ax6_add_comm` y `ax5_add_succ`). -/
 theorem prf_add_succ_left (m n : Term) : Prf (add (succ m) n =eq succ (add m n)) := by
   have key : Prf (Formula.forall (Formula.eq
       (add (succ (liftTerm 0 m)) (.var 0)) (succ (add (liftTerm 0 m) (.var 0))))) := by
     refine prf_nat_induction _ ?base ?step
-    · simp only [substFormula, substTerm, substTerms, add, succ, zero, Nat.reduceEqDiff,
-        reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    · simp only [substFormula, substTerm, substTerms, add, succ, zero,
+        ite_true, FOL.substTerm_liftTerm]
       exact prf_eq_trans (prf_add_zero_t (succ m))
         (prf_eq_symm (prf_eq_congr_succ (prf_add_zero_t m)))
     · refine Prf.gen _ ?_
       simp only [substFormula, substTerm, substTerms, add, succ, liftFormula, liftTerm, liftTerms,
-        zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, reduceIte, ite_true,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift, norm11]
+        Nat.reduceAdd, Nat.reduceLT, ite_true,
+        norm11]
       refine prf_deduction ?_
       have ih : PrfH [Formula.eq (add (succ (liftTerm 0 m)) (.var 0)) (succ (add (liftTerm 0 m) (.var 0)))]
           (add (succ (liftTerm 0 m)) (.var 0) =eq succ (add (liftTerm 0 m) (.var 0))) := prfH_hyp_self _
@@ -106,17 +103,16 @@ theorem prf_add_succ_left (m n : Term) : Prf (add (succ m) n =eq succ (add m n))
   simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff, Nat.reduceGT,
     reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hn
 
-set_option linter.unusedSimpArgs false in
 /-- **Introducción de `<` desde un testigo** en `PrfH`: de `add a (σk) =eq b` sale `lt a b`
     (`k` es el testigo del `∃k. a + σk = b` de `ax13_lt_def`). -/
 theorem PrfH_lt_intro {Γ : List Formula} (a b k : Term)
     (h : PrfH Γ (add a (succ k) =eq b)) : PrfH Γ (lt a b) := by
   have hiff := prf_spec (prf_spec (prf_ax (show ax13_lt_def ∈ axioms by simp [axioms])) a) b
-  simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
+  simp [substFormula, substTerm, substTerms, lt, succ, iff,
+    FOL.substTerm_liftTerm] at hiff
   refine PrfH_iff_mpr hiff ?_
   refine PrfH_ex_intro k ?_
-  simp only [substFormula, substTerm, substTerms, add, succ, zero, Nat.reduceEqDiff, reduceIte,
+  simp only [substFormula, substTerm, substTerms, add, Nat.reduceEqDiff, reduceIte,
     ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   exact h
 
@@ -129,13 +125,12 @@ theorem prf_zero_lt_succ (n : Term) : Prf (lt zero (succ n)) :=
   prf_lt_intro zero (succ n) n
     (prf_eq_trans (prf_add_succ_t zero n) (prf_eq_congr_succ (prf_add_zero_left n)))
 
-set_option linter.unusedSimpArgs false in
 /-- **Desplegado de `<`**: `lt a b ⇔ ∃k. a + σk = b` (instancia de `ax13_lt_def`, con el
     cuerpo del `∃` ya reducido: bajo el binder, `a`,`b` aparecen con un `liftTerm 0`). -/
 theorem prf_lt_iff (a b : Term) :
     Prf (lt a b ⇔ Formula.ex (Formula.eq (add (liftTerm 0 a) (succ (.var 0))) (liftTerm 0 b))) := by
   have hiff := prf_spec (prf_spec (prf_ax (show ax13_lt_def ∈ axioms by simp [axioms])) a) b
-  simp [substFormula, substTerm, substTerms, lt, add, succ, iff, liftTerm, liftTerms,
+  simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
   exact hiff
 
@@ -159,20 +154,17 @@ theorem prf_succ_lt_succ_of_lt (m n : Term) : Prf (lt m n ⇒ lt (succ m) (succ 
 
 /-! ### Peano 2/3 en `Prf` (σ ≠ 0, σ inyectiva) y las dos piezas restantes de `<` -/
 
-set_option linter.unusedSimpArgs false in
 /-- `σn ≠ 0` en `Prf` (`ax2_peano_succ_neq_zero`). -/
 theorem prf_succ_ne_zero (n : Term) : Prf (neg (succ n =eq zero)) := by
   have hh := prf_spec (prf_ax (show ax2_peano_succ_neq_zero ∈ axioms by simp [axioms])) n
-  simp [ax2_peano_succ_neq_zero, substFormula, substTerm, substTerms, neg, succ, zero,
-    FOL.substTerm_liftTerm] at hh
+  simp [substFormula, substTerm, substTerms, neg, succ, zero] at hh
   exact hh
 
-set_option linter.unusedSimpArgs false in
 /-- `σa = σb ⇒ a = b` en `Prf` (`ax3_peano_succ_inj`). -/
 theorem prf_succ_inj (a b : Term) : Prf ((succ a =eq succ b) ⇒ (a =eq b)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax3_peano_succ_inj ∈ axioms by simp [axioms])) a) b
-  simp [ax3_peano_succ_inj, substFormula, substTerm, substTerms, succ,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  simp [substFormula, substTerm, substTerms, succ,
+    FOL.substTerm_liftTerm] at hh
   exact hh
 
 /-- **`¬ (n < 0)`** en `Prf`: de `n + σk = 0` sale `σ(n+k) = 0`, contra `ax2`. -/
@@ -208,7 +200,6 @@ theorem prf_lt_of_succ_lt_succ (m n : Term) : Prf (lt (succ m) (succ n) ⇒ lt m
   exact prf_deduction (PrfH.mp _ _ _ (prf_to_prfH himp _)
     (PrfH_iff_mp (prf_lt_iff (succ m) (succ n)) (prfH_hyp_self _)))
 
-set_option linter.unusedSimpArgs false in
 /-- **`n = 0 ∨ ∃k. n = σk`** en `Prf` (cero-o-sucesor; porte de `Full.zero_or_succ_ax`,
     que solo existía a nivel `axioms ⊢`). Necesario para el análisis por casos sobre un
     índice. Por `prf_nat_induction` (el paso no usa la HI). -/
@@ -222,11 +213,11 @@ theorem prf_zero_or_succ (n : Term) :
     · refine Prf.gen _ ?_
       simp only [substFormula, substTerm, substTerms, lor, zero, succ, liftFormula, liftTerm,
         liftTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-        reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+        reduceIte, ite_true]
       refine prf_deduction (prf_to_prfH ?_ _)
       refine prf_or_intro_right ?_
       refine prf_ex_intro (.var 0) ?_
-      simp only [substFormula, substTerm, substTerms, succ, Nat.reduceEqDiff, Nat.reduceGT,
+      simp only [substFormula, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
         reduceIte, ite_true]
       exact prf_refl _
   have hn := prf_spec key n

@@ -1,0 +1,101 @@
+# tabla.py — compone tabla-t18.tsv a partir de salida/*.fila, ediciones/*.ed y notas-t18.tsv.
+# Columnas pedidas: sondeo, causa, arreglos, rc, segundos, errores, primer_error, nota.
+# Columnas añadidas (detrás): la línea base de hoy (sin tocar el sondeo) y la medida suplementaria «+subst1».
+import glob, os, re, collections
+
+T = os.path.dirname(os.path.abspath(__file__))
+SUBST2 = 'ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2'
+SUBST1 = 'ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1'
+CAUSA = {}
+for x in 'ClausuraLiftSinWTs ClausuraSubsttc DiscriminaEcuacional DiscriminaTestigoAbierto EvalSubstfcPrf HasWitFCritica HasWitFReal HasWitFRealMin HasWitTcFn ParseWitness ParticionDiscrimina ParticionTresPredicados Paso2Guardado SubstfcEx'.split():
+    CAUSA[x] = 'SUBST2'
+for x in 'CtorDotados DescensoLiftc EnsamblajeMedida EnsamblajeTriple EqTransCodeImp2 EvalSubsttc GateGuardaEnriquecida Paso2CasoForall ReflectorAtomoAllIn ReflectorDesdeConsumidor ReflectorForallAnidado SubCodesCritica SubCodesWitness SubstfcPlanos'.split():
+    CAUSA[x] = 'AMB'
+
+def fila(path):
+    if not os.path.exists(path):
+        return None
+    p = open(path, encoding='utf-8').read().rstrip('\n').split('\t')
+    return {'rc': p[2], 'seg': p[3], 'nerr': p[4], 'e1': p[5] if len(p) > 5 else ''}
+
+def ultima(F):
+    if os.path.exists(f'{T}/salida/{F}.final.fila'):
+        return fila(f'{T}/salida/{F}.final.fila'), 'final'
+    ks = sorted(int(m.group(1)) for f in glob.glob(f'{T}/salida/{F}.it*.fila')
+                if (m := re.search(r'\.it(\d+)\.fila$', f)))
+    return (fila(f'{T}/salida/{F}.it{ks[-1]}.fila'), f'it{ks[-1]}') if ks else (None, '')
+
+def sintope(F):
+    ks = sorted(int(m.group(1)) for f in glob.glob(f'{T}/salida/{F}.sintope*.fila')
+                if (m := re.search(r'\.sintope(\d+)\.fila$', f)))
+    return fila(f'{T}/salida/{F}.sintope{ks[-1]}.fila') if ks else None
+
+def sitios(F):
+    c = collections.Counter()
+    for ed in glob.glob(f'{T}/ediciones/{F}.it*.ed') + glob.glob(f'{T}/ediciones/{F}.sintope*.ed'):
+        for l in open(ed, encoding='utf-8'):
+            p = l.rstrip('\n').split('\t')
+            if len(p) >= 4:
+                c[(p[2].split()[0], p[3])] += 1
+    return c
+
+def resumen_sitios(c):
+    if not c:
+        return '0'
+    por = collections.defaultdict(int)
+    for (n, r), k in c.items():
+        por[(n, r)] += k
+    tot = sum(por.values())
+    partes = []
+    for (n, r), k in sorted(por.items(), key=lambda e: (-e[1], e[0])):
+        q = r.rsplit('.', 1)[0]
+        q = q.replace('ROBINSON_PlusPlus.', '')
+        partes.append(f'{n}×{k}→{q}')
+    return f'{tot} ({"; ".join(partes)})'
+
+notas = {}
+if os.path.exists(f'{T}/notas-t18.tsv'):
+    for l in open(f'{T}/notas-t18.tsv', encoding='utf-8'):
+        if l.strip() and not l.startswith('#'):
+            k, v = l.rstrip('\n').split('\t', 1)
+            notas[k] = v
+
+cab = ['sondeo', 'causa', 'arreglos', 'rc', 'segundos', 'errores', 'primer_error', 'nota (claves: D7 = literal String donde el build pide List Char, los símbolos de ADR‑129; GUARDA = hipótesis hasWit/hasWitF de la vía C, ADR‑020, en las firmas del sistema interno o en ax_lineWF_q1; SUBST1 = BoundedInPrf.PrfH_lt_subst1, gemelo de subst2 movido a ChainPrf en el mismo dedup, ADR‑019; GNUM = prf_gnum_lt, retirado en ADR‑190, hoy prf_numeral_lt)',
+       'base_rc', 'base_segundos', 'base_errores', 'base_primer_error',
+       's1_arreglos', 's1_rc', 's1_segundos', 's1_errores', 's1_primer_error']
+filas = []
+orden = [x for x in CAUSA if CAUSA[x] == 'SUBST2'] + [x for x in CAUSA if CAUSA[x] == 'AMB']
+# los dos precedentes de hasWitF, primero
+orden = ['HasWitFCritica', 'DiscriminaTestigoAbierto'] + [x for x in orden if x not in ('HasWitFCritica', 'DiscriminaTestigoAbierto')]
+for x in orden:
+    src = open(f'{T}/orig/{x}.lean', encoding='utf-8').read()
+    n2 = src.count(SUBST2); n1 = src.count(SUBST1)
+    fin, et = ultima(x)
+    st = sintope(x)
+    base = fila(f'{T}/salida/{x}.base.fila')
+    errores = fin['nerr'] if fin else ''
+    if st and fin and fin['nerr'] == '101':
+        errores = f"101 (tope maxErrors=100; sin tope: {st['nerr']})"
+    arreglos = f'renombre subst2: {n2}; ambiguos cualificados: {resumen_sitios(sitios(x))}'
+    s1 = {}
+    if os.path.exists(f'{T}/salida/{x}__s1.it1.fila') or os.path.exists(f'{T}/salida/{x}__s1.final.fila'):
+        f1, _ = ultima(f'{x}__s1')
+        st1 = sintope(f'{x}__s1')
+        e = f1['nerr']
+        if st1 and e == '101':
+            e = f"101 (tope; sin tope: {st1['nerr']})"
+        s1 = {'arr': f'+ renombre subst1: {n1}; ambiguos nuevos: {resumen_sitios(sitios(x + "__s1"))}',
+              'rc': f1['rc'], 'seg': f1['seg'], 'nerr': e, 'e1': f1['e1'].replace(x + '__s1.lean', x + '.lean')}
+    COMPILA = '— (compila entero: rc 0, 0 errores, sin sorry)'
+    if fin['rc'] == '0' and not fin['e1']:
+        fin['e1'] = COMPILA
+    if s1 and s1['rc'] == '0' and not s1['e1']:
+        s1['e1'] = COMPILA
+    filas.append([x, CAUSA[x], arreglos, fin['rc'], fin['seg'], errores, fin['e1'], notas.get(x, ''),
+                  base['rc'], base['seg'], base['nerr'] if base['nerr'] != '101' else '101 (tope maxErrors=100)', base['e1'],
+                  s1.get('arr', ''), s1.get('rc', ''), s1.get('seg', ''), s1.get('nerr', ''), s1.get('e1', '')])
+with open(f'{T}/tabla-t18.tsv', 'w', encoding='utf-8', newline='\n') as o:
+    o.write('\t'.join(cab) + '\n')
+    for f in filas:
+        o.write('\t'.join(str(c).replace('\t', ' ') for c in f) + '\n')
+print(f'{len(filas)} filas → tabla-t18.tsv')

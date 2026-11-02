@@ -619,14 +619,13 @@ theorem clausesL_imp (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)
         (prf_or_elim_imp (ramaL_bin wF wT c X 8 h8)
                          (ramaL_un wF wT c X 9 h9)))))))
 
-set_option linter.unusedSimpArgs false in
 /-- ⛔ ADR‑019: `psi_lift_form3` es GENÉRICO en `Φ` y vive en `Meta/StrongInductionPrf.lean`.
     Aquí sólo se pliega el resultado en la abreviatura local `PSIatL`. -/
 theorem psi_l3L : liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI PHIliftfc)))
     = PSIatL (.var 3) := by
   rw [psi_lift_form3 PHIliftfc hPHIliftfc]
-  simp only [PSIatL, lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
-    reduceIte, hPHIliftfc]
+  simp only [PSIatL, lt, liftTerm, Nat.reduceAdd, Nat.reduceLT,
+    reduceIte]
 
 /-- **EL PASO DE LA INDUCCIÓN FUERTE.** -/
 theorem PHIliftfc_step (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)

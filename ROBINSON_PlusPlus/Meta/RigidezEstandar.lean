@@ -70,7 +70,6 @@ theorem M_str (hM : Estandar M) (v : Nat → Nat) (s : List Char) : evalTerm M v
 
 /-! ## §2 · La aritmética que miran las guardas: `+` y `<` -/
 
-set_option linter.unusedSimpArgs false in
 /-- `+` es la suma: `ax4`, `ax5` y la inducción sobre el segundo sumando. -/
 theorem M_add (hM : Estandar M) (a b : Nat) : M.func add_sym [a, b] = a + b := by
   induction b with
@@ -79,14 +78,13 @@ theorem M_add (hM : Estandar M) (a b : Nat) : M.func add_sym [a, b] = a + b := b
     simpa [ax4_add_zero, forall_, add, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] using h
   | succ b ih =>
     have h := ax_de hM (φ := ax5_add_succ) (by simp [axioms]) (fun _ => 0) a b
-    simp [forall_2, add, succ, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hsucc] at h
+    simp [add, succ, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hsucc] at h
     rw [h, ih]; omega
 
-set_option linter.unusedSimpArgs false in
 /-- `<` es el orden: `ax13` (`n < m ⇔ ∃k, n + σk = m`) con `+` rígido. -/
 theorem M_lt (hM : Estandar M) (a b : Nat) : M.rel lt_sym [a, b] ↔ a < b := by
   have h := ax_de hM (φ := ax13_lt_def) (by simp [axioms]) (fun _ => 0) a b
-  simp [ax13_lt_def, forall_2, _root_.iff, lt, add, succ, ex, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hsucc,
+  simp [_root_.iff, lt, add, succ, ex, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hsucc,
     M_add hM] at h
   constructor
   · intro hp; obtain ⟨d, hd⟩ := h.1 hp; omega
@@ -102,7 +100,6 @@ theorem M_cdrc (hM : Estandar M) (a b : Nat) : M.func sym!"cdrc" [consN a b] = b
   have h := ax_de hM (φ := ax_cdrc) (by simp [axioms]) (fun _ => 0) a b
   simpa [ax_cdrc, forall_2, cdrc, cons, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hcons] using h
 
-set_option linter.unusedSimpArgs false in
 theorem M_lenc (hM : Estandar M) : ∀ l : Nat, M.func sym!"lenc" [l] = lenN l := by
   intro l
   induction l using Nat.strongRecOn with
@@ -113,11 +110,10 @@ theorem M_lenc (hM : Estandar M) : ∀ l : Nat, M.func sym!"lenc" [l] = lenN l :
       simpa [ax_lenc_nil, lenc, nil, zero, evalFormula, evalTerm, evalTerms, hM.hzero, lenN_zero] using h
     · obtain ⟨a, b, rfl, hb⟩ := consN_de hl
       have h := ax_de hM (φ := ax_lenc_cons) (by simp [axioms]) (fun _ => 0) a b
-      simp [ax_lenc_cons, forall_2, lenc, cons, succ, evalFormula, evalTerm, evalTerms, shiftEnv,
+      simp [lenc, cons, succ, evalFormula, evalTerm, evalTerms, shiftEnv,
         hM.hcons, hM.hsucc] at h
       rw [h, ih b hb, lenN_consN]
 
-set_option linter.unusedSimpArgs false in
 /-- `nthc` en RANGO: `ax_nthc_zero` y `ax_nthc_succ`. (Fuera de rango, sobre `nil`, ningún axioma lo fija.) -/
 theorem M_nthc (hM : Estandar M) : ∀ (i l : Nat), i < lenN l → M.func sym!"nthc" [l, i] = nthN l i := by
   intro i
@@ -127,7 +123,7 @@ theorem M_nthc (hM : Estandar M) : ∀ (i l : Nat), i < lenN l → M.func sym!"n
     have hl : ¬ l = 0 := by intro h; subst h; simp [lenN_zero] at hi
     obtain ⟨a, b, rfl, _⟩ := consN_de hl
     have h := ax_de hM (φ := ax_nthc_zero) (by simp [axioms]) (fun _ => 0) a b
-    simp [ax_nthc_zero, forall_2, nthc, cons, zero, evalFormula, evalTerm, evalTerms, shiftEnv,
+    simp [nthc, cons, zero, evalFormula, evalTerm, evalTerms, shiftEnv,
       hM.hcons, hM.hzero] at h
     rw [h, nthN_cz]
   | succ i ih =>
@@ -135,12 +131,11 @@ theorem M_nthc (hM : Estandar M) : ∀ (i l : Nat), i < lenN l → M.func sym!"n
     have hl : ¬ l = 0 := by intro h; subst h; simp [lenN_zero] at hi
     obtain ⟨a, b, rfl, _⟩ := consN_de hl
     have h := ax_de hM (φ := ax_nthc_succ) (by simp [axioms]) (fun _ => 0) a b i
-    simp [ax_nthc_succ, forall_3, nthc, cons, succ, evalFormula, evalTerm, evalTerms, shiftEnv,
+    simp [nthc, cons, succ, evalFormula, evalTerm, evalTerms, shiftEnv,
       hM.hcons, hM.hsucc] at h
     rw [lenN_consN] at hi
     rw [h, nthN_cs, ih b (by omega)]
 
-set_option linter.unusedSimpArgs false in
 theorem M_concat (hM : Estandar M) : ∀ a b : Nat, M.func concat_sym [a, b] = concatN a b := by
   intro a
   induction a using Nat.strongRecOn with
@@ -153,11 +148,10 @@ theorem M_concat (hM : Estandar M) : ∀ a b : Nat, M.func concat_sym [a, b] = c
         hM.hzero, concatN_zero] using h
     · obtain ⟨x, r, rfl, hr⟩ := consN_de ha
       have h := ax_de hM (φ := ax_C2_concat_cons) (by simp [axioms]) (fun _ => 0) x r b
-      simp [ax_C2_concat_cons, forall_3, concat, cons, evalFormula, evalTerm, evalTerms, shiftEnv,
+      simp [concat, cons, evalFormula, evalTerm, evalTerms, shiftEnv,
         hM.hcons] at h
       rw [h, ih r hr b, concatN_consN]
 
-set_option linter.unusedSimpArgs false in
 /-- `tcFn` sobre todo `Nat`: `ax_tc_zero` y `ax_tc_succ`. -/
 theorem M_tcFn (hM : Estandar M) : ∀ n : Nat, M.func sym!"tcFn" [n] = tcFnN n := by
   intro n
@@ -169,7 +163,7 @@ theorem M_tcFn (hM : Estandar M) : ∀ n : Nat, M.func sym!"tcFn" [n] = tcFnN n 
     rw [h, tcFnN]
   | succ n ih =>
     have h := ax_de hM (φ := ax_tc_succ) (by simp [axioms]) (fun _ => 0) n
-    simp [ax_tc_succ, forall_, tcFn, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms, shiftEnv,
+    simp [tcFn, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms, shiftEnv,
       hM.hcons, hM.hzero, hM.hsucc, M_numeral hM, M_str hM] at h
     rw [h, ih, tcFnN]
 
@@ -361,7 +355,6 @@ theorem M_pred (hM : Estandar M) (n : Nat) : M.func pred_sym [n] = n - 1 := by
     have h := ax_de hM (φ := ax26_pred_succ) (by simp [axioms]) (fun _ => 0) n
     simpa [ax26_pred_succ, forall_, pred, succ, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hsucc] using h
 
-set_option linter.unusedSimpArgs false in
 mutual
 theorem M_substtc (hM : Estandar M) {c : Nat} (h : CodT c) (k s : Nat) :
     M.func sym!"substtc" [k, s, c] = substtcN k s c :=
@@ -370,20 +363,20 @@ theorem M_substtc (hM : Estandar M) {c : Nat} (h : CodT c) (k s : Nat) :
       rw [substtcN_var]
       rcases Nat.lt_trichotomy k n with hkn | rfl | hkn
       · have h := ax_de hM (φ := ax_substtc_var_gt) (by simp [axioms]) (fun _ => 0) k s n
-        simp [ax_substtc_var_gt, forall_3, substtc, varc, cons, nil, zero, pred, lt, evalFormula, evalTerm,
+        simp [substtc, varc, cons, nil, zero, pred, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, M_lt hM, M_pred hM] at h
         rw [h hkn, ite_eq_right (by omega), ite_eq_left hkn]
       · have h := ax_de hM (φ := ax_substtc_var_eq) (by simp [axioms]) (fun _ => 0) k s k
-        simp [ax_substtc_var_eq, forall_3, substtc, varc, cons, nil, zero, evalFormula, evalTerm,
+        simp [substtc, varc, cons, nil, zero, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero] at h
         rw [h, ite_eq_left rfl]
       · have h := ax_de hM (φ := ax_substtc_var_lt) (by simp [axioms]) (fun _ => 0) k s n
-        simp [ax_substtc_var_lt, forall_3, substtc, varc, cons, nil, zero, lt, evalFormula, evalTerm,
+        simp [substtc, varc, cons, nil, zero, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, M_lt hM] at h
         rw [h hkn, ite_eq_right (by omega), ite_eq_right (by omega)]
   | .func sc ts hts => by
       have h := ax_de hM (φ := ax_substtc_func) (by simp [axioms]) (fun _ => 0) k s sc ts
-      simp [ax_substtc_func, forall_4, substtc, substtsc, funcc, cons, nil, zero, succ, evalFormula, evalTerm,
+      simp [substtc, substtsc, funcc, cons, nil, zero, succ, evalFormula, evalTerm,
         evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
       rw [h, M_substtsc hM hts k s, substtcN_func]
 theorem M_substtsc (hM : Estandar M) {ts : Nat} (h : CodTs ts) (k s : Nat) :
@@ -391,17 +384,16 @@ theorem M_substtsc (hM : Estandar M) {ts : Nat} (h : CodTs ts) (k s : Nat) :
   match h with
   | .nil => by
       have h := ax_de hM (φ := ax_substtsc_nil) (by simp [axioms]) (fun _ => 0) k s
-      simp [ax_substtsc_nil, forall_2, substtsc, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv,
+      simp [substtsc, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv,
         hM.hzero] at h
       rw [h, substtscN_zero]
   | .cons a r ha hr => by
       have h := ax_de hM (φ := ax_substtsc_cons) (by simp [axioms]) (fun _ => 0) k s a r
-      simp [ax_substtsc_cons, forall_4, substtsc, substtc, cons, evalFormula, evalTerm, evalTerms, shiftEnv,
+      simp [substtsc, substtc, cons, evalFormula, evalTerm, evalTerms, shiftEnv,
         hM.hcons] at h
       rw [h, M_substtc hM ha k s, M_substtsc hM hr k s, substtscN_consN]
 end
 
-set_option linter.unusedSimpArgs false in
 mutual
 theorem M_liftc (hM : Estandar M) {t : Nat} (h : CodT t) (c : Nat) :
     M.func sym!"liftc" [c, t] = liftcN c t :=
@@ -410,16 +402,16 @@ theorem M_liftc (hM : Estandar M) {t : Nat} (h : CodT t) (c : Nat) :
       rw [liftcN_var]
       by_cases hn : n < c
       · have h := ax_de hM (φ := ax_liftc_var_lt) (by simp [axioms]) (fun _ => 0) c n
-        simp [ax_liftc_var_lt, forall_2, liftc, varc, cons, nil, zero, lt, evalFormula, evalTerm,
+        simp [liftc, varc, cons, nil, zero, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, M_lt hM] at h
         rw [h hn, ite_eq_left hn]
       · have h := ax_de hM (φ := ax_liftc_var_ge) (by simp [axioms]) (fun _ => 0) c n
-        simp [ax_liftc_var_ge, forall_2, liftc, varc, cons, nil, zero, succ, lt, evalFormula, evalTerm,
+        simp [liftc, varc, cons, nil, zero, succ, lt, evalFormula, evalTerm,
           evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc, M_lt hM] at h
         rw [h (by omega), ite_eq_right hn]
   | .func sc ts hts => by
       have h := ax_de hM (φ := ax_liftc_func) (by simp [axioms]) (fun _ => 0) c sc ts
-      simp [ax_liftc_func, forall_3, liftc, liftsc, funcc, cons, nil, zero, succ, evalFormula, evalTerm,
+      simp [liftc, liftsc, funcc, cons, nil, zero, succ, evalFormula, evalTerm,
         evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
       rw [h, M_liftsc hM hts c, liftcN_func]
 theorem M_liftsc (hM : Estandar M) {ts : Nat} (h : CodTs ts) (c : Nat) :
@@ -427,19 +419,18 @@ theorem M_liftsc (hM : Estandar M) {ts : Nat} (h : CodTs ts) (c : Nat) :
   match h with
   | .nil => by
       have h := ax_de hM (φ := ax_liftsc_nil) (by simp [axioms]) (fun _ => 0) c
-      simp [ax_liftsc_nil, forall_, liftsc, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv,
+      simp [liftsc, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv,
         hM.hzero] at h
       rw [h, liftscN_zero]
   | .cons a r ha hr => by
       have h := ax_de hM (φ := ax_liftsc_cons) (by simp [axioms]) (fun _ => 0) c a r
-      simp [ax_liftsc_cons, forall_3, liftsc, liftc, cons, evalFormula, evalTerm, evalTerms, shiftEnv,
+      simp [liftsc, liftc, cons, evalFormula, evalTerm, evalTerms, shiftEnv,
         hM.hcons] at h
       rw [h, M_liftc hM ha c, M_liftsc hM hr c, liftscN_consN]
 end
 
 
 
-set_option linter.unusedSimpArgs false in
 /-- `substfc`, sobre un código de fórmula bueno y un sustituyendo bueno (el que piden las guardas). -/
 theorem M_substfc (hM : Estandar M) {A : Nat} (h : CodF A) :
     ∀ (k s : Nat), CodT s → M.func sym!"substfc" [k, s, A] = substfcN k s A := by
@@ -447,102 +438,101 @@ theorem M_substfc (hM : Estandar M) {A : Nat} (h : CodF A) :
   | bot =>
     intro k s _
     have h := ax_de hM (φ := ax_substfc_bottom) (by simp [axioms]) (fun _ => 0) k s
-    simp [ax_substfc_bottom, forall_2, substfc, botc, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms,
+    simp [substfc, botc, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms,
       shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, substfcN_bot]
   | atom p ts hts =>
     intro k s _
     have h := ax_de hM (φ := ax_substfc_atom) (by simp [axioms]) (fun _ => 0) k s p ts
-    simp [ax_substfc_atom, forall_4, substfc, substtsc, atomc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [substfc, substtsc, atomc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, M_substtsc hM hts k s, substfcN_atom]
   | eq a b ha hb =>
     intro k s _
     have h := ax_de hM (φ := ax_substfc_eq) (by simp [axioms]) (fun _ => 0) k s a b
-    simp [ax_substfc_eq, forall_4, substfc, substtc, eqc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [substfc, substtc, eqc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, M_substtc hM ha k s, M_substtc hM hb k s, substfcN_eq]
   | impl a b _ _ iha ihb =>
     intro k s hs
     have h := ax_de hM (φ := ax_substfc_impl) (by simp [axioms]) (fun _ => 0) k s a b
-    simp [ax_substfc_impl, forall_4, substfc, implc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [substfc, implc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha k s hs, ihb k s hs, substfcN_impl]
   | all a _ iha =>
     intro k s hs
     have h := ax_de hM (φ := ax_substfc_forall) (by simp [axioms]) (fun _ => 0) k s a
-    simp [ax_substfc_forall, forall_3, substfc, liftc, forallc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [substfc, liftc, forallc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, M_liftc hM hs 0, iha (k + 1) (liftcN 0 s) (codT_liftcN hs 0), substfcN_forall]
   | and a b _ _ iha ihb =>
     intro k s hs
     have h := ax_de hM (φ := ax_substfc_and) (by simp [axioms]) (fun _ => 0) k s a b
-    simp [ax_substfc_and, forall_4, substfc, andc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [substfc, andc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha k s hs, ihb k s hs, substfcN_and]
   | or a b _ _ iha ihb =>
     intro k s hs
     have h := ax_de hM (φ := ax_substfc_or) (by simp [axioms]) (fun _ => 0) k s a b
-    simp [ax_substfc_or, forall_4, substfc, orc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [substfc, orc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha k s hs, ihb k s hs, substfcN_or]
   | ex a _ iha =>
     intro k s hs
     have h := ax_de hM (φ := ax_substfc_ex) (by simp [axioms]) (fun _ => 0) k s a
-    simp [ax_substfc_ex, forall_3, substfc, liftc, exc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [substfc, liftc, exc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, M_liftc hM hs 0, iha (k + 1) (liftcN 0 s) (codT_liftcN hs 0), substfcN_ex]
 
-set_option linter.unusedSimpArgs false in
 /-- `liftfc`, sobre un código de fórmula bueno. -/
 theorem M_liftfc (hM : Estandar M) {A : Nat} (h : CodF A) : ∀ c : Nat, M.func sym!"liftfc" [c, A] = liftfcN c A := by
   induction h with
   | bot =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_bottom) (by simp [axioms]) (fun _ => 0) c
-    simp [ax_liftfc_bottom, forall_, liftfc, botc, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms,
+    simp [liftfc, botc, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms,
       shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, liftfcN_bot]
   | atom p ts hts =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_atom) (by simp [axioms]) (fun _ => 0) c p ts
-    simp [ax_liftfc_atom, forall_3, liftfc, liftsc, atomc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [liftfc, liftsc, atomc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, M_liftsc hM hts c, liftfcN_atom]
   | eq a b ha hb =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_eq) (by simp [axioms]) (fun _ => 0) c a b
-    simp [ax_liftfc_eq, forall_3, liftfc, liftc, eqc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [liftfc, liftc, eqc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, M_liftc hM ha c, M_liftc hM hb c, liftfcN_eq]
   | impl a b _ _ iha ihb =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_impl) (by simp [axioms]) (fun _ => 0) c a b
-    simp [ax_liftfc_impl, forall_3, liftfc, implc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [liftfc, implc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha c, ihb c, liftfcN_impl]
   | all a _ iha =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_forall) (by simp [axioms]) (fun _ => 0) c a
-    simp [ax_liftfc_forall, forall_2, liftfc, forallc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [liftfc, forallc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha (c + 1), liftfcN_forall]
   | and a b _ _ iha ihb =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_and) (by simp [axioms]) (fun _ => 0) c a b
-    simp [ax_liftfc_and, forall_3, liftfc, andc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [liftfc, andc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha c, ihb c, liftfcN_and]
   | or a b _ _ iha ihb =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_or) (by simp [axioms]) (fun _ => 0) c a b
-    simp [ax_liftfc_or, forall_3, liftfc, orc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [liftfc, orc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha c, ihb c, liftfcN_or]
   | ex a _ iha =>
     intro c
     have h := ax_de hM (φ := ax_liftfc_ex) (by simp [axioms]) (fun _ => 0) c a
-    simp [ax_liftfc_ex, forall_2, liftfc, exc, cons, nil, zero, succ, evalFormula, evalTerm,
+    simp [liftfc, exc, cons, nil, zero, succ, evalFormula, evalTerm,
       evalTerms, shiftEnv, hM.hcons, hM.hzero, hM.hsucc] at h
     rw [h, iha (c + 1), liftfcN_ex]
 
@@ -643,7 +633,6 @@ theorem M_axiomsCodeT (hM : Estandar M) : M.func sym!"axiomsCodeT" [] = codeNatL
 theorem M_carc' (hM : Estandar M) {x : Nat} (hx : ¬ x = 0) : M.func sym!"carc" [x] = carN x := by
   obtain ⟨a, b, rfl, _⟩ := consN_de hx; rw [M_carc hM, carN_consN]
 
-set_option linter.unusedSimpArgs false in
 theorem M_allIn (hM : Estandar M) (c : Nat) : ∀ L : Nat, M.rel sym!"allIn" [c, L] ↔ allInN c L := by
   intro L
   induction L using Nat.strongRecOn with
@@ -651,11 +640,11 @@ theorem M_allIn (hM : Estandar M) (c : Nat) : ∀ L : Nat, M.rel sym!"allIn" [c,
     by_cases hL : L = 0
     · subst hL
       have h := ax_de hM (φ := ax_allIn_nil) (by simp [axioms]) (fun _ => 0) c
-      simp [ax_allIn_nil, forall_, allIn, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] at h
+      simp [allIn, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] at h
       exact ⟨fun _ => allInN_zero c, fun _ => h⟩
     · obtain ⟨a, b, rfl, hb⟩ := consN_de hL
       have h := ax_de hM (φ := ax_allIn_cons) (by simp [axioms]) (fun _ => 0) c a b
-      simp [ax_allIn_cons, forall_3, _root_.iff, allIn, In, land, cons, evalFormula, evalTerm, evalTerms,
+      simp [_root_.iff, allIn, In, land, cons, evalFormula, evalTerm, evalTerms,
         shiftEnv, hM.hcons, M_mem hM] at h
       rw [allInN_consN, ← ih b hb]
       exact ⟨fun hh => h.1 hh, fun hh => h.2 hh.1 hh.2⟩
@@ -825,7 +814,6 @@ theorem lw_20 (htag : M.func sym!"nthc" [x, 1] = 20) : lineWFN Vm x := by
 
 /-! ## §9 · De `lineWF` en `M` a `lineWFN`, por la etiqueta (`ax_lineWF_inv`) -/
 
-set_option linter.unusedSimpArgs false in
 theorem M_tagDisj (hM : Estandar M) (v : Nat → Nat) (t : Term) : ∀ n : Nat,
     evalFormula M v (tagDisj t n) → ∃ K, And (K ≤ n) (M.func sym!"nthc" [evalTerm M v t, 1] = K) := by
   intro n
@@ -839,16 +827,15 @@ theorem M_tagDisj (hM : Estandar M) (v : Nat → Nat) (t : Term) : ∀ n : Nat,
     intro h
     simp only [tagDisj, lor, evalFormula] at h
     rcases h with h | h
-    · simp [lineTag, nthc, succ, zero, evalFormula, evalTerm, evalTerms, hM.hsucc, hM.hzero, M_numeral hM] at h
+    · simp [lineTag, nthc, succ, zero, evalTerm, evalTerms, hM.hsucc, hM.hzero, M_numeral hM] at h
       exact ⟨n + 1, Nat.le_refl _, h⟩
     · obtain ⟨K, hK, e⟩ := ih h; exact ⟨K, by omega, e⟩
 
 include hM hwf in
-set_option linter.unusedSimpArgs false in
 /-- 🏁 **Si `M` cree que `x` es una línea bien formada, lo es** (con el `V` de `M`). -/
 theorem M_lineWF : lineWFN (M.func sym!"axiomsCodeT" []) x := by
   have h := ax_de hM (φ := ax_lineWF_inv) (by simp [axioms]) (fun _ => 0) x
-  simp only [ax_lineWF_inv, forall_, evalFormula, lineWF] at h
+  simp only [evalFormula, lineWF] at h
   have hx := h (by simpa [evalTerm, evalTerms, shiftEnv] using hwf)
   obtain ⟨K, hK, htag⟩ := M_tagDisj hM _ _ 20 hx
   simp only [evalTerm, shiftEnv] at htag
@@ -896,7 +883,6 @@ theorem dec3 {x : Nat} (h : lenN x = 3) : ∃ a b c, x = consN a (consN b (consN
     · obtain ⟨d, s, rfl, _⟩ := consN_de (Nat.pos_iff_ne_zero.mp hpos); rw [lenN_consN] at h; omega
   subst this; exact ⟨a, b, c, rfl⟩
 
-set_option linter.unusedSimpArgs false in
 /-- Si `M` cree que las premisas de una línea bien formada están en `c`, lo están: sólo `mp` y `gen` tienen. -/
 theorem M_allIn_prems (hM : Estandar M) {V c x : Nat} (hwf : lineWFN V x)
     (h : M.rel sym!"allIn" [c, M.func sym!"premsOf" [x]]) : allInN c (premsOfN x) := by
@@ -907,7 +893,7 @@ theorem M_allIn_prems (hM : Estandar M) {V c x : Nat} (hwf : lineWFN V x)
     have hb : b = 16 := by simpa [nthN_cs, nthN_cz] using h16
     subst hb
     have hp := ax_de hM (φ := ax_premsOf_mp) (by simp [axioms]) (fun _ => 0) a d
-    simp [ax_premsOf_mp, forall_2, premsOf, implc, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms,
+    simp [premsOf, implc, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms,
       shiftEnv, hM.hcons, hM.hzero, hM.hsucc, M_numeral hM] at hp
     rw [hp] at h
     simpa [premsOfN, nthN_cs, nthN_cz] using h
@@ -917,13 +903,12 @@ theorem M_allIn_prems (hM : Estandar M) {V c x : Nat} (hwf : lineWFN V x)
       have hb : b = 17 := by simpa [nthN_cs, nthN_cz] using h17
       subst hb
       have hp := ax_de hM (φ := ax_premsOf_gen) (by simp [axioms]) (fun _ => 0) a d
-      simp [ax_premsOf_gen, forall_2, premsOf, cons, nil, zero, succ, evalFormula, evalTerm, evalTerms,
-        shiftEnv, hM.hcons, hM.hzero, hM.hsucc, M_numeral hM] at hp
+      simp [premsOf, cons, nil, zero, evalFormula, evalTerm, evalTerms,
+        shiftEnv, hM.hcons, hM.hzero, M_numeral hM] at hp
       rw [hp] at h
       simpa [premsOfN, nthN_cs, nthN_cz] using h
     · rw [premsOfN, ite_eq_right h16, ite_eq_right h17]; exact allInN_zero c
 
-set_option linter.unusedSimpArgs false in
 /-- 🏁 **Si `M` cree que `p` es una cadena válida desde `c`, lo es**, y `runFn` vale lo mismo. -/
 theorem M_cadena (hM : Estandar M) : ∀ (p c : Nat), M.rel sym!"chainOk" [c, p] →
     And (chainOkN (M.func sym!"axiomsCodeT" []) c p) (M.func sym!"runFn" [c, p] = runFnN c p) := by
@@ -934,11 +919,11 @@ theorem M_cadena (hM : Estandar M) : ∀ (p c : Nat), M.rel sym!"chainOk" [c, p]
     by_cases hp : p = 0
     · subst hp
       have h := ax_de hM (φ := ax_runFn_nil) (by simp [axioms]) (fun _ => 0) c
-      simp [ax_runFn_nil, forall_, runFn, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] at h
+      simp [runFn, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] at h
       exact ⟨chainOkN_zero _ c, by rw [h, runFnN_zero]⟩
     · obtain ⟨l, r, rfl, hr⟩ := consN_de hp
       have h := ax_de hM (φ := ax_chainOk_cons) (by simp [axioms]) (fun _ => 0) c l r
-      simp [ax_chainOk_cons, forall_3, _root_.iff, chainOk, lineOk, lineWF, allIn, premsOf, land, concat, carc,
+      simp [_root_.iff, chainOk, lineOk, lineWF, allIn, premsOf, land, concat, carc,
         cons, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hcons, hM.hzero] at h
       obtain ⟨⟨hwf, hal⟩, hrest⟩ := h.1 hc
       have hlw := M_lineWF hM l hwf
@@ -950,7 +935,7 @@ theorem M_cadena (hM : Estandar M) : ∀ (p c : Nat), M.rel sym!"chainOk" [c, p]
       rw [M_carc' hM hl0, M_concat hM] at hrest
       obtain ⟨ihc, ihr⟩ := ih r hr _ hrest
       have hrf := ax_de hM (φ := ax_runFn_cons) (by simp [axioms]) (fun _ => 0) c l r
-      simp [ax_runFn_cons, forall_3, runFn, concat, carc, cons, nil, zero, evalFormula, evalTerm, evalTerms,
+      simp [runFn, concat, carc, cons, nil, zero, evalFormula, evalTerm, evalTerms,
         shiftEnv, hM.hcons, hM.hzero] at hrf
       refine ⟨(chainOkN_consN _ c l r).2 ⟨⟨hlw, M_allIn_prems hM hlw hal⟩, ihc⟩, ?_⟩
       rw [hrf, M_carc' hM hl0, M_concat hM, ihr, runFnN_consN]

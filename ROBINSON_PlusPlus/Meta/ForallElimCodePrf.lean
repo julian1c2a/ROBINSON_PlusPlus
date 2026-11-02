@@ -76,7 +76,6 @@ theorem prf_lineOk_q1 (c Ac w : Term)
     (prf_iff_mpr (prf_lineWF_q1 _ Ac w hwF hwT) (prf_refl _))
     (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q1 _ Ac w)) (prf_allIn_nil c))
 
-set_option linter.unusedSimpArgs false in
 /-- **`∀`‑elim a nivel de código** (reflexión de la regla Q1), con testigo‑código **abierto**:
     de la demostrabilidad del código universal `forallc Ac` sale la del código sustituido
     `substfc zero w Ac`. No pide `Ac` cerrado (eso es `pcc_forallElim_code'`, con `hAc`): pide las
@@ -95,8 +94,7 @@ theorem pcc_forallElim_code_open (Ac w : Term)
   -- ANTECEDENTE: el lift atraviesa `forallc` y cae sobre `Ac`
   simp only [liftTerm_forallc_open Ac]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte]
   -- ctx: [chainOk nil #0 ∧ In (forallc ↑Ac) (runFn nil #0)] ; meta: provFromCode (substfc zero ↑w ↑Ac)
   refine PrfH_ex_intro
     (concat (.var 0)
@@ -106,8 +104,8 @@ theorem pcc_forallElim_code_open (Ac w : Term)
         (cons (cons (substfc zero (liftTerm 0 w) (liftTerm 0 Ac))
           (cons (numeralM 16) (cons (forallc (liftTerm 0 Ac)) nil))) nil))) ?_
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm]
   -- abreviaturas (`Ac'`/`w'` = cuerpo y testigo LIFTEADOS)
   let Ac' : Term := liftTerm 0 Ac
   let w' : Term := liftTerm 0 w

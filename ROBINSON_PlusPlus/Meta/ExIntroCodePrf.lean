@@ -36,15 +36,14 @@ theorem liftTerm_exc (Ac : Term) (hAc : ∀ c, liftTerm c Ac = Ac) :
   intro c
   simp only [exc, cons, nil, zero, succ, liftTerm, liftTerms, hAc c]
 
-set_option linter.unusedSimpArgs false in
 /-- Clausura de `provFromCode (exc Ac)` bajo `liftFormula 0` (para `Ac` cerrado a todo nivel,
     como `formCode psi` via `liftTerm_formCode`). -/
 theorem liftFormula_provFromCode_exc (Ac : Term) (hAc : ∀ c, liftTerm c Ac = Ac) :
     liftFormula 0 (provFromCode (exc Ac)) = provFromCode (exc Ac) := by
   simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftFormula, liftTerm,
-    liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT,
+    liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_exc Ac hAc]
+    liftTerm_exc Ac hAc]
 
 /-- `liftTerm` es identidad sobre `substfc zero w Ac` a cualquier nivel (para `Ac`,`w` cerrados). -/
 theorem liftTerm_substfc (Ac w : Term) (hAc : ∀ c, liftTerm c Ac = Ac) (hw : ∀ c, liftTerm c w = w) :
@@ -74,7 +73,6 @@ de `d2_prf`. (✏️ 2026‑10‑14, ADR‑134: desde el 2026‑07‑10 este ens
 `pcc_exIntro_code'`, con testigo abierto, y `pcc_exIntro_code` es su corolario; desde ADR‑020 los
 dos piden además las guardas `hwF`/`hwT`, así que `w` tampoco es del todo arbitrario.) -/
 
-set_option linter.unusedSimpArgs false in
 /-- **∃‑intro a nivel de código** (reflexión de la regla Q2): para `Ac` cerrado a todo nivel
     (`hAc`) y testigo `w` ABIERTO, con las guardas de ADR‑020 `hwF : Prf (hasWitF Ac)` y
     `hwT : Prf (hasWit (liftTerm 0 w))`, de la demostrabilidad del código sustituido
@@ -96,8 +94,7 @@ theorem pcc_exIntro_code' (Ac w : Term)
   -- Debe hacerse MIENTRAS `zero` es literal (patrón con `zero`), antes del `simp` grande.
   simp only [liftTerm_substfc_open Ac hAc w]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte]
   -- ctx: [chainOk nil #0 ∧ In Ain (runFn nil #0)] con `Ain = substfc zero (↑w) Ac`
   -- testigo `r = p ++ [q2line, mpline]`  (el testigo‑código de la línea Q2 es `↑w`)
   refine PrfH_ex_intro
@@ -108,8 +105,8 @@ theorem pcc_exIntro_code' (Ac w : Term)
           (cons (numeralM 16) (cons (substfc zero (liftTerm 0 w) Ac) nil))) nil))) ?_
   -- el slot `liftTerm 0 (exc Ac)` se cancela con la subst externa `substTerm 0 r (·)` (`substTerm_liftTerm`)
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm]
   -- abreviaturas  (`w'` = testigo LIFTEADO; es el que la línea Q2 lleva como argumento)
   let w' : Term := liftTerm 0 w
   let Ain : Term := substfc zero w' Ac

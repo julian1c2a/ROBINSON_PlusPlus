@@ -1,0 +1,14 @@
+# renombra.py FICHERO [subst1] — el renombre de T18: BoundedInPrf.PrfH_lt_subst2 → ChainPrf.PrfH_lt_subst2, en todas
+# sus apariciones. Con «subst1», además el gemelo BoundedInPrf.PrfH_lt_subst1 → ChainPrf.PrfH_lt_subst1 (mismo dedup,
+# ADR-019; FUERA del encargo, medida suplementaria). Imprime cuántas sustituciones hizo de cada uno.
+import sys
+f = sys.argv[1]
+txt = open(f, encoding='utf-8', newline='').read()
+pares = [('ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2', 'ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2')]
+if len(sys.argv) > 2 and sys.argv[2] == 'subst1':
+    pares = [('ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1', 'ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst1')]
+for a, b in pares:
+    n = txt.count(a)
+    txt = txt.replace(a, b)
+    print(f'{a.split(".")[-1]}: {n}')
+open(f, 'w', encoding='utf-8', newline='').write(txt)

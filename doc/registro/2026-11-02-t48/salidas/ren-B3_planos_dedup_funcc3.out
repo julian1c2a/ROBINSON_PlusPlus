@@ -1,0 +1,8 @@
+'B3PlanosFuncc3.prf_substtc_funcc3' depends on axioms: [propext, Quot.sound]
+'B3PlanosFuncc3.prf_congr_funcc3' depends on axioms: [propext, Quot.sound]
+'B3PlanosFuncc3.substfcT_termCode' does not depend on any axioms
+'B3PlanosFuncc3.prf_congr_substfcT' depends on axioms: [propext, Quot.sound]
+'B3PlanosFuncc3.prf_substtc_substfcT' depends on axioms: [propext, Quot.sound]
+'B3PlanosFuncc3.substtc_inv_substfcT' depends on axioms: [propext, Quot.sound]
+'B3PlanosFuncc3.liftTerm_substfcT' depends on axioms: [propext]
+'B3PlanosFuncc3.substTerm_substfcT' depends on axioms: [propext]

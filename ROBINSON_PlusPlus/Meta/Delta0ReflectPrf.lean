@@ -60,7 +60,6 @@ theorem liftTerm_exc_open (Ac : Term) : ∀ c, liftTerm c (exc Ac) = exc (liftTe
   intro c
   simp only [exc, cons, nil, zero, succ, liftTerm, liftTerms]
 
-set_option linter.unusedSimpArgs false in
 /-- **∃‑intro a nivel de código, con `Ac` ABIERTO** (reflexión de Q2 sin clausura): para `Ac`, `w`
     **arbitrarios**, `Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))`.
 
@@ -76,8 +75,7 @@ theorem pcc_exIntro_code_open (Ac w : Term)
   rw [liftFormula_provFromCode_open 0 (exc Ac), liftTerm_exc_open Ac 0]
   simp only [liftTerm_substfc_open2 Ac w]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte]
   -- ctx: [chainOk nil #0 ∧ In Ain (runFn nil #0)] con `Ain = substfc zero (↑w) (↑Ac)`
   refine PrfH_ex_intro
     (concat (.var 0)
@@ -86,8 +84,8 @@ theorem pcc_exIntro_code_open (Ac w : Term)
         (cons (cons (exc (liftTerm 0 Ac))
           (cons (numeralM 16) (cons (substfc zero (liftTerm 0 w) (liftTerm 0 Ac)) nil))) nil))) ?_
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm]
   let A' : Term := liftTerm 0 Ac
   let w' : Term := liftTerm 0 w
   let Ain : Term := substfc zero w' A'
@@ -136,7 +134,6 @@ theorem pcc_exIntro_code_open (Ac w : Term)
           (prf_to_prfH (prf_In_mono_right_imp Ain (cons (carc q2line) nil) Cp) Γ) hpIn
   exact PrfH_and_intro hChainR hInB
 
-set_option linter.unusedSimpArgs false in
 /-- **GEN a nivel de código** (reflexión de la regla GEN, ahora que la línea 17 es sólida): para
     `body` **arbitrario** (abierto), `Prf (provFromCode body ⇒ provFromCode (forallc body))`.
 
@@ -149,15 +146,14 @@ theorem pcc_gen_code (body : Term) :
   refine prf_ex_elim_imp ?_
   rw [liftFormula_provFromCode_open 0 (forallc body), liftTerm_forallc_open body 0]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte]
   refine PrfH_ex_intro
     (concat (.var 0)
       (cons (cons (forallc (liftTerm 0 body))
               (cons (numeralM 17) (cons (liftTerm 0 body) nil))) nil)) ?_
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm]
   let B' : Term := liftTerm 0 body
   let genline : Term := cons (forallc B') (cons (numeralM 17) (cons B' nil))
   let p_ : Term := (.var 0)

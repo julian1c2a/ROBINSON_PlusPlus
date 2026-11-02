@@ -1,0 +1,206 @@
+Probe/ren/CritRefl_anidado.lean:295:33: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:302:34: warning: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+Probe/ren/CritRefl_anidado.lean:302:73: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:318:54: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:326:48: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+Probe/ren/CritRefl_anidado.lean:326:59: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+Probe/ren/CritRefl_anidado.lean:397:4: error: Type mismatch
+  PrfH_eq_symm_code (bdInB W) (tcFn (lenc W)) (substtc_inv_bdInB W) (prf_to_prfH hBeq ?m.115)
+has type
+  (⊢ᴴ hasWit (bdInB W)) → (⊢ᴴ hasWit (tcFn (lenc W))) → PrfH ?m.115 (provFromCode (eqc (tcFn (lenc W)) (bdInB W)))
+but is expected to have type
+  PrfH Γ' (provFromCode (eqc (tcFn (lenc W)) (bdInB W)))
+Probe/ren/CritRefl_anidado.lean:406:4: error: Type mismatch
+  PrfH_leibniz_apply (ltCodeFn (tcFn #0) (varc (numeral 0))) (tcFn (lenc W)) (bdInB W) hBsym hA1
+has type
+  (⊢ᴴ hasWitF (ltCodeFn (tcFn #0) (varc (numeral 0)))) →
+    (⊢ᴴ hasWit (tcFn (lenc W))) →
+      (⊢ᴴ hasWit (bdInB W)) → PrfH Γ' (provFromCode (substfc zero (bdInB W) (ltCodeFn (tcFn #0) (varc (numeral 0)))))
+but is expected to have type
+  PrfH Γ' (provFromCode (substfc zero (bdInB W) (ltCodeFn (tcFn #0) (varc (numeral 0)))))
+Probe/ren/CritRefl_anidado.lean:429:2: error: Type mismatch
+  PrfH_bdEx_intro_open (bdInB W) (bdInPhic X W) (tcFn #0) (substtc_inv_bdInB W) hltB hphi
+has type
+  (⊢ᴴ hasWit (liftTerm 0 (bdInB W))) →
+    (⊢ᴴ hasWitF (liftTerm 0 (bdInPhic X W))) →
+      (⊢ᴴ hasWit (liftTerm 0 (tcFn #0))) → PrfH Γ' (provFromCode (bdExCode (bdInB W) (bdInPhic X W)))
+but is expected to have type
+  PrfH Γ' (provFromCode (bdInDot X W))
+Probe/ren/CritRefl_anidado.lean:443:4: error: Type mismatch
+  pcc_thm_inst2 phiInBwd InBwd A B
+has type
+  (⊢ᴴ hasWit (liftTerm 0 A)) →
+    (⊢ᴴ hasWit (liftTerm 0 B)) →
+      ⊢ᴴ provFromCode (substfc zero B (substfc (succ zero) (liftc zero A) (formCode phiInBwd)))
+but is expected to have type
+  ⊢ᴴ provFromCode (substfc zero B (substfc (succ zero) W (formCode phiInBwd)))
+Probe/ren/CritRefl_anidado.lean:501:58: error: Type mismatch
+  PrfH_leibniz_apply Cin u v heq h1
+has type
+  (⊢ᴴ hasWitF Cin) → (⊢ᴴ hasWit u) → (⊢ᴴ hasWit v) → PrfH Γ (provFromCode (substfc zero v Cin))
+but is expected to have type
+  PrfH Γ (provFromCode (substfc zero v Cin))
+Probe/ren/CritRefl_anidado.lean:510:85: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:603:28: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:621:4: error: Type mismatch
+  PrfH_eq_symm_code (nthcT (tcFn (carc p)) (tcFn i)) (tcFn (nthc (carc p) i))
+    (substtc_inv_nthcT (substtc_inv_tcFn (carc p)) (substtc_inv_tcFn i)) hev
+has type
+  (⊢ᴴ hasWit (nthcT (tcFn (carc p)) (tcFn i))) →
+    (⊢ᴴ hasWit (tcFn (nthc (carc p) i))) →
+      PrfH Γ (provFromCode (eqc (tcFn (nthc (carc p) i)) (nthcT (tcFn (carc p)) (tcFn i))))
+but is expected to have type
+  PrfH Γ (provFromCode (eqCodeFn (tcFn (nthc (carc p) i)) (nthcT (tcFn (carc p)) (tcFn i))))
+Probe/ren/CritRefl_anidado.lean:635:35: error: Application type mismatch: The argument
+  argsPsi_body
+has type
+  ∀ (p i : Term), ⊢ᴴ argsCF p ⇒ lt i (argsBnd p) ⇒ provFromCode (substfc zero (tcFn i) (argsPsi p))
+but is expected to have type
+  ∀ (q : Term), ⊢ᴴ hasWitF (argsPsi q)
+in the application
+  pcc_bdAll_intro argsCF argsBnd argsPsi p argsCF_l argsCF_s argsBnd_l argsBnd_s argsPsi_l argsPsi_s argsPsi_id
+    argsPsi_body
+Probe/ren/CritRefl_anidado.lean:640:74: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:646:74: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:685:4: error: Type mismatch
+  PrfH_eq_symm_code (lencT (tcFn Y)) (tcFn (lenc Y)) (substtc_inv_lencT (substtc_inv_tcFn Y))
+    (prf_to_prfH (pcc_eval_lenc Y) ?m.49)
+has type
+  (⊢ᴴ hasWit (lencT (tcFn Y))) →
+    (⊢ᴴ hasWit (tcFn (lenc Y))) → PrfH ?m.49 (provFromCode (eqc (tcFn (lenc Y)) (lencT (tcFn Y))))
+but is expected to have type
+  PrfH [argsIn q Y] (provFromCode (eqc (tcFn (lenc Y)) (lencT (tcFn Y))))
+Probe/ren/CritRefl_anidado.lean:690:4: error: Type mismatch
+  PrfH_leibniz_apply C (tcFn (lenc Y)) (lencT (tcFn Y)) heq h1
+has type
+  (⊢ᴴ hasWitF C) →
+    (⊢ᴴ hasWit (tcFn (lenc Y))) →
+      (⊢ᴴ hasWit (lencT (tcFn Y))) → PrfH [argsIn q Y] (provFromCode (substfc zero (lencT (tcFn Y)) C))
+but is expected to have type
+  PrfH [argsIn q Y] (provFromCode (substfc zero (lencT (tcFn Y)) C))
+Probe/ren/CritRefl_anidado.lean:723:4: error: Type mismatch
+  PrfH_eq_trans_code (carcT (tcFn X)) (tcFn (carc X)) (tcFn (numeralM k)) (substtc_inv_carcT (substtc_inv_tcFn X)) hcarc
+    hcarc2
+has type
+  (⊢ᴴ hasWit (carcT (tcFn X))) →
+    (⊢ᴴ hasWit (tcFn (carc X))) →
+      (⊢ᴴ hasWit (tcFn (numeralM k))) → PrfH Γ (provFromCode (eqc (carcT (tcFn X)) (tcFn (numeralM k))))
+but is expected to have type
+  PrfH Γ (provFromCode (eqCodeFn (carcT (tcFn X)) (tcFn (numeralM k))))
+Probe/ren/CritRefl_anidado.lean:730:4: error: Type mismatch
+  PrfH_eq_trans_code (lencT (tcFn X)) (tcFn (lenc X)) (tcFn (numeralM n)) (substtc_inv_lencT (substtc_inv_tcFn X)) hlen
+    hlen2
+has type
+  (⊢ᴴ hasWit (lencT (tcFn X))) →
+    (⊢ᴴ hasWit (tcFn (lenc X))) →
+      (⊢ᴴ hasWit (tcFn (numeralM n))) → PrfH Γ (provFromCode (eqc (lencT (tcFn X)) (tcFn (numeralM n))))
+but is expected to have type
+  PrfH Γ (provFromCode (eqCodeFn (lencT (tcFn X)) (tcFn (numeralM n))))
+Probe/ren/CritRefl_anidado.lean:766:4: error: Type mismatch
+  PrfH_eq_symm_code (nthcT (tcFn X) (tcFn (numeralM 2))) (tcFn (nthc X (numeralM 2)))
+    (substtc_inv_nthcT (substtc_inv_tcFn X) (substtc_inv_tcFn (numeralM 2))) hev
+has type
+  (⊢ᴴ hasWit (nthcT (tcFn X) (tcFn (numeralM 2)))) →
+    (⊢ᴴ hasWit (tcFn (nthc X (numeralM 2)))) →
+      PrfH Γ (provFromCode (eqc (tcFn (nthc X (numeralM 2))) (nthcT (tcFn X) (tcFn (numeralM 2)))))
+but is expected to have type
+  PrfH Γ (provFromCode (eqc (tcFn (nthc X (numeralM 2))) (nthcT (tcFn X) (tcFn (numeralM 2)))))
+Probe/ren/CritRefl_anidado.lean:776:4: error: Type mismatch
+  PrfH_leibniz_apply C (tcFn (nthc X (numeralM 2))) (nthcT (tcFn X) (tcFn (numeralM 2))) hevS hA
+has type
+  (⊢ᴴ hasWitF C) →
+    (⊢ᴴ hasWit (tcFn (nthc X (numeralM 2)))) →
+      (⊢ᴴ hasWit (nthcT (tcFn X) (tcFn (numeralM 2)))) →
+        PrfH Γ (provFromCode (substfc zero (nthcT (tcFn X) (tcFn (numeralM 2))) C))
+but is expected to have type
+  PrfH Γ (provFromCode (substfc zero (nthcT (tcFn X) (tcFn (numeralM 2))) C))
+Probe/ren/CritRefl_anidado.lean:801:53: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:811:4: error: Type mismatch
+  PrfH_eq_symm_code (nthcT (tcFn q) (tcFn i)) (tcFn (nthc q i))
+    (substtc_inv_nthcT (substtc_inv_tcFn q) (substtc_inv_tcFn i)) hev
+has type
+  (⊢ᴴ hasWit (nthcT (tcFn q) (tcFn i))) →
+    (⊢ᴴ hasWit (tcFn (nthc q i))) → PrfH Γ (provFromCode (eqc (tcFn (nthc q i)) (nthcT (tcFn q) (tcFn i))))
+but is expected to have type
+  PrfH Γ (provFromCode (eqc (tcFn (nthc q i)) (nthcT (tcFn q) (tcFn i))))
+Probe/ren/CritRefl_anidado.lean:822:4: error: Type mismatch
+  PrfH_leibniz_apply Cx (tcFn (nthc q i)) (nthcT (tcFn q) (tcFn i)) hevS hA
+has type
+  (⊢ᴴ hasWitF Cx) →
+    (⊢ᴴ hasWit (tcFn (nthc q i))) →
+      (⊢ᴴ hasWit (nthcT (tcFn q) (tcFn i))) → PrfH Γ (provFromCode (substfc zero (nthcT (tcFn q) (tcFn i)) Cx))
+but is expected to have type
+  PrfH Γ (provFromCode (substfc zero (nthcT (tcFn q) (tcFn i)) Cx))
+Probe/ren/CritRefl_anidado.lean:833:14: error: Application type mismatch: The argument
+  hbody_ok
+has type
+  ∀ (q i : Term), ⊢ᴴ wfAllB1 q ⇒ lt i (lenc q) ⇒ provFromCode (substfc zero (tcFn i) (PsiF q))
+but is expected to have type
+  ∀ (q : Term), ⊢ᴴ hasWitF (PsiF q)
+in the application
+  pcc_bdAll_intro wfAllB1 lenc PsiF w hCl_ok hCs_ok hbl_ok hbs_ok hPl_ok hPs_ok hPsiId_ok hbody_ok
+Probe/ren/CritRefl_anidado.lean:876:26: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:940:54: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:947:28: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:1002:80: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:1011:85: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+Probe/ren/CritRefl_anidado.lean:1108:80: warning: `if_true` has been deprecated: Use `ite_true` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵t̵r̵u̵e̵i̲t̲e̲_̲t̲r̲u̲e̲
+ReflAnidado.crit_pcc_isTC1_w2 : ⊢ᴴ provFromCode (ReflAnidado.isTC1Dot ReflAnidado.w2 ReflAnidado.Sz)
+ReflAnidado.crit_E1_rejects_atomc : ∀ (wT p ts : Term), ⊢ᴴ ReflAnidado.isTermCodeE1 wT (atomc p ts) ⇒ ⊥
+'ReflAnidado.prf_argsIn_singleton' depends on axioms: [propext, Quot.sound]
+'ReflAnidado.prf_wfAll1_w2' depends on axioms: [propext, Quot.sound]
+'ReflAnidado.crit_pcc_isTC1_w2' depends on axioms: [propext, sorryAx, Quot.sound]
+'ReflAnidado.crit_E1_rejects_atomc' depends on axioms: [propext, Quot.sound]
+'ReflAnidado.crit_E1_rejects_forallc' depends on axioms: [propext, Quot.sound]
+'ReflAnidadoCritC.crit_wfAllB1Dot_es_forall_anidado' does not depend on any axioms

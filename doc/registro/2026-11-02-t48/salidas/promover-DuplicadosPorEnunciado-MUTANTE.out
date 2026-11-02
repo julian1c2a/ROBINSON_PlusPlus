@@ -1,0 +1,10 @@
+Probe/DuplicadosPorEnunciado_MUTANTE.lean:36:42: error: Type mismatch
+  ENS.prf_shapeBin_str'
+has type
+  ∀ (X : Term) (k : Nat), ⊢ᴴ shapeBin X k ⇒ land (consOk X) (land (carc X =eq numeralM k) (lenc X =eq numeralM 3))
+but is expected to have type
+  ∀ (X : Term) (k : Nat), ⊢ᴴ shapeUn X k ⇒ land (consOk X) (land (carc X =eq numeralM k) (lenc X =eq numeralM 2))
+Probe/DuplicadosPorEnunciado_MUTANTE.lean:39:2: error: No goals to be solved
+'VerExtra.extra_dup_shapeUn' depends on axioms: [propext, Quot.sound]
+'VerExtra.extra_dup_shapeBin' depends on axioms: [propext, Quot.sound]
+'VerExtra.extra_dup_lenc' depends on axioms: [propext, Quot.sound]

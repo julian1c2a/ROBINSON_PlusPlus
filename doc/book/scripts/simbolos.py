@@ -85,7 +85,8 @@ def censo():
     prod, fuera, citados = set(), set(), set()
     for rel in cierre_de_imports():
         prod |= nombres_de(os.path.join(RAIZ, rel))
-    for sub in ("sondeos", "cuarentena", "Probe"):
+    # ✏️ 2026-11-02 (T48, ADR-247 de RPP): sin "Probe", archivado en la etiqueta archivo/probe-2026-11-02 y barrido
+    for sub in ("sondeos", "cuarentena"):
         d = os.path.join(RAIZ, sub)
         if not os.path.isdir(d):
             continue

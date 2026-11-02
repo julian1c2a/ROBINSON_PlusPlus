@@ -1,0 +1,65 @@
+DIAGNÓSTICO — sondeos/A3IsFCBTracked.lean contra el build de master 4a0c00e (2026-11-02)
+==========================================================================================
+
+Orden (MEDIDO): desde la raíz del clon,
+  LEAN_PATH='E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean;c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.35.0\lib\lean' \
+  LEAN_NUM_THREADS=2 lean.exe sondeos/A3IsFCBTracked.lean
+Resultado (MEDIDO): rc=1, 5 s, 19 errores y 6 avisos. Salida íntegra: salida-inicial.txt.
+
+Las 19, por línea, con su causa
+-------------------------------
+CLASE A — las GUARDAS de ADR-020 (16 de 19). Los lemas internos de sustitución/Leibniz piden hoy
+`Prf (hasWit t)` / `Prf (hasWitF C)` (Minimal/Axioms.lean:1145 y :1191) para cada código que tocan,
+porque la línea de Leibniz sólo es bien formada con ellas (`ax_lineWF_leibniz`, `pcc_leibniz_code`
+en Meta/Sigma1AtomPrf.lean:235). El sondeo es de septiembre y llama a las firmas viejas.
+   1. 358:4  PrfH_eq_symm_code    (pcc_boundedIn_tracked, hBsym)  faltan hwX hwY      [Meta/D3InDotPrf.lean:95]
+   2. 367:4  PrfH_leibniz_apply   (pcc_boundedIn_tracked, hA2)    faltan hwA hw1 hw2  [Meta/EvalCarcNthcPrf.lean:55]
+   3. 390:2  PrfH_bdEx_intro_open (pcc_boundedIn_tracked)         faltan hwB hwP hwK  [Meta/D3InDotPrf.lean:122]
+   4. 412:4  pcc_thm_inst2        (pcc_InBwd_computed, h0)        faltan hw₁ hw₂      [Meta/MpCodePrf.lean:207]
+   5. 516:58 PrfH_leibniz_apply   (PrfH_in_transport, h2)         faltan hwA hw1 hw2  — ⚠️ aquí u, v, W son
+             ARBITRARIOS: las guardas `hasWit u`, `hasWit v`, `hasWit W` no se pueden descargar (ver abajo)
+   6. 541:4  PrfH_eq_trans_code   (pcc_shape_tracked, hA)         faltan hwX hwY hwZ  [Meta/EvalCarcNthcPrf.lean:64]
+   7. 548:4  PrfH_eq_trans_code   (pcc_shape_tracked, hB)         idem
+  10. 584:4  PrfH_eq_symm_code    (pcc_carcIn_tracked, hbrS)      faltan hwX hwY
+  12. 598:4  PrfH_eq_symm_code    (pcc_cdrcIn_tracked, hbrS)      faltan hwX hwY
+  16. 799:4  PrfH_eq_symm_code    (hbody_ok, hevS)                faltan hwX hwY
+  17. 812:4  PrfH_leibniz_apply   (hbody_ok, h2)                  faltan hwA hw1 hw2
+  18. 822:88 pcc_bdAll_intro      (pcc_wfAll_tracked)             la firma ganó una obligación entre
+             hPsiId y hbody: `hwPsi : ∀ q, Prf (hasWitF (PsiF q))` [Meta/BdAllIntroPrf.lean:320]
+   (los «Type mismatch» de 6, 7 dicen `eqc` frente a `eqCodeFn`: es sólo el síntoma de los argumentos
+    que faltan; `eqc a b` y `eqCodeFn a b` coinciden por definición —`numeral 4` = `succ⁴ zero`—)
+  y tres «unsolved goals» que son CONSECUENCIA de un error anterior del mismo bloque táctico:
+   9. 554:85 (pcc_child_tracked)   — por el 8
+  11. 577:65 (pcc_carcIn_tracked)  — por el 10
+  13. 591:65 (pcc_cdrcIn_tracked)  — por el 12
+   (el bloque de pcc_child_tracked esconde además otro de la clase A, su PrfH_eq_symm_code de hevS)
+
+CLASE B — un RENOMBRE/traslado del árbol (2 de 19).
+   8. 562:4  Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2` (pcc_child_tracked, hlt)
+  19. 904:4  idem (prf_isFCB_bottom, hlt1)
+      Hoy vive en `ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2` (Meta/ChainPrf.lean:89), mismo enunciado.
+
+CLASE C — una AMBIGÜEDAD nueva (1 de 19, más su consecuencia).
+  14. 751:4  Ambiguous term `liftTerm_numeralM` (hCl_ok): dos homónimos visibles,
+             ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM (abierto) y
+             ROBINSON_PlusPlus.Meta.PremsOfDotPrf.liftTerm_numeralM (exportado a la raíz, PremsOfDotPrf.lean:1044);
+             mismo enunciado.
+  15. 747:91 unsolved goals (hCl_ok) — consecuencia del 14: el `simp only` corre sin ese lema y deja
+             `liftTerm (k+1) (numeralM n)` sin reescribir.
+
+Los 6 avisos: `if_pos` (751), `if_neg` ×2 (760), `if_true` (783, 882, 893) obsoletos en v4.35.0.
+
+El caso que NO es una reparación de prueba: PrfH_in_transport (error 5)
+------------------------------------------------------------------------
+Enunciado del sondeo: (u v W : Term) (hW : ∀ V, substtc zero V W = W) (heq : PrfH Γ Prov(eqc u v))
+  (h : PrfH Γ Prov(inFormCodeFn u W)) ⊢ PrfH Γ Prov(inFormCodeFn v W), con u, v, W ARBITRARIOS.
+Su prueba es una Leibniz interna, y la Leibniz interna de hoy (pcc_leibniz_code, y con ella
+PrfH_leibniz_apply) exige como teoremas CERRADOS `Prf (hasWitF (inFormCodeFn ⌜v₀⌝ W))`, `Prf (hasWit u)`
+y `Prf (hasWit v)`: para términos arbitrarios no son demostrables (hasWit c = ∃w. wfAll1 w ∧ c ∈ w).
+Tampoco hay en el árbol un «Prov(c) ⇒ hasWitF(c)» objeto que permitiera sacarlas de heq/h (sólo
+`prf_hasWitF_real`, para códigos CONCRETOS `formCodeM φ`), ni una Leibniz con las guardas como
+antecedentes objeto. Con el árbol de hoy, ese enunciado SIN guardas no se puede derivar (INFERIDO de la
+búsqueda: no he demostrado que sea indemostrable). Su homónimo promovido,
+`ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.PrfH_in_transport` (Meta/TrackedAtomsPrf.lean:508), resolvió lo
+mismo AÑADIENDO al enunciado las tres guardas como parámetros automáticos (`:= by hw_auto`), que en los
+tres usos (u, v, W son códigos punteados) se descargan solos.

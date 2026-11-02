@@ -1,7 +1,8 @@
 # doc/control/segundo-nucleo.tsv — lo que dice cada núcleo del cierre de cada conjunto de titulares (T23, ADR-222).
 # Lo compara scripts/segundo-nucleo.bash en la CI, en los DOS sentidos: un núcleo que deja de aceptar es rojo, y uno que
 # empieza a aceptar también (para que la tabla suba). Sólo cambia con un ADR. ✏️ 2026-10-30 (ADR-228): los 32, aceptados
-# por los seis (v_tc_zero, reescrita; nanoda, con un hilo y la pila del proceso sin límite).
+# por los seis (v_tc_zero, reescrita; nanoda, con un hilo y la pila del proceso sin límite). ✏️ 2026-11-02 (ADR-250 y
+# ADR-251): los 35 (con los tres semánticos del puente con FOL), aceptados por los seis; nanoda, con cuatro hilos.
 #   acepta   comprueba el cierre entero y lo da por bueno (y rechaza el mutante como error de tipos);
 #   agota    se queda sin recursos (pila, recursión, combustible o tiempo) sin pronunciarse: NO es un rechazo.
 # núcleo	conjunto	veredicto

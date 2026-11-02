@@ -1,0 +1,36 @@
+ADR-251, 2026-11-02: lo que dijo nanoda (cuatro hilos, nat y string extension) de cada variante, exportada SOLA con
+leanexport en WSL sobre los .olean de Windows (prueba.sh). Copiado de la salida; «rc=134 … overflowed its stack» es
+agotar la pila de un hilo; «rc=0 … Checked N declarations with no typechecker errors» es aceptar.
+
+Tanda 1 (NanT.lean.txt, contra el build de master 4a0c00e):
+  a0  v_allIn_nil tal cual (intro v c; abre; …)                                  rc=134  8,2 s   overflowed its stack
+  a3  intro v; unfold ax_allIn_nil; abre; intro c; …                             rc=0    0,2 s   Checked 1759 declarations
+  c0  v_chainOk_nil tal cual                                                     rc=134  7,7 s   overflowed its stack
+  c3  como a3                                                                    rc=0    0,2 s   Checked 1755 declarations
+  b3  evalFormula (MNV V) v ax_allIn_nil = ∀ c, … := rfl                        rc=134  9,2 s   overflowed its stack
+  g3  lo mismo con un modelo M cualquiera                                         rc=0    0,02 s  Checked 266 declarations
+  p1  evalFormula (MNV V) w (atom «<» [..]) = (MNV V).rel «<» … := rfl          rc=0    0,2 s
+  p3  evalFormula (MNV V) w (atom «allIn» [..]) = (MNV V).rel «allIn» … := rfl  rc=134  11 s    overflowed its stack
+  q1  (MNV V).rel «<» [a, b] = (a < b) := rfl                                   rc=0    0,25 s
+  ⇒ con el modelo concreto, comparar por definición la evaluación de un átomo (fuera del primer símbolo de su match) o
+    de un ∀ cuyo cuerpo es uno de esos átomos agota la pila de los hilos; con un modelo cualquiera, no.
+
+Tanda 2 (ModeloEstandar de master):
+  ev_hasWit rc=134 · ev_hasWitF rc=134 · MN_allIn, MN_lenc, MN_nthc, MN_mem, MN_cons, MN_lt, MN_zero, ev_lift0 y
+  ev_numeralM, rc=0. La bisección de la exportación de ev_hasWit (biseca.sh de ADR-228): el primer fallo es ev_hasWit
+  misma.
+
+Tanda 3 (NanT2.lean.txt):
+  hw1  la prueba de ev_hasWit, con evalFormula, evalTerm y evalTerms en su simp     rc=134  6,3 s
+  hw2  la misma, con los lemas de evaluación CON PRUEBA (evB, evA, … evTsc)          rc=0    0,3 s   Checked 1827
+  ⇒ simp usa un lema rfl como reescritura definicional (sin prueba) y deja la comparación al núcleo.
+
+El cierre de los 32 (nanoda32.sh, desde un clon con los arreglos):
+  tras el primer arreglo (los lemas en abre, ev_hasWit y ev_hasWitF, y los intro tras abre): rc=134; la bisección
+  (todos_v1.out) da ev_termCodeM._f (los show de las evaluaciones de los códigos cerrados).
+  tras el segundo (esas evaluaciones, por rw con evc_cons y evc_zero):
+    leanexport 27 s, 49 008 683 bytes · nanoda, 4 hilos: rc=0, «Checked 6731 declarations with no typechecker
+    errors», 3,48 s, 113 320 KB.   (ADR-228: con un hilo y la pila sin límite, 527 s y 2,7 GB)
+
+Los 35 (con los tres semánticos de ADR-250) y los 12 de la clase (i), por los seis núcleos con su mutante: seis35.out
+y seis12.out (seis.sh). Los seis aceptan las dos exportaciones y rechazan los dos mutantes.

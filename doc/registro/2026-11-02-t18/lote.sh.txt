@@ -1,0 +1,10 @@
+#!/bin/bash
+# lote.sh <etiqueta> X1 X2 ... — compila los sondeos de la lista con compila.sh, como mucho 2 a la vez.
+T18=/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/t18
+ET=$1; shift
+for X in "$@"; do
+  while [ "$(jobs -rp | wc -l)" -ge 2 ]; do wait -n; done
+  "$T18/compila.sh" "$X" "$ET" &
+done
+wait
+echo "LOTE $ET TERMINADO"

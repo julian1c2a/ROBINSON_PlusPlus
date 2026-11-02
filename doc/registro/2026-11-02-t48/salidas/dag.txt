@@ -1,0 +1,18 @@
+módulo	EvalArithPrf en su clausura	CodeCtorKit en su clausura	EvalCarcNthcPrf en su clausura
+CodeCtorKit	True	True	True
+EvalArithPrf	True	False	False
+EvalCarcNthcPrf	True	False	True
+EvalLiftfcPrf	True	True	True
+EvalMulPrf	True	False	False
+EvalPredPrf	True	True	True
+EvalSubstfcPrf	True	True	True
+EvalSubsttcPrf	True	True	True
+LiftcCodePrf	True	True	True
+LineWFTrackedPrf	True	False	True
+SubstfcCodePrf	True	True	True
+TrackedAtomsPrf	True	True	True
+controles: OK (LiftcCodePrf ⊇ CodeCtorKit; EvalArithPrf ∉ su clausura)
+CodeCtorKit en la clausura de EvalArithPrf: False
+EvalArithPrf en la clausura de CodeCtorKit: True
+EvalCarcNthcPrf en la clausura de CodeCtorKit: True
+SubstfcWitnessPrf en la clausura de EvalArithPrf: True

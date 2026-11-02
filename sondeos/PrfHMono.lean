@@ -9,7 +9,7 @@ import ROBINSON_PlusPlus.Meta.HilbertDeduction
 # SONDEO · `PrfH_mono` / `PrfH_w1` — la **deuda B6b**, que ya estaba pagada sin que nadie lo supiera
 
 **Rescatado el 2026‑09‑11** del barrido de `Probe/` (regla **M‑9**), desde
-`Probe/CritDesc_consumidor.lean` §C2 (líneas 1517‑1539, `0 sorry`).
+`archivo/probe-2026-11-02:Probe/CritDesc_consumidor.lean` §C2 (líneas 1517‑1539, `0 sorry`).
 
 ## ⛔ Por qué este fichero es un hallazgo y no una promoción rutinaria
 

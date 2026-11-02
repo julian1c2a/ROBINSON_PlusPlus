@@ -58,12 +58,11 @@ theorem ax_lineWF_efq_eq :
 /-- Obligación administrativa del chasis: la condición sólo menciona `#0`. -/
 theorem substFormula_condEfq : substFormula 0 (.var 0) condEfq = condEfq := rfl
 
-set_option linter.unusedSimpArgs false in
 /-- La condición instanciada en una línea concreta `t`. -/
 theorem substFormula_condEfq_at (t : Term) :
     substFormula 0 t condEfq = (carc t =eq implc botc (nthc t (numeralM 2))) := by
   simp only [condEfq, carc, nthc, implc, botc, numeralM, succ, zero, cons, nil,
-    substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+    substFormula, substTerm, substTerms, ite_true]
 
 /-! ### La parte propia del tag (1): el código punteado, EVALUADO
 

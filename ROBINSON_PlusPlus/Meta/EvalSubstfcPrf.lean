@@ -642,7 +642,6 @@ theorem clauses_imp (hbot : CasoBot) (hatom : CasoAtom) (heq : CasoEq)
 
 /-! ### El `PSI` levantado CUATRO veces (uno por binder interno) -/
 
-set_option linter.unusedSimpArgs false in
 /-- ⛔ ADR-019: los tres primeros escalones NO se reescriben aquí. `psi_lift_form`,
     `psi_lift_form2` y `psi_lift_form3` de `Meta/StrongInductionPrf.lean` son GENÉRICOS en `Φ`,
     y este frente es sólo una instancia con `Φ := PHIsubstfc`. El cuarto sí necesita una línea
@@ -650,8 +649,8 @@ set_option linter.unusedSimpArgs false in
 theorem psi_l4 : liftFormula 0 (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI PHIsubstfc))))
     = PSIat (.var 4) := by
   rw [psi_lift_form4 PHIsubstfc hPHIsubstfc]
-  simp only [PSIat, lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
-    reduceIte, hPHIsubstfc]
+  simp only [PSIat, lt, liftTerm, Nat.reduceAdd, Nat.reduceLT,
+    reduceIte]
 
 /-- **EL PASO DE LA INDUCCION FUERTE.** -/
 theorem PHIsubstfc_step (hbot : CasoBot) (hatom : CasoAtom) (heq : CasoEq)

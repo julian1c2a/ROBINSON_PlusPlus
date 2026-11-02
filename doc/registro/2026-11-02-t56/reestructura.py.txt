@@ -1,0 +1,104 @@
+"""T56: reestructura FOL/REFERENCE.md — §2 al DEPENDENCIES.md generado, §6 generada, y lo viejo al apéndice R."""
+import io, sys
+
+RUTA = sys.argv[1]
+crudo = io.open(RUTA, encoding='utf-8', newline='').read()
+crlf = '\r\n' in crudo
+L = crudo.replace('\r\n', '\n').split('\n')
+
+
+def idx(cab):
+    ks = [i for i, l in enumerate(L) if l == cab]
+    if len(ks) != 1:
+        raise SystemExit(f'cabecera {cab!r}: {len(ks)} apariciones')
+    return ks[0]
+
+
+H2 = idx('## 2. Dependency Graph')
+H3 = idx('## 3. Module Descriptions')
+S31 = idx('### 3.1 Prelim.lean')
+S32 = idx('### 3.2 FOL.lean')
+S310 = idx('### 3.10 Soundness.lean')
+S313 = idx('### 3.13 Los módulos del plan finitista (2026‑09‑13 → 09‑26)')
+H6 = idx('## 6. Exports')
+H7 = idx('## 7. Documentation Status')
+H71 = idx('### 7.1 Fully Projected Files')
+H72 = idx('### 7.2 Partially Projected Files')
+assert H2 < H3 < S31 < S32 < S310 < S313 < H6 < H7 < H71 < H72
+
+
+def baja(bloque):
+    """las cabeceras de un bloque movido al apéndice, un nivel más abajo"""
+    return [('#' + l) if l.startswith('### ') else l for l in bloque]
+
+
+viejo2 = L[H2 + 1:H3]
+aviso3 = L[H3 + 1:S31]
+viejo31 = L[S31:S32]
+viejo310 = L[S310:S313]
+viejo6 = L[H6 + 1:H7]
+viejo71 = L[H71 + 1:H72]
+
+nuevo2 = [
+    '',
+    'El grafo de imports se CALCULA: está en `DEPENDENCIES.md`, que escribe `python3 gen-dependencies.py` desde las líneas',
+    '`import` reales (la CI comprueba con `--check` que está al día). ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): aquí iba un',
+    'grafo `mermaid` escrito a mano, puesto al día por última vez el 2026‑10‑02 (54 módulos; hoy son 70): está en el',
+    'apéndice R.1, como registro.',
+    '',
+    '---',
+    '',
+]
+nuevo_aviso3 = [
+    '',
+    '> ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): las cuatro entradas de módulos que ya no existen —§3.1 `Prelim.lean`, eliminado',
+    '> el 2026‑05‑05, y §3.10‑§3.12 `Soundness.lean`, `Completeness.lean` y `Compacity.lean`, borrados el 2026‑09‑23— están',
+    '> en el apéndice R.2, con el aviso que las acompañaba. Aquí quedan las de los módulos del árbol.',
+    '',
+]
+nuevo6 = [
+    '',
+    '<!-- §6 GENERADO por `python3 gen-reference.py`: no se edita a mano (T56) -->',
+    '<!-- FIN DEL §6 GENERADO -->',
+    '',
+    '---',
+    '',
+]
+nuevo71 = [
+    '',
+    '- Todos los módulos de las dos `lean_lib`: cada uno tiene su entrada en §6, que se GENERA de las fuentes',
+    '  (`gen-reference.py`, T56), y su fila en la tabla de §1.1.',
+    '',
+    '🗑️ Aquí figuraban también `Prelim.lean` (eliminado el 2026-05-05), `Soundness.lean`, `Completeness.lean` y `Compacity.lean` (borrados el 2026-09-23) y `MetaRules.lean` (borrado el 2026‑10‑02, ADR‑115 de RPP): ya no existen. La lista escrita a mano que había aquí hasta el 2026‑11‑02 está en el apéndice R.3.',
+    '',
+]
+
+apendice = [
+    '',
+    '---',
+    '',
+    '## Apéndice R · Registro (NO describe el árbol)',
+    '',
+    '> 🗑️ Movido aquí el 2026‑11‑02 (T56, ADR‑245 de RPP), TAL CUAL, sin reescribir: es el texto de las secciones que',
+    '> describían módulos borrados o que se escribían a mano y ya no se pueden mantener así. Se conserva porque explica',
+    '> decisiones vivas y porque otros documentos lo citan; sus nombres y sus cifras son los de su fecha. Lo vigente: §1.1',
+    '> (la tabla), §3 (los módulos del árbol), §6 (generada) y `DEPENDENCIES.md` (generado). Las referencias «§6.N» de',
+    '> §1.1 y de §3 son a las entradas de R.3 (la numeración vieja).',
+    '',
+    '### R.1 · El grafo de dependencias escrito a mano (el §2 hasta el 2026‑11‑02)',
+] + viejo2 + [
+    '### R.2 · Las descripciones de los módulos borrados (§3.1 y §3.10‑§3.12 hasta el 2026‑11‑02)',
+] + aviso3 + baja(viejo31) + baja(viejo310) + [
+    '### R.3 · El §6 escrito a mano (hasta el 2026‑11‑02)',
+] + baja(viejo6) + [
+    '### R.4 · La lista de §7.1 escrita a mano (hasta el 2026‑11‑02)',
+] + viejo71
+
+N = (L[:H2 + 1] + nuevo2 + L[H3:H3 + 1] + nuevo_aviso3 + L[S32:S310] + L[S313:H6 + 1] + nuevo6 + L[H7:H71 + 1]
+     + nuevo71 + L[H72:])
+while N and N[-1] == '':
+    N.pop()
+N += apendice
+texto = '\n'.join(N) + '\n'
+io.open(RUTA, 'w', encoding='utf-8', newline='').write(texto.replace('\n', '\r\n') if crlf else texto)
+print('líneas', len(L), '→', len(N))

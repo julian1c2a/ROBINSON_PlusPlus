@@ -316,17 +316,15 @@ theorem PrfH_dotVN {Γ : List Formula} (t : Term) {n : Nat}
 /-- La condición estructural asociada a un árbol: `carc #0 = E(nthc #0 i…)`. -/
 def condOf (T : CTree) : Formula := carc (.var 0) =eq T.objAt (.var 0)
 
-set_option linter.unusedSimpArgs false in
 /-- La obligación administrativa del chasis, resuelta para todo árbol. -/
 theorem substFormula_condOf (T : CTree) : substFormula 0 (.var 0) (condOf T) = condOf T := by
-  simp only [condOf, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true,
+  simp only [condOf, carc, substFormula, substTerm, substTerms, ite_true,
     substTerm_objAt_var0 T]
 
-set_option linter.unusedSimpArgs false in
 /-- La condición instanciada en una línea concreta. -/
 theorem substFormula_condOf_at (T : CTree) (t : Term) :
     substFormula 0 t (condOf T) = (carc t =eq T.objAt t) := by
-  simp only [condOf, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true,
+  simp only [condOf, carc, substFormula, substTerm, substTerms, ite_true,
     substTerm_objAt T t]
 
 /-- **`COND_dot` evaluado**, genérico en el árbol. -/

@@ -215,13 +215,12 @@ noncomputable def nthcEvalPred : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 1)))
     (provFromCode (evalNthcCode (.var 1) (.var 0))))
 
-set_option linter.unusedSimpArgs false in
 /-- Caso base: `p = nil` (vacuo, `i < lenc nil = 0`). -/
 theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
   refine Prf.gen _ ?_
-  simp only [nthcEvalPred, substFormula_provFromCode_open, substTerm_evalNthcCode,
+  simp only [substFormula_provFromCode_open, substTerm_evalNthcCode,
     substFormula, substTerm, substTerms, lt, lenc, nil, zero, Nat.reduceEqDiff,
-    reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    reduceIte, ite_true]
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
@@ -289,7 +288,6 @@ theorem substtc_inv_nthcT {X Y : Term}
   fun W => prf_eq_trans (prf_substtc_nthcT zero W X Y) (prf_congr_nthcT (hX W) (hY W))
 
 set_option maxRecDepth 8000 in
-set_option linter.unusedSimpArgs false in
 /-- **Paso `cons`** de la inducción acotada: análisis de casos `i = 0 / σ(pred i)`
     (`prf_zero_or_eq_succ_pred`), reflejando `pcc_nthc_zero_code` (base) y `pcc_nthc_succ_code` + HI
     (`pcc_eq_trans_code_imp`) en el caso sucesor, transportando por igualdad de código bajo contexto
@@ -300,9 +298,8 @@ theorem nthcEvalPred_step :
   refine Prf.gen _ (Prf.gen _ ?_)
   simp only [nthcEvalPred, liftFormula_provFromCode_open, substFormula_provFromCode_open,
     liftTerm_evalNthcCode, substTerm_evalNthcCode, liftFormula, liftTerm, liftTerms,
-    substFormula, substTerm, substTerms, lt, lenc, cons, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    substFormula, substTerm, substTerms, lt, lenc, cons,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
   refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
   refine prf_deduction (deduction_aux ?_ (lt (.var 0) (lenc (cons (.var 2) (.var 1)))) _ rfl)
   let P0 : Formula := Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 2)))
@@ -334,11 +331,10 @@ theorem nthcEvalPred_step :
     have hP : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0] P0 :=
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
     have ihj := PrfH_spec hP (pred (.var 0))
-    simp only [P0, liftFormula_provFromCode_open, substFormula_provFromCode_open,
-      substTerm_evalNthcCode, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-      lt, lenc, pred, cons, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-      Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm,
-      FOL.substTerm_liftLift] at ihj
+    simp only [P0, substFormula_provFromCode_open,
+      substTerm_evalNthcCode, substFormula, substTerm, substTerms,
+      lt, lenc, pred, Nat.reduceEqDiff,
+      Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true] at ihj
     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (lt (pred (.var 0)) (lenc (.var 1))) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)

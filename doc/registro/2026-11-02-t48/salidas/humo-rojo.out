@@ -1,0 +1,7 @@
+Probe/_humo/HumoRojo.lean:2:8: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.CodeCtorKit.pcc_congr_hole_code`
+Probe/_humo/HumoRojo.lean:3:15: error(lean.unknownIdentifier): Unknown identifier `x`
+
+Note: It is not possible to treat `x` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+Probe/_humo/HumoRojo.lean:3:19: error(lean.unknownIdentifier): Unknown identifier `x`
+
+Note: It is not possible to treat `x` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.

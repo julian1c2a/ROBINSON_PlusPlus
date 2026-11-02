@@ -370,7 +370,6 @@ theorem M_premsOf_de (hM : Estandar M) (x : Nat) (hw : lineWFN Vm x) :
   | 20, _, hT => have hlen : lenN x = 3 := hT.1; pr3 ax_premsOf_listInd
   | k + 21, hK, _ => exact absurd hK (by omega)
 
-set_option linter.unusedSimpArgs false in
 /-- 🏁 **Si `p` es una cadena válida de verdad desde `c`, `M` la cree**: la vuelta de `M_cadena`. -/
 theorem M_cadena_de (hM : Estandar M) : ∀ (p c : Nat), chainOkN Vm c p → M.rel sym!"chainOk" [c, p] := by
   intro p
@@ -384,7 +383,7 @@ theorem M_cadena_de (hM : Estandar M) : ∀ (p c : Nat), chainOkN Vm c p → M.r
         using h
     · obtain ⟨l, r, rfl, hr⟩ := consN_de hp
       have h := ax_de hM (φ := ax_chainOk_cons) (by simp [axioms]) (fun _ => 0) c l r
-      simp [ax_chainOk_cons, forall_3, _root_.iff, chainOk, lineOk, lineWF, allIn, premsOf, land, concat, carc,
+      simp [_root_.iff, chainOk, lineOk, lineWF, allIn, premsOf, land, concat, carc,
         cons, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hcons, hM.hzero] at h
       obtain ⟨⟨hlw, hal⟩, hrest⟩ := (chainOkN_consN _ c l r).1 hc
       have hl0 : ¬ l = 0 := by

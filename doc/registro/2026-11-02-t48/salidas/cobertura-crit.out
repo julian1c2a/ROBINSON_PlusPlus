@@ -1,0 +1,3 @@
+'T48Cobertura.isTC1_real_prov' depends on axioms: [propext, Quot.sound]
+'T48Cobertura.isTC1_succ_zero_prov' depends on axioms: [propext, Quot.sound]
+'T48Cobertura.lista_no_vacia' does not depend on any axioms

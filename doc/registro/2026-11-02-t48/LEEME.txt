@@ -1,0 +1,10 @@
+T48 (ADR-247), 2026-11-02: los cuatro ficheros de Probe/ que el triaje del 2026-09-11 mandó promover, re-medidos
+contra el build (RPP 4a0c00e) por un agente; el coordinador revisó el informe, copió los dos promovidos a sondeos/,
+archivó Probe/ en la etiqueta archivo/probe-2026-11-02 y lo barrió del disco.
+
+  informe-t48.md        el informe: qué es cada uno, si compila, si lo que aporta ya está en el build, la recomendación
+                        con su razón, las filas para sondeos/README.md y el censo de las citas a Probe/
+  medidas/              las comprobaciones contra el build (T48_YaEnElBuild, T48_CoberturaCrit, el destino de
+                        CongruenciaHueco) y sus mutantes, con .txt detrás (las versiones renombradas, no: están en la
+                        etiqueta, con los originales)
+  salidas/              cada compilación con su .meta (rc, segundos), el grafo de imports y el censo de las citas

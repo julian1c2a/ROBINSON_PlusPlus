@@ -1,0 +1,9 @@
+ADR-249, 2026-11-02: los argumentos de simp sin usar, quitados de verdad (304 «set_option linter.unusedSimpArgs false
+in» en 46 ficheros de RPP, 1682 argumentos). La herramienta, simp_args.py.txt (en un clon compartido, compilando con
+lean --json contra los .olean de master; después, lake build entero del clon).
+
+  lista.txt     los 46 ficheros
+  ronda1.txt    sin las opciones: cuántos argumentos señala el linter en cada uno (0 errores, 0 otros avisos)
+  ronda2.txt    con los argumentos quitados: los 46, LIMPIOS (sin errores ni avisos), sin devolver ninguna unidad
+  resumen.json  por fichero: opciones, unidades con avisos, unidades devueltas (ninguna), argumentos quitados (línea y
+                nombre) y casos raros (ninguno)

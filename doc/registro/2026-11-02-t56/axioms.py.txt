@@ -1,0 +1,33 @@
+"""T56: FOL/AXIOMS.md — §2.3 a su sitio (tras §2.2) y §2.6‑§2.7 dentro de §2 (estaban tras §3). Sin tocar el texto."""
+import io, sys
+
+RUTA = sys.argv[1]
+crudo = io.open(RUTA, encoding='utf-8', newline='').read()
+crlf = '\r\n' in crudo
+L = crudo.replace('\r\n', '\n').split('\n')
+
+
+def idx(prefijo):
+    ks = [i for i, l in enumerate(L) if l.startswith(prefijo)]
+    if len(ks) != 1:
+        raise SystemExit(f'{prefijo!r}: {len(ks)} apariciones')
+    return ks[0]
+
+
+s22 = idx('### 2.2 ')
+s24 = idx('### 2.4 ')
+s25 = idx('### 2.5 ')
+s23 = idx('### 2.3 ')
+h3 = idx('## 3 ')
+s26 = idx('### 2.6 ')
+s27 = idx('### 2.7 ')
+h4 = idx('## 4 ')
+assert s22 < s24 < s25 < s23 < h3 < s26 < s27 < h4
+b23 = L[s23:h3]          # §2.3, hasta §3
+b3 = L[h3:s26]           # §3, hasta §2.6
+b2627 = L[s26:h4]        # §2.6 y §2.7, hasta §4
+N = L[:s24] + b23 + L[s24:s23] + b2627 + b3 + L[h4:]
+assert sorted(N) == sorted(L) and len(N) == len(L)
+t = '\n'.join(N)
+io.open(RUTA, 'w', encoding='utf-8', newline='').write(t.replace('\n', '\r\n') if crlf else t)
+print('ok', [l for l in N if l.startswith('## ') or l.startswith('### ')][4:16])

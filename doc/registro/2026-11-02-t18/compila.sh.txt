@@ -1,0 +1,21 @@
+#!/bin/bash
+# compila.sh <X> <etiqueta> — compila rpp/sondeos/<X>.lean contra el build de E:\Dropbox\GitHub\lean4\{FOL,ROBINSON_PlusPlus}
+# con lean.exe (sin -o: no escribe .olean), con los leanOptions del lakefile de RPP (autoImplicit y
+# relaxedAutoImplicit apagados, como `lake lean`), timeout 900, LEAN_NUM_THREADS=2.
+# Escribe salida/<X>.<etiqueta>.out y una fila «X<TAB>etiqueta<TAB>rc<TAB>segundos<TAB>nerr<TAB>primer error» en salida/<X>.<etiqueta>.fila
+set -u
+T18=/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/t18
+X=$1; ET=$2
+cd "$T18/rpp" || exit 99
+export LEAN_PATH='E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean;c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.35.0\lib\lean'
+export LEAN_NUM_THREADS=2
+LEAN=/c/Users/julia/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean.exe
+OUT="$T18/salida/$X.$ET.out"
+t0=$(date +%s)
+timeout 900 "$LEAN" -DautoImplicit=false -DrelaxedAutoImplicit=false "sondeos/$X.lean" > "$OUT" 2>&1
+rc=$?
+t1=$(date +%s)
+nerr=$(grep -cE '^sondeos[\\/][^:]+:[0-9]+:[0-9]+: error' "$OUT")
+e1=$(grep -m1 -E '^sondeos[\\/][^:]+:[0-9]+:[0-9]+: error' "$OUT" | sed -E 's#^sondeos[\\/]##' | tr '\t' ' ' | cut -c1-250)
+printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$X" "$ET" "$rc" "$((t1 - t0))" "$nerr" "$e1" > "$T18/salida/$X.$ET.fila"
+cat "$T18/salida/$X.$ET.fila"

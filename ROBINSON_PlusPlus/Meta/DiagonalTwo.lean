@@ -70,13 +70,12 @@ def godelBeta' : Formula := substFormula 0 diagTerm godelPred'
 /-- **Sentencia de Gödel estructural** `G' = β'(⌜β'⌝)`. -/
 noncomputable def godelC' : Formula := selfApp godelBeta'
 
-set_option linter.unusedSimpArgs false in
 /-- Composición de sustituciones para `godelPred'` (sin var libre ≥ 1): se reduce
     con `substTerm_lift_comm`. -/
 theorem godel_comp' (s : Term) :
     substFormula 0 s godelBeta' = substFormula 0 (substTerm 0 s diagTerm) godelPred' := by
   simp [godelBeta', godelPred', neg, provFormulaC', substFormula, substTerm, substTerms,
-    land, chainOk, In, runFn, nil, zero, FOL.substTerm_liftTerm, FOL.substTerm_lift_comm]
+    land, chainOk, In, runFn, nil, zero, FOL.substTerm_lift_comm]
 
 -- [REPARACION] `godelC'_fixedpoint` y sus dos direcciones RETIRADOS: usaban `diag_arith`,
 -- o sea `tc_form`. Los sustituyó `godelCN_fixedpoint` (`Meta/DiagonalNumeral.lean`, sobre `⊢`),

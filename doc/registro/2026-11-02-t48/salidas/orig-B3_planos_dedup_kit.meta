@@ -1,0 +1,10 @@
+fichero: Probe/B3_planos_dedup_kit.lean
+md5: 1b15a60e640d689c455c152cf07149fb
+orden: LEAN_PATH=<FOL .lake/build/lib/lean ; RPP .lake/build/lib/lean ; toolchain lib/lean> LEAN_NUM_THREADS=2 timeout 900 lean.exe -DautoImplicit=false -DrelaxedAutoImplicit=false Probe/B3_planos_dedup_kit.lean
+toolchain: Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)
+rpp: 4a0c00e ADR-237…244: T32, T30, T39, T37, T49, T10 y T69 ce
+fecha: 2026-11-02 17:16:33
+rc: 1
+segundos: 5
+errores: 2
+sorry: 0

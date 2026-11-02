@@ -49,16 +49,14 @@ sale de `hC_dot_of_chainOkBDot` (`Meta/D3ChainDotPrf.lean`). `d3_prf_real` pasa 
 noncomputable def bodyF (φ : Formula) : Formula :=
   land (chainOk nil (.var 0)) (In (formCode φ) (runFn nil (.var 0)))
 
-set_option linter.unusedSimpArgs false in
 /-- **Keystone estructural**: `formCode (provCodeC' φ) = exc (formCode (bodyF φ))`.
     (`provCodeC' φ = ∃p. bodyF`, y `formCode` de un `∃` es `exc` del código del cuerpo.) -/
 theorem formCode_provCodeC'_eq (φ : Formula) :
     formCode (provCodeC' φ) = exc (formCode (bodyF φ)) := by
   simp only [provCodeC', provFormulaC', bodyF, substFormula, substTerm, substTerms, land,
-    chainOk, In, runFn, nil, zero, formCode, exc, numeral, Nat.reduceAdd, Nat.reduceLT,
-    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm, liftTerm_formCode]
+    chainOk, In, runFn, nil, zero, formCode, exc, numeral, Nat.reduceAdd,
+    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, liftTerm_formCode]
 
-set_option linter.unusedSimpArgs false in
 /-- **D3 reducida a la reflexión PUNTEADA del cuerpo** (keystone de la ruta B): dada
     `hbody : bodyF φ ⇒ provFromCode (substfc 0 (tcFn #0) (formCode (bodyF φ)))` —la reflexión del
     cuerpo Δ₀ con `p` **dotado** (`num p = tcFn p`)— se obtiene `d3_prf`
@@ -74,7 +72,7 @@ theorem d3_prf_of_dotted (φ : Formula)
   refine prf_ex_elim_imp ?_
   rw [liftFormula_provCodeC']
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceEqDiff, reduceIte, FOL.substTerm_liftTerm, liftTerm_formCode]
+    Nat.reduceEqDiff, reduceIte, liftTerm_formCode]
   rw [provCodeC'_eq_provFromCode, formCode_provCodeC'_eq]
   have hb : PrfH [bodyF φ] (provFromCode (substfc zero (tcFn (.var 0)) (formCode (bodyF φ)))) :=
     PrfH.mp _ _ _ (prf_to_prfH hbody _) (prfH_hyp_self _)

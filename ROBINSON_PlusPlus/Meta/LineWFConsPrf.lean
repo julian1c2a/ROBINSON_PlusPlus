@@ -35,7 +35,6 @@ theorem prf_lineWF_cons (line : Term) :
   simpa [ax_lineWF_cons, substFormula, substTerm, substTerms, lineWF, carc, cdrc, cons,
     nil, zero, FOL.substTerm_liftTerm] using hh
 
-set_option linter.unusedSimpArgs false in
 /-- **`chainOk nil p` da `lineWF` de la línea `i`** (para `i < lenc p`). Vía `chainOkB` (que es
     `∀i<lenc p. lineOkB nil p i`) y `∧`‑elim izquierdo (`lineOkB = lineWF (nthc p i) ∧ …`). -/
 theorem prf_chainOk_lineWF (p i : Term) :
@@ -47,9 +46,9 @@ theorem prf_chainOk_lineWF (p i : Term) :
   have hB : PrfH [lt i (lenc p), chainOk nil p] (chainOkB nil p) :=
     PrfH_iff_mp (prf_chainOk_iff_chainOkB nil p) hchain
   have hspec := PrfH_spec hB i
-  simp only [chainOkB, lineOkB, land, substFormula_boundedPremsIn, substFormula, substTerm,
-    substTerms, lt, lenc, nthc, lineWF, premsOf, nil, zero, Nat.reduceEqDiff, reduceIte, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hspec
+  simp only [lineOkB, land, substFormula_boundedPremsIn, substFormula, substTerm,
+    substTerms, lt, lenc, nthc, lineWF, premsOf, nil, zero, ite_true,
+    FOL.substTerm_liftTerm] at hspec
   exact PrfH_and_elim_left (PrfH.mp _ _ _ hspec hlt)
 
 /-- **La línea `i`-ésima de una cadena válida es un `cons`**: `chainOk nil p ⇒ i < lenc p ⇒

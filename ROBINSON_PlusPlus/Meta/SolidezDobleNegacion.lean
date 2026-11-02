@@ -417,7 +417,6 @@ theorem ax_de (hM : Estandar M) {φ : Formula} (h : φ ∈ axioms) (v : Nat → 
 theorem consN_de {l : Nat} (h : ¬ l = 0) : ∃ a b, And (l = consN a b) (b < l) :=
   ⟨carN l, cdrN l, (consN_car_cdr h).symm, cdrN_lt h⟩
 
-set_option linter.unusedSimpArgs false in
 theorem M_mem (hM : Estandar M) : ∀ (l x : Nat), M.rel in_sym [x, l] ↔ memN x l := by
   intro l
   induction l using Nat.strongRecOn with
@@ -426,11 +425,11 @@ theorem M_mem (hM : Estandar M) : ∀ (l x : Nat), M.rel in_sym [x, l] ↔ memN 
     by_cases hl : l = 0
     · subst hl
       have h := ax_de hM (φ := ax_L1_in_nil) (by simp [axioms]) (fun _ => 0) x
-      simp [ax_L1_in_nil, forall_, neg, In, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] at h
+      simp [neg, In, nil, zero, evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero] at h
       simp [h, memN_zero]
     · obtain ⟨a, b, rfl, hb⟩ := consN_de hl
       have h := ax_de hM (φ := ax_L2_in_cons) (by simp [axioms]) (fun _ => 0) x a b
-      simp [ax_L2_in_cons, forall_3, _root_.iff, In, cons, lor, evalFormula, evalTerm, evalTerms, shiftEnv,
+      simp [_root_.iff, In, cons, lor, evalFormula, evalTerm, evalTerms, shiftEnv,
         hM.hcons] at h
       rw [show M.rel in_sym [x, consN a b] ↔ Or (x = a) (M.rel in_sym [x, b]) from ⟨h.1, h.2⟩,
         memN_consN, ih b hb x]

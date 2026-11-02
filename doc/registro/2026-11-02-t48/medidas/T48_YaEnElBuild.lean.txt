@@ -1,0 +1,125 @@
+/- T48 · Lo que los arneses B3 (`Probe/B3_planos_dedup*.lean`, 2026‑09‑04) proponían promover, ¿está
+   en el build de hoy? Cada `example` lleva el ENUNCIADO del arnés (copiado; `strCode "…"` pasa a
+   `strCode sym!"…"`, D7) y se cierra con la constante del BUILD, por su nombre completo. Si alguna
+   no estuviera, o su enunciado fuera otro, aquí fallaría. -/
+import ROBINSON_PlusPlus.Meta
+
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
+open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.TcArithPrf ROBINSON_PlusPlus.Meta.Sigma1Prf
+open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf ROBINSON_PlusPlus.Meta.MpCodePrf
+open ROBINSON_PlusPlus.Meta.DotConsPrf ROBINSON_PlusPlus.Meta.DerivCondPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+
+namespace T48YaEnElBuild
+
+/-! ## (a) EL KIT TERNARIO (9) — `B3_planos_dedup_funcc3.lean` §1 ⇒ `Meta/EvalArithPrf.lean` -/
+
+example (v W sc x y z : Term) :
+    Prf (substtc v W (funcc sc (cons x (cons y (cons z nil))))
+      =eq funcc sc (cons (substtc v W x) (cons (substtc v W y) (cons (substtc v W z) nil)))) :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_substtc_funcc3 v W sc x y z
+example {sc x x' y y' z z' : Term}
+    (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) (hz : Prf (z =eq z')) :
+    Prf (funcc sc (cons x (cons y (cons z nil)))
+      =eq funcc sc (cons x' (cons y' (cons z' nil)))) :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_congr_funcc3 hx hy hz
+example (v s f : Term) : ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT v s f
+    = funcc (strCode sym!"substfc") (cons v (cons s (cons f nil))) := rfl
+example (v s f : Term) :
+    ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT (termCode v) (termCode s) (termCode f)
+      = termCode (substfc v s f) :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT_termCode v s f
+example {v v' s s' f f' : Term}
+    (hv : Prf (v =eq v')) (hs : Prf (s =eq s')) (hf : Prf (f =eq f')) :
+    Prf (ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT v s f
+      =eq ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT v' s' f') :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_congr_substfcT hv hs hf
+example (v W x y z : Term) :
+    Prf (substtc v W (ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT x y z)
+      =eq ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT (substtc v W x) (substtc v W y)
+        (substtc v W z)) :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_substtc_substfcT v W x y z
+example {X Y Z : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))
+    (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :
+    ∀ W, Prf (substtc zero W (ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT X Y Z)
+      =eq ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT X Y Z) :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.substtc_inv_substfcT hX hY hZ
+example (k : Nat) (v s f : Term) :
+    liftTerm k (ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT v s f)
+      = ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT (liftTerm k v) (liftTerm k s) (liftTerm k f) :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.liftTerm_substfcT k v s f
+example (k : Nat) (u v s f : Term) :
+    substTerm k u (ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT v s f)
+      = ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT (substTerm k u v) (substTerm k u s)
+        (substTerm k u f) :=
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.substTerm_substfcT k u v s f
+
+/-! ## (b) `binK` y la subsunción al revés (4 + 3) — `B3_planos_dedup.lean` §1 y `_kit` §1
+     ⇒ `Meta/CodeCtorKit.lean`; y `prf_substtc_binT_at` ES ya corolario del general
+     (`Meta/LiftcCodePrf.lean`, «eran DOCE lineas de `refine`, y son una»). -/
+
+example (H a b : Term) : ROBINSON_PlusPlus.Meta.CodeCtorKit.binK H a b
+    = consT H (consT a (consT b (termCode nil))) := rfl
+example (m : Nat) (a b : Term) :
+    ROBINSON_PlusPlus.Meta.CodeCtorKit.binK (termCode (numeralM m)) a b
+      = ROBINSON_PlusPlus.Meta.CodeCtorKit.binT m a b :=
+  ROBINSON_PlusPlus.Meta.CodeCtorKit.binK_binT m a b
+example {H a a' b b' : Term} (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
+    Prf (ROBINSON_PlusPlus.Meta.CodeCtorKit.binK H a b
+      =eq ROBINSON_PlusPlus.Meta.CodeCtorKit.binK H a' b') :=
+  ROBINSON_PlusPlus.Meta.CodeCtorKit.prf_congr_binK ha hb
+example (T : Term) (hT : ∀ c : Nat, liftTerm c T = T) (n : Nat) (W a b : Term) :
+    Prf (substtc (numeral n) W (ROBINSON_PlusPlus.Meta.CodeCtorKit.binK (termCode T) a b)
+      =eq ROBINSON_PlusPlus.Meta.CodeCtorKit.binK (termCode T)
+        (substtc (numeral n) W a) (substtc (numeral n) W b)) :=
+  ROBINSON_PlusPlus.Meta.CodeCtorKit.prf_substtc_binK_at T hT n W a b
+-- los tres `prf_substtc_termCode_*` que el arnés redeclaraba con prefijo `L_`: hoy en `CodeCtorKit`
+example (v : Nat) (W t : Term) (ht : ∀ c : Nat, liftTerm c t = t) :
+    Prf (substtc (numeral v) W (termCode t) =eq termCode t) :=
+  ROBINSON_PlusPlus.Meta.CodeCtorKit.prf_substtc_termCode_closed v W t ht
+example (v m : Nat) (W : Term) :
+    Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+  ROBINSON_PlusPlus.Meta.CodeCtorKit.prf_substtc_termCode_numeralM v m W
+example (v : Nat) (W : Term) :
+    Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+  ROBINSON_PlusPlus.Meta.CodeCtorKit.prf_substtc_termCode_zero v W
+
+/-! ## (c) `binct` y su familia (10) — `B3_planos_dedup.lean` §4(b), `_opens` §2
+     ⇒ `Meta/SubstfcCodePrf.lean` (no `Minimal/Axioms.lean`, como proponía el arnés). -/
+
+example (T a b : Term) : ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct T a b
+    = cons T (cons a (cons b nil)) := rfl
+example (a b : Term) : ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct (numeralM 5) a b = implc a b :=
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct_implc a b
+example (a b : Term) : ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct (numeralM 7) a b = andc a b :=
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct_andc a b
+example (a b : Term) : ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct (numeralM 8) a b = orc a b :=
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct_orc a b
+example : ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBOT_BODY
+    = (substfc (.var 1) (.var 0) botc =eq botc) := rfl
+example : ax_substfc_bottom = forall_2 ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBOT_BODY :=
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBOT_BODY_ok
+example (T : Term) : ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBIN_BODY T
+    = (substfc (.var 3) (.var 2) (ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct T (.var 1) (.var 0))
+      =eq ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct T (substfc (.var 3) (.var 2) (.var 1))
+        (substfc (.var 3) (.var 2) (.var 0))) := rfl
+example : ax_substfc_impl = forall_4 (ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBIN_BODY (numeralM 5)) :=
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBIN_impl
+example : ax_substfc_and = forall_4 (ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBIN_BODY (numeralM 7)) :=
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBIN_and
+example : ax_substfc_or = forall_4 (ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBIN_BODY (numeralM 8)) :=
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.AXBIN_or
+
+/-! ## CONTROL NEGATIVO: la técnica no lo acepta todo -/
+
+example : True := by
+  fail_if_success exact (ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct_implc :
+    ∀ a b : Term, ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct (numeralM 7) a b = implc a b)
+  fail_if_success exact (rfl : ∀ v s f : Term, ROBINSON_PlusPlus.Meta.EvalArithPrf.substfcT v s f
+    = funcc (strCode sym!"substtc") (cons v (cons s (cons f nil))))
+  trivial
+
+end T48YaEnElBuild

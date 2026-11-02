@@ -1,0 +1,5 @@
+'CongruenciaHueco.pcc_congr_hole_code' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_binT_2_code' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_succ_code' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_eqcT_diag_code_imp' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_nthcT_arg1_code' depends on axioms: [propext, Quot.sound]

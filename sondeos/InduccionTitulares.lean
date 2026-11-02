@@ -362,3 +362,8 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
 #modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol
 #modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol
+
+-- ✏️ 2026‑11‑02 (ADR‑250): los tres semánticos del puente con FOL, titulares por decisión del propietario.
+#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo
+#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
+#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico

@@ -1,0 +1,46 @@
+# verifica_diff.py DIR — comprueba que cada DIR/X.lean difiere de orig/X.lean SÓLO por los dos arreglos de T18:
+# el renombre BoundedInPrf.PrfH_lt_subst2 → ChainPrf.PrfH_lt_subst2 (y, en parcheados-s1, el de subst1), y prefijos de
+# cualificación delante de un identificador (lo que dicen las ediciones/*.ed). Deshace los cambios línea a línea y
+# exige recuperar la línea original; mismo número de líneas. Imprime un resumen y sale 1 si algo no cuadra.
+import sys, os, glob, re
+
+T = os.path.dirname(os.path.abspath(__file__))
+D = sys.argv[1]
+mal = 0
+for f in sorted(glob.glob(f'{T}/{D}/*.lean')):
+    x = os.path.basename(f)[:-5]
+    o = open(f'{T}/orig/{x}.lean', encoding='utf-8', newline='').read().split('\n')
+    n = open(f, encoding='utf-8', newline='').read().split('\n')
+    if len(o) != len(n):
+        print(f'✗ {x}: {len(o)} → {len(n)} líneas'); mal += 1; continue
+    # los reemplazos que constan en ediciones/ (estricto y, si toca, __s1)
+    reps = set()
+    pats = [f'{T}/ediciones/{x}.it*.ed', f'{T}/ediciones/{x}.sintope*.ed']
+    if D.endswith('-s1'):
+        pats += [f'{T}/ediciones/{x}__s1.it*.ed', f'{T}/ediciones/{x}__s1.sintope*.ed']
+    for p in pats:
+        for ed in glob.glob(p):
+            for l in open(ed, encoding='utf-8'):
+                q = l.rstrip('\n').split('\t')
+                if len(q) >= 4:
+                    reps.add((q[2].split()[0], q[3]))
+    cambiadas = 0; s2 = s1 = q = 0
+    for i, (a, b) in enumerate(zip(o, n)):
+        if a == b:
+            continue
+        cambiadas += 1
+        c = b
+        k = c.count('ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2')
+        c = c.replace('ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2', 'ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2'); s2 += k
+        if D.endswith('-s1'):
+            k = c.count('ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst1')
+            c = c.replace('ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst1', 'ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1'); s1 += k
+        for nom, rep in sorted(reps, key=lambda r: -len(r[1])):
+            # deshace «rep» → «nom» sólo donde rep es un identificador entero
+            pat = r'(?<![A-Za-z0-9_.\'])' + re.escape(rep) + r'(?![A-Za-z0-9_\'])'
+            c, k = re.subn(pat, nom, c); q += k
+        if c != a:
+            print(f'✗ {x}:{i + 1}: no se recupera la original\n    orig: {a.strip()[:160]}\n    nueva: {b.strip()[:160]}'); mal += 1
+    print(f'{"✓" if True else ""} {x}: {cambiadas} líneas cambiadas; subst2 {s2}' + (f', subst1 {s1}' if D.endswith('-s1') else '') + f'; cualificaciones deshechas {q}')
+print('TODO CUADRA' if mal == 0 else f'{mal} PROBLEMAS')
+sys.exit(1 if mal else 0)

@@ -1,0 +1,15 @@
+#!/bin/bash
+# prueba.sh MOD decl... — en WSL: exporta cada decl sola (con los .olean de Windows) y la pasa por nanoda con 4 hilos
+set -u
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+D=/mnt/d/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/nanoda
+export LEAN_PATH=/mnt/e/dropbox/github/lean4/ROBINSON_PlusPlus/.lake/build/lib/lean:/mnt/e/dropbox/github/lean4/FOL/.lake/build/lib/lean:$D/olean
+export PATH=$BIN:$PATH ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0
+H=${HILOS:-4}
+M=$1; shift
+for d in "$@"; do
+  "$BIN/leanexport" "$M" -- "$d" > /tmp/np_x.ndjson 2> /tmp/np_x.err || { echo "$d: leanexport falló: $(head -c 200 /tmp/np_x.err)"; continue; }
+  python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":sys.argv[1],"permitted_axioms":["propext","Quot.sound","Classical.choice"],"unpermitted_axiom_hard_error":True,"num_threads":int(sys.argv[2]),"nat_extension":True,"string_extension":True,"print_success_message":True}))' /tmp/np_x.ndjson "$H" > /tmp/np.json
+  s=$(date +%s.%N); timeout 300 "$BIN/nanoda_bin" /tmp/np.json > /tmp/np.log 2>&1; rc=$?; e=$(echo "$(date +%s.%N) - $s" | bc)
+  echo "$d hilos=$H rc=$rc ${e}s $(wc -c < /tmp/np_x.ndjson)B :: $(tail -c 110 /tmp/np.log | tr '\n' ' ')"
+done

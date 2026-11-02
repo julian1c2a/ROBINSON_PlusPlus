@@ -1439,7 +1439,8 @@ T_UNIVERSO="goedel_first_prf goedel_second_prf prf_con_imp_godel prf_godelCN_fix
   tarski_semantico consistencia repr_pos'_prf d2_prf d3_prf_real rosser_ext rosser lob
   prf_godel_iff_con goedel_second_formalizado con_indecidible
   prf_of_prov_de modelo_prov_iff_de godelCN_verdadera_de con_verdadera_de
-  tarski_semantico_de goedel_I_fol goedel_I_neg_fol goedel_II_fol"
+  tarski_semantico_de goedel_I_fol goedel_I_neg_fol goedel_II_fol
+  prf_completo modelo_sin_G goedel_I_semantico"
 t_filas() {   # stdin: el documento → un nombre por cada aparición en la columna del nombre de §1 (1.ª) o §3 (2.ª)
   LC_ALL=C awk '
     /^## 1 · / { s = 1; next }
@@ -1925,8 +1926,8 @@ S_TAB=$(mktemp); S_HOY=$(mktemp)
 # ── LA TABLA ──  fichero § sondeo (sin `.lean`) § citas § por qué es procedencia
 cat > "$S_TAB" <<'SEOF'
 ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean§AcotarEsLaMismaObligacion§1§los consumidores de la firma que quedan en el sondeo
-ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§A3IsFCBTracked§2§lo que aplicó y lo que no necesitó en su día (nota ✏️ de ADR‑134; REPARAR: no compila)
-ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean§A3IsFCBTracked§3§lo que reflejó, su §2 citada y cómo define su PsiF (REPARAR)
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§A3IsFCBTracked§2§lo que aplicó y lo que no necesitó en su día (nota ✏️ de ADR‑134; REGISTRO: compila otra vez desde ADR‑248)
+ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean§A3IsFCBTracked§3§lo que reflejó, su §2 citada y cómo define su PsiF (REGISTRO desde ADR‑248)
 ROBINSON_PlusPlus/Meta/HilbertDeduction.lean§PrfHMono§2§el rescate de la deuda B6b (2026‑09‑11) y su copia; PrfH_w1 está en el build
 ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean§SegundoMuro§1§una de las copias de la pieza antes de entrar en el build
 ROBINSON_PlusPlus/Meta/ModeloCodigo.lean§ModeloNat§1§de dónde se promovió el modelo (ADR‑119)
@@ -1937,7 +1938,7 @@ ROBINSON_PlusPlus/Meta/Sigma1CorePrf.lean§D3Sigma1Vacuo§1§la refutación de h
 ROBINSON_PlusPlus/Meta/Sigma1Prf.lean§D3Sigma1Vacuo§1§la refutación de hI, «compilado el 2026‑10‑12» (ADR‑132)
 ROBINSON_PlusPlus/Meta/SolidezPrf.lean§CantorSobreyectivo§1§de dónde se copió wN
 ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean§MergeTestigos§2§de dónde se copió la fusión de testigos, y la copia que sigue fuera
-ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean§A3IsFCBTracked§3§de dónde se promovió el kit genérico, lo que probó y su idioma de bdInB (REPARAR)
+ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean§A3IsFCBTracked§3§de dónde se promovió el kit genérico, lo que probó y su idioma de bdInB (REGISTRO desde ADR‑248)
 SEOF
 S_CTRL=$(grep -v '^#' sondeos/CONTROLES.txt 2>/dev/null | grep . | sed 's/[.]lean$//' | LC_ALL=C sort -u)
 S_CITAS=$(LC_ALL=C grep -rnoE '(archivo/[A-Za-z0-9_.-]+:)?sondeos/[A-Za-z0-9_]+[.]lean' ROBINSON_PlusPlus --include=*.lean 2>/dev/null)

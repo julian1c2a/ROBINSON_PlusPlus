@@ -34,30 +34,27 @@ def boundedIn (x L : Term) : Formula :=
   Formula.ex (land (lt (.var 0) (liftTerm 0 (lenc L)))
                    (Formula.eq (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 x)))
 
-set_option linter.unusedSimpArgs false in
 /-- Clausura De Bruijn de `boundedIn` bajo `liftFormula 0`. NO es defeq: bajo el `∃`, el
     `liftFormula 1` produce `liftTerm 1 (liftTerm 0 ·)` mientras que `boundedIn ↑x ↑L` produce
     `liftTerm 0 (liftTerm 0 ·)`; los iguala `FOL.liftTerm_comm_zero` (teorema, no defeq). -/
 theorem liftFormula_boundedIn (x L : Term) :
     liftFormula 0 (boundedIn x L) = boundedIn (liftTerm 0 x) (liftTerm 0 L) := by
   simp only [boundedIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc,
-    Nat.reduceAdd, Nat.reduceLT, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
+    Nat.reduceAdd, Nat.reduceLT, ite_true, ← FOL.liftTerm_comm_zero]
 
-set_option linter.unusedSimpArgs false in
 /-- `liftFormula` atraviesa `boundedIn` (general en el nivel `k`). Vía `liftTerm_comm_zero`. -/
 theorem liftFormula_boundedIn_gen (k : Nat) (x L : Term) :
     liftFormula k (boundedIn x L) = boundedIn (liftTerm k x) (liftTerm k L) := by
   simp only [boundedIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc,
-    Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
+    Nat.zero_lt_succ, ite_true, ← FOL.liftTerm_comm_zero]
 
-set_option linter.unusedSimpArgs false in
 /-- `substFormula` atraviesa `boundedIn`. Vía `FOL.substTerm_lift_comm_zero`. -/
 theorem substFormula_boundedIn (v : Nat) (s x L : Term) :
     substFormula v s (boundedIn x L) = boundedIn (substTerm v s x) (substTerm v s L) := by
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftTerm,
-    liftTerms, hz, hz2, ite_false, Nat.zero_lt_succ, reduceIte, ite_true,
+    liftTerms, hz, hz2, ite_false,
     FOL.substTerm_lift_comm_zero]
 
 /-! ### Congruencias de `lt` (Leibniz object) -/
@@ -76,20 +73,18 @@ en `Meta/NatOrderPrf.lean`, y las dos llegaban a la raíz. Llega aquí por el `e
 
 /-! ### Dirección ⇒ : los dos casos del paso `cons` -/
 
-set_option linter.unusedSimpArgs false in
 /-- **Caso cabeza (⇒)**: si `x =eq hd` entonces `boundedIn x (cons hd t)` (testigo `i = 0`).
     `0 < lenc (cons hd t) = σ(lenc t)` (`prf_zero_lt_succ`) y `nthc (cons hd t) 0 = hd = x`. -/
 theorem prf_boundedIn_head (x hd t : Term) : Prf ((x =eq hd) ⇒ boundedIn x (cons hd t)) := by
   refine prf_deduction ?_
   refine PrfH_ex_intro zero ?_
-  simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, cons, nil, zero,
-    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
+  simp only [substFormula, substTerm, substTerms, land, lt, nthc, lenc, cons, zero,
+    Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro ?_ ?_
   · exact prf_to_prfH
       (prf_lt_subst2 (prf_eq_symm (prf_lenc_cons hd t)) (prf_zero_lt_succ (lenc t))) _
   · exact PrfH_eq_trans (prf_to_prfH (prf_nthc_zero hd t) _) (PrfH_eq_symm (prfH_hyp_self _))
 
-set_option linter.unusedSimpArgs false in
 /-- **Caso cola (⇒)**: `boundedIn x t ⇒ boundedIn x (cons hd t)` (testigo `i = σj`).
     `σj < σ(lenc t) = lenc (cons hd t)` (`prf_succ_lt_succ_of_lt`) y
     `nthc (cons hd t) (σj) = nthc t j = x` (`prf_nthc_succ`).
@@ -105,9 +100,9 @@ theorem prf_boundedIn_tail (x hd t : Term) : Prf (boundedIn x t ⇒ boundedIn x 
       (Formula.eq (nthc (liftTerm 0 t) (.var 0)) (liftTerm 0 x)) :=
     PrfH_and_elim_right (prfH_hyp_self _)
   refine PrfH_ex_intro (succ (.var 0)) ?_
-  simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, cons, succ,
-    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  simp only [substFormula, substTerm, substTerms, land, lt, nthc, lenc, cons, succ,
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
+    FOL.substTerm_liftTerm]
   refine PrfH_and_intro ?_ ?_
   · refine PrfH_lt_subst2
       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 t))) _) ?_
@@ -118,12 +113,10 @@ theorem prf_boundedIn_tail (x hd t : Term) : Prf (boundedIn x t ⇒ boundedIn x 
 
 /-! ### Predecesor: case-split del índice SIN `∃` (evita el `∃`-elim anidado bajo `PrfH`) -/
 
-set_option linter.unusedSimpArgs false in
 /-- `pred (σn) = n` en `Prf` (`ax26_pred_succ`). -/
 theorem prf_pred_succ (n : Term) : Prf (pred (succ n) =eq n) := by
   have hh := prf_spec (prf_ax (show ax26_pred_succ ∈ axioms by simp [axioms])) n
-  simp [ax26_pred_succ, substFormula, substTerm, substTerms, pred, succ,
-    FOL.substTerm_liftTerm] at hh
+  simp [substFormula, substTerm, substTerms, pred, succ] at hh
   exact hh
 
 /-- Congruencia de `pred` en `Prf` (Leibniz object). -/
@@ -255,7 +248,6 @@ theorem PrfH_eq_congr_nthc2 {Γ : List Formula} {L i j : Term} (h : PrfH Γ (i =
 
 /-! ### Dirección ⇐ : paso `cons` (descomposición) -/
 
-set_option linter.unusedSimpArgs false in
 /-- **Paso `cons` (⇐)**: `boundedIn x (cons hd t) ⇒ (x =eq hd) ∨ boundedIn x t`.
     Case-split del índice `i` con `prf_zero_or_eq_succ_pred` (sin `∃`): si `i = 0`,
     `nthc (cons hd t) 0 = hd`; si `i = σ(pred i)`, el testigo para `t` es `pred i`
@@ -291,9 +283,9 @@ theorem prf_boundedIn_cons (x hd t : Term) :
       PrfH_and_elim_right hand
     refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) ?_
     refine PrfH_ex_intro (pred (.var 0)) ?_
-    simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, pred, cons,
-      succ, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
-      FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    simp only [substFormula, substTerm, substTerms, land, lt, nthc, lenc, pred, cons,
+      succ, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
+      FOL.substTerm_liftTerm]
     refine PrfH_and_intro ?_ ?_
     · have h2 : PrfH _ (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 t)))) :=
         PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 t)) _)
@@ -307,7 +299,6 @@ theorem prf_boundedIn_cons (x hd t : Term) :
 
 /-! ### Las dos inducciones de listas y el `⇔` -/
 
-set_option linter.unusedSimpArgs false in
 /-- **Dirección ⇒**: `In x L ⇒ ∃ i < lenc L. nthc L i =eq x`. Inducción de listas sobre `L`
     (`prf_list_induction`); base `nil` por explosión, paso `cons` por `ax_L2` + los helpers
     cabeza/cola. El parámetro `x` va con `liftTerm 0` y se normaliza con `norm21`. -/
@@ -321,9 +312,8 @@ theorem prf_boundedIn_of_In (x L : Term) : Prf (In x L ⇒ boundedIn x L) := by
       simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
         FOL.substTerm_liftTerm, ite_true] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
-      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms, In,
-        cons, liftFormula_boundedIn_gen, substFormula_boundedIn, norm21,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerms, In,
+        cons, liftFormula_boundedIn_gen, substFormula_boundedIn, norm21]
       refine prf_deduction (deduction_aux ?_
         (In (liftTerm 1 (liftTerm 0 x)) (cons (.var 1) (.var 0)))
         [Formula.impl (In (liftTerm 1 (liftTerm 0 x)) (.var 0))
@@ -344,7 +334,6 @@ theorem prf_boundedIn_of_In (x L : Term) : Prf (In x L ⇒ boundedIn x L) := by
   simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
     FOL.substTerm_liftTerm, ite_true] using hL
 
-set_option linter.unusedSimpArgs false in
 /-- **Dirección ⇐**: `(∃ i < lenc L. nthc L i =eq x) ⇒ In x L`. Inducción de listas;
     base `nil` por explosión (`prf_boundedIn_nil`), paso `cons` por `prf_boundedIn_cons`. -/
 theorem prf_In_of_boundedIn (x L : Term) : Prf (boundedIn x L ⇒ In x L) := by
@@ -357,9 +346,8 @@ theorem prf_In_of_boundedIn (x L : Term) : Prf (boundedIn x L ⇒ In x L) := by
       simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
         FOL.substTerm_liftTerm, ite_true] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
-      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms, In,
-        cons, liftFormula_boundedIn_gen, substFormula_boundedIn, norm21,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerms, In,
+        cons, liftFormula_boundedIn_gen, substFormula_boundedIn, norm21]
       refine prf_deduction (deduction_aux ?_
         (boundedIn (liftTerm 1 (liftTerm 0 x)) (cons (.var 1) (.var 0)))
         [Formula.impl (boundedIn (liftTerm 1 (liftTerm 0 x)) (.var 0))

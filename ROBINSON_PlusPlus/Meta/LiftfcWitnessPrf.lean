@@ -144,13 +144,12 @@ theorem PHIL_at (t : Term) :
   simp only [PHIL, PHILbody, substFormula, substF_BODYL, substTerm, Nat.reduceAdd,
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
-set_option linter.unusedSimpArgs false in
 theorem PHIL_spec1 (t w : Term) :
     substFormula 0 w (Formula.forall (BODYL (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
       = Formula.forall (BODYL (liftTerm 0 w) (.var 0) (liftTerm 0 t)) := by
   have ht := FOL.substTerm_liftLift t 0 (liftTerm 0 w)
   simp only [substFormula, substF_BODYL, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, ht]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, ht]
 
 theorem PHIL_spec2 (t w v : Term) :
     substFormula 0 v (BODYL (liftTerm 0 w) (.var 0) (liftTerm 0 t)) = BODYL w v t := by
@@ -397,7 +396,6 @@ theorem PHILF_at (t : Term) :
   simp only [PHILF, PHILFbody, substFormula, substF_BODYFL, substTerm, Nat.reduceAdd,
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
-set_option linter.unusedSimpArgs false in
 theorem PHILF_spec1 (t wF : Term) :
     substFormula 0 wF (Formula.forall (Formula.forall
       (BODYFL (.var 2) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 (liftTerm 0 t))))))
@@ -406,9 +404,8 @@ theorem PHILF_spec1 (t wF : Term) :
             (liftTerm 0 (liftTerm 0 t)))) := by
   have h3 := substTerm_liftLiftLift t 0 (liftTerm 0 (liftTerm 0 wF))
   simp only [substFormula, substF_BODYFL, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, h3]
 
-set_option linter.unusedSimpArgs false in
 theorem PHILF_spec2 (t wF wT : Term) :
     substFormula 0 wT (Formula.forall
       (BODYFL (liftTerm 0 (liftTerm 0 wF)) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
@@ -416,7 +413,7 @@ theorem PHILF_spec2 (t wF wT : Term) :
   have hw := FOL.substTerm_liftLift wF 0 (liftTerm 0 wT)
   have ht := FOL.substTerm_liftLift t 0 (liftTerm 0 wT)
   simp only [substFormula, substF_BODYFL, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, hw, ht]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, hw, ht]
 
 theorem PHILF_spec3 (t wF wT v : Term) :
     substFormula 0 v (BODYFL (liftTerm 0 wF) (liftTerm 0 wT) (.var 0) (liftTerm 0 t))

@@ -485,19 +485,17 @@ theorem pcc_eval_add_succ_imp (a b : Term) :
 `evalAddCode` es transparente a `substTerm`/`liftTerm` (sus constantes — `numeral 4`, `strCode +`,
 `cons`, `nil` — son cerradas). Esos dos lemas de transporte hacen la inducción rutinaria. -/
 
-set_option linter.unusedSimpArgs false in
 /-- `substTerm` atraviesa `evalAddCode` (las constantes de código son cerradas). -/
 theorem substTerm_evalAddCode (v : Nat) (s X Y : Term) :
     substTerm v s (evalAddCode X Y)
       = evalAddCode (substTerm v s X) (substTerm v s Y) := by
-  simp only [evalAddCode, eqCodeFn, addcT, succcT, funcc, tcFn, add, cons, nil, zero, succ,
+  simp only [evalAddCode, eqCodeFn, addcT, funcc, tcFn, add, cons, nil, zero, succ,
     substTerm, substTerms, substTerm_numeral, substTerm_strCode]
 
-set_option linter.unusedSimpArgs false in
 /-- `liftTerm` atraviesa `evalAddCode`. -/
 theorem liftTerm_evalAddCode (k : Nat) (X Y : Term) :
     liftTerm k (evalAddCode X Y) = evalAddCode (liftTerm k X) (liftTerm k Y) := by
-  simp only [evalAddCode, eqCodeFn, addcT, succcT, funcc, tcFn, add, cons, nil, zero, succ,
+  simp only [evalAddCode, eqCodeFn, addcT, funcc, tcFn, add, cons, nil, zero, succ,
     liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
 
 /-- Predicado inductivo `Ψ(b) = Prov(⌜ȧ + ḃ = (a+b)˙⌝)` (`b` = `#0`; `a` liftado). -/

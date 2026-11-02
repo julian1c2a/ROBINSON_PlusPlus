@@ -1,0 +1,256 @@
+diff --git a/sondeos/A3IsFCBTracked.lean b/sondeos/A3IsFCBTracked.lean
+index d9940bc..bc3a6b3 100644
+--- a/sondeos/A3IsFCBTracked.lean
++++ b/sondeos/A3IsFCBTracked.lean
+@@ -10,6 +10,30 @@
+    (✏️ 2026‑10‑14, ADR‑134: ese axioma ya no existe; desde ADR‑117 el ancla es el axioma diagonal
+    `ax_axiomsCodeT_def` y `prf_ancla` es teorema.)
+ 
++   (✏️ 2026‑11‑02 (T10): reparado. No compilaba —19 errores, el primero en :358, MEDIDO el
++   2026‑10‑16 y el 2026‑11‑02—; hoy, contra el build de `master` 4a0c00e (Lean v4.35.0),
++   `lean sondeos/A3IsFCBTracked.lean` da rc 0, 0 errores y 0 avisos (MEDIDO; 26 y 30 s en dos
++   pasadas con `LEAN_NUM_THREADS=2` y otros trabajos en la máquina), y
++
++    'A3Directa.pcc_isFCB_tracked' depends on axioms: [propext, Quot.sound]
++
++   —sin `Classical.choice`, que el de septiembre traía, y sin el ancla, que es un axioma OBJETO
++   (está en `axioms`), no un `axiom` de Lean—. Los 19 tenían tres causas, y ninguna tocaba la
++   matemática del sondeo: (1) las GUARDAS de ADR‑020: `PrfH_eq_symm_code`, `PrfH_eq_trans_code`,
++   `PrfH_leibniz_apply`, `PrfH_bdEx_intro_open` y `pcc_thm_inst2` piden hoy `Prf (hasWit t)` /
++   `Prf (hasWitF C)` de cada código que tocan, y `pcc_bdAll_intro` una obligación más,
++   `hwPsi : ∀ q, Prf (hasWitF (PsiF q))`; todas se descargan con `hw_auto`, como en
++   `Meta/TrackedAtomsPrf.lean` (16 errores, tres de ellos «unsolved goals» en cascada);
++   (2) `PrfH_lt_subst2` vive hoy en `ROBINSON_PlusPlus.Meta.ChainPrf`, no en `BoundedInPrf` (2);
++   (3) `liftTerm_numeralM` era ambiguo con el que exporta `Meta/PremsOfDotPrf.lean`: cualificado
++   (1, con su cascada). De paso, los seis `if_pos`/`if_neg`/`if_true` obsoletos, a sus nombres de
++   v4.35.0 (`ite_eq_left`/`ite_eq_right`/`ite_true`, mismas firmas). Los ENUNCIADOS son los mismos
++   —comparados con `#check`/`#print` contra el original, con nombres completos: las 81
++   declaraciones, en el mismo orden, y 80 idénticas— salvo UNO: `PrfH_in_transport` lleva ahora las
++   tres guardas como parámetros automáticos, igual que su homónimo promovido de `TrackedAtomsPrf`,
++   porque con `u`, `v`, `W` arbitrarios no se derivan con el árbol de hoy; en sus tres usos las
++   descarga `hw_auto` solo, y ningún otro enunciado cambia. Ver su docstring.)
++
+ Fichero AUTOCONTENIDO (sólo `import ROBINSON_PlusPlus.Meta`).
+ 
+ ## Las tres decisiones que lo hicieron salir
+@@ -355,7 +379,7 @@ theorem pcc_boundedIn_tracked (x w : Term) :
+       (prf_congr_eqCodeFn (prf_congr_lencT (prf_eq_symm (prf_liftc_tcFn W))) (prf_refl _)))
+       (pcc_eval_lenc W)
+   have hBsym : PrfH Γ' (provFromCode (eqc (tcFn (lenc W)) (bdInB W))) :=
+-    PrfH_eq_symm_code _ _ (substtc_inv_bdInB W) (prf_to_prfH hBeq _)
++    PrfH_eq_symm_code _ _ (substtc_inv_bdInB W) (prf_to_prfH hBeq _) (by hw_auto) (by hw_auto)
+   have hcompLt : ∀ t : Term, Prf (substfc zero t (ltCodeFn (tcFn (.var 0)) (varc (numeral 0)))
+       =eq ltCodeFn (tcFn (.var 0)) t) := fun t =>
+     prf_substfc_ltCodeFn_snd (tcFn (.var 0)) t (substtc_inv_tcFn (.var 0))
+@@ -364,7 +388,7 @@ theorem pcc_boundedIn_tracked (x w : Term) :
+     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcompLt _))) _) hlt1
+   have hA2 : PrfH Γ' (provFromCode (substfc zero (bdInB W)
+       (ltCodeFn (tcFn (.var 0)) (varc (numeral 0))))) :=
+-    PrfH_leibniz_apply _ _ _ hBsym hA1
++    PrfH_leibniz_apply _ _ _ hBsym hA1 (by hw_auto) (by hw_auto) (by hw_auto)
+   have hltB : PrfH Γ' (provFromCode (ltCodeFn (tcFn (.var 0)) (bdInB W))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcompLt _)) _) hA2
+   have hev : PrfH Γ' (provFromCode (eqCodeFn (nthcT (tcFn W) (tcFn (.var 0)))
+@@ -388,7 +412,7 @@ theorem pcc_boundedIn_tracked (x w : Term) :
+   have hphi : PrfH Γ' (provFromCode (substfc zero (tcFn (.var 0)) (bdInPhic X W))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm hcompPhi)) _) hphi0
+   exact PrfH_bdEx_intro_open (bdInB W) (bdInPhic X W) (tcFn (.var 0))
+-    (substtc_inv_bdInB W) hltB hphi
++    (substtc_inv_bdInB W) hltB hphi (by hw_auto) (by hw_auto) (by hw_auto)
+ 
+ def phiInBwd : Formula := Formula.impl (boundedIn (.var 1) (.var 0)) (In (.var 1) (.var 0))
+ 
+@@ -409,7 +433,7 @@ theorem pcc_InBwd_computed (x w : Term) :
+   let B : Term := tcFn w
+   let W : Term := liftc zero A
+   have h0 : Prf (provFromCode (substfc zero B (substfc (succ zero) W (formCode phiInBwd)))) :=
+-    pcc_thm_inst2 phiInBwd InBwd A B
++    pcc_thm_inst2 phiInBwd InBwd A B (by hw_auto) (by hw_auto)
+   have hin : Prf (substfc (succ zero) W (formCode phiInBwd)
+       =eq implc (exc (andc (ltCodeFn (varc (numeral 0)) (lencT (varc (numeral 1))))
+                            (eqCodeFn (nthcT (varc (numeral 1)) (varc (numeral 0)))
+@@ -502,18 +526,30 @@ theorem pcc_cdrcD_bridge_cons (X : Term) :
+       (prf_to_prfH (prf_refl _) _))
+     (prf_to_prfH (pcc_eval_cdrc (carc X) (cdrc X)) _)
+ 
+-/-- Transporte interno dentro del 1er argumento del átomo `In`. -/
++/-- Transporte interno dentro del 1er argumento del átomo `In`.
++
++    ✏️ 2026‑11‑02 (T10): **el único enunciado del fichero que cambia.** Lleva las tres guardas de
++    ADR‑020 (`hwW`, `hwu`, `hwv`) como parámetros automáticos, igual que su homónimo promovido
++    `ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.PrfH_in_transport` (`Meta/TrackedAtomsPrf.lean:508`):
++    la Leibniz interna (`PrfH_leibniz_apply`) las exige como teoremas cerrados, y con `u`, `v`, `W`
++    arbitrarios no se pueden derivar. En los tres usos (`u`, `v`, `W` son códigos punteados) las
++    descarga `hw_auto` solo, así que las llamadas no cambian. -/
+ theorem PrfH_in_transport {Γ : List Formula} (u v W : Term)
+     (hW : ∀ V, Prf (substtc zero V W =eq W))
+     (heq : PrfH Γ (provFromCode (eqc u v)))
+-    (h : PrfH Γ (provFromCode (inFormCodeFn u W))) :
++    (h : PrfH Γ (provFromCode (inFormCodeFn u W)))
++    (hwW : Prf (hasWit W) := by hw_auto) (hwu : Prf (hasWit u) := by hw_auto)
++    (hwv : Prf (hasWit v) := by hw_auto) :
+     PrfH Γ (provFromCode (inFormCodeFn v W)) := by
+   let Cin : Term := inFormCodeFn (varc (numeral 0)) W
+   have hcomp : ∀ t : Term, Prf (substfc zero t Cin =eq inFormCodeFn t W) := fun t =>
+     prf_substfc_inDot t (varc (numeral 0)) t W (prf_substtc_varc0 t) hW
+   have h1 : PrfH Γ (provFromCode (substfc zero u Cin)) :=
+     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcomp u))) _) h
+-  have h2 : PrfH Γ (provFromCode (substfc zero v Cin)) := PrfH_leibniz_apply Cin u v heq h1
++  have h2 : PrfH Γ (provFromCode (substfc zero v Cin)) :=
++    PrfH_leibniz_apply Cin u v heq h1
++      (prf_hasWitF_atom2 (strCode in_sym) (varc (numeral 0)) W
++        (prf_hasWit_varc (numeral 0)) hwW) hwu hwv
+   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp v)) _) h2
+ 
+ /-! ## 6 · LOS 12 CASOS (reflexión de cada disyunto sobre el nodo `X` ABSTRACTO) -/
+@@ -539,6 +575,7 @@ theorem pcc_shape_tracked (X : Term) (k n : Nat) :
+       (PrfH_and_elim_left hsh)
+   have hA : PrfH Γ (provFromCode (eqCodeFn (carcT (tcFn X)) (tcFn (numeralM k)))) :=
+     PrfH_eq_trans_code _ _ _ (substtc_inv_carcT (substtc_inv_tcFn X)) hcarc hcarc2
++      (by hw_auto) (by hw_auto) (by hw_auto)
+   have hlen : PrfH Γ (provFromCode (eqCodeFn (lencT (tcFn X)) (tcFn (lenc X)))) :=
+     prf_to_prfH (pcc_eval_lenc X) Γ
+   have hlen2 : PrfH Γ (provFromCode (eqCodeFn (tcFn (lenc X)) (tcFn (numeralM n)))) :=
+@@ -546,6 +583,7 @@ theorem pcc_shape_tracked (X : Term) (k n : Nat) :
+       (PrfH_and_elim_right hsh)
+   have hB : PrfH Γ (provFromCode (eqCodeFn (lencT (tcFn X)) (tcFn (numeralM n)))) :=
+     PrfH_eq_trans_code _ _ _ (substtc_inv_lencT (substtc_inv_tcFn X)) hlen hlen2
++      (by hw_auto) (by hw_auto) (by hw_auto)
+   exact PrfH_and_intro_code _ _ hA hB
+ 
+ /-- La pertenencia de un HIJO en la casilla `j`, en forma COMPUTADA (`nthcT Ẋ ȷ̇`). -/
+@@ -559,7 +597,7 @@ theorem pcc_child_tracked (q X : Term) (j n : Nat) (hjn : j < n) :
+   have hlen : PrfH [In (nthc X (numeralM j)) q, Formula.eq (lenc X) (numeralM n)]
+       (Formula.eq (lenc X) (numeralM n)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH _ (lt (numeralM j) (lenc X)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+       (prf_to_prfH (prf_lt_numeralM hjn) _)
+   have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM j)))
+       (tcFn (nthc X (numeralM j))))) :=
+@@ -568,6 +606,7 @@ theorem pcc_child_tracked (q X : Term) (j n : Nat) (hjn : j < n) :
+       (nthcT (tcFn X) (tcFn (numeralM j))))) :=
+     PrfH_eq_symm_code _ _
+       (substtc_inv_nthcT (substtc_inv_tcFn X) (substtc_inv_tcFn (numeralM j))) hev
++      (by hw_auto) (by hw_auto)
+   have hat : PrfH _ (provFromCode (inFormCodeFn (tcFn (nthc X (numeralM j))) (tcFn q))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_In_atom_tracked (nthc X (numeralM j)) q) _) hin
+   exact PrfH_in_transport _ _ _ (substtc_inv_tcFn q) hevS hat
+@@ -581,7 +620,7 @@ theorem pcc_carcIn_tracked (q X : Term) :
+     PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hbr := PrfH.mp _ _ _ (prf_to_prfH (pcc_carcD_bridge_cons X) _) hcons
+   have hbrS : PrfH _ (provFromCode (eqCodeFn (tcFn (carc X)) (carcT (tcFn X)))) :=
+-    PrfH_eq_symm_code _ _ (substtc_inv_carcT (substtc_inv_tcFn X)) hbr
++    PrfH_eq_symm_code _ _ (substtc_inv_carcT (substtc_inv_tcFn X)) hbr (by hw_auto) (by hw_auto)
+   have hat : PrfH _ (provFromCode (inFormCodeFn (tcFn (carc X)) (tcFn q))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_In_atom_tracked (carc X) q) _) hin
+   exact PrfH_in_transport _ _ _ (substtc_inv_tcFn q) hbrS hat
+@@ -595,7 +634,7 @@ theorem pcc_cdrcIn_tracked (q X : Term) :
+     PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hbr := PrfH.mp _ _ _ (prf_to_prfH (pcc_cdrcD_bridge_cons X) _) hcons
+   have hbrS : PrfH _ (provFromCode (eqCodeFn (tcFn (cdrc X)) (cdrcT (tcFn X)))) :=
+-    PrfH_eq_symm_code _ _ (substtc_inv_cdrcT (substtc_inv_tcFn X)) hbr
++    PrfH_eq_symm_code _ _ (substtc_inv_cdrcT (substtc_inv_tcFn X)) hbr (by hw_auto) (by hw_auto)
+   have hat : PrfH _ (provFromCode (inFormCodeFn (tcFn (cdrc X)) (tcFn q))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_In_atom_tracked (cdrc X) q) _) hin
+   exact PrfH_in_transport _ _ _ (substtc_inv_tcFn q) hbrS hat
+@@ -748,7 +787,8 @@ theorem hCl_ok : ∀ (k : Nat) (q : Term), liftFormula k (wfAll q) = wfAll (lift
+   intro k q
+   simp only [wfAll, nodeOk, cOk, consOk, lorAll, nulOk, unOk, binOk, strBinOk, varOk,
+     land, lor, In, lt, carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero]
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, ite_eq_left (Nat.zero_lt_succ k),
++    ← FOL.liftTerm_comm_zero]
+ 
+ theorem hCs_ok : ∀ (v : Nat) (t q : Term),
+     substFormula v t (wfAll q) = wfAll (substTerm v t q) := by
+@@ -757,7 +797,7 @@ theorem hCs_ok : ∀ (v : Nat) (t q : Term),
+   have h2 : ¬ ((0 : Nat) > v + 1) := by omega
+   simp only [wfAll, nodeOk, cOk, consOk, lorAll, nulOk, unOk, binOk, strBinOk, varOk,
+     land, lor, In, lt, carc, cdrc, lenc, nthc, cons, nil, zero, substFormula, substTerm, substTerms,
+-    substTerm_numeralM, FOL.substTerm_lift_comm_zero, if_neg h1, if_neg h2]
++    substTerm_numeralM, FOL.substTerm_lift_comm_zero, ite_eq_right h1, ite_eq_right h2]
+ 
+ /-- **`hPsiId`**: sustituir el hueco `⌜v₀⌝` por sí mismo es la identidad — sale por
+     instanciación pura del descenso, porque el RHS es DEFINICIONALMENTE `PsiF q`. -/
+@@ -780,7 +820,7 @@ theorem hbody_ok : ∀ q i : Term, Prf (wfAll q ⇒ (lt i (lenc q)
+       = Formula.impl (lt i (lenc q)) (nodeOk q (nthc q i)) := by
+     simp only [nodeOk, cOk, consOk, lorAll, nulOk, unOk, binOk, strBinOk, varOk, land, lor, In,
+       lt, carc, cdrc, lenc, nthc, cons, nil, zero, substFormula, substTerm, substTerms,
+-      substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
++      substTerm_numeralM, FOL.substTerm_liftTerm, ite_true]
+   have h0 := PrfH.mp _ _ _ (PrfH.incl0 [lt i (lenc q), wfAll q] _
+     (Prfᵢ.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (lenc q)))
+       (nodeOk (liftTerm 0 q) (nthc (liftTerm 0 q) (.var 0)))) i)) hwf
+@@ -797,7 +837,7 @@ theorem hbody_ok : ∀ q i : Term, Prf (wfAll q ⇒ (lt i (lenc q)
+   have hevS : PrfH [lt i (lenc q), wfAll q]
+       (provFromCode (eqCodeFn (tcFn (nthc q i)) (nthcT (tcFn q) (tcFn i)))) :=
+     PrfH_eq_symm_code _ _
+-      (substtc_inv_nthcT (substtc_inv_tcFn q) (substtc_inv_tcFn i)) hev
++      (substtc_inv_nthcT (substtc_inv_tcFn q) (substtc_inv_tcFn i)) hev (by hw_auto) (by hw_auto)
+   -- (4) UNA Leibniz interna con el contexto `nodeOkDot q̇ ⌜v₀⌝` cubre los 12 disyuntos
+   have hC : ∀ t : Term,
+       Prf (substfc zero t (nodeOkDot (tcFn q) (varc (numeral 0))) =eq nodeOkDot (tcFn q) t) :=
+@@ -809,7 +849,7 @@ theorem hbody_ok : ∀ q i : Term, Prf (wfAll q ⇒ (lt i (lenc q)
+   have h2 : PrfH [lt i (lenc q), wfAll q]
+       (provFromCode (substfc zero (nthcT (tcFn q) (tcFn i))
+         (nodeOkDot (tcFn q) (varc (numeral 0))))) :=
+-    PrfH_leibniz_apply _ _ _ hevS h1
++    PrfH_leibniz_apply _ _ _ hevS h1 (by hw_auto) (by hw_auto) (by hw_auto)
+   have h3 : PrfH [lt i (lenc q), wfAll q]
+       (provFromCode (nodeOkDot (tcFn q) (nthcT (tcFn q) (tcFn i)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hC _)) _) h2
+@@ -819,7 +859,8 @@ theorem hbody_ok : ∀ q i : Term, Prf (wfAll q ⇒ (lt i (lenc q)
+ /-! ## 9 · A3 -/
+ 
+ theorem pcc_wfAll_tracked (w : Term) : Prf (wfAll w ⇒ provFromCode (wfAllDot w)) :=
+-  pcc_bdAll_intro wfAll lenc PsiF w hCl_ok hCs_ok hbl_ok hbs_ok hPl_ok hPs_ok hPsiId_ok hbody_ok
++  pcc_bdAll_intro wfAll lenc PsiF w hCl_ok hCs_ok hbl_ok hbs_ok hPl_ok hPs_ok hPsiId_ok
++    (fun _ => by hw_auto) hbody_ok
+ 
+ /-- **A3**: `isFCB w c ⇒ Prov(⌜isFCBDot w c⌝)`, con `w` y `c` **ABSTRACTOS**. -/
+ theorem pcc_isFCB_tracked (w c : Term) : Prf (isFCB w c ⇒ provFromCode (isFCBDot w c)) := by
+@@ -879,7 +920,7 @@ theorem PrfH_congr_nthc_idx {Γ : List Formula} {w i₁ i₂ : Term} (h : PrfH 
+     Formula.eq (nthc (liftTerm 0 w) (liftTerm 0 i₁)) (nthc (liftTerm 0 w) (.var 0))
+   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (nthc w i₁) (nthc w s) := by
+     intro s
+-    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
++    simp only [f, nthc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+   exact (hS i₂) ▸ PrfH_leibniz_subst (A := f) h ((hS i₁) ▸ prf_to_prfH (prf_refl (nthc w i₁)) Γ)
+ 
+ /-- Leibniz sobre el nodo: UNA sola aplicación, no 12. -/
+@@ -890,7 +931,7 @@ theorem PrfH_congr_nodeOk {Γ : List Formula} {w X₁ X₂ : Term} (h : PrfH Γ
+     intro s
+     simp only [f, nodeOk, cOk, consOk, lorAll, nulOk, unOk, binOk, strBinOk, varOk, land, lor, In,
+       carc, cdrc, lenc, nthc, cons, nil, zero, substFormula, substTerm, substTerms,
+-      FOL.substTerm_liftTerm, substTerm_numeralM, if_true]
++      FOL.substTerm_liftTerm, substTerm_numeralM, ite_true]
+   exact (hS X₂) ▸ PrfH_leibniz_subst (A := f) h ((hS X₁) ▸ hN)
+ 
+ theorem prf_isFCB_bottom : Prf (isFCB wBot (formCodeM Formula.bottom)) := by
+@@ -901,7 +942,7 @@ theorem prf_isFCB_bottom : Prf (isFCB wBot (formCodeM Formula.bottom)) := by
+   rw [hlift]
+   have hlen : Prf (Formula.eq (lenc wBot) (numeralM 1)) := prf_lenc_objList _
+   have hlt1 : PrfH [lt (.var 0) (lenc wBot)] (lt (.var 0) (succ zero)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH hlen _)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH hlen _)
+       (PrfH.hyp _ _ (List.Mem.head _))
+   have hsplit : PrfH [lt (.var 0) (lenc wBot)]
+       (lor (lt (.var 0) zero) (Formula.eq (.var 0) zero)) :=
+@@ -931,6 +972,16 @@ set_option pp.explicit false in
+ #check @A3Directa.pcc_wfAll_tracked
+ #check @A3Directa.pcc_isFCB_bottom
+ 
++/- ✏️ 2026‑11‑02 (T10): salida MEDIDA de los ocho `#print axioms` de abajo, contra el build de
++   `master` 4a0c00e (Lean v4.35.0) — la misma en los ocho:
++     'A3Directa.pcc_isFCB_tracked' depends on axioms: [propext, Quot.sound]
++     'A3Directa.pcc_wfAll_tracked' depends on axioms: [propext, Quot.sound]
++     'A3Directa.hbody_ok' depends on axioms: [propext, Quot.sound]
++     'A3Directa.pcc_nodeOk_pure' depends on axioms: [propext, Quot.sound]
++     'A3Directa.pcc_In_atom_tracked' depends on axioms: [propext, Quot.sound]
++     'A3Directa.hPsiId_ok' depends on axioms: [propext, Quot.sound]
++     'A3Directa.prf_isFCB_bottom' depends on axioms: [propext, Quot.sound]
++     'A3Directa.pcc_isFCB_bottom' depends on axioms: [propext, Quot.sound] -/
+ #print axioms A3Directa.pcc_isFCB_tracked
+ #print axioms A3Directa.pcc_wfAll_tracked
+ #print axioms A3Directa.hbody_ok

@@ -1,0 +1,8 @@
+ADR-248, 2026-11-02: sondeos/A3IsFCBTracked.lean, REPARADO por un agente (contra RPP 4a0c00e); el coordinador lo
+recompiló en el árbol (lake lean: rc 0, 0 errores, 0 avisos, 20 s; pcc_isFCB_tracked: [propext, Quot.sound]).
+
+  diagnostico.txt       los 19 errores de partida, con su causa
+  reparacion.diff       el diff contra el de master (LF)
+  compilacion-final.txt la salida de la compilación final del agente
+  firmas.diff           las 81 declaraciones, #check y #print antes y después: cambia sólo PrfH_in_transport (tres
+                        guardas automáticas, las de su homónimo promovido en Meta/TrackedAtomsPrf.lean)

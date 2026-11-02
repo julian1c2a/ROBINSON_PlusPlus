@@ -226,11 +226,10 @@ theorem prf_ax_tc_succ (x : Term) : Prf (tcFn (succ x) =eq SUCCNODE x) := by
 La lista de argumentos del nodo `σ` tiene UN elemento. `argsIn W [hd]` se reduce a `In hd W`:
 la posición 0 es `hd`, y no hay más porque `lenc nil = 0` cierra el caso sucesor por `efq`. -/
 
-set_option linter.unusedSimpArgs false in
 theorem prf_argsIn_singleton (W hd : Term) :
     Prf (Formula.impl (In hd W) (argsIn W (cons hd nil))) := by
   refine prf_mp (Prf.qconf (In hd W) (argsInBody W (cons hd nil))) (Prf.gen _ ?_)
-  simp only [liftFormula, In, liftTerm, liftTerms]
+  simp only [liftFormula, In, liftTerms]
   refine prf_deduction (deduction_aux ?_
     (lt (.var 0) (liftTerm 0 (lenc (cons hd nil))))
     [In (liftTerm 0 hd) (liftTerm 0 W)] rfl)

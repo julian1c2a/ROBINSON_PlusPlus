@@ -1,0 +1,12 @@
+A3Directa.pcc_isFCB_tracked : ∀ (w c : Term), ⊢ᴴ A3Directa.isFCB w c ⇒ provFromCode (A3Directa.isFCBDot w c)
+A3Directa.pcc_wfAll_tracked : ∀ (w : Term), ⊢ᴴ A3Directa.wfAll w ⇒ provFromCode (A3Directa.wfAllDot w)
+A3Directa.pcc_isFCB_bottom : ⊢ᴴ provFromCode (A3Directa.isFCBDot A3Directa.wBot (formCodeM ⊥))
+'A3Directa.pcc_isFCB_tracked' depends on axioms: [propext, Quot.sound]
+'A3Directa.pcc_wfAll_tracked' depends on axioms: [propext, Quot.sound]
+'A3Directa.hbody_ok' depends on axioms: [propext, Quot.sound]
+'A3Directa.pcc_nodeOk_pure' depends on axioms: [propext, Quot.sound]
+'A3Directa.pcc_In_atom_tracked' depends on axioms: [propext, Quot.sound]
+'A3Directa.hPsiId_ok' depends on axioms: [propext, Quot.sound]
+'A3Directa.prf_isFCB_bottom' depends on axioms: [propext, Quot.sound]
+'A3Directa.pcc_isFCB_bottom' depends on axioms: [propext, Quot.sound]
+rc=0 segundos=27

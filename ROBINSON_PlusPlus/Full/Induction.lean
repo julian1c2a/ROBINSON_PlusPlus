@@ -114,7 +114,6 @@ theorem primAxioms_subset : ∀ f ∈ primAxioms, f ∈ axioms := by
 
 /-! ### Lema de composición de sustitución (De Bruijn, offset 0) -/
 
-set_option linter.unusedSimpArgs false in
 mutual
 theorem substTerm_subst_succ_lift (m t : Term) :
     substTerm 0 m (substTerm 0 (succ (.var 0)) (liftTerm 1 t)) = substTerm 0 (succ m) t := by
@@ -126,7 +125,7 @@ theorem substTerm_subst_succ_lift (m t : Term) :
       have h2 : ¬ (j + 1 = 0) := by omega
       have h3 : j + 1 > 0 := by omega
       have h4 : j > 0 := by omega
-      simp [liftTerm, substTerm, substTerms, succ, hj, h1, h2, h3, h4]
+      simp [liftTerm, substTerm, succ, hj, h1, h3, h4]
   | func f ts =>
     simp only [liftTerm, substTerm]
     congr 1
@@ -142,7 +141,6 @@ end
 
 /-! ### Composición generalizada (offset arbitrario) — para fórmulas con `∀`/`∃` -/
 
-set_option linter.unusedSimpArgs false in
 mutual
 theorem substTerm_subst_succ_lift_gen (c : Nat) (m t : Term) :
     substTerm c m (substTerm c (succ (.var c)) (liftTerm (c + 1) t)) = substTerm c (succ m) t := by
@@ -150,12 +148,12 @@ theorem substTerm_subst_succ_lift_gen (c : Nat) (m t : Term) :
   | var j =>
     rcases Nat.lt_trichotomy j c with hlt | heq | hgt
     · have e1 : j < c + 1 := by omega
-      simp [liftTerm, substTerm, substTerms, succ, e1,
-            show ¬ j = c from by omega, show ¬ j > c from by omega, hlt]
+      simp [liftTerm, substTerm, succ, e1,
+            show ¬ j = c from by omega, show ¬ j > c from by omega]
     · subst heq
       simp [liftTerm, substTerm, substTerms, succ, show j < j + 1 from by omega]
     · have e1 : ¬ j < c + 1 := by omega
-      simp [liftTerm, substTerm, substTerms, succ, e1,
+      simp [liftTerm, substTerm, succ, e1,
             show ¬ (j + 1 = c) from by omega, show j + 1 > c from by omega,
             show ¬ (j = c) from by omega, hgt]
   | func f ts =>

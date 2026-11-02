@@ -1,0 +1,81 @@
+Probe/ren/B3_planos_dedup.lean:267:4: error: Application type mismatch: The argument
+  PrfH_leibniz_apply Ac X Y (prfH_hyp_self (provFromCode (eqc X Y))) (prf_to_prfH hAX [provFromCode (eqc X Y)])
+has type
+  (⊢ᴴ hasWitF Ac) → (⊢ᴴ hasWit X) → (⊢ᴴ hasWit Y) → PrfH [provFromCode (eqc X Y)] (provFromCode (substfc zero Y Ac))
+but is expected to have type
+  PrfH [provFromCode (eqc X Y)] (provFromCode (substfc zero Y Ac))
+in the application
+  PrfH.mp [provFromCode (eqc X Y)] (provFromCode (substfc zero Y Ac)) (provFromCode (eqc (F X) (F Y)))
+    (prf_to_prfH (prf_provCode_congr (hcomp Y)) [provFromCode (eqc X Y)])
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self (provFromCode (eqc X Y))) (prf_to_prfH hAX [provFromCode (eqc X Y)]))
+Probe/ren/B3_planos_dedup.lean:295:2: error: could not synthesize default value for parameter 'hwA' using tactics
+Probe/ren/B3_planos_dedup.lean:295:2: error: Type mismatch
+  prf_hasWitF_fc ?m.9
+has type
+  ⊢ᴴ hasWitF (formCode ?m.9)
+but is expected to have type
+  ⊢ᴴ hasWit A
+Probe/ren/B3_planos_dedup.lean:295:2: error: could not synthesize default value for parameter 'hwX' using tactics
+Probe/ren/B3_planos_dedup.lean:295:2: error: Type mismatch
+  prf_hasWitF_fc ?m.10
+has type
+  ⊢ᴴ hasWitF (formCode ?m.10)
+but is expected to have type
+  ⊢ᴴ hasWit X
+Probe/ren/B3_planos_dedup.lean:295:2: error: could not synthesize default value for parameter 'hwY' using tactics
+Probe/ren/B3_planos_dedup.lean:295:2: error: Type mismatch
+  prf_hasWitF_fc ?m.11
+has type
+  ⊢ᴴ hasWitF (formCode ?m.11)
+but is expected to have type
+  ⊢ᴴ hasWit Y
+Probe/ren/B3_planos_dedup.lean:325:2: error: Type mismatch
+  pcc_thm_inst4 φ h w₁ w₂ w₃ w₄
+has type
+  (⊢ᴴ hasWit (liftTerm 0 w₁)) →
+    (⊢ᴴ hasWit (liftTerm 0 w₂)) →
+      (⊢ᴴ hasWit (liftTerm 0 w₃)) →
+        (⊢ᴴ hasWit (liftTerm 0 w₄)) →
+          ⊢ᴴ
+            provFromCode
+              (substfc zero w₄
+                (substfc (numeral 1) (liftc zero w₃)
+                  (substfc (numeral 2) (liftc zero (liftc zero w₂))
+                    (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+but is expected to have type
+  ⊢ᴴ
+    provFromCode
+      (substfc zero w₄
+        (substfc (numeral 1) (liftc zero w₃)
+          (substfc (numeral 2) (liftc zero (liftc zero w₂))
+            (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+Probe/ren/B3_planos_dedup.lean:331:2: error: Type mismatch
+  pcc_axiom_inst4 φ hmem w₁ w₂ w₃ w₄
+has type
+  (⊢ᴴ hasWit (liftTerm 0 w₁)) →
+    (⊢ᴴ hasWit (liftTerm 0 w₂)) →
+      (⊢ᴴ hasWit (liftTerm 0 w₃)) →
+        (⊢ᴴ hasWit (liftTerm 0 w₄)) →
+          ⊢ᴴ
+            provFromCode
+              (substfc zero w₄
+                (substfc (numeral 1) (liftc zero w₃)
+                  (substfc (numeral 2) (liftc zero (liftc zero w₂))
+                    (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+but is expected to have type
+  ⊢ᴴ
+    provFromCode
+      (substfc zero w₄
+        (substfc (numeral 1) (liftc zero w₃)
+          (substfc (numeral 2) (liftc zero (liftc zero w₂))
+            (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+'B3PlanosDedup.binK_binT' does not depend on any axioms
+'B3PlanosDedup.prf_congr_binK' depends on axioms: [propext, Quot.sound]
+'B3PlanosDedup.prf_substtc_binK_at' depends on axioms: [propext, Quot.sound]
+'B3PlanosDedup.CTRL_prf_substtc_binT_at_desde_binK' depends on axioms: [propext, Quot.sound]
+'B3PlanosDedup.CTRL_prf_substtc_funccT_at_desde_binK' depends on axioms: [propext, Quot.sound]
+'B3PlanosDedup.CTRL_prf_substtc_binT_zero_desde_binK' depends on axioms: [propext, Quot.sound]
+'B3PlanosDedup.CTRL_generalidad_estricta' depends on axioms: [propext, Quot.sound]
+'B3PlanosDedup.pcc_congr_hole_code' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosDedup.CTRL_pcc_congr_substfcT_arg3_code_desde_hole' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosDedup.CTRL_pcc_congr_binT_2_code_desde_hole' depends on axioms: [propext, sorryAx, Quot.sound]

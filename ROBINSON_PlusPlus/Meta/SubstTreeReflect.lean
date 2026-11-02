@@ -299,16 +299,14 @@ theorem prf_hasWit_dotN (t : Term) : ∀ T : STree, Prf (hasWit (T.dotN t))
 /-- La condición estructural asociada a un árbol con sustituciones. -/
 def condOfS (T : STree) : Formula := carc (.var 0) =eq T.objAt (.var 0)
 
-set_option linter.unusedSimpArgs false in
 theorem substFormula_condOfS (T : STree) :
     substFormula 0 (.var 0) (condOfS T) = condOfS T := by
-  simp only [condOfS, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
+  simp only [condOfS, carc, substFormula, substTerm, substTerms,
     ite_true, substTerm_objAt_var0 T]
 
-set_option linter.unusedSimpArgs false in
 theorem substFormula_condOfS_at (T : STree) (t : Term) :
     substFormula 0 t (condOfS T) = (carc t =eq T.objAt t) := by
-  simp only [condOfS, carc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
+  simp only [condOfS, carc, substFormula, substTerm, substTerms,
     ite_true, substTerm_objAt T t]
 
 /-- ⭐ **`condD` de una condición‑árbol CON sustituciones, evaluado.** Idéntico a
@@ -715,7 +713,6 @@ theorem pcc_condDS_of_stree (T : STree) (t : Term) {n : Nat} (hmax : Nat.le T.ma
 
 La obligación administrativa `hC` del chasis, para una condición guardada. -/
 
-set_option linter.unusedSimpArgs false in
 theorem substFormula_guardedCond_var0 :
     ∀ (gs : List GuardSlot) (C : Formula), substFormula 0 (.var 0) C = C →
       substFormula 0 (.var 0) (guardedCond gs C) = guardedCond gs C
@@ -725,10 +722,10 @@ theorem substFormula_guardedCond_var0 :
         cases g with
         | wit i =>
             simp only [GuardSlot.toF, substF_hasWit, nthc, substTerm, substTerms,
-              substTerm_numeralM, FOL.substTerm_liftTerm, ite_true]
+              substTerm_numeralM, ite_true]
         | witF i =>
             simp only [GuardSlot.toF, substF_hasWitF, nthc, substTerm, substTerms,
-              substTerm_numeralM, FOL.substTerm_liftTerm, ite_true]
+              substTerm_numeralM, ite_true]
       simp only [guardedCond, substFormula, hg, substFormula_guardedCond_var0 gs C h]
 
 /-- ⭐ **EL CIERRE DE UN TAG DE SUSTITUCIÓN**, genérico: basta declarar su árbol, su lista de
@@ -751,17 +748,15 @@ exactamente los hijos del nodo `sub`**. `treeQ1 = bin 5 (un 6 (leaf 2)) (sub (le
 y la cascada del tag 9 es `[witF 2, wit 3]` — la `witF` sobre la casilla 2 (el cuerpo del
 `substfc`) y la `wit` sobre la 3 (el sustituyendo). `SGuards` las pide **ahí y sólo ahí**. -/
 
-set_option linter.unusedSimpArgs false in
 theorem substF_wit_slot (t : Term) (i : Nat) :
     substFormula 0 t (GuardSlot.wit i).toF = hasWit (nthc t (numeralM i)) := by
   simp only [GuardSlot.toF, substF_hasWit, nthc, substTerm, substTerms, substTerm_numeralM,
-    FOL.substTerm_liftTerm, ite_true]
+    ite_true]
 
-set_option linter.unusedSimpArgs false in
 theorem substF_witF_slot (t : Term) (i : Nat) :
     substFormula 0 t (GuardSlot.witF i).toF = hasWitF (nthc t (numeralM i)) := by
   simp only [GuardSlot.toF, substF_hasWitF, nthc, substTerm, substTerms, substTerm_numeralM,
-    FOL.substTerm_liftTerm, ite_true]
+    ite_true]
 
 /-- El núcleo estructural de **q1**, con la fórmula guardada entera a la vista. -/
 theorem pcc_core_q1 (t : Term) :

@@ -1,0 +1,31 @@
+#!/bin/bash
+# compila.bash <fichero.lean relativo a la raíz del clon> <etiqueta>
+# Compila UN fichero contra el build actual de RPP (oleans de RPP y de FOL), desde la raíz del clon,
+# con los leanOptions del lakefile (autoImplicit y relaxedAutoImplicit apagados, como `lake lean`).
+# Escribe salidas/<etiqueta>.out (la salida del compilador) y salidas/<etiqueta>.meta (rc, segundos, orden).
+set -u
+T48=/d/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/t48
+F=$1; TAG=$2
+LEAN='/c/Users/julia/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean.exe'
+export LEAN_PATH='E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean;c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.35.0\lib\lean'
+export LEAN_NUM_THREADS=2
+cd "$T48/rpp" || exit 9
+t0=$(date +%s)
+timeout 900 "$LEAN" -DautoImplicit=false -DrelaxedAutoImplicit=false "$F" > "$T48/salidas/$TAG.out" 2>&1
+rc=$?
+t1=$(date +%s)
+nerr=$(grep -cE '^[^ ]+:[0-9]+:[0-9]+: error' "$T48/salidas/$TAG.out")
+nsorry=$(grep -cE "declaration uses 'sorry'" "$T48/salidas/$TAG.out")
+{
+  echo "fichero: $F"
+  echo "md5: $(md5sum "$F" | cut -d' ' -f1)"
+  echo "orden: LEAN_PATH=<FOL .lake/build/lib/lean ; RPP .lake/build/lib/lean ; toolchain lib/lean> LEAN_NUM_THREADS=2 timeout 900 lean.exe -DautoImplicit=false -DrelaxedAutoImplicit=false $F"
+  echo "toolchain: $("$LEAN" --version)"
+  echo "rpp: $(git -C "$T48/rpp" log --oneline -1 | cut -c1-60)"
+  echo "fecha: $(date '+%Y-%m-%d %H:%M:%S')"
+  echo "rc: $rc"
+  echo "segundos: $((t1 - t0))"
+  echo "errores: $nerr"
+  echo "sorry: $nsorry"
+} > "$T48/salidas/$TAG.meta"
+cat "$T48/salidas/$TAG.meta"

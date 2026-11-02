@@ -1,0 +1,10 @@
+fichero: Probe/T48_CoberturaCrit.lean
+md5: fdc9844070f82c2d14b13a8b815c7e80
+orden: LEAN_PATH=<FOL .lake/build/lib/lean ; RPP .lake/build/lib/lean ; toolchain lib/lean> LEAN_NUM_THREADS=2 timeout 900 lean.exe -DautoImplicit=false -DrelaxedAutoImplicit=false Probe/T48_CoberturaCrit.lean
+toolchain: Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)
+rpp: 4a0c00e ADR-237…244: T32, T30, T39, T37, T49, T10 y T69 ce
+fecha: 2026-11-02 17:21:14
+rc: 0
+segundos: 3
+errores: 0
+sorry: 0

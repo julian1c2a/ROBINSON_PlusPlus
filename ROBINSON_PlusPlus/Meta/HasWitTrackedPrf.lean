@@ -26,7 +26,8 @@ en cuatro líneas apoyado en el kit genérico que ya está en producción
 (`Meta/TrackedAtomsPrf.lean`): la mitad derecha es `pcc_In_atom_tracked`, con `c` y `w`
 **abstractos**. (✏️ 2026‑10‑14, ADR‑134: el sondeo es hoy registro: no compila —rc 1, error en su
 :355— en ninguna de las cuatro tablas de `sondeos/pasadas/`, la última `tabla_adr129.txt`, medida el
-2026‑10‑05; su kit genérico vive en `Meta/TrackedAtomsPrf.lean`.)
+2026‑10‑05; su kit genérico vive en `Meta/TrackedAtomsPrf.lean`. ✏️ 2026‑11‑02, ADR‑248: REPARADO, compila otra vez
+—REGISTRO—.)
 
 ⇒ Queda **una** obligación de contenido para esta mitad: reflejar el `∀` acotado `wfAll1`.
 
@@ -525,23 +526,21 @@ theorem hbl_lenc : ∀ (k : Nat) (q : Term), liftTerm k (lenc q) = lenc (liftTer
 theorem hbs_lenc : ∀ (v : Nat) (s q : Term), substTerm v s (lenc q) = lenc (substTerm v s q) := by
   intro v s q; simp only [lenc, substTerm, substTerms]
 
-set_option linter.unusedSimpArgs false in
 theorem hPl_wfAll1Psi :
     ∀ (k : Nat) (q : Term), liftTerm k (wfAll1Psi q) = wfAll1Psi (liftTerm k q) := by
   intro k q
   simp only [wfAll1Psi, wfAll1PsiC, wfAll1PsiAtC, shapeFCun, shapeFCbin, unT, binT, consT,
     bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
-    eqCodeFn, andc, orc, implc, forallc, carcT, lencT, nthcT, varc, liftc, funcc, tcFn,
+    eqCodeFn, andc, orc, implc, forallc, lencT, nthcT, varc, funcc, tcFn,
     cons, nil, zero, succ, numeralM, liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode,
     liftTerm_termCode]
 
-set_option linter.unusedSimpArgs false in
 theorem hPs_wfAll1Psi :
     ∀ (v : Nat) (s q : Term), substTerm v s (wfAll1Psi q) = wfAll1Psi (substTerm v s q) := by
   intro v s q
   simp only [wfAll1Psi, wfAll1PsiC, wfAll1PsiAtC, shapeFCun, shapeFCbin, unT, binT, consT,
     bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
-    eqCodeFn, andc, orc, implc, forallc, carcT, lencT, nthcT, varc, liftc, funcc, tcFn,
+    eqCodeFn, andc, orc, implc, forallc, lencT, nthcT, varc, funcc, tcFn,
     cons, nil, zero, succ, numeralM, substTerm, substTerms, substTerm_numeral, substTerm_strCode,
     substTerm_termCode]
 
@@ -1207,7 +1206,6 @@ theorem prf_condD_hasWit_eq (t : Term) (i : Nat) :
   rw [← h]
   exact prf_substfc_arith_open 0 (tcFn t) _
 
-set_option linter.unusedSimpArgs false in
 /-- ⭐⭐⭐ **`DEUDA_hGuardT` PROBADA**, para toda casilla `i` bajo la longitud canónica `n`.
 
     La cota `i < n` **no es un artefacto**: el transporte `(nthc t ı̇)˙ → nthcT ṫ ı̄` es
@@ -1221,7 +1219,7 @@ theorem pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) :
   have hsub : substFormula 0 t (hasWit (nthc (.var 0) (numeralM i)))
       = hasWit (nthc t (numeralM i)) := by
     simp only [substF_hasWit, nthc, substTerm, substTerms, substTerm_numeralM,
-      FOL.substTerm_liftTerm, ite_true]
+      ite_true]
   rw [hsub]
   refine prf_deduction (deduction_aux (deduction_aux ?_
     (hasWit (nthc t (numeralM i))) [lenc t =eq numeralM n, lineWF t] rfl)

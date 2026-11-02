@@ -140,7 +140,6 @@ theorem PHIT_at (t : Term) :
 
 /-! ### Los tres colapsos, uno por binder -/
 
-set_option linter.unusedSimpArgs false in
 theorem PHIT_spec1 (t w : Term) :
     substFormula 0 w (Formula.forall (Formula.forall
       (BODY (.var 2) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 (liftTerm 0 t))))))
@@ -149,9 +148,8 @@ theorem PHIT_spec1 (t w : Term) :
             (liftTerm 0 (liftTerm 0 t)))) := by
   have h3 := substTerm_liftLiftLift t 0 (liftTerm 0 (liftTerm 0 w))
   simp only [substFormula, substF_BODY, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, h3]
 
-set_option linter.unusedSimpArgs false in
 theorem PHIT_spec2 (t w v : Term) :
     substFormula 0 v (Formula.forall
       (BODY (liftTerm 0 (liftTerm 0 w)) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
@@ -159,7 +157,7 @@ theorem PHIT_spec2 (t w v : Term) :
   have hw := FOL.substTerm_liftLift w 0 (liftTerm 0 v)
   have ht := FOL.substTerm_liftLift t 0 (liftTerm 0 v)
   simp only [substFormula, substF_BODY, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, hw, ht]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, hw, ht]
 
 theorem PHIT_spec3 (t w v s : Term) :
     substFormula 0 s (BODY (liftTerm 0 w) (liftTerm 0 v) (.var 0) (liftTerm 0 t))
@@ -208,13 +206,12 @@ theorem prf_hasWit_varc (m : Term) : Prf (hasWit (varc m)) := by
   exact prf_mp (prf_wfAll1_cons (varc m) nil)
     (prf_and_intro (prf_isTermCodeE1_var (cons (varc m) nil) m) prf_wfAll1_nil)
 
-set_option linter.unusedSimpArgs false in
 /-- Tricotomía del orden, en `Prf` (`ax19_lt_trichotomy`). -/
 theorem prf_lt_trich (a b : Term) :
     Prf (lor (lt a b) (lor (Formula.eq a b) (lt b a))) := by
   have h := prf_spec (prf_spec
     (prf_ax (show ax19_lt_trichotomy ∈ axioms by simp [axioms])) a) b
-  simp [ax19_lt_trichotomy, substFormula, substTerm, substTerms, lt, lor,
+  simp [substFormula, substTerm, substTerms, lt,
     FOL.substTerm_liftTerm] at h
   exact h
 
@@ -409,7 +406,6 @@ theorem nilOrCons_at (Y : Term) :
   simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, substFormula, substTerm,
     substTerms, ite_true]
 
-set_option linter.unusedSimpArgs false in
 theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
   refine prf_list_induction nilOrCons ?base ?step
   · rw [nilOrCons_at]
@@ -418,7 +414,7 @@ theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
     have hR : substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 nilOrCons))
         = lor (Formula.eq (cons (.var 1) (.var 0)) nil) (consOk (cons (.var 1) (.var 0))) := by
       simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, liftFormula, substFormula,
-        liftTerm, liftTerms, substTerm, substTerms, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
+        liftTerm, liftTerms, substTerm, substTerms, Nat.reduceLT, Nat.reduceGT,
         reduceIte, ite_true]
     rw [hR]
     exact prf_mp (Prf.incl (Prfᵢ.p1 _ _)) (prf_orR (prf_consOk_cons _ _))
@@ -442,14 +438,13 @@ private def CTXa (W a as : Term) : List Formula :=
   [lt (.var 0) (lenc (cons (liftTerm 0 a) (liftTerm 0 as))),
    land (In (liftTerm 0 a) (liftTerm 0 W)) (argsIn (liftTerm 0 W) (liftTerm 0 as))]
 
-set_option linter.unusedSimpArgs false in
 /-- **INTRODUCCIÓN de `argsIn` sobre `cons`**: cabeza en el testigo + cola ya cubierta.
     Misma estructura que `prf_wfAll1_cons`: corte del índice con `prf_zero_or_eq_succ_pred`. -/
 theorem prf_argsIn_cons_intro (W a as : Term) :
     Prf (Formula.impl (land (In a W) (argsIn W as)) (argsIn W (cons a as))) := by
   refine prf_mp (Prf.qconf (land (In a W) (argsIn W as)) (argsInBody W (cons a as)))
     (Prf.gen _ ?_)
-  simp only [liftFormula, liftF_argsIn, land, In, liftTerm, liftTerms]
+  simp only [liftFormula, liftF_argsIn, land, In, liftTerms]
   refine prf_deduction (deduction_aux ?_
     (lt (.var 0) (liftTerm 0 (lenc (cons a as))))
     [land (In (liftTerm 0 a) (liftTerm 0 W)) (argsIn (liftTerm 0 W) (liftTerm 0 as))] rfl)
@@ -514,13 +509,12 @@ theorem PrfH_congr_hasWitArgs {Γ : List Formula} {a b : Term}
   exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
     (A := hasWitArgs (.var 0)) h ((e a) ▸ hw)
 
-set_option linter.unusedSimpArgs false in
 /-- La lista VACÍA tiene testigo (el vacío). -/
 theorem prf_hasWitArgs_nil : Prf (hasWitArgs nil) := by
   refine prf_ex_intro nil ?_
   have h : substFormula 0 nil (land (wfAll1 (.var 0)) (argsIn (.var 0) (liftTerm 0 nil)))
       = land (wfAll1 nil) (argsIn nil nil) := by
-    simp only [land, substFormula, substF_wfAll1, substF_argsIn, substTerm, substTerms,
+    simp only [land, substFormula, substF_wfAll1, substF_argsIn, substTerm,
       ite_true, FOL.substTerm_liftTerm]
   rw [h]
   exact prf_and_intro prf_wfAll1_nil (prf_argsIn_nil nil)
@@ -555,7 +549,6 @@ sola constante, la de aquí; la copia de `sondeos/MergeTestigos.lean` sigue fuer
 la COLA, y hay que fusionarlos. La ruta es pasar a forma de PERTENENCIA (donde `concat` es un
 axioma), fusionar allí, y volver: ni un índice partido. -/
 
-set_option linter.unusedSimpArgs false in
 theorem prf_in_nthc (L i : Term) :
     Prf (Formula.impl (lt i (lenc L)) (In (nthc L i) L)) := by
   refine prf_deduction ?_
@@ -563,7 +556,7 @@ theorem prf_in_nthc (L i : Term) :
   have hsub : substFormula 0 i (land (lt (.var 0) (liftTerm 0 (lenc L)))
       (Formula.eq (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 (nthc L i))))
       = land (lt i (lenc L)) (Formula.eq (nthc L i) (nthc L i)) := by
-    simp only [land, lt, lenc, nthc, In, substFormula, substTerm, substTerms,
+    simp only [land, lt, lenc, nthc, substFormula, substTerm, substTerms,
       FOL.substTerm_liftTerm, ite_true]
   have hb : PrfH [lt i (lenc L)] (boundedIn (nthc L i) L) := by
     unfold boundedIn
@@ -617,13 +610,12 @@ theorem prf_isTermCodeE1_mono_of (w w' X : Term)
 `In` sobre `concat` es un axioma (`ax_L3_in_concat`), así que en forma de pertenencia el caso
 sale por `or_elim` sobre las dos mitades. Ni un índice partido. -/
 
-set_option linter.unusedSimpArgs false in
 /-- `ax_L3_in_concat` instanciado, en `Prf`. -/
 theorem prf_in_concat (x L M : Term) :
     Prf (In x (concat L M) ⇔ lor (In x L) (In x M)) := by
   have h := prf_spec (prf_spec (prf_spec
     (prf_ax (show ax_L3_in_concat ∈ axioms by simp [axioms])) x) L) M
-  simp [ax_L3_in_concat, substFormula, substTerm, substTerms, In, concat, lor, iff,
+  simp [substFormula, substTerm, substTerms, In, concat, lor, iff,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h
   exact h
 
@@ -703,7 +695,6 @@ que es más barato que dentro del paso—, y el testigo de la lista es el `conca
 `prf_wfAll1_concat` para la buena formación, y la monotonía generalizada para que cada mitad
 siga cubriendo lo suyo. -/
 
-set_option linter.unusedSimpArgs false in
 theorem prf_hasWitArgs_cons (a as : Term) :
     Prf (Formula.impl (hasWit a) (Formula.impl (hasWitArgs as) (hasWitArgs (cons a as)))) := by
   refine prf_ex_elim_imp ?_
@@ -754,7 +745,7 @@ theorem prf_hasWitArgs_cons (a as : Term) :
       = land (wfAll1 (concat (.var 1) (.var 0)))
           (argsIn (concat (.var 1) (.var 0))
             (cons (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 as)))) := by
-    simp only [land, substFormula, substF_wfAll1, substF_argsIn, substTerm, substTerms,
+    simp only [land, substFormula, substF_wfAll1, substF_argsIn, substTerm,
       ite_true, FOL.substTerm_liftTerm]
   rw [hs]
   exact PrfH_and_intro hwfC hargsCons
@@ -923,7 +914,6 @@ theorem PHIF_at (t : Term) :
   simp only [PHIF, PHIFbody, substFormula, substF_BODYF, substTerm, Nat.reduceAdd,
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
 
-set_option linter.unusedSimpArgs false in
 theorem PHIF_spec1 (t wF : Term) :
     substFormula 0 wF (Formula.forall (Formula.forall (Formula.forall
       (BODYF (.var 3) (.var 2) (.var 1) (.var 0)
@@ -933,9 +923,8 @@ theorem PHIF_spec1 (t wF : Term) :
             (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
   have h4 := substTerm_liftLiftLiftLift t 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 wF)))
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h4]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, h4]
 
-set_option linter.unusedSimpArgs false in
 theorem PHIF_spec2 (t wF wT : Term) :
     substFormula 0 wT (Formula.forall (Formula.forall
       (BODYF (liftTerm 0 (liftTerm 0 (liftTerm 0 wF))) (.var 2) (.var 1) (.var 0)
@@ -946,9 +935,8 @@ theorem PHIF_spec2 (t wF wT : Term) :
   have h3 := substTerm_liftLiftLift t 0 (liftTerm 0 (liftTerm 0 wT))
   have hw := substTerm_liftLiftLift wF 0 (liftTerm 0 (liftTerm 0 wT))
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h3, hw]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, h3, hw]
 
-set_option linter.unusedSimpArgs false in
 theorem PHIF_spec3 (t wF wT v : Term) :
     substFormula 0 v (Formula.forall
       (BODYF (liftTerm 0 (liftTerm 0 wF)) (liftTerm 0 (liftTerm 0 wT)) (.var 1) (.var 0)
@@ -959,7 +947,7 @@ theorem PHIF_spec3 (t wF wT v : Term) :
   have hF := FOL.substTerm_liftLift wF 0 (liftTerm 0 v)
   have hT := FOL.substTerm_liftLift wT 0 (liftTerm 0 v)
   simp only [substFormula, substF_BODYF, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, FOL.substTerm_liftTerm, h2, hF, hT]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true, h2, hF, hT]
 
 theorem PHIF_spec4 (t wF wT v s : Term) :
     substFormula 0 s (BODYF (liftTerm 0 wF) (liftTerm 0 wT) (liftTerm 0 v) (.var 0)

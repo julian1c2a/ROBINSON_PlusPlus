@@ -1,0 +1,53 @@
+/- T48 · TEST DE DESTINO del genérico adaptado: ¿cabe en `Meta/EvalArithPrf.lean`?
+   Importa SÓLO `EvalArithPrf` (nada aguas abajo). Si el genérico y las dos copias de ese módulo
+   compilan aquí, el genérico puede vivir en `EvalArithPrf` —tras `pcc_leibniz_apply_imp`—, que
+   está en la clausura de imports de los doce módulos con copia (salidas/dag.txt). -/
+import ROBINSON_PlusPlus.Meta.EvalArithPrf
+
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
+open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.TcArithPrf ROBINSON_PlusPlus.Meta.Sigma1Prf
+open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf ROBINSON_PlusPlus.Meta.MpCodePrf
+open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+open ROBINSON_PlusPlus.Meta.EvalArithPrf ROBINSON_PlusPlus.Meta.DerivCondPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+
+namespace CongruenciaHuecoDestino
+
+theorem pcc_congr_hole_code (F : Term → Term) (X Y : Term)
+    (hinv : ∀ W, Prf (substtc zero W (F X) =eq F X))
+    (hhole : ∀ w, Prf (substtc zero w (F (varc (numeral 0))) =eq F w))
+    (hwFX : Prf (hasWit (F X))) (hwF0 : Prf (hasWit (F (varc (numeral 0)))))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (F X) (F Y))) := by
+  let Ac : Term := eqc (F X) (F (varc (numeral 0)))
+  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (F X) (F w)) := by
+    intro w
+    refine prf_eq_trans (prf_substfc_eq zero w (F X) (F (varc (numeral 0)))) ?_
+    exact prf_congr_eqCodeFn (hinv w) (hhole w)
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
+      (prf_provFromCode_eqCodeFn_refl (F X))
+  have himp : Prf (provFromCode (eqc X Y) ⇒ provFromCode (substfc zero Y Ac)) :=
+    pcc_leibniz_apply_imp Ac X Y
+      (prf_hasWitF_eq2 (F X) (F (varc (numeral 0))) hwFX hwF0) hwX hwY hAX
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
+
+theorem C_pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (succcT X) (succcT Y))) :=
+  pcc_congr_hole_code succcT X Y
+    (fun W => prf_eq_trans (prf_substtc_succcT zero W X) (prf_congr_succcT (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_succcT zero w (varc (numeral 0)))
+      (prf_congr_succcT (prf_substtc_varc0 w)))
+    (prf_hasWit_succcT hwX) (prf_hasWit_succcT (prf_hasWit_varc (numeral 0))) hwX hwY
+
+example : @C_pcc_congr_succ_code_imp
+    = @ROBINSON_PlusPlus.Meta.EvalArithPrf.pcc_congr_succ_code_imp := rfl
+
+end CongruenciaHuecoDestino
+
+#print axioms CongruenciaHuecoDestino.pcc_congr_hole_code

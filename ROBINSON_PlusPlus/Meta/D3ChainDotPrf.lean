@@ -26,10 +26,11 @@ que se escribió cada sección (del 2026‑09‑07 al 2026‑09‑10): sus «que
 
 La reflexión de un `∀` acotado con argumento **abstracto** ya está resuelta y ejercitada: es
 `pcc_bdAll_intro` (`Meta/BdAllIntroPrf.lean:313`), la keystone de §3.20.7, y
-`sondeos/A3IsFCBTracked.lean:819` la aplica entera (`pcc_wfAll_tracked`) descargando sus ocho
+`sondeos/A3IsFCBTracked.lean:859` la aplica entera (`pcc_wfAll_tracked`) descargando sus ocho
 obligaciones administrativas. (✏️ 2026‑10‑14, ADR‑134: el sondeo es hoy registro: no compila en
 ninguna pasada medida desde la del 2026‑10‑02 —en la última (2026‑10‑05, `sondeos/pasadas/tabla_adr129.txt`),
-error en su l. 355—; lo que usa el build es `pcc_bdAll_intro` mismo.)
+error en su l. 355—; lo que usa el build es `pcc_bdAll_intro` mismo. ✏️ 2026‑11‑02, ADR‑248: REPARADO, compila otra
+vez —REGISTRO—; la línea de la cita, la de hoy.)
 
 ⚠️ **Pero aquel caso no tenía el hueco que tiene éste.** Allí `wfAll` **es** un `∀` acotado, así
 que lo que `pcc_bdAll_intro` entrega —el código de un `∀` acotado— *es* lo que se pedía. Aquí
@@ -332,17 +333,15 @@ noncomputable def bdCarcLtPhic (y p : Term) : Term :=
 noncomputable def bdCarcLtDot (y p b : Term) : Term :=
   bdExCode (liftc zero (tcFn b)) (bdCarcLtPhic y p)
 
-set_option linter.unusedSimpArgs false in
 theorem liftTerm_bdCarcLtPhic (c : Nat) (y p : Term) :
     liftTerm c (bdCarcLtPhic y p) = bdCarcLtPhic (liftTerm c y) (liftTerm c p) := by
   simp only [bdCarcLtPhic, eqCodeFn, carcT, nthcT, liftc, varc, numeral, funcc, cons, nil, zero,
-    succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral]
+    succ, tcFn, liftTerm, liftTerms, liftTerm_strCode]
 
-set_option linter.unusedSimpArgs false in
 theorem liftTerm_bdCarcLtDot (c : Nat) (y p b : Term) :
     liftTerm c (bdCarcLtDot y p b) = bdCarcLtDot (liftTerm c y) (liftTerm c p) (liftTerm c b) := by
   simp only [bdCarcLtDot, bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral,
-    funcc, cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral,
+    cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode,
     liftTerm_bdCarcLtPhic]
 
 theorem substtc_inv_bdCarcLtB (b : Term) :
@@ -371,7 +370,6 @@ theorem prf_contract {A B : Formula} (h : Prf (A ⇒ (A ⇒ B))) : Prf (A ⇒ B)
   prf_deduction (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH h _) (prfH_hyp_self _))
     (prfH_hyp_self _))
 
-set_option linter.unusedSimpArgs false in
 theorem pcc_bdEx_carc_reflect_gen (y p b Phic Phic' : Term) (A A' : Formula)
     (hPlift : liftTerm 0 Phic = Phic')
     (hAlift : liftFormula 0 A = A')
@@ -392,8 +390,8 @@ theorem pcc_bdEx_carc_reflect_gen (y p b Phic Phic' : Term) (A A' : Formula)
   rw [liftFormula_provFromCode_open]
   have hLb : liftTerm 0 (bdExCode (liftc zero (tcFn b)) Phic)
       = bdExCode (liftc zero (tcFn (liftTerm 0 b))) Phic' := by
-    simp only [bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral, funcc,
-      cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral,
+    simp only [bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral,
+      cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode,
       hPlift]
   rw [hLb]
   let exBody : Formula := land (lt (.var 0) (liftTerm 0 b))
@@ -595,15 +593,13 @@ theorem hCs_premsPair (v : Nat) (s q : Term) :
   simp only [premsPair, pkP, pkI, pkL, substFormula_boundedPremsIn, carc, cdrc, nil, zero,
     substTerm, substTerms]
 
-set_option linter.unusedSimpArgs false in
 theorem hbl_premsBnd (k : Nat) (q : Term) :
     liftTerm k (premsBnd q) = premsBnd (liftTerm k q) := by
-  simp only [premsBnd, pkL, lenc, carc, cdrc, liftTerm, liftTerms]
+  simp only [premsBnd, pkL, lenc, cdrc, liftTerm, liftTerms]
 
-set_option linter.unusedSimpArgs false in
 theorem hbs_premsBnd (v : Nat) (s q : Term) :
     substTerm v s (premsBnd q) = premsBnd (substTerm v s q) := by
-  simp only [premsBnd, pkL, lenc, carc, cdrc, substTerm, substTerms]
+  simp only [premsBnd, pkL, lenc, cdrc, substTerm, substTerms]
 
 /-! ### ⚠️ LA INSTANCIACIÓN DEL PAQUETE **NO ES `rfl`** — y conviene tenerlo escrito
 

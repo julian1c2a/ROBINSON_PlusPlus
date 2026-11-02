@@ -83,23 +83,21 @@ Lo que hay que probar por inducción es sólo lo que **no** es axioma (p. ej. `0
 `add` recurre por la derecha). Se deja la instanciación directa.
 ✏️ 2026‑10‑12 (ADR‑134): el ejemplo no vale: con `ax6_add_comm`, `0 + n = n` sale sin inducción (`ax4`). -/
 
-set_option linter.unusedSimpArgs false in
 /-- **Asociatividad de `+`** en `Prf` — instancia de `ax7_add_assoc`. -/
 theorem prf_add_assoc (a b c : Term) :
     Prf (add (add a b) c =eq add a (add b c)) := by
   have hh := prf_spec (prf_spec (prf_spec
     (prf_ax (show ax7_add_assoc ∈ axioms by simp [axioms])) a) b) c
-  simp [ax7_add_assoc, substFormula, substTerm, substTerms, add,
+  simp [substFormula, substTerm, substTerms, add,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
-set_option linter.unusedSimpArgs false in
 /-- **Conmutatividad de `+`** en `Prf` — instancia de `ax6_add_comm`. -/
 theorem prf_add_comm (a b : Term) : Prf (add a b =eq add b a) := by
   have hh := prf_spec (prf_spec
     (prf_ax (show ax6_add_comm ∈ axioms by simp [axioms])) a) b
-  simp [ax6_add_comm, substFormula, substTerm, substTerms, add,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  simp [substFormula, substTerm, substTerms, add,
+    FOL.substTerm_liftTerm] at hh
   exact hh
 
 /-! ### Introducción de `≤`
@@ -137,44 +135,40 @@ theorem PrfH_eq_congr_add1 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
     simp only [f, substFormula, add, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (add t₁ c)) Γ)
 
-set_option linter.unusedSimpArgs false in
 /-- Sustitución en el primer argumento de `≤`, en contexto. -/
 theorem PrfH_le_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a₁ =eq a₂))
     (hle : PrfH Γ (le a₁ b)) : PrfH Γ (le a₂ b) := by
   let f : Formula := le (.var 0) (liftTerm 0 b)
   have hS : ∀ s : Term, substFormula 0 s f = le s b := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+    simp only [f, le, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
 
-set_option linter.unusedSimpArgs false in
 /-- Sustitución en el 1er argumento de `≤`, a nivel `Prf`. -/
 theorem prf_le_subst1 {a₁ a₂ b : Term} (h : Prf (a₁ =eq a₂)) (hle : Prf (le a₁ b)) :
     Prf (le a₂ b) := by
   let f : Formula := le (.var 0) (liftTerm 0 b)
   have hS : ∀ s : Term, substFormula 0 s f = le s b := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+    simp only [f, le, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS a₂) ▸ prf_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
 
-set_option linter.unusedSimpArgs false in
 /-- Sustitución en el 2º argumento de `≤`, a nivel `Prf`. -/
 theorem prf_le_subst2 {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hle : Prf (le a b₁)) :
     Prf (le a b₂) := by
   let f : Formula := le (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = le a s := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+    simp only [f, le, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b₂) ▸ prf_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
 
-set_option linter.unusedSimpArgs false in
 /-- Sustitución en el segundo argumento de `≤`, en contexto. -/
 theorem PrfH_le_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
     (hle : PrfH Γ (le a b₁)) : PrfH Γ (le a b₂) := by
   let f : Formula := le (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = le a s := by
     intro s
-    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+    simp only [f, le, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
 
 /-! ⛔ **Las dos `PrfH_lt_subst*` bajaron a `Meta/ChainPrf.lean`** (2026‑09‑09d, ADR‑019).

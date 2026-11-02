@@ -1,0 +1,14 @@
+T18 (ADR-246), 2026-11-02: los 28 sondeos rotos del 2026-10-02 por el viejo nombre de PrfH_lt_subst2 (14) o por un
+término ambiguo (14), todos archivados en archivo/sondeos-2026-10, MEDIDOS tras esos dos arreglos y nada más. Lo hizo
+un agente (sobre RPP 4a0c00e, lean v4.35.0 con los leanOptions del lakefile, sin escribir .olean); el coordinador
+revisó la tabla, los diffs y las filas, e integró las filas en sondeos/README.md.
+
+  tabla-t18.tsv         una fila por sondeo: arreglos, rc, segundos, errores, el NUEVO primer error y una nota; y, detrás,
+                        la línea base de hoy (sin arreglos) y la medida aparte con el gemelo PrfH_lt_subst1 renombrado.
+                        Copia en sondeos/pasadas/tabla-2026-11-02-t18.tsv.
+  notas-t18.tsv         las notas largas por sondeo
+  parches.diff          los 28 diffs contra la etiqueta (sólo renombre y cualificaciones: verifica_diff.py lo comprueba)
+  parches-s1.diff       la medida aparte (9 sondeos, también subst1)
+  filas-redactadas.md   las 19 celdas «sin redactar», redactadas, tal como las entregó el agente (en el README, sin la
+                        palabra REGISTRO y con las comillas invertidas de los nombres muertos quitadas, por [B])
+  *.py.txt, *.sh.txt    los guiones del agente; integra_readme.py.txt, el del coordinador

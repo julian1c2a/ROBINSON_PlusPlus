@@ -1128,7 +1128,6 @@ theorem prf_condD_hasWitF_eq (t : Term) (i : Nat) :
   rw [← h]
   exact prf_substfc_arith_open 0 (tcFn t) _
 
-set_option linter.unusedSimpArgs false in
 /-- ⭐⭐⭐ **`DEUDA_hGuardF` PROBADA**, para toda casilla `i` bajo la longitud canónica `n`.
 
     La cota `i < n` es la misma de C3‑T y por la misma razón: el transporte
@@ -1141,7 +1140,7 @@ theorem pcc_hGuardF (i n : Nat) (t : Term) (hin : i < n) :
   have hsub : substFormula 0 t (hasWitF (nthc (.var 0) (numeralM i)))
       = hasWitF (nthc t (numeralM i)) := by
     simp only [substF_hasWitF, nthc, substTerm, substTerms, substTerm_numeralM,
-      FOL.substTerm_liftTerm, ite_true]
+      ite_true]
   rw [hsub]
   refine prf_deduction (deduction_aux (deduction_aux ?_
     (hasWitF (nthc t (numeralM i))) [lenc t =eq numeralM n, lineWF t] rfl)

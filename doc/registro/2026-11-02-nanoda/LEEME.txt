@@ -1,0 +1,16 @@
+ADR-251, 2026-11-02: nanoda con cuatro hilos también para el cierre de los titulares. Medido en WSL (Ubuntu, el
+mismo toolchain v4.35.0 en Linux), con leanexport sobre los .olean de la compilación de Windows, como ADR-228 (nunca
+lake en WSL). Los guiones llevan .txt para que no se ejecuten por error; las rutas son las de esta sesión.
+
+  resultados.txt        lo que dijo nanoda de cada variante y del cierre entero, copiado de la salida (léase primero)
+  NanT.lean.txt         la tanda 1: v_allIn_nil y v_chainOk_nil tal cual y con los intro tras abre; los defeq sueltos
+  NanT2.lean.txt        la tanda 3: ev_hasWit con las ecuaciones rfl y con los lemas con prueba
+  prueba.sh.txt         exporta una declaración sola y la pasa por nanoda (4 hilos)
+  bis_hw.sh.txt         la bisección de una exportación (con prefijo.py y biseca.sh de doc/registro/2026-10-30-adr228/)
+  todos_v1.out          la bisección del cierre de los 32 tras el primer arreglo: ev_termCodeM._f
+  nanoda32.sh.txt       exporta el cierre de una lista de titulares y lo pasa por nanoda
+  seis.sh.txt           el cierre de una lista por los seis núcleos, con el mutante de scripts/exportacion.py
+  seis35.out, seis12.out   los seis núcleos sobre los 35 (ADR-250) y sobre los 12 de la clase (i)
+  titulares35.txt, puros12.txt   las dos listas
+  aplica_nanoda.py.txt, aplica_nanoda2.py.txt   los dos arreglos, tal como se aplicaron (ModeloEstandar y
+                        ModeloCodificacion); después se retocaron a mano los comentarios

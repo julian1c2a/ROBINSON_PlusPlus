@@ -1,0 +1,66 @@
+Probe/B3_planos_dedup_opens.lean:71:2: error: Type mismatch
+  pcc_thm_inst4 φ h w₁ w₂ w₃ w₄
+has type
+  (⊢ᴴ hasWit (liftTerm 0 w₁)) →
+    (⊢ᴴ hasWit (liftTerm 0 w₂)) →
+      (⊢ᴴ hasWit (liftTerm 0 w₃)) →
+        (⊢ᴴ hasWit (liftTerm 0 w₄)) →
+          ⊢ᴴ
+            provFromCode
+              (substfc zero w₄
+                (substfc (numeral 1) (liftc zero w₃)
+                  (substfc (numeral 2) (liftc zero (liftc zero w₂))
+                    (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+but is expected to have type
+  ⊢ᴴ
+    provFromCode
+      (substfc zero w₄
+        (substfc (numeral 1) (liftc zero w₃)
+          (substfc (numeral 2) (liftc zero (liftc zero w₂))
+            (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+Probe/B3_planos_dedup_opens.lean:77:2: error: Type mismatch
+  pcc_axiom_inst4 φ hmem w₁ w₂ w₃ w₄
+has type
+  (⊢ᴴ hasWit (liftTerm 0 w₁)) →
+    (⊢ᴴ hasWit (liftTerm 0 w₂)) →
+      (⊢ᴴ hasWit (liftTerm 0 w₃)) →
+        (⊢ᴴ hasWit (liftTerm 0 w₄)) →
+          ⊢ᴴ
+            provFromCode
+              (substfc zero w₄
+                (substfc (numeral 1) (liftc zero w₃)
+                  (substfc (numeral 2) (liftc zero (liftc zero w₂))
+                    (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+but is expected to have type
+  ⊢ᴴ
+    provFromCode
+      (substfc zero w₄
+        (substfc (numeral 1) (liftc zero w₃)
+          (substfc (numeral 2) (liftc zero (liftc zero w₂))
+            (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))
+Probe/B3_planos_dedup_opens.lean:83:7: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.LiftcCodePrf.prf_substtc_termCode_closed`
+Probe/B3_planos_dedup_opens.lean:99:17: error: Application type mismatch: The argument
+  "substfc"
+has type
+  String
+but is expected to have type
+  List Char
+in the application
+  strCode "substfc"
+Probe/B3_planos_dedup_opens.lean:101:0: error: Not a definitional equality: the left-hand side
+  substfcT (termCode v) (termCode s) (termCode f)
+is not definitionally equal to the right-hand side
+  termCode (substfc v s f)
+Probe/B3_planos_dedup_opens.lean:102:82: error: Type mismatch
+  rfl
+has type
+  ?m.3 = ?m.3
+but is expected to have type
+  substfcT (termCode v) (termCode s) (termCode f) = termCode (substfc v s f)
+'B3PlanosOpens.substfcT_termCode' depends on axioms: [sorryAx]
+'B3PlanosOpens.binK_binT' does not depend on any axioms
+'B3PlanosOpens.binct_funcc' does not depend on any axioms
+'B3PlanosOpens.binct_atomc' does not depend on any axioms
+'B3PlanosOpens.binct_eqc' does not depend on any axioms
+'B3PlanosOpens.AXBIN_impl' does not depend on any axioms
+'B3PlanosOpens.AXBOT_BODY_ok' does not depend on any axioms

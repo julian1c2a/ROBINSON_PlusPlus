@@ -82,14 +82,13 @@ theorem substFormula_liftFormula (φ : Formula) (c : Nat) (s : Term) :
 def PSI (Φ : Formula) : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (.var 1)) (liftFormula 1 Φ))
 
-set_option linter.unusedSimpArgs false in
 /-- `ψ(t) = ∀m. m < t ⇒ φ(m)`. -/
 theorem psi_at (Φ : Formula) (t : Term) :
     substFormula 0 t (PSI Φ)
       = Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 t)) Φ) := by
   simp only [PSI, substFormula, substTerm, substTerms, lt]
   rw [substFormula_liftFormula]
-  simp [substTerm]
+  simp
 
 /-- **Extracción**: de `ψ(t)` y `m < t` deriva `φ(m)`, a nivel `Prf`. -/
 theorem prf_psi_elim (Φ : Formula) (t m : Term)
@@ -283,7 +282,6 @@ theorem PSI_inst4 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formul
       Nat.reduceSub, reduceIte, ite_true]
   rwa [e] at h
 
-set_option linter.unusedSimpArgs false in
 theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
     (step : Prf (Formula.forall (Formula.impl (PSI Φ) Φ))) :
     ∀ t : Term, Prf (substFormula 0 t Φ) := by
@@ -312,9 +310,9 @@ theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
         have hpsi : PrfH ΓA (liftFormula 0 (PSI Φ)) :=
           PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
         have hinst := PrfH.mp _ _ _ (PrfH.incl0 ΓA _ (Prfᵢ.q1 _ (.var 0))) hpsi
-        simp only [PSI, liftFormula, substFormula, lt, liftTerms, liftTerm, substTerms, substTerm,
+        simp only [liftFormula, substFormula, lt, liftTerms, liftTerm, substTerms, substTerm,
           Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, Nat.reduceSub,
-          hΦ, subst1_id Φ hΦ, subst0_var0_id Φ hΦ] at hinst
+          hΦ, subst0_var0_id Φ hΦ] at hinst
         exact PrfH.mp _ _ _ hinst (PrfH.hyp _ _ (List.Mem.head _))
       case brB =>
         rw [hΦ]

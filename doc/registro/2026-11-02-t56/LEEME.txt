@@ -1,0 +1,3 @@
+T56 (ADR-245), 2026-11-02: los documentos de FOL contra su árbol. mutaciones-gen-reference.txt: --check de
+gen-reference.py visto fallar. reestructura.py.txt, decisions.py.txt y axioms.py.txt: los guiones que movieron el texto
+de REFERENCE (al apéndice R), revisaron DECISIONS y reordenaron AXIOMS de FOL, tal como se aplicaron.

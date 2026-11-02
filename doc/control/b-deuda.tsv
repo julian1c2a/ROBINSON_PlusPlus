@@ -198,7 +198,7 @@ B	Prov	DECISIONS.md	2
 B	Prov	REFERENCE.md	8
 B	Prov	cuarentena/README.md	2
 B	Prov	doc/REFERENCE-Incompleteness.md	43
-B	Prov	sondeos/README.md	5
+B	Prov	sondeos/README.md	4
 B	Provable	REFERENCE.md	2
 B	Provable	doc/REFERENCE-Godelization.md	2
 B	Psi	doc/REFERENCE-Incompleteness.md	1
@@ -567,7 +567,7 @@ B	isFormCode	sondeos/README.md	4
 B	isFormCodeB	sondeos/README.md	1
 B	isFormCodeE	sondeos/README.md	1
 B	isTermCode	doc/REFERENCE-Incompleteness.md	1
-B	isTermCode	sondeos/README.md	4
+B	isTermCode	sondeos/README.md	2
 B	isTermsCode	doc/REFERENCE-Incompleteness.md	1
 B	isTermsCode	sondeos/README.md	2
 B	isTsC1	sondeos/README.md	1
@@ -676,7 +676,7 @@ B	prf_tc_cons'	doc/REFERENCE-Incompleteness.md	4
 B	prf_tc_cons'	sondeos/README.md	1
 B	prf_tc_form	cuarentena/README.md	1
 B	prf_tc_form	doc/REFERENCE-Incompleteness.md	2
-B	prf_tc_form	sondeos/README.md	3
+B	prf_tc_form	sondeos/README.md	2
 B	prf_tc_nul	cuarentena/README.md	1
 B	prf_tc_nul	doc/REFERENCE-Incompleteness.md	1
 B	prf_tc_objAt	doc/REFERENCE-Incompleteness.md	1
@@ -892,7 +892,6 @@ B2	Paso2Guardado.lean	doc/REFERENCE-Incompleteness.md	1
 B2	PilotoDiagonal.lean	AXIOMS.md	1
 B2	PilotoDiagonal.lean	sondeos/README.md	1
 B2	Probe/ADV_novacuo.lean	doc/REFERENCE-Incompleteness.md	1
-B2	Probe/CritDesc_consumidor.lean	sondeos/README.md	1
 B2	Probe/MC_enmienda.lean	doc/REFERENCE-Incompleteness.md	1
 B2	Probe/PilotoParticion.lean	sondeos/README.md	1
 B2	Probe/PuenteInNth.lean	sondeos/README.md	1

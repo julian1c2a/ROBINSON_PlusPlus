@@ -1,0 +1,25 @@
+import ROBINSON_PlusPlus.Meta.ModeloCodificacion
+open FOL FOL.Metamath.Semantics ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.ModeloCodigo
+open ROBINSON_PlusPlus.Meta.ModeloEstandar ROBINSON_PlusPlus.Meta.ModeloCodificacion
+
+namespace NanT
+variable {V : Nat}
+
+theorem a0 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_allIn_nil := by
+  intro v c; abre; exact allInN_zero c
+theorem a3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_allIn_nil := by
+  intro v; unfold ax_allIn_nil; abre; intro c; exact allInN_zero c
+theorem c0 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_nil := by
+  intro v c; abre; exact chainOkN_zero _ c
+theorem c3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_nil := by
+  intro v; unfold ax_chainOk_nil; abre; intro c; exact chainOkN_zero _ c
+theorem b3 (v : Nat → Nat) : evalFormula (MNV V) v ax_allIn_nil =
+    ∀ c, evalFormula (MNV V) (shiftEnv v c) (allIn (.var 0) nil) := rfl
+theorem g3 (M : Model Nat) (v : Nat → Nat) : evalFormula M v ax_allIn_nil =
+    ∀ c, evalFormula M (shiftEnv v c) (allIn (.var 0) nil) := rfl
+theorem p1 (w : Nat → Nat) : evalFormula (MNV V) w (Formula.atom sym!"<" [Term.var 0, Term.var 1]) =
+    (MNV V).rel sym!"<" [w 0, w 1] := rfl
+theorem p3 (w : Nat → Nat) : evalFormula (MNV V) w (Formula.atom sym!"allIn" [Term.var 0, Term.var 1]) =
+    (MNV V).rel sym!"allIn" [w 0, w 1] := rfl
+theorem q1 (a b : Nat) : (MNV V).rel sym!"<" [a, b] = (a < b) := rfl
+end NanT

@@ -1,0 +1,45 @@
+Probe/adapt/CongruenciaHueco_MUTANTE.lean:103:46: warning: Variable name `hY` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hY
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+Probe/adapt/CongruenciaHueco_MUTANTE.lean:325:34: error: Type mismatch
+  @pcc_congr_unT_code
+has type
+  ∀ (m : Nat) (X Y : Term),
+    (∀ (W : Term), ⊢ᴴ substtc zero W X =eq X) →
+      autoParam (⊢ᴴ hasWit X) pcc_congr_unT_code._auto_1 →
+        autoParam (⊢ᴴ hasWit Y) pcc_congr_unT_code._auto_3 →
+          ⊢ᴴ provFromCode (eqc X Y) ⇒ provFromCode (eqc (unT m X) (unT m Y))
+but is expected to have type
+  ∀ (m : Nat) (X Y : Term),
+    (∀ (W : Term), ⊢ᴴ substtc zero W X =eq X) →
+      (∀ (W : Term), ⊢ᴴ substtc zero W Y =eq Y) →
+        autoParam (⊢ᴴ hasWit X) C_pcc_congr_unT_code._auto_1 →
+          autoParam (⊢ᴴ hasWit Y) C_pcc_congr_unT_code._auto_3 →
+            ⊢ᴴ provFromCode (eqc X Y) ⇒ provFromCode (eqc (unT m X) (unT m Y))
+Probe/adapt/CongruenciaHueco_MUTANTE.lean:362:6: error: Type mismatch
+  @pcc_congr_binT_1_code
+has type
+  ∀ (m : Nat) (B X Y : Term),
+    (∀ (W : Term), ⊢ᴴ substtc zero W B =eq B) →
+      (∀ (W : Term), ⊢ᴴ substtc zero W X =eq X) →
+        autoParam (⊢ᴴ hasWit B) pcc_congr_binT_1_code._auto_1 →
+          autoParam (⊢ᴴ hasWit X) pcc_congr_binT_1_code._auto_3 →
+            autoParam (⊢ᴴ hasWit Y) pcc_congr_binT_1_code._auto_5 →
+              ⊢ᴴ provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m X B) (binT m Y B))
+but is expected to have type
+  ∀ (m : Nat) (A X Y : Term),
+    (∀ (W : Term), ⊢ᴴ substtc zero W A =eq A) →
+      (∀ (W : Term), ⊢ᴴ substtc zero W X =eq X) →
+        autoParam (⊢ᴴ hasWit A) C_pcc_congr_binT_2_code._auto_1 →
+          autoParam (⊢ᴴ hasWit X) C_pcc_congr_binT_2_code._auto_3 →
+            autoParam (⊢ᴴ hasWit Y) C_pcc_congr_binT_2_code._auto_5 →
+              ⊢ᴴ provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m A X) (binT m A Y))
+Probe/adapt/CongruenciaHueco_MUTANTE.lean:367:2: error: No goals to be solved
+'CongruenciaHueco.pcc_congr_hole_code' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_binT_2_code' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_succ_code' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_eqcT_diag_code_imp' depends on axioms: [propext, Quot.sound]
+'CongruenciaHueco.C_pcc_congr_nthcT_arg1_code' depends on axioms: [propext, Quot.sound]

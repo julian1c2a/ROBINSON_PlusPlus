@@ -1,0 +1,3218 @@
+--- a/sondeos/ClausuraLiftSinWTs.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ClausuraLiftSinWTs.lean (T18, los dos arreglos)
+@@ -414,7 +414,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -463,7 +463,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -524,7 +524,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -560,7 +560,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -609,7 +609,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -702,7 +702,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -801,7 +801,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+--- a/sondeos/ClausuraSubsttc.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ClausuraSubsttc.lean (T18, los dos arreglos)
+@@ -175,7 +175,7 @@
+   have hlt : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) (lenc nil)) :=
+     prfH_hyp_self _
+   have hz : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hz)
+ 
+@@ -355,7 +355,7 @@
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+   have h123 : Prf (lt AA (cons (numeralM 1) (cons SS (cons AA nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-  have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+   -- (2) la HIPOTESIS DE INDUCCION en el argumento
+   have hih := PrfH.mp _ _ _ (PSI_inst3 PHI hPHI hpsi AA) hltb
+@@ -411,7 +411,7 @@
+   have hlt : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) (lenc nil)) :=
+     prfH_hyp_self _
+   have hz : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hz)
+ 
+@@ -453,7 +453,7 @@
+       PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXa W a as)
+         (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 as)))) :=
+-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (prf_to_prfH (prf_lenc_cons (liftTerm 0 a) (liftTerm 0 as)) _)
+         (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+     have hltw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXa W a as)
+@@ -760,9 +760,9 @@
+   -- (2) Cantor: cabeza y cola son estrictamente menores que la lista
+   have hcHD : Prf (lt HD (cons HD TL)) := prf_cantor_mono_left _ _
+   have hcTL : Prf (lt TL (cons HD TL)) := prf_cantor_mono_right _ _
+-  have hltHD := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  have hltHD := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm hcons) (prf_to_prfH hcHD _)
+-  have hltTL := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  have hltTL := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm hcons) (prf_to_prfH hcTL _)
+   -- (3) la HIPOTESIS DE INDUCCION en cada mitad
+   have hihHD := PrfH.mp _ _ _ (PSI_inst3 PHI hPHI hpsi HD) hltHD
+@@ -1092,7 +1092,7 @@
+       PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+         (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 wF)))) :=
+-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 wF)) _)
+         (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+     have hltw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+@@ -1472,7 +1472,7 @@
+   have hlt : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) (lenc nil)) :=
+     prfH_hyp_self _
+   have hz : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hz)
+ 
+@@ -1719,9 +1719,9 @@
+   have cB12 : Prf (lt BF (cons AF (cons BF nil))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) cB1) cB2
+   have cB : Prf (lt BF (binN k AF BF)) := prf_mp (prf_mp (prf_lt_trans _ _ _) cB12) cA2
+-  have hltA := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  have hltA := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm hshape) (prf_to_prfH cA _)
+-  have hltB := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  have hltB := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm hshape) (prf_to_prfH cB _)
+   -- LA HIPOTESIS DE INDUCCION, una por operando (cuarto escalon de la escalera psi)
+   have hihA := PrfH.mp _ _ _ (PSI_inst4 PHIF hPHIF hpsi AF) hltA
+@@ -1758,7 +1758,7 @@
+   have cA1 : Prf (lt AF (cons AF nil)) := prf_cantor_mono_left _ _
+   have cA2 : Prf (lt (cons AF nil) (unN k AF)) := prf_cantor_mono_right _ _
+   have cA : Prf (lt AF (unN k AF)) := prf_mp (prf_mp (prf_lt_trans _ _ _) cA1) cA2
+-  have hltA := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  have hltA := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm hshape) (prf_to_prfH cA _)
+   have hihA := PrfH.mp _ _ _ (PSI_inst4 PHIF hPHIF hpsi AF) hltA
+   -- el sustituyendo sube de nivel: su testigo lo da `CRIT_hasWit_lift`
+--- a/sondeos/CtorDotados.lean (archivo/sondeos-2026-10)
++++ b/sondeos/CtorDotados.lean (T18, los dos arreglos)
+@@ -254,7 +254,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+--- a/sondeos/DescensoLiftc.lean (archivo/sondeos-2026-10)
++++ b/sondeos/DescensoLiftc.lean (T18, los dos arreglos)
+@@ -127,7 +127,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -964,7 +964,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -1114,7 +1114,7 @@
+   refine prf_deduction ?_
+   have hargs : PrfH [argsIn w (cons hd tl)] (argsIn w (cons hd tl)) := prfH_hyp_self _
+   have hlt : PrfH [argsIn w (cons hd tl)] (lt zero (lenc (cons hd tl))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons hd tl)) _)
+       (prf_to_prfH (prf_zero_lt_succ (lenc tl)) _)
+   have hin : PrfH [argsIn w (cons hd tl)] (In (nthc (cons hd tl) zero) w) :=
+@@ -1140,7 +1140,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -1290,7 +1290,7 @@
+           (cons (numeralM 1)
+             (cons (nthc (.var 1) (numeralM 1)) (cons (nthc (.var 1) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 1) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 1) (numeralM 2)) (.var 0) hphi
+@@ -1326,14 +1326,14 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR ⟹ `targetLift (carc X)` por la HI
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 1)) (cdrc (.var 1))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 1)))) _)
+       have hin0 := PrfH.mp _ _ _
+         (PrfH_inst_argsIn (.var 0) (.var 1) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 1)) (cdrc (.var 1))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_hd := PHI_use (carc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 1))) hlthd)
+@@ -1342,7 +1342,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 1)) (cdrc (.var 1))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_tl := PHI_use (cdrc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 1))) hlttl)
+@@ -1610,7 +1610,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+--- a/sondeos/DiscriminaEcuacional.lean (archivo/sondeos-2026-10)
++++ b/sondeos/DiscriminaEcuacional.lean (T18, los dos arreglos)
+@@ -293,7 +293,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ## 4 · Normalización de `substFormula` sobre el par -/
+@@ -707,7 +707,7 @@
+   have hlen : PrfH [In (nthc X (numeralM j)) q, Formula.eq (lenc X) (numeralM n)]
+       (Formula.eq (lenc X) (numeralM n)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH _ (lt (numeralM j) (lenc X)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+       (prf_to_prfH (prf_lt_numeralM hjn) _)
+   have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM j)))
+       (tcFn (nthc X (numeralM j))))) :=
+@@ -860,7 +860,7 @@
+   ⟨fun c => liftTerm_termsCodeM c ts, fun v s => substTerm_termsCodeM v s ts⟩
+ 
+ theorem closed_nil : CodeClosed nil :=
+-  ⟨fun c => liftTerm_nil c, fun v s => substTerm_nil v s⟩
++  ⟨fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil c, fun v s => ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil v s⟩
+ 
+ mutual
+ theorem closed_mem_tcodesT : ∀ (t x : Term), List.Mem x (tcodesT t) → CodeClosed x
+@@ -1469,7 +1469,7 @@
+   intro k q
+   simp only [wfAllF, bndFF, isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF,
+     land, lor, In, lt, carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hF.lift, hT.lift, hTs.lift]
+ 
+ theorem hCs_F (aF aT aTs : Term → Term) (hF : Nat1 aF) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1652,7 +1652,7 @@
+   intro k q
+   simp only [wfAllTgen, bndTgen, isTermCodeB, cOk, consOk, varOkT, funcOkT, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1672,7 +1672,7 @@
+   intro k q
+   simp only [wfAllTsgen, bndTsgen, isTermsCodeB, cOk, consOk, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tsg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -3087,14 +3087,14 @@
+ theorem liftF_isTermCodeB (k : Nat) (A B X : Term) :
+     liftFormula k (isTermCodeB A B X)
+       = isTermCodeB (liftTerm k A) (liftTerm k B) (liftTerm k X) := by
+-  simp only [isTermCodeB, cOk, consOk, varOkT, funcOkT, land, lor, In,
++  simp only [isTermCodeB, cOk, CritPiloto.consOk, varOkT, funcOkT, land, lor, In,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM]
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_isTermsCodeB (k : Nat) (A B X : Term) :
+     liftFormula k (isTermsCodeB A B X)
+       = isTermsCodeB (liftTerm k A) (liftTerm k B) (liftTerm k X) := by
+-  simp only [isTermsCodeB, cOk, consOk, land, lor, In,
++  simp only [isTermsCodeB, cOk, CritPiloto.consOk, land, lor, In,
+     carc, cdrc, cons, nil, zero, liftFormula, liftTerm, liftTerms]
+ 
+ theorem liftF_wfAllT (k : Nat) (p : Term) :
+@@ -3117,7 +3117,7 @@
+     PrfH Γ (Formula.impl (lt k (bndT p))
+       (isTermCodeB (carc p) (cdrc p) (nthc (carc p) k))) := by
+   have hi := PrfH_spec h k
+-  simpa only [wfAllT, bndT, isTermCodeB, cOk, consOk, varOkT, funcOkT, lt, lenc, carc, cdrc,
++  simpa only [wfAllT, bndT, isTermCodeB, cOk, CritPiloto.consOk, varOkT, funcOkT, lt, lenc, carc, cdrc,
+     nthc, land, lor, In, cons, nil, zero, substFormula, substTerm, substTerms,
+     FOL.substTerm_liftTerm, substTerm_numeralM, if_true] using hi
+ 
+@@ -3170,7 +3170,7 @@
+     (hcl : ∀ n : Nat, liftTerm n c = c)
+     (hck : Prf (carc c =eq numeralM k)) :
+     Prf (Formula.impl (In c (carc p)) (Formula.impl (pairOk p) Formula.bottom)) :=
+-  impT (prf_boundedIn_of_In c (carc p)) (prf_crit_In_rejects_openP p c k hk0 hk1 hcl hck)
++  CritPiloto.impT (prf_boundedIn_of_In c (carc p)) (prf_crit_In_rejects_openP p c k hk0 hk1 hcl hck)
+ 
+ /-! ## 4 · LOS TITULARES, re-enunciados SIN clausura sobre el testigo -/
+ 
+@@ -3214,12 +3214,12 @@
+ theorem liftF_isFormCodeB (k : Nat) (A B C X : Term) :
+     liftFormula k (isFormCodeB A B C X)
+       = isFormCodeB (liftTerm k A) (liftTerm k B) (liftTerm k C) (liftTerm k X) := by
+-  simp only [isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF, land, lor, In,
+-    carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms, liftTerm_numeralM]
++  simp only [isFormCodeB, CritPiloto.lorAll, cOk, CritPiloto.consOk, nulOkF, unOkF, binOkF, strBinOkF, land, lor, In,
++    carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAllF (k : Nat) (p : Term) :
+     liftFormula k (wfAllF acF acT acTs p) = wfAllF acF acT acTs (liftTerm k p) := by
+-  simp only [wfAllF, bndFF, liftFormula, liftF_isFormCodeB, lt, lenc, nthc,
++  simp only [CritPiloto.wfAllF, bndFF, liftFormula, liftF_isFormCodeB, lt, lenc, nthc,
+     liftT_acF, liftT_acT, liftT_acTs, acF, acT, acTs, carc, cdrc,
+     liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+ 
+@@ -3244,7 +3244,7 @@
+     PrfH Γ (Formula.impl (lt k (bndFF acF p))
+       (isFormCodeB (acF p) (acT p) (acTs p) (nthc (acF p) k))) := by
+   have hi := PrfH_spec h k
+-  simpa only [wfAllF, bndFF, isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF,
++  simpa only [CritPiloto.wfAllF, bndFF, isFormCodeB, CritPiloto.lorAll, cOk, CritPiloto.consOk, nulOkF, unOkF, binOkF, strBinOkF,
+     acF, acT, acTs, lt, lenc, carc, cdrc, nthc, land, lor, In, cons, nil, zero,
+     substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, substTerm_numeralM,
+     if_true] using hi
+@@ -3288,7 +3288,7 @@
+     (hcl : ∀ n : Nat, liftTerm n c = c)
+     (hck : Prf (carc c =eq numeralM k)) :
+     Prf (Formula.impl (In c (acF p)) (Formula.impl (tripleOk p) Formula.bottom)) :=
+-  impT (prf_boundedIn_of_In c (acF p))
++  CritPiloto.impT (prf_boundedIn_of_In c (acF p))
+     (prf_crit_In_F_rejects_openP p c k h2 h3 h4 h5 h6 h7 h8 h9 hcl hck)
+ 
+ theorem crit_isFCB3_no_termcode_open (p n : Term) (hn : CodeClosed n)
+@@ -3342,9 +3342,9 @@
+ theorem prf_shape_strengthens (X C : Term) (k n : Nat)
+     (hcarc : Prf (carc C =eq numeralM k))
+     (hlenc : Prf (lenc C =eq numeralM n))
+-    (hcons : Prf (consOk C)) :
++    (hcons : Prf (CritPiloto.consOk C)) :
+     Prf (Formula.impl (Formula.eq X C)
+-      (land (consOk X) (land (Formula.eq (carc X) (numeralM k))
++      (land (CritPiloto.consOk X) (land (Formula.eq (carc X) (numeralM k))
+                              (Formula.eq (lenc X) (numeralM n))))) := by
+   refine prf_deduction ?_
+   let f : Formula :=
+@@ -3352,10 +3352,10 @@
+          (land (Formula.eq (carc (.var 0)) (numeralM k))
+                (Formula.eq (lenc (.var 0)) (numeralM n)))
+   have hS : ∀ s : Term, substFormula 0 s f =
+-      land (consOk s) (land (Formula.eq (carc s) (numeralM k))
++      land (CritPiloto.consOk s) (land (Formula.eq (carc s) (numeralM k))
+                             (Formula.eq (lenc s) (numeralM n))) := by
+     intro s
+-    simp only [f, consOk, land, carc, cdrc, lenc, cons, substFormula, substTerm, substTerms,
++    simp only [f, CritPiloto.consOk, land, carc, cdrc, lenc, cons, substFormula, substTerm, substTerms,
+       substTerm_numeralM, if_true]
+   have hbase : PrfH [Formula.eq X C] (substFormula 0 C f) := by
+     rw [hS]
+@@ -3379,21 +3379,21 @@
+ 
+ theorem prf_shapeNul_str (X : Term) (k : Nat) :
+     Prf (Formula.impl (shapeNul X k)
+-      (land (consOk X) (land (Formula.eq (carc X) (numeralM k))
++      (land (CritPiloto.consOk X) (land (Formula.eq (carc X) (numeralM k))
+                              (Formula.eq (lenc X) (numeralM 1))))) :=
+   prf_shape_strengthens X _ k 1 (prf_carc_cons _ _)
+     (PilotoParticion.prf_lenc_c1 _) (PilotoParticion.prf_consOk_cons _ _)
+ 
+ theorem prf_shapeUn_str (X : Term) (k : Nat) :
+     Prf (Formula.impl (shapeUn X k)
+-      (land (consOk X) (land (Formula.eq (carc X) (numeralM k))
++      (land (CritPiloto.consOk X) (land (Formula.eq (carc X) (numeralM k))
+                              (Formula.eq (lenc X) (numeralM 2))))) :=
+   prf_shape_strengthens X _ k 2 (prf_carc_cons _ _)
+     (PilotoParticion.prf_lenc_c2 _ _) (PilotoParticion.prf_consOk_cons _ _)
+ 
+ theorem prf_shapeBin_str (X : Term) (k : Nat) :
+     Prf (Formula.impl (shapeBin X k)
+-      (land (consOk X) (land (Formula.eq (carc X) (numeralM k))
++      (land (CritPiloto.consOk X) (land (Formula.eq (carc X) (numeralM k))
+                              (Formula.eq (lenc X) (numeralM 3))))) :=
+   prf_shape_strengthens X _ k 3 (prf_carc_cons _ _)
+     (PilotoParticion.prf_lenc_c3 _ _ _) (PilotoParticion.prf_consOk_cons _ _)
+@@ -3428,7 +3428,7 @@
+   lor (shapeUn X 0) (land (shapeBin X 1) (In (nthc X (numeralM 2)) wTs))
+ 
+ def isFormCodeE (wF wT wTs X : Term) : Formula :=
+-  lorAll (shapeNul X 2)
++  CritPiloto.lorAll (shapeNul X 2)
+     [ land (shapeBin X 3) (In (nthc X (numeralM 2)) wTs)
+     , land (shapeBin X 4) (land (In (nthc X (numeralM 1)) wT) (In (nthc X (numeralM 2)) wT))
+     , land (shapeBin X 5) (land (In (nthc X (numeralM 1)) wF) (In (nthc X (numeralM 2)) wF))
+@@ -3439,7 +3439,7 @@
+ 
+ /-- Reensamblado: de `shape ∧ M` con el fortalecimiento sale la forma `cOk X ((tag ∧ len) ∧ M)`. -/
+ theorem prf_str_and (X : Term) (k n : Nat) (S M : Formula)
+-    (hstr : Prf (Formula.impl S (land (consOk X)
++    (hstr : Prf (Formula.impl S (land (CritPiloto.consOk X)
+       (land (Formula.eq (carc X) (numeralM k)) (Formula.eq (lenc X) (numeralM n)))))) :
+     Prf (Formula.impl (land S M)
+       (cOk X (land (land (Formula.eq (carc X) (numeralM k))
+@@ -3447,7 +3447,7 @@
+   refine prf_deduction ?_
+   let Γ : List Formula := [land S M]
+   have hh : PrfH Γ (land S M) := prfH_hyp_self _
+-  have hs : PrfH Γ (land (consOk X) (land (Formula.eq (carc X) (numeralM k))
++  have hs : PrfH Γ (land (CritPiloto.consOk X) (land (Formula.eq (carc X) (numeralM k))
+       (Formula.eq (lenc X) (numeralM n)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH hstr _) (PrfH_and_elim_left hh)
+   exact PrfH_and_intro (PrfH_and_elim_left hs)
+@@ -3457,27 +3457,27 @@
+ theorem prf_isTermCodeE_str (wT wTs X : Term) :
+     Prf (Formula.impl (isTermCodeE wT wTs X) (isTermCodeB wT wTs X)) := by
+   unfold isTermCodeE isTermCodeB
+-  refine prf_or_elim_imp (impT (prf_shapeUn_str X 0) (prf_lorL _ _)) ?_
+-  exact impT (prf_str_and X 1 3 _ _ (prf_shapeBin_str X 1)) (prf_lorR _ _)
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_shapeUn_str X 0) (prf_lorL _ _)) ?_
++  exact CritPiloto.impT (prf_str_and X 1 3 _ _ (prf_shapeBin_str X 1)) (prf_lorR _ _)
+ 
+ /-- **La forma ecuacional FORTALECE `isFormCodeB`**, los 8 disyuntos. -/
+ theorem prf_isFormCodeE_str (wF wT wTs X : Term) :
+     Prf (Formula.impl (isFormCodeE wF wT wTs X) (isFormCodeB wF wT wTs X)) := by
+-  unfold isFormCodeE isFormCodeB lorAll
+-  refine prf_or_elim_imp (impT (prf_shapeNul_str X 2) (prf_lorL _ _)) ?_
+-  refine impT ?_ (prf_lorR _ _)
+-  refine prf_or_elim_imp (impT (prf_str_and X 3 3 _ _ (prf_shapeBin_str X 3)) (prf_lorL _ _)) ?_
+-  refine impT ?_ (prf_lorR _ _)
+-  refine prf_or_elim_imp (impT (prf_str_and X 4 3 _ _ (prf_shapeBin_str X 4)) (prf_lorL _ _)) ?_
+-  refine impT ?_ (prf_lorR _ _)
+-  refine prf_or_elim_imp (impT (prf_str_and X 5 3 _ _ (prf_shapeBin_str X 5)) (prf_lorL _ _)) ?_
+-  refine impT ?_ (prf_lorR _ _)
+-  refine prf_or_elim_imp (impT (prf_str_and X 6 2 _ _ (prf_shapeUn_str X 6)) (prf_lorL _ _)) ?_
+-  refine impT ?_ (prf_lorR _ _)
+-  refine prf_or_elim_imp (impT (prf_str_and X 7 3 _ _ (prf_shapeBin_str X 7)) (prf_lorL _ _)) ?_
+-  refine impT ?_ (prf_lorR _ _)
+-  refine prf_or_elim_imp (impT (prf_str_and X 8 3 _ _ (prf_shapeBin_str X 8)) (prf_lorL _ _)) ?_
+-  refine impT ?_ (prf_lorR _ _)
++  unfold isFormCodeE isFormCodeB CritPiloto.lorAll
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_shapeNul_str X 2) (prf_lorL _ _)) ?_
++  refine CritPiloto.impT ?_ (prf_lorR _ _)
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_str_and X 3 3 _ _ (prf_shapeBin_str X 3)) (prf_lorL _ _)) ?_
++  refine CritPiloto.impT ?_ (prf_lorR _ _)
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_str_and X 4 3 _ _ (prf_shapeBin_str X 4)) (prf_lorL _ _)) ?_
++  refine CritPiloto.impT ?_ (prf_lorR _ _)
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_str_and X 5 3 _ _ (prf_shapeBin_str X 5)) (prf_lorL _ _)) ?_
++  refine CritPiloto.impT ?_ (prf_lorR _ _)
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_str_and X 6 2 _ _ (prf_shapeUn_str X 6)) (prf_lorL _ _)) ?_
++  refine CritPiloto.impT ?_ (prf_lorR _ _)
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_str_and X 7 3 _ _ (prf_shapeBin_str X 7)) (prf_lorL _ _)) ?_
++  refine CritPiloto.impT ?_ (prf_lorR _ _)
++  refine CritPiloto.prf_or_elim_imp (CritPiloto.impT (prf_str_and X 8 3 _ _ (prf_shapeBin_str X 8)) (prf_lorL _ _)) ?_
++  refine CritPiloto.impT ?_ (prf_lorR _ _)
+   exact prf_str_and X 9 2 _ _ (prf_shapeUn_str X 9)
+ 
+ /-! ## 5 · ✅ LA REVALIDACIÓN — la discriminación SOBREVIVE a la forma ecuacional -/
+@@ -3486,7 +3486,7 @@
+ theorem crit_isTermCodeE_rejects (wT wTs X : Term) (k : Nat) (hk0 : k ≠ 0) (hk1 : k ≠ 1)
+     (hX : Prf (carc X =eq numeralM k)) :
+     Prf (Formula.impl (isTermCodeE wT wTs X) Formula.bottom) :=
+-  impT (prf_isTermCodeE_str wT wTs X) (crit_isTermCodeB_rejects wT wTs X k hk0 hk1 hX)
++  CritPiloto.impT (prf_isTermCodeE_str wT wTs X) (crit_isTermCodeB_rejects wT wTs X k hk0 hk1 hX)
+ 
+ /-- **EL JUNK, refutado también en forma ECUACIONAL.** Es el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ` de
+     `sondeos/SubCodesCritica.lean`, que el predicado FUSIONADO aceptaba. -/
+@@ -3500,7 +3500,7 @@
+     (h6 : k ≠ 6) (h7 : k ≠ 7) (h8 : k ≠ 8) (h9 : k ≠ 9)
+     (hX : Prf (carc X =eq numeralM k)) :
+     Prf (Formula.impl (isFormCodeE wF wT wTs X) Formula.bottom) :=
+-  impT (prf_isFormCodeE_str wF wT wTs X)
++  CritPiloto.impT (prf_isFormCodeE_str wF wT wTs X)
+     (crit_isFormCodeB_rejects wF wT wTs X k h2 h3 h4 h5 h6 h7 h8 h9 hX)
+ 
+ /-- **Un código de VARIABLE (tag 0) NO pasa por `isFormCodeE`** — la otra mitad de la
+--- a/sondeos/DiscriminaTestigoAbierto.lean (archivo/sondeos-2026-10)
++++ b/sondeos/DiscriminaTestigoAbierto.lean (T18, los dos arreglos)
+@@ -293,7 +293,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ## 4 · Normalización de `substFormula` sobre el par -/
+@@ -707,7 +707,7 @@
+   have hlen : PrfH [In (nthc X (numeralM j)) q, Formula.eq (lenc X) (numeralM n)]
+       (Formula.eq (lenc X) (numeralM n)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH _ (lt (numeralM j) (lenc X)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+       (prf_to_prfH (prf_lt_numeralM hjn) _)
+   have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM j)))
+       (tcFn (nthc X (numeralM j))))) :=
+@@ -860,7 +860,7 @@
+   ⟨fun c => liftTerm_termsCodeM c ts, fun v s => substTerm_termsCodeM v s ts⟩
+ 
+ theorem closed_nil : CodeClosed nil :=
+-  ⟨fun c => liftTerm_nil c, fun v s => substTerm_nil v s⟩
++  ⟨fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil c, fun v s => ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil v s⟩
+ 
+ mutual
+ theorem closed_mem_tcodesT : ∀ (t x : Term), List.Mem x (tcodesT t) → CodeClosed x
+@@ -1469,7 +1469,7 @@
+   intro k q
+   simp only [wfAllF, bndFF, isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF,
+     land, lor, In, lt, carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hF.lift, hT.lift, hTs.lift]
+ 
+ theorem hCs_F (aF aT aTs : Term → Term) (hF : Nat1 aF) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1652,7 +1652,7 @@
+   intro k q
+   simp only [wfAllTgen, bndTgen, isTermCodeB, cOk, consOk, varOkT, funcOkT, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1672,7 +1672,7 @@
+   intro k q
+   simp only [wfAllTsgen, bndTsgen, isTermsCodeB, cOk, consOk, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tsg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -3087,14 +3087,14 @@
+ theorem liftF_isTermCodeB (k : Nat) (A B X : Term) :
+     liftFormula k (isTermCodeB A B X)
+       = isTermCodeB (liftTerm k A) (liftTerm k B) (liftTerm k X) := by
+-  simp only [isTermCodeB, cOk, consOk, varOkT, funcOkT, land, lor, In,
++  simp only [isTermCodeB, cOk, CritPiloto.consOk, varOkT, funcOkT, land, lor, In,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM]
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_isTermsCodeB (k : Nat) (A B X : Term) :
+     liftFormula k (isTermsCodeB A B X)
+       = isTermsCodeB (liftTerm k A) (liftTerm k B) (liftTerm k X) := by
+-  simp only [isTermsCodeB, cOk, consOk, land, lor, In,
++  simp only [isTermsCodeB, cOk, CritPiloto.consOk, land, lor, In,
+     carc, cdrc, cons, nil, zero, liftFormula, liftTerm, liftTerms]
+ 
+ theorem liftF_wfAllT (k : Nat) (p : Term) :
+@@ -3117,7 +3117,7 @@
+     PrfH Γ (Formula.impl (lt k (bndT p))
+       (isTermCodeB (carc p) (cdrc p) (nthc (carc p) k))) := by
+   have hi := PrfH_spec h k
+-  simpa only [wfAllT, bndT, isTermCodeB, cOk, consOk, varOkT, funcOkT, lt, lenc, carc, cdrc,
++  simpa only [wfAllT, bndT, isTermCodeB, cOk, CritPiloto.consOk, varOkT, funcOkT, lt, lenc, carc, cdrc,
+     nthc, land, lor, In, cons, nil, zero, substFormula, substTerm, substTerms,
+     FOL.substTerm_liftTerm, substTerm_numeralM, if_true] using hi
+ 
+@@ -3170,7 +3170,7 @@
+     (hcl : ∀ n : Nat, liftTerm n c = c)
+     (hck : Prf (carc c =eq numeralM k)) :
+     Prf (Formula.impl (In c (carc p)) (Formula.impl (pairOk p) Formula.bottom)) :=
+-  impT (prf_boundedIn_of_In c (carc p)) (prf_crit_In_rejects_openP p c k hk0 hk1 hcl hck)
++  CritPiloto.impT (prf_boundedIn_of_In c (carc p)) (prf_crit_In_rejects_openP p c k hk0 hk1 hcl hck)
+ 
+ /-! ## 4 · LOS TITULARES, re-enunciados SIN clausura sobre el testigo -/
+ 
+@@ -3214,12 +3214,12 @@
+ theorem liftF_isFormCodeB (k : Nat) (A B C X : Term) :
+     liftFormula k (isFormCodeB A B C X)
+       = isFormCodeB (liftTerm k A) (liftTerm k B) (liftTerm k C) (liftTerm k X) := by
+-  simp only [isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF, land, lor, In,
+-    carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms, liftTerm_numeralM]
++  simp only [isFormCodeB, CritPiloto.lorAll, cOk, CritPiloto.consOk, nulOkF, unOkF, binOkF, strBinOkF, land, lor, In,
++    carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAllF (k : Nat) (p : Term) :
+     liftFormula k (wfAllF acF acT acTs p) = wfAllF acF acT acTs (liftTerm k p) := by
+-  simp only [wfAllF, bndFF, liftFormula, liftF_isFormCodeB, lt, lenc, nthc,
++  simp only [CritPiloto.wfAllF, bndFF, liftFormula, liftF_isFormCodeB, lt, lenc, nthc,
+     liftT_acF, liftT_acT, liftT_acTs, acF, acT, acTs, carc, cdrc,
+     liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+ 
+@@ -3244,7 +3244,7 @@
+     PrfH Γ (Formula.impl (lt k (bndFF acF p))
+       (isFormCodeB (acF p) (acT p) (acTs p) (nthc (acF p) k))) := by
+   have hi := PrfH_spec h k
+-  simpa only [wfAllF, bndFF, isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF,
++  simpa only [CritPiloto.wfAllF, bndFF, isFormCodeB, CritPiloto.lorAll, cOk, CritPiloto.consOk, nulOkF, unOkF, binOkF, strBinOkF,
+     acF, acT, acTs, lt, lenc, carc, cdrc, nthc, land, lor, In, cons, nil, zero,
+     substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, substTerm_numeralM,
+     if_true] using hi
+@@ -3288,7 +3288,7 @@
+     (hcl : ∀ n : Nat, liftTerm n c = c)
+     (hck : Prf (carc c =eq numeralM k)) :
+     Prf (Formula.impl (In c (acF p)) (Formula.impl (tripleOk p) Formula.bottom)) :=
+-  impT (prf_boundedIn_of_In c (acF p))
++  CritPiloto.impT (prf_boundedIn_of_In c (acF p))
+     (prf_crit_In_F_rejects_openP p c k h2 h3 h4 h5 h6 h7 h8 h9 hcl hck)
+ 
+ theorem crit_isFCB3_no_termcode_open (p n : Term) (hn : CodeClosed n)
+--- a/sondeos/EnsamblajeMedida.lean (archivo/sondeos-2026-10)
++++ b/sondeos/EnsamblajeMedida.lean (T18, los dos arreglos)
+@@ -108,7 +108,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    liftTerm, liftTerms, nthc, cons, nil, zero, liftTerm_numeralM]
++    liftTerm, liftTerms, nthc, cons, nil, zero, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -445,29 +445,29 @@
+ /-- tags 6/9, genericos en el tag. `SubstfcEx.paso2_caso_un_guarded` ya instanciado. -/
+ def CASO_un (m : Nat) : Prop :=
+   ∀ v s f : Term,
+-    Prf (Formula.impl (hasWit (liftc zero s)) (TGT (succ v) (liftc zero s) f)) →
+-    Prf (Formula.impl (hasWit s) (TGT v s (unc m f)))
++    Prf (Formula.impl (FamA.hasWit (liftc zero s)) (TGT (succ v) (liftc zero s) f)) →
++    Prf (Formula.impl (FamA.hasWit s) (TGT v s (unc m f)))
+ 
+ /-! ### GRUPO III — GUARDA `isTC1 w ·` sobre los **SUBCODIGOS DEL SUSTITUIDO**.
+        ⚠️ **NINGUNO DE LOS DOS ESTA ENSAMBLADO.** Lo que hay es el INGREDIENTE. -/
+ 
+ /-- El ingrediente que SI existe: `SFsubsttc.pcc_eval_substtc'`. -/
+ def ING_substtc : Prop :=
+-  ∀ w v s t : Term, Prf (isTC1 w t) →
++  ∀ w v s t : Term, Prf (FamA.isTC1 w t) →
+     Prf (provFromCode (eqCodeFn (substtcT (tcFn v) (tcFn s) (tcFn t)) (tcFn (substtc v s t))))
+ 
+ /-- El ingrediente que SI existe: `SFsubsttc.pcc_eval_substtsc'`. -/
+ def ING_substtsc : Prop :=
+-  ∀ w v s t : Term, Prf (wfAll1 w) → Prf (argsIn w t) →
++  ∀ w v s t : Term, Prf (FamA.wfAll1 w) → Prf (FamA.argsIn w t) →
+     Prf (provFromCode (eqCodeFn (substtscT (tcFn v) (tcFn s) (tcFn t)) (tcFn (substtsc v s t))))
+ 
+ /-- tag 4, **POR ENSAMBLAR**. La guarda cae sobre los DOS subcodigos de TERMINO. -/
+ def CASO_eq : Prop :=
+-  ∀ w v s a b : Term, Prf (isTC1 w a) → Prf (isTC1 w b) → Prf (TGT v s (eqc a b))
++  ∀ w v s a b : Term, Prf (FamA.isTC1 w a) → Prf (FamA.isTC1 w b) → Prf (TGT v s (eqc a b))
+ 
+ /-- tag 3, **POR ENSAMBLAR**. La guarda cae sobre la LISTA de argumentos. -/
+ def CASO_atom : Prop :=
+-  ∀ w v s p ts : Term, Prf (wfAll1 w) → Prf (argsIn w ts) → Prf (TGT v s (atomc p ts))
++  ∀ w v s p ts : Term, Prf (FamA.wfAll1 w) → Prf (FamA.argsIn w ts) → Prf (TGT v s (atomc p ts))
+ 
+ /-! ### §4.a · ¿SON COMPATIBLES LAS TRES FORMAS DE GUARDA?
+        **SI, y se unifican** — las tres viven en la MISMA familia A y se derivan
+@@ -476,23 +476,23 @@
+ /-- `hasWit` (grupo II) ES `isTC1` (grupo III) con el testigo existencializado.
+     No son «dos guardas distintas»: es la misma, abierta y cerrada. -/
+ theorem unif_hasWit_es_isTC1 (c : Term) :
+-    hasWit c = Formula.ex (isTC1 (.var 0) (liftTerm 0 c)) := rfl
++    FamA.hasWit c = Formula.ex (FamA.isTC1 (.var 0) (liftTerm 0 c)) := rfl
+ 
+ /-- `wfAll1` (grupo III, mitad de listas) ES la mitad izquierda de `isTC1`. -/
+-theorem unif_wfAll1_es_mitad (w c : Term) : isTC1 w c = land (wfAll1 w) (In c w) := rfl
++theorem unif_wfAll1_es_mitad (w c : Term) : FamA.isTC1 w c = land (FamA.wfAll1 w) (In c w) := rfl
+ 
+ /-- La guarda UNIFICADA que sirve para los tres grupos a la vez: un solo testigo `w`
+     bien formado, mas las pertenencias que cada caso necesita. -/
+-def GuardaUnica (w s : Term) : Formula := land (wfAll1 w) (In s w)
++def GuardaUnica (w s : Term) : Formula := land (FamA.wfAll1 w) (In s w)
+ 
+-theorem unif_guarda_unica (w s : Term) : GuardaUnica w s = isTC1 w s := rfl
++theorem unif_guarda_unica (w s : Term) : GuardaUnica w s = FamA.isTC1 w s := rfl
+ 
+ /-- Y por tanto **la guarda del grupo II se DERIVA de la unica** (ex-intro). -/
+ theorem unif_II_desde_unica (w s : Term)
+-    (h : Prf (GuardaUnica w s)) : Prf (hasWit s) := by
+-  have hsub : substFormula 0 w (isTC1 (.var 0) (liftTerm 0 s)) = isTC1 w s := by
+-    simp only [substF_isTC1, substTerm, FOL.substTerm_liftTerm, if_true]
+-  exact prf_ex_intro (A := isTC1 (.var 0) (liftTerm 0 s)) w (hsub ▸ h)
++    (h : Prf (GuardaUnica w s)) : Prf (FamA.hasWit s) := by
++  have hsub : substFormula 0 w (FamA.isTC1 (.var 0) (liftTerm 0 s)) = FamA.isTC1 w s := by
++    simp only [FamA.substF_isTC1, substTerm, FOL.substTerm_liftTerm, if_true]
++  exact prf_ex_intro (A := FamA.isTC1 (.var 0) (liftTerm 0 s)) w (hsub ▸ h)
+ 
+ end Censo
+ end S_Censo
+@@ -530,7 +530,7 @@
+       = FamB.isTermCodeB (liftTerm k wT) (liftTerm k wTs) (liftTerm k X) := by
+   simp only [FamB.isTermCodeB, FamB.cOk, FamB.consOk, FamB.varOkT, FamB.funcOkT,
+     lor, land, In, carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM]
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_isTermsCodeB (k : Nat) (wT wTs X : Term) :
+     liftFormula k (FamB.isTermsCodeB wT wTs X)
+@@ -543,7 +543,7 @@
+       = FamB.isFormCodeB (liftTerm k wF) (liftTerm k wT) (liftTerm k wTs) (liftTerm k X) := by
+   simp only [FamB.isFormCodeB, FamB.lorAll, FamB.cOk, FamB.consOk, FamB.nulOkF, FamB.unOkF,
+     FamB.binOkF, FamB.strBinOkF, lor, land, In, carc, cdrc, lenc, nthc, cons, nil, zero,
+-    liftFormula, liftTerm, liftTerms, liftTerm_numeralM]
++    liftFormula, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftT_acF  (k : Nat) (p : Term) : liftTerm k (FamB.acF p)  = FamB.acF  (liftTerm k p) := by
+   simp only [FamB.acF, carc, liftTerm, liftTerms]
+@@ -585,18 +585,18 @@
+ 
+ /-- `P2G.PHI_guarded`, copiado literalmente. `#2` = codigo, `#1` = v, `#0` = s. -/
+ def PHI1 : Formula :=
+-  Formula.forall (Formula.forall (Formula.impl (hasWit (.var 0)) (TGT (.var 1) (.var 0) (.var 2))))
++  Formula.forall (Formula.forall (Formula.impl (FamA.hasWit (.var 0)) (TGT (.var 1) (.var 0) (.var 2))))
+ 
+ /-- **GATE DE Φ1: PASA.** (Reproduce `P2G.PHI_guarded_lift`.) -/
+ theorem PHI1_lift : liftFormula 1 PHI1 = PHI1 := by
+-  simp only [PHI1, liftFormula, liftF_hasWit, liftF_TGT, liftTerm,
++  simp only [PHI1, liftFormula, FamA.liftF_hasWit, liftF_TGT, liftTerm,
+     Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
+ 
+ /-! ### §5.c · Φ2 — EL QUE HACE FALTA. `#3` = codigo, `#2` = p, `#1` = v, `#0` = s. -/
+ 
+ def PHI2body : Formula :=
+   Formula.impl (FamB.isFCB3 (.var 2) (.var 3))
+-    (Formula.impl (hasWit (.var 0)) (TGT (.var 1) (.var 0) (.var 3)))
++    (Formula.impl (FamA.hasWit (.var 0)) (TGT (.var 1) (.var 0) (.var 3)))
+ 
+ def PHI2 : Formula := Formula.forall (Formula.forall (Formula.forall PHI2body))
+ 
+@@ -604,7 +604,7 @@
+     dentro es admisible por `prf_strong_induction`. Tres binders — exactamente los
+     mismos que `SFsubsttc.PHI` (`sondeos/EvalSubsttc.lean:1537`). -/
+ theorem PHI2_lift : liftFormula 1 PHI2 = PHI2 := by
+-  simp only [PHI2, PHI2body, liftFormula, liftF_isFCB3, liftF_hasWit, liftF_TGT, liftTerm,
++  simp only [PHI2, PHI2body, liftFormula, liftF_isFCB3, FamA.liftF_hasWit, liftF_TGT, liftTerm,
+     Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
+ 
+ /-! ### §5.d · Φ3 — con el testigo EXISTENCIALIZADO (sin binder exterior para `p`),
+@@ -619,12 +619,12 @@
+ 
+ def PHI3 : Formula :=
+   Formula.forall (Formula.forall (Formula.impl (hasFWit (.var 2))
+-    (Formula.impl (hasWit (.var 0)) (TGT (.var 1) (.var 0) (.var 2)))))
++    (Formula.impl (FamA.hasWit (.var 0)) (TGT (.var 1) (.var 0) (.var 2)))))
+ 
+ /-- **GATE DE Φ3: PASA.** Dos binders solamente: el testigo `p` no anade binder
+     exterior porque es un `ex` INTERNO. -/
+ theorem PHI3_lift : liftFormula 1 PHI3 = PHI3 := by
+-  simp only [PHI3, liftFormula, liftF_hasFWit, liftF_hasWit, liftF_TGT, liftTerm,
++  simp only [PHI3, liftFormula, liftF_hasFWit, FamA.liftF_hasWit, liftF_TGT, liftTerm,
+     Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
+ 
+ end Gate
+@@ -735,23 +735,23 @@
+     substFormula 0 t PHI2
+       = Formula.forall (Formula.forall (Formula.forall
+           (Formula.impl (FamB.isFCB3 (.var 2) (liftTerm 0 (liftTerm 0 (liftTerm 0 t))))
+-            (Formula.impl (hasWit (.var 0))
++            (Formula.impl (FamA.hasWit (.var 0))
+               (TGT (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))))) := by
+-  simp only [PHI2, PHI2body, substFormula, substF_isFCB3, substF_hasWit, substF_TGT,
++  simp only [PHI2, PHI2body, substFormula, substF_isFCB3, FamA.substF_hasWit, substF_TGT,
+     substTerm, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+ 
+ /-- Especializacion del PRIMER binder (`p`). **Consume `substTerm_liftLiftLift`.** -/
+ theorem PHI2_spec1 (t p : Term) :
+     substFormula 0 p (Formula.forall (Formula.forall
+         (Formula.impl (FamB.isFCB3 (.var 2) (liftTerm 0 (liftTerm 0 (liftTerm 0 t))))
+-          (Formula.impl (hasWit (.var 0))
++          (Formula.impl (FamA.hasWit (.var 0))
+             (TGT (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 (liftTerm 0 t))))))))
+       = Formula.forall (Formula.forall
+           (Formula.impl (FamB.isFCB3 (liftTerm 0 (liftTerm 0 p))
+               (liftTerm 0 (liftTerm 0 t)))
+-            (Formula.impl (hasWit (.var 0))
++            (Formula.impl (FamA.hasWit (.var 0))
+               (TGT (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t)))))) := by
+-  simp only [substFormula, substF_isFCB3, substF_hasWit, substF_TGT, substTerm,
++  simp only [substFormula, substF_isFCB3, FamA.substF_hasWit, substF_TGT, substTerm,
+     Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+     ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift]
+ 
+@@ -759,22 +759,22 @@
+ theorem PHI2_spec2 (t p v : Term) :
+     substFormula 0 v (Formula.forall
+         (Formula.impl (FamB.isFCB3 (liftTerm 0 (liftTerm 0 p)) (liftTerm 0 (liftTerm 0 t)))
+-          (Formula.impl (hasWit (.var 0))
++          (Formula.impl (FamA.hasWit (.var 0))
+             (TGT (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))))
+       = Formula.forall
+           (Formula.impl (FamB.isFCB3 (liftTerm 0 p) (liftTerm 0 t))
+-            (Formula.impl (hasWit (.var 0))
++            (Formula.impl (FamA.hasWit (.var 0))
+               (TGT (liftTerm 0 v) (.var 0) (liftTerm 0 t)))) := by
+-  simp only [substFormula, substF_isFCB3, substF_hasWit, substF_TGT, substTerm,
++  simp only [substFormula, substF_isFCB3, FamA.substF_hasWit, substF_TGT, substTerm,
+     Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+     FOL.substTerm_liftLift]
+ 
+ /-- Especializacion del TERCER binder (`s`). **Consume `FOL.substTerm_liftTerm`.** -/
+ theorem PHI2_spec3 (t p v s : Term) :
+     substFormula 0 s (Formula.impl (FamB.isFCB3 (liftTerm 0 p) (liftTerm 0 t))
+-        (Formula.impl (hasWit (.var 0)) (TGT (liftTerm 0 v) (.var 0) (liftTerm 0 t))))
+-      = Formula.impl (FamB.isFCB3 p t) (Formula.impl (hasWit s) (TGT v s t)) := by
+-  simp only [substFormula, substF_isFCB3, substF_hasWit, substF_TGT, substTerm,
++        (Formula.impl (FamA.hasWit (.var 0)) (TGT (liftTerm 0 v) (.var 0) (liftTerm 0 t))))
++      = Formula.impl (FamB.isFCB3 p t) (Formula.impl (FamA.hasWit s) (TGT v s t)) := by
++  simp only [substFormula, substF_isFCB3, FamA.substF_hasWit, substF_TGT, substTerm,
+     FOL.substTerm_liftTerm, if_true]
+ 
+ end Lifts
+@@ -858,7 +858,7 @@
+   have h3 : Prf (lt (nthc X (numeralM 1))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (FamB.shapeUn X k))) (prf_to_prfH h3 _)
+ 
+ theorem descenso_bin1 (X : Term) (k : Nat) :
+@@ -872,7 +872,7 @@
+   have h3 : Prf (lt (nthc X (numeralM 1))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (FamB.shapeBin X k))) (prf_to_prfH h3 _)
+ 
+ theorem descenso_bin2 (X : Term) (k : Nat) :
+@@ -888,7 +888,7 @@
+   have h4 : Prf (lt (nthc X (numeralM 2))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) (prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2)) h3
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (FamB.shapeBin X k))) (prf_to_prfH h4 _)
+ 
+ /-! ### §7.c · **LA OBLIGACION RESIDUAL 1 — EL PUENTE A->B.  *** NO EXISTE. ***
+@@ -1020,7 +1020,7 @@
+ /-- **LA INSTANCIACION COMPLETA DE Φ2** — de la conclusion de `prf_strong_induction`
+     a la forma util. Los tres binders se abren con las tres cancelaciones del §6. -/
+ theorem PHI2_use {Γ : List Formula} (t p v s : Term) (h : PrfH Γ (substFormula 0 t PHI2)) :
+-    PrfH Γ (Formula.impl (FamB.isFCB3 p t) (Formula.impl (hasWit s) (TGT v s t))) := by
++    PrfH Γ (Formula.impl (FamB.isFCB3 p t) (Formula.impl (FamA.hasWit s) (TGT v s t))) := by
+   rw [PHI2_at] at h
+   have h1 := PrfH_spec h p
+   rw [PHI2_spec1] at h1
+@@ -1064,7 +1064,7 @@
+ /-- La HI, ya abierta a `p`, `v`, `s` y con el codigo hijo `z`. -/
+ theorem IH_at {Γ : List Formula} (hpsi : PrfH Γ PSI3) (z p v s : Term)
+     (hlt : PrfH Γ (lt z (.var 3))) :
+-    PrfH Γ (Formula.impl (FamB.isFCB3 p z) (Formula.impl (hasWit s) (TGT v s z))) :=
++    PrfH Γ (Formula.impl (FamB.isFCB3 p z) (Formula.impl (FamA.hasWit s) (TGT v s z))) :=
+   PHI2_use z p v s (PrfH.mp _ _ _ (PSI_inst hpsi z) hlt)
+ 
+ /-! ### §8.2 · EL CONTEXTO EMPAQUETADO y las OCHO RAMAS como hipotesis TIPADAS.
+@@ -1074,7 +1074,7 @@
+     `#3` = codigo, `#2` = testigo, `#1` = v, `#0` = s. -/
+ 
+ def CTX : Formula :=
+-  land PSI3 (land (FamB.isFCB3 (.var 2) (.var 3)) (hasWit (.var 0)))
++  land PSI3 (land (FamB.isFCB3 (.var 2) (.var 3)) (FamA.hasWit (.var 0)))
+ 
+ /-- El objetivo de toda rama. -/
+ def GOAL : Formula := TGT (.var 1) (.var 0) (.var 3)
+@@ -1158,12 +1158,12 @@
+   simp only [List.map_cons, List.map_nil]
+   show PrfH [PSI3] PHI2body
+   refine deduction_aux ?_ (FamB.isFCB3 (.var 2) (.var 3)) [PSI3] rfl
+-  refine deduction_aux ?_ (hasWit (.var 0)) [FamB.isFCB3 (.var 2) (.var 3), PSI3] rfl
+-  have hpsi : PrfH [hasWit (.var 0), FamB.isFCB3 (.var 2) (.var 3), PSI3] PSI3 :=
++  refine deduction_aux ?_ (FamA.hasWit (.var 0)) [FamB.isFCB3 (.var 2) (.var 3), PSI3] rfl
++  have hpsi : PrfH [FamA.hasWit (.var 0), FamB.isFCB3 (.var 2) (.var 3), PSI3] PSI3 :=
+     PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+-  have hfc : PrfH [hasWit (.var 0), FamB.isFCB3 (.var 2) (.var 3), PSI3]
++  have hfc : PrfH [FamA.hasWit (.var 0), FamB.isFCB3 (.var 2) (.var 3), PSI3]
+       (FamB.isFCB3 (.var 2) (.var 3)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+-  have hg : PrfH [hasWit (.var 0), FamB.isFCB3 (.var 2) (.var 3), PSI3] (hasWit (.var 0)) :=
++  have hg : PrfH [FamA.hasWit (.var 0), FamB.isFCB3 (.var 2) (.var 3), PSI3] (FamA.hasWit (.var 0)) :=
+     PrfH.hyp _ _ (List.Mem.head _)
+   exact PrfH.mp _ _ _ (prf_to_prfH hctx _)
+     (PrfH_and_intro hpsi (PrfH_and_intro hfc hg))
+@@ -1175,8 +1175,8 @@
+     (r2 : RAMA D2) (r3 : RAMA D3) (r4 : RAMA D4)
+     (r5 : RAMA (DBIN 5)) (r6 : RAMA (DUN 6)) (r7 : RAMA (DBIN 7))
+     (r8 : RAMA (DBIN 8)) (r9 : RAMA (DUN 9))
+-    (p f v s : Term) (hw : Prf (FamB.isFCB3 p f)) (hs : Prf (hasWit s)) :
+-    Prf (provFromCode (evalSubstfcCode v s f)) := by
++    (p f v s : Term) (hw : Prf (FamB.isFCB3 p f)) (hs : Prf (FamA.hasWit s)) :
++    Prf (provFromCode (FamA.evalSubstfcCode v s f)) := by
+   have hall : Prf (substFormula 0 f PHI2) :=
+     prf_strong_induction PHI2 PHI2_lift
+       (PHI2_step hecu r2 r3 r4 r5 r6 r7 r8 r9) f
+@@ -1224,8 +1224,8 @@
+ 
+ /-- Caso UNARIO relativizado (`∀` tag 6, `∃` tag 9). -/
+ def CASO_un_H (k : Nat) : Prop := ∀ (Γ : List Formula) (v s f : Term),
+-  PrfH Γ (hasWit s) →
+-  PrfH Γ (Formula.impl (hasWit (liftc zero s)) (TGT (succ v) (liftc zero s) f)) →
++  PrfH Γ (FamA.hasWit s) →
++  PrfH Γ (Formula.impl (FamA.hasWit (liftc zero s)) (TGT (succ v) (liftc zero s) f)) →
+   PrfH Γ (TGT v s (Censo.unc k f))
+ 
+ /-- ✅ **CONTROL: la forma relativizada es MAS FUERTE.** De `CASO_bin_H k` sale el
+@@ -1237,7 +1237,7 @@
+ /-- ✅ Idem para el caso unario, contra `SubstfcEx.paso2_caso_un_guarded`. -/
+ theorem CTRL_un_es_mas_fuerte (k : Nat) (h : CASO_un_H k) : Censo.CASO_un k :=
+   fun v s f hIH =>
+-    prf_deduction (h [hasWit s] v s f (prfH_hyp_self _) (prf_to_prfH hIH _))
++    prf_deduction (h [FamA.hasWit s] v s f (prfH_hyp_self _) (prf_to_prfH hIH _))
+ 
+ /-! ### §9.b · Extraccion del contexto empaquetado -/
+ 
+@@ -1250,7 +1250,7 @@
+   PrfH_and_elim_left (PrfH_and_elim_right (PrfH_and_elim_left (prfH_hyp_self _)))
+ theorem ctx_tr : PrfH [land CTX d] (FamB.tripleOk (.var 2)) :=
+   PrfH_and_elim_left ctx_fc
+-theorem ctx_g : PrfH [land CTX d] (hasWit (.var 0)) :=
++theorem ctx_g : PrfH [land CTX d] (FamA.hasWit (.var 0)) :=
+   PrfH_and_elim_right (PrfH_and_elim_right (PrfH_and_elim_left (prfH_hyp_self _)))
+ theorem ctx_d : PrfH [land CTX d] d :=
+   PrfH_and_elim_right (prfH_hyp_self _)
+@@ -1303,7 +1303,7 @@
+     PrfH.mp _ _ _ (prf_to_prfH (Puente.descenso_un (.var 3) k) _) hshape
+   -- ⚠️ la HI se instancia con `v := σ v` y `s := liftc 0 s`, que es lo que el
+   --    caso `∀`/`∃` consume. El testigo del hijo NO cambia (puente de testigos).
+-  have hIH : PrfH Γ (Formula.impl (hasWit (liftc zero (.var 0)))
++  have hIH : PrfH Γ (Formula.impl (FamA.hasWit (liftc zero (.var 0)))
+       (TGT (succ (.var 1)) (liftc zero (.var 0)) (nthc (.var 3) (numeralM 1)))) :=
+     PrfH.mp _ _ _
+       (IH_at ctx_psi (nthc (.var 3) (numeralM 1)) (.var 2) (succ (.var 1))
+@@ -1333,8 +1333,8 @@
+     (hbot : Censo.CASO_bottom)
+     (hbin : ∀ k : Nat, CASO_bin_H k) (hun : ∀ k : Nat, CASO_un_H k)
+     (r3 : RAMA D3) (r4 : RAMA D4)
+-    (p f v s : Term) (hw : Prf (FamB.isFCB3 p f)) (hs : Prf (hasWit s)) :
+-    Prf (provFromCode (evalSubstfcCode v s f)) :=
++    (p f v s : Term) (hw : Prf (FamB.isFCB3 p f)) (hs : Prf (FamA.hasWit s)) :
++    Prf (provFromCode (FamA.evalSubstfcCode v s f)) :=
+   pcc_eval_substfc_modulo_7 hecu (rama_D2 hbot) r3 r4
+     (rama_DBIN 5 (hbin 5)) (rama_DUN 6 (hun 6))
+     (rama_DBIN 7 (hbin 7)) (rama_DBIN 8 (hbin 8)) (rama_DUN 9 (hun 9))
+@@ -1502,8 +1502,8 @@
+     -- D · los dos casos por ensamblar
+     (heq : CASO_eq_H) (hatom : CASO_atom_H)
+     -- y el enunciado: `v`, `s`, `f` ABSTRACTOS
+-    (p f v s : Term) (hw : Prf (FamB.isFCB3 p f)) (hs : Prf (hasWit s)) :
+-    Prf (provFromCode (evalSubstfcCode v s f)) :=
++    (p f v s : Term) (hw : Prf (FamB.isFCB3 p f)) (hs : Prf (FamA.hasWit s)) :
++    Prf (provFromCode (FamA.evalSubstfcCode v s f)) :=
+   pcc_eval_substfc_modulo_2 hecu hbot hbin hun
+     (rama_D3 (PUENTE_TSC_de hab hargs) hatom)
+     (rama_D4 (PUENTE_TC_de_AB hab) heq)
+@@ -1512,8 +1512,8 @@
+ /-- **CONTROL DE NO-VACUIDAD DEL ENUNCIADO**: la conclusion es la del encargo,
+     literalmente `provFromCode (eqc (substfcT v̇ ṡ ḟ) (substfc v s f)˙)`. -/
+ theorem CTRL_conclusion (v s f : Term) :
+-    provFromCode (evalSubstfcCode v s f)
+-      = provFromCode (eqCodeFn (substfcT (tcFn v) (tcFn s) (tcFn f))
++    provFromCode (FamA.evalSubstfcCode v s f)
++      = provFromCode (eqCodeFn (FamA.substfcT (tcFn v) (tcFn s) (tcFn f))
+           (tcFn (substfc v s f))) := rfl
+ 
+ end Cierre
+--- a/sondeos/EnsamblajeTriple.lean (archivo/sondeos-2026-10)
++++ b/sondeos/EnsamblajeTriple.lean (T18, los dos arreglos)
+@@ -215,7 +215,7 @@
+ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
+     liftFormula k (isTermCodeE1 wT X) = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn1, shapeBin1, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -345,21 +345,21 @@
+ 
+ theorem liftF_shapeNul (k : Nat) (X : Term) (m : Nat) :
+     liftFormula k (shapeNul X m) = shapeNul (liftTerm k X) m := by
+-  simp only [shapeNul, liftFormula, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++  simp only [shapeNul, liftFormula, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_shapeUn (k : Nat) (X : Term) (m : Nat) :
+     liftFormula k (shapeUn X m) = shapeUn (liftTerm k X) m := by
+-  simp only [shapeUn, liftFormula, nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++  simp only [shapeUn, liftFormula, nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_shapeBin (k : Nat) (X : Term) (m : Nat) :
+     liftFormula k (shapeBin X m) = shapeBin (liftTerm k X) m := by
+-  simp only [shapeBin, liftFormula, nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++  simp only [shapeBin, liftFormula, nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_isTermCodeE (k : Nat) (wT wTs X : Term) :
+     liftFormula k (isTermCodeE wT wTs X)
+       = isTermCodeE (liftTerm k wT) (liftTerm k wTs) (liftTerm k X) := by
+   simp only [isTermCodeE, lor, land, liftFormula, liftF_shapeUn, liftF_shapeBin,
+-    In, nthc, liftTerm, liftTerms, liftTerm_numeralM]
++    In, nthc, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_isTermsCodeE (k : Nat) (wT wTs X : Term) :
+     liftFormula k (isTermsCodeE wT wTs X)
+@@ -371,7 +371,7 @@
+     liftFormula k (isFormCodeE wF wT wTs X)
+       = isFormCodeE (liftTerm k wF) (liftTerm k wT) (liftTerm k wTs) (liftTerm k X) := by
+   simp only [isFormCodeE, lorAll, lor, land, liftFormula, liftF_shapeNul, liftF_shapeUn,
+-    liftF_shapeBin, In, nthc, liftTerm, liftTerms, liftTerm_numeralM]
++    liftF_shapeBin, In, nthc, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_shapeNul (v : Nat) (u X : Term) (m : Nat) :
+     substFormula v u (shapeNul X m) = shapeNul (substTerm v u X) m := by
+@@ -894,7 +894,7 @@
+ /-- Transporte del descenso a traves de la ecuacion de forma. -/
+ theorem lt_of_shape {Γ : List Formula} {X D y : Term} (hsh : PrfH Γ (Formula.eq X D))
+     (h : Prf (lt y D)) : PrfH Γ (lt y X) :=
+-  ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hsh) (prf_to_prfH h _)
++  ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hsh) (prf_to_prfH h _)
+ 
+ /-! ### §9.1 · LA MITAD DE FORMULA — los OCHO disyuntos -/
+ 
+--- a/sondeos/EqTransCodeImp2.lean (archivo/sondeos-2026-10)
++++ b/sondeos/EqTransCodeImp2.lean (T18, los dos arreglos)
+@@ -100,7 +100,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+--- a/sondeos/EvalSubstfcPrf.lean (archivo/sondeos-2026-10)
++++ b/sondeos/EvalSubstfcPrf.lean (T18, los dos arreglos)
+@@ -423,7 +423,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -472,7 +472,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -533,7 +533,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -569,7 +569,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -618,7 +618,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -711,7 +711,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -810,7 +810,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -1511,7 +1511,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -2348,7 +2348,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -2498,7 +2498,7 @@
+   refine prf_deduction ?_
+   have hargs : PrfH [argsIn w (cons hd tl)] (argsIn w (cons hd tl)) := prfH_hyp_self _
+   have hlt : PrfH [argsIn w (cons hd tl)] (lt zero (lenc (cons hd tl))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons hd tl)) _)
+       (prf_to_prfH (prf_zero_lt_succ (lenc tl)) _)
+   have hin : PrfH [argsIn w (cons hd tl)] (In (nthc (cons hd tl) zero) w) :=
+@@ -2524,7 +2524,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -2674,7 +2674,7 @@
+           (cons (numeralM 1)
+             (cons (nthc (.var 1) (numeralM 1)) (cons (nthc (.var 1) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 1) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 1) (numeralM 2)) (.var 0) hphi
+@@ -2710,14 +2710,14 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR ⟹ `targetLift (carc X)` por la HI
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 1)) (cdrc (.var 1))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 1)))) _)
+       have hin0 := PrfH.mp _ _ _
+         (PrfH_inst_argsIn (.var 0) (.var 1) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 1)) (cdrc (.var 1))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_hd := PHI_use (carc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 1))) hlthd)
+@@ -2726,7 +2726,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 1)) (cdrc (.var 1))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_tl := PHI_use (cdrc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 1))) hlttl)
+@@ -2994,7 +2994,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -3599,7 +3599,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -3943,7 +3943,7 @@
+     substCodeT v w (unc m a) = unT m (substCodeT v w a) := by
+   show consT (substCodeT v w (numeralM m)) (consT (substCodeT v w a) (termCode nil))
+       = unT m (substCodeT v w a)
+-  rw [substCodeT_closed v w (numeralM m) (fun c => liftTerm_numeralM c m)]
++  rw [substCodeT_closed v w (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)]
+   rfl
+ 
+ theorem substCodeF_AXBODY (m : Nat) (W : Term) :
+@@ -4217,7 +4217,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -5271,7 +5271,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -5375,7 +5375,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -5754,7 +5754,7 @@
+           (cons (numeralM 1) (cons (nthc (.var 3) (numeralM 1))
+             (cons (nthc (.var 3) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 3) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 3) (numeralM 2)) (.var 2) (.var 1) (.var 0) hphi
+@@ -5787,13 +5787,13 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 3)) (cdrc (.var 3))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 3)))) _)
+       have hin0 := PrfH.mp _ _ _ (PrfH_inst_argsIn (.var 2) (.var 3) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 3)) (cdrc (.var 3))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 3)) (cdrc (.var 3))) _)
+       have huse_hd := PHI_use (carc (.var 3)) (.var 2) (.var 1) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 3))) hlthd)
+@@ -5802,7 +5802,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 2) (carc (.var 3)) (cdrc (.var 3))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 3)) (cdrc (.var 3))) _)
+       have huse_tl := PHI_use (cdrc (.var 3)) (.var 2) (.var 1) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 3))) hlttl)
+@@ -6039,7 +6039,7 @@
+ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
+     liftFormula k (isTermCodeE1 wT X) = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
+     substFormula v s (isTermCodeE1 wT X)
+@@ -6141,7 +6141,7 @@
+       = isFormCodeE2 (liftTerm k wF) (liftTerm k wT) (liftTerm k X) := by
+   simp only [isFormCodeE2, lorAll, clBot, clAtom, clEq, clBin, clUn, shapeNul, shapeUn,
+     shapeBin, lor, land, In, liftFormula, liftF_argsIn, nthc, cons, nil, zero,
+-    liftTerm, liftTerms, liftTerm_numeralM]
++    liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isFormCodeE2 (v : Nat) (s wF wT X : Term) :
+     substFormula v s (isFormCodeE2 wF wT X)
+@@ -6400,7 +6400,7 @@
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) := prf_cantor_mono_right _ _
+   have h3 : Prf (lt (nthc X (numeralM 1)) (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeUn X k))) (prf_to_prfH h3 _)
+ 
+ theorem descenso_bin1 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (numeralM 1)) X) := by
+@@ -6413,7 +6413,7 @@
+   have h3 : Prf (lt (nthc X (numeralM 1))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h3 _)
+ 
+ theorem descenso_bin2 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (numeralM 2)) X) := by
+@@ -6431,7 +6431,7 @@
+   have h5 : Prf (lt (nthc X (numeralM 2))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h4) h3
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h5 _)
+ 
+ /-! ############################################################################
+@@ -7123,19 +7123,19 @@
+ 
+ theorem casoBin5 : CasoBin 5 :=
+   casoBin_gen 5
+-    (fun v s a b => pcc_substfc_bin_dot (numeralM 5) (fun c => liftTerm_numeralM c 5)
++    (fun v s a b => pcc_substfc_bin_dot (numeralM 5) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 5)
+       (show ax_substfc_impl ∈ axioms by simp [axioms]) v s a b)
+     (fun v s a b => prf_substfc_impl v s a b)
+ 
+ theorem casoBin7 : CasoBin 7 :=
+   casoBin_gen 7
+-    (fun v s a b => pcc_substfc_bin_dot (numeralM 7) (fun c => liftTerm_numeralM c 7)
++    (fun v s a b => pcc_substfc_bin_dot (numeralM 7) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 7)
+       (show ax_substfc_and ∈ axioms by simp [axioms]) v s a b)
+     (fun v s a b => prf_substfc_and v s a b)
+ 
+ theorem casoBin8 : CasoBin 8 :=
+   casoBin_gen 8
+-    (fun v s a b => pcc_substfc_bin_dot (numeralM 8) (fun c => liftTerm_numeralM c 8)
++    (fun v s a b => pcc_substfc_bin_dot (numeralM 8) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 8)
+       (show ax_substfc_or ∈ axioms by simp [axioms]) v s a b)
+     (fun v s a b => prf_substfc_or v s a b)
+ 
+@@ -7286,7 +7286,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -7335,7 +7335,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -7396,7 +7396,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -7451,7 +7451,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -7544,7 +7544,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -7825,7 +7825,7 @@
+       (substfcT (tcFn v) (tcFn s) (binT 3 (tcFn a) (tcFn b)))
+       (binT 3 (tcFn a) (SFsubsttc.substtscT (tcFn v) (tcFn s) (tcFn b))))) := by
+   let T : Term := numeralM 3
+-  have hT : ∀ c : Nat, liftTerm c T = T := fun c => liftTerm_numeralM c 3
++  have hT : ∀ c : Nat, liftTerm c T = T := fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 3
+   let W3 : Term := liftc zero (liftc zero (liftc zero (tcFn v)))
+   let W2 : Term := liftc zero (liftc zero (tcFn s))
+   let W1 : Term := liftc zero (tcFn a)
+@@ -7984,7 +7984,7 @@
+     (pcc_dot_bin_symm 4 a b))
+     [land (SFsubsttc.targetSubsttc v s a) (SFsubsttc.targetSubsttc v s b)]
+   have h2 := prf_to_prfH (pcc_substfc_ter_dot (numeralM 4) "substtc"
+-      (fun c => liftTerm_numeralM c 4)
++      (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 4)
+       (show ax_substfc_eq ∈ axioms by simp [axioms]) v s a b)
+     [land (SFsubsttc.targetSubsttc v s a) (SFsubsttc.targetSubsttc v s b)]
+   have h3 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_1_code 4
+--- a/sondeos/EvalSubsttc.lean (archivo/sondeos-2026-10)
++++ b/sondeos/EvalSubsttc.lean (T18, los dos arreglos)
+@@ -135,7 +135,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -1163,7 +1163,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -1267,7 +1267,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -1648,7 +1648,7 @@
+           (cons (numeralM 1) (cons (nthc (.var 3) (numeralM 1))
+             (cons (nthc (.var 3) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 3) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 3) (numeralM 2)) (.var 2) (.var 1) (.var 0) hphi
+@@ -1681,13 +1681,13 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 3)) (cdrc (.var 3))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 3)))) _)
+       have hin0 := PrfH.mp _ _ _ (PrfH_inst_argsIn (.var 2) (.var 3) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 3)) (cdrc (.var 3))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 3)) (cdrc (.var 3))) _)
+       have huse_hd := PHI_use (carc (.var 3)) (.var 2) (.var 1) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 3))) hlthd)
+@@ -1696,7 +1696,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 2) (carc (.var 3)) (cdrc (.var 3))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 3)) (cdrc (.var 3))) _)
+       have huse_tl := PHI_use (cdrc (.var 3)) (.var 2) (.var 1) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 3))) hlttl)
+--- a/sondeos/GateGuardaEnriquecida.lean (archivo/sondeos-2026-10)
++++ b/sondeos/GateGuardaEnriquecida.lean (T18, los dos arreglos)
+@@ -73,7 +73,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+--- a/sondeos/HasWitFCritica.lean (archivo/sondeos-2026-10)
++++ b/sondeos/HasWitFCritica.lean (T18, los dos arreglos)
+@@ -423,7 +423,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -472,7 +472,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -533,7 +533,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -569,7 +569,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -618,7 +618,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -711,7 +711,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -810,7 +810,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -1500,7 +1500,7 @@
+ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
+     liftFormula k (isTermCodeE1 wT X) = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
+     substFormula v s (isTermCodeE1 wT X)
+@@ -1602,7 +1602,7 @@
+       = isFormCodeE2 (liftTerm k wF) (liftTerm k wT) (liftTerm k X) := by
+   simp only [isFormCodeE2, lorAll, clBot, clAtom, clEq, clBin, clUn, shapeNul, shapeUn,
+     shapeBin, lor, land, In, liftFormula, liftF_argsIn, nthc, cons, nil, zero,
+-    liftTerm, liftTerms, liftTerm_numeralM]
++    liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isFormCodeE2 (v : Nat) (s wF wT X : Term) :
+     substFormula v s (isFormCodeE2 wF wT X)
+@@ -2130,7 +2130,7 @@
+ 
+ theorem closed_JUNK30 : ∀ n : Nat, liftTerm n JUNK30 = JUNK30 := by
+   intro n
+-  simp only [JUNK30, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++  simp only [JUNK30, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem carc_JUNK30 : Prf (carc JUNK30 =eq numeralM 30) := prf_carc_cons _ _
+ 
+--- a/sondeos/HasWitFReal.lean (archivo/sondeos-2026-10)
++++ b/sondeos/HasWitFReal.lean (T18, los dos arreglos)
+@@ -430,7 +430,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -479,7 +479,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -540,7 +540,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -576,7 +576,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -625,7 +625,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -718,7 +718,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -817,7 +817,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -1518,7 +1518,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -2355,7 +2355,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -2505,7 +2505,7 @@
+   refine prf_deduction ?_
+   have hargs : PrfH [argsIn w (cons hd tl)] (argsIn w (cons hd tl)) := prfH_hyp_self _
+   have hlt : PrfH [argsIn w (cons hd tl)] (lt zero (lenc (cons hd tl))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons hd tl)) _)
+       (prf_to_prfH (prf_zero_lt_succ (lenc tl)) _)
+   have hin : PrfH [argsIn w (cons hd tl)] (In (nthc (cons hd tl) zero) w) :=
+@@ -2531,7 +2531,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -2681,7 +2681,7 @@
+           (cons (numeralM 1)
+             (cons (nthc (.var 1) (numeralM 1)) (cons (nthc (.var 1) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 1) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 1) (numeralM 2)) (.var 0) hphi
+@@ -2717,14 +2717,14 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR ⟹ `targetLift (carc X)` por la HI
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 1)) (cdrc (.var 1))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 1)))) _)
+       have hin0 := PrfH.mp _ _ _
+         (PrfH_inst_argsIn (.var 0) (.var 1) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 1)) (cdrc (.var 1))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_hd := PHI_use (carc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 1))) hlthd)
+@@ -2733,7 +2733,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 1)) (cdrc (.var 1))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_tl := PHI_use (cdrc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 1))) hlttl)
+@@ -3001,7 +3001,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -3606,7 +3606,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -3950,7 +3950,7 @@
+     substCodeT v w (unc m a) = unT m (substCodeT v w a) := by
+   show consT (substCodeT v w (numeralM m)) (consT (substCodeT v w a) (termCode nil))
+       = unT m (substCodeT v w a)
+-  rw [substCodeT_closed v w (numeralM m) (fun c => liftTerm_numeralM c m)]
++  rw [substCodeT_closed v w (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)]
+   rfl
+ 
+ theorem substCodeF_AXBODY (m : Nat) (W : Term) :
+@@ -4224,7 +4224,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -5278,7 +5278,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -5382,7 +5382,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -5761,7 +5761,7 @@
+           (cons (numeralM 1) (cons (nthc (.var 3) (numeralM 1))
+             (cons (nthc (.var 3) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 3) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 3) (numeralM 2)) (.var 2) (.var 1) (.var 0) hphi
+@@ -5794,13 +5794,13 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 3)) (cdrc (.var 3))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 3)))) _)
+       have hin0 := PrfH.mp _ _ _ (PrfH_inst_argsIn (.var 2) (.var 3) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 3)) (cdrc (.var 3))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 3)) (cdrc (.var 3))) _)
+       have huse_hd := PHI_use (carc (.var 3)) (.var 2) (.var 1) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 3))) hlthd)
+@@ -5809,7 +5809,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 2) (carc (.var 3)) (cdrc (.var 3))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 3)) (cdrc (.var 3))) _)
+       have huse_tl := PHI_use (cdrc (.var 3)) (.var 2) (.var 1) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 3))) hlttl)
+@@ -6046,7 +6046,7 @@
+ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
+     liftFormula k (isTermCodeE1 wT X) = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
+     substFormula v s (isTermCodeE1 wT X)
+@@ -6148,7 +6148,7 @@
+       = isFormCodeE2 (liftTerm k wF) (liftTerm k wT) (liftTerm k X) := by
+   simp only [isFormCodeE2, lorAll, clBot, clAtom, clEq, clBin, clUn, shapeNul, shapeUn,
+     shapeBin, lor, land, In, liftFormula, liftF_argsIn, nthc, cons, nil, zero,
+-    liftTerm, liftTerms, liftTerm_numeralM]
++    liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isFormCodeE2 (v : Nat) (s wF wT X : Term) :
+     substFormula v s (isFormCodeE2 wF wT X)
+@@ -6407,7 +6407,7 @@
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) := prf_cantor_mono_right _ _
+   have h3 : Prf (lt (nthc X (numeralM 1)) (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeUn X k))) (prf_to_prfH h3 _)
+ 
+ theorem descenso_bin1 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (numeralM 1)) X) := by
+@@ -6420,7 +6420,7 @@
+   have h3 : Prf (lt (nthc X (numeralM 1))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h3 _)
+ 
+ theorem descenso_bin2 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (numeralM 2)) X) := by
+@@ -6438,7 +6438,7 @@
+   have h5 : Prf (lt (nthc X (numeralM 2))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h4) h3
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h5 _)
+ 
+ /-! ############################################################################
+@@ -7130,19 +7130,19 @@
+ 
+ theorem casoBin5 : CasoBin 5 :=
+   casoBin_gen 5
+-    (fun v s a b => pcc_substfc_bin_dot (numeralM 5) (fun c => liftTerm_numeralM c 5)
++    (fun v s a b => pcc_substfc_bin_dot (numeralM 5) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 5)
+       (show ax_substfc_impl ∈ axioms by simp [axioms]) v s a b)
+     (fun v s a b => prf_substfc_impl v s a b)
+ 
+ theorem casoBin7 : CasoBin 7 :=
+   casoBin_gen 7
+-    (fun v s a b => pcc_substfc_bin_dot (numeralM 7) (fun c => liftTerm_numeralM c 7)
++    (fun v s a b => pcc_substfc_bin_dot (numeralM 7) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 7)
+       (show ax_substfc_and ∈ axioms by simp [axioms]) v s a b)
+     (fun v s a b => prf_substfc_and v s a b)
+ 
+ theorem casoBin8 : CasoBin 8 :=
+   casoBin_gen 8
+-    (fun v s a b => pcc_substfc_bin_dot (numeralM 8) (fun c => liftTerm_numeralM c 8)
++    (fun v s a b => pcc_substfc_bin_dot (numeralM 8) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 8)
+       (show ax_substfc_or ∈ axioms by simp [axioms]) v s a b)
+     (fun v s a b => prf_substfc_or v s a b)
+ 
+@@ -7293,7 +7293,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -7342,7 +7342,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -7403,7 +7403,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -7458,7 +7458,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -7551,7 +7551,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -7832,7 +7832,7 @@
+       (substfcT (tcFn v) (tcFn s) (binT 3 (tcFn a) (tcFn b)))
+       (binT 3 (tcFn a) (SFsubsttc.substtscT (tcFn v) (tcFn s) (tcFn b))))) := by
+   let T : Term := numeralM 3
+-  have hT : ∀ c : Nat, liftTerm c T = T := fun c => liftTerm_numeralM c 3
++  have hT : ∀ c : Nat, liftTerm c T = T := fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 3
+   let W3 : Term := liftc zero (liftc zero (liftc zero (tcFn v)))
+   let W2 : Term := liftc zero (liftc zero (tcFn s))
+   let W1 : Term := liftc zero (tcFn a)
+@@ -7991,7 +7991,7 @@
+     (pcc_dot_bin_symm 4 a b))
+     [land (SFsubsttc.targetSubsttc v s a) (SFsubsttc.targetSubsttc v s b)]
+   have h2 := prf_to_prfH (pcc_substfc_ter_dot (numeralM 4) "substtc"
+-      (fun c => liftTerm_numeralM c 4)
++      (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 4)
+       (show ax_substfc_eq ∈ axioms by simp [axioms]) v s a b)
+     [land (SFsubsttc.targetSubsttc v s a) (SFsubsttc.targetSubsttc v s b)]
+   have h3 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_1_code 4
+--- a/sondeos/HasWitFRealMin.lean (archivo/sondeos-2026-10)
++++ b/sondeos/HasWitFRealMin.lean (T18, los dos arreglos)
+@@ -420,7 +420,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -469,7 +469,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -530,7 +530,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -566,7 +566,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -615,7 +615,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -708,7 +708,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -807,7 +807,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -1328,7 +1328,7 @@
+ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
+     liftFormula k (isTermCodeE1 wT X) = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
+     substFormula v s (isTermCodeE1 wT X)
+@@ -1430,7 +1430,7 @@
+       = isFormCodeE2 (liftTerm k wF) (liftTerm k wT) (liftTerm k X) := by
+   simp only [isFormCodeE2, lorAll, clBot, clAtom, clEq, clBin, clUn, shapeNul, shapeUn,
+     shapeBin, lor, land, In, liftFormula, liftF_argsIn, nthc, cons, nil, zero,
+-    liftTerm, liftTerms, liftTerm_numeralM]
++    liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isFormCodeE2 (v : Nat) (s wF wT X : Term) :
+     substFormula v s (isFormCodeE2 wF wT X)
+--- a/sondeos/HasWitTcFn.lean (archivo/sondeos-2026-10)
++++ b/sondeos/HasWitTcFn.lean (T18, los dos arreglos)
+@@ -174,7 +174,7 @@
+       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+     have hw2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand2
+     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTX0 A w) (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 w)))) :=
+-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 w)) _)
++      ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 w)) _)
+         (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+     have hltw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTX0 A w) (lt (pred (.var 0)) (lenc (liftTerm 0 w))) :=
+       PrfH.mp _ _ _ (prf_to_prfH
+@@ -245,13 +245,13 @@
+     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) ::
+         [lt (.var 0) (lenc (cons (liftTerm 0 hd) nil)), In (liftTerm 0 hd) (liftTerm 0 W)])
+         (lt (succ (pred (.var 0))) (succ (lenc nil))) :=
+-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (prf_to_prfH (prf_lenc_cons (liftTerm 0 hd) nil) _)
+         (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+     have hzero : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) ::
+         [lt (.var 0) (lenc (cons (liftTerm 0 hd) nil)), In (liftTerm 0 hd) (liftTerm 0 W)])
+         (lt (pred (.var 0)) zero) :=
+-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _)
++      ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _)
+         (PrfH.mp _ _ _ (prf_to_prfH
+           (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc nil)) _) hltS)
+     exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+--- a/sondeos/ParseWitness.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ParseWitness.lean (T18, los dos arreglos)
+@@ -267,7 +267,7 @@
+   rw [hlift]
+   have hlen : Prf (Formula.eq (lenc wBot) (numeralM 1)) := prf_lenc_objList _
+   have hlt1 : PrfH [lt (.var 0) (lenc wBot)] (lt (.var 0) (succ zero)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH hlen _)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH hlen _)
+       (PrfH.hyp _ _ (List.Mem.head _))
+   have hsplit : PrfH [lt (.var 0) (lenc wBot)]
+       (lor (lt (.var 0) zero) (Formula.eq (.var 0) zero)) :=
+@@ -322,7 +322,7 @@
+   refine Prf.gen _ (prf_deduction ?_)
+   rw [hlift2, hlift]
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_objList L) _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ end ParseWitness
+--- a/sondeos/ParticionDiscrimina.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ParticionDiscrimina.lean (T18, los dos arreglos)
+@@ -293,7 +293,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ## 4 · Normalización de `substFormula` sobre el par -/
+@@ -707,7 +707,7 @@
+   have hlen : PrfH [In (nthc X (numeralM j)) q, Formula.eq (lenc X) (numeralM n)]
+       (Formula.eq (lenc X) (numeralM n)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH _ (lt (numeralM j) (lenc X)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+       (prf_to_prfH (prf_lt_numeralM hjn) _)
+   have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM j)))
+       (tcFn (nthc X (numeralM j))))) :=
+@@ -860,7 +860,7 @@
+   ⟨fun c => liftTerm_termsCodeM c ts, fun v s => substTerm_termsCodeM v s ts⟩
+ 
+ theorem closed_nil : CodeClosed nil :=
+-  ⟨fun c => liftTerm_nil c, fun v s => substTerm_nil v s⟩
++  ⟨fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil c, fun v s => ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil v s⟩
+ 
+ mutual
+ theorem closed_mem_tcodesT : ∀ (t x : Term), List.Mem x (tcodesT t) → CodeClosed x
+@@ -1469,7 +1469,7 @@
+   intro k q
+   simp only [wfAllF, bndFF, isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF,
+     land, lor, In, lt, carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hF.lift, hT.lift, hTs.lift]
+ 
+ theorem hCs_F (aF aT aTs : Term → Term) (hF : Nat1 aF) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1652,7 +1652,7 @@
+   intro k q
+   simp only [wfAllTgen, bndTgen, isTermCodeB, cOk, consOk, varOkT, funcOkT, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1672,7 +1672,7 @@
+   intro k q
+   simp only [wfAllTsgen, bndTsgen, isTermsCodeB, cOk, consOk, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tsg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+--- a/sondeos/ParticionTresPredicados.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ParticionTresPredicados.lean (T18, los dos arreglos)
+@@ -293,7 +293,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ## 4 · Normalización de `substFormula` sobre el par -/
+@@ -707,7 +707,7 @@
+   have hlen : PrfH [In (nthc X (numeralM j)) q, Formula.eq (lenc X) (numeralM n)]
+       (Formula.eq (lenc X) (numeralM n)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH _ (lt (numeralM j) (lenc X)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+       (prf_to_prfH (prf_lt_numeralM hjn) _)
+   have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM j)))
+       (tcFn (nthc X (numeralM j))))) :=
+@@ -860,7 +860,7 @@
+   ⟨fun c => liftTerm_termsCodeM c ts, fun v s => substTerm_termsCodeM v s ts⟩
+ 
+ theorem closed_nil : CodeClosed nil :=
+-  ⟨fun c => liftTerm_nil c, fun v s => substTerm_nil v s⟩
++  ⟨fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil c, fun v s => ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil v s⟩
+ 
+ mutual
+ theorem closed_mem_tcodesT : ∀ (t x : Term), List.Mem x (tcodesT t) → CodeClosed x
+@@ -1469,7 +1469,7 @@
+   intro k q
+   simp only [wfAllF, bndFF, isFormCodeB, lorAll, cOk, consOk, nulOkF, unOkF, binOkF, strBinOkF,
+     land, lor, In, lt, carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hF.lift, hT.lift, hTs.lift]
+ 
+ theorem hCs_F (aF aT aTs : Term → Term) (hF : Nat1 aF) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1652,7 +1652,7 @@
+   intro k q
+   simp only [wfAllTgen, bndTgen, isTermCodeB, cOk, consOk, varOkT, funcOkT, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+@@ -1672,7 +1672,7 @@
+   intro k q
+   simp only [wfAllTsgen, bndTsgen, isTermsCodeB, cOk, consOk, land, lor, In, lt,
+     carc, cdrc, lenc, nthc, cons, nil, zero, liftFormula, liftTerm, liftTerms,
+-    liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero,
+     hT.lift, hTs.lift]
+ 
+ theorem hCs_Tsg (aT aTs : Term → Term) (hT : Nat1 aT) (hTs : Nat1 aTs) :
+--- a/sondeos/Paso2CasoForall.lean (archivo/sondeos-2026-10)
++++ b/sondeos/Paso2CasoForall.lean (T18, los dos arreglos)
+@@ -254,7 +254,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -610,7 +610,7 @@
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) := prf_cantor_mono_right _ _
+   have h3 : Prf (lt (nthc X (numeralM 1)) (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeUn X k))) (prf_to_prfH h3 _)
+ 
+ /-- **DESCENSO binario, 1er hijo**. -/
+@@ -624,7 +624,7 @@
+   have h3 : Prf (lt (nthc X (numeralM 1))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h3 _)
+ 
+ /-- **DESCENSO binario, 2o hijo** (dos transitividades). -/
+@@ -643,7 +643,7 @@
+   have h5 : Prf (lt (nthc X (numeralM 2))
+       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
+     prf_mp (prf_mp (prf_lt_trans _ _ _) h4) h3
+-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h5 _)
+ 
+ /-! ## §8 · La ECUACION OBJETO del caso `∀`, disparada por la forma ecuacional -/
+@@ -687,19 +687,19 @@
+ 
+ /-- El predicado: `#0` es el CODIGO sobre el que se induce; `v` (`#1`) y `s` (`#0`) van dentro. -/
+ def PHI : Formula :=
+-  Formula.forall (Formula.forall (provFromCode (evalSubstfcCode (.var 1) (.var 0) (.var 2))))
++  Formula.forall (Formula.forall (provFromCode (Paso2.evalSubstfcCode (.var 1) (.var 0) (.var 2))))
+ 
+ /-- **`hΦ` SE CUMPLE**: el predicado con `v`/`s` internos es admisible para `prf_strong_induction`. -/
+ theorem PHI_lift : liftFormula 1 PHI = PHI := by
+-  simp only [PHI, liftFormula, liftFormula_provFromCode_open, liftTerm_evalSubstfcCode,
++  simp only [PHI, liftFormula, liftFormula_provFromCode_open, Paso2.liftTerm_evalSubstfcCode,
+     liftTerm, Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
+ 
+ /-- Y la instancia en un codigo `t` es la ecuacion que queremos, con `∀v∀s` delante. -/
+ theorem PHI_at (t : Term) :
+     substFormula 0 t PHI
+       = Formula.forall (Formula.forall
+-          (provFromCode (evalSubstfcCode (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))) := by
+-  simp only [PHI, substFormula, substFormula_provFromCode_open, substTerm_evalSubstfcCode,
++          (provFromCode (Paso2.evalSubstfcCode (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))) := by
++  simp only [PHI, substFormula, substFormula_provFromCode_open, Paso2.substTerm_evalSubstfcCode,
+     substTerm, substTerms, liftTerm, liftTerms, Nat.reduceLT, Nat.reduceAdd, Nat.reduceEqDiff,
+     Nat.reduceSub, Nat.reduceGT, reduceIte, if_true]
+ 
+--- a/sondeos/Paso2Guardado.lean (archivo/sondeos-2026-10)
++++ b/sondeos/Paso2Guardado.lean (T18, los dos arreglos)
+@@ -420,7 +420,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -469,7 +469,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -530,7 +530,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -566,7 +566,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -615,7 +615,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -708,7 +708,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -807,7 +807,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -1508,7 +1508,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -2345,7 +2345,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -2495,7 +2495,7 @@
+   refine prf_deduction ?_
+   have hargs : PrfH [argsIn w (cons hd tl)] (argsIn w (cons hd tl)) := prfH_hyp_self _
+   have hlt : PrfH [argsIn w (cons hd tl)] (lt zero (lenc (cons hd tl))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons hd tl)) _)
+       (prf_to_prfH (prf_zero_lt_succ (lenc tl)) _)
+   have hin : PrfH [argsIn w (cons hd tl)] (In (nthc (cons hd tl) zero) w) :=
+@@ -2521,7 +2521,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -2671,7 +2671,7 @@
+           (cons (numeralM 1)
+             (cons (nthc (.var 1) (numeralM 1)) (cons (nthc (.var 1) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 1) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 1) (numeralM 2)) (.var 0) hphi
+@@ -2707,14 +2707,14 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR ⟹ `targetLift (carc X)` por la HI
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 1)) (cdrc (.var 1))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 1)))) _)
+       have hin0 := PrfH.mp _ _ _
+         (PrfH_inst_argsIn (.var 0) (.var 1) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 1)) (cdrc (.var 1))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_hd := PHI_use (carc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 1))) hlthd)
+@@ -2723,7 +2723,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 1)) (cdrc (.var 1))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_tl := PHI_use (cdrc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 1))) hlttl)
+@@ -2991,7 +2991,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -3596,7 +3596,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -3958,12 +3958,12 @@
+     (mismo `liftcT`, por `rfl`). -/
+ theorem targetLift_bridge (s : Term) :
+     DescMutua.targetLift s
+-      = provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))) := rfl
++      = provFromCode (eqc (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))) := rfl
+ 
+ /-- **DESCENSO_hasWit**, reexpresado en los simbolos que consume el PASO 2. -/
+ theorem DESCENSO_hasWit' (s : Term) :
+     Prf (Formula.impl (hasWit s)
+-      (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))) :=
++      (provFromCode (eqc (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))) :=
+   DescMutua.DESCENSO_hasWit s
+ 
+ /-- **CRIT_hasWit_lift**, con el nombre local. -/
+@@ -3981,57 +3981,57 @@
+     ya en su forma guardada (la que produce `prf_strong_induction` sobre `PHI_guarded`). -/
+ theorem paso2_caso_forall_guarded (v s f : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero s))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero s) f)))) :
+-    Prf (Formula.impl (hasWit s) (provFromCode (evalSubstfcCode v s (forallc f)))) := by
+-  unfold evalSubstfcCode at hIH ⊢
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero s) f)))) :
++    Prf (Formula.impl (hasWit s) (provFromCode (Paso2.evalSubstfcCode v s (forallc f)))) := by
++  unfold Paso2.evalSubstfcCode at hIH ⊢
+   refine prf_deduction ?_
+   -- la GUARDA, disponible en el contexto
+   have hg : PrfH [hasWit s] (hasWit s) := prfH_hyp_self _
+   -- (I) `hLift` DESCARGADA por el DESCENSO
+-  have hLift : PrfH [hasWit s] (provFromCode (eqc (liftcT (termCode zero) (tcFn s))
++  have hLift : PrfH [hasWit s] (provFromCode (eqc (Paso2.liftcT (termCode zero) (tcFn s))
+       (tcFn (liftc zero s)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (DESCENSO_hasWit' s) _) hg
+   -- (II) la guarda SUBE al subcodigo, y con ella se dispara la HI
+   have hgl : PrfH [hasWit s] (hasWit (liftc zero s)) :=
+     PrfH.mp _ _ _ (prf_to_prfH (CRIT_hasWit_lift' s) _) hg
+   have hIHg : PrfH [hasWit s] (provFromCode (eqc
+-      (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))
++      (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))
+       (tcFn (substfc (succ v) (liftc zero s) f)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH hIH _) hgl
+   -- ### invariancias `substtc` (identicas a las de `paso2_caso_forall`)
+   have iz : ∀ W, Prf (substtc zero W (termCode zero) =eq termCode zero) :=
+-    fun W => prf_substtc_termCode_zero 0 W
+-  have iL : ∀ W, Prf (substtc zero W (liftcT (termCode zero) (tcFn s))
+-      =eq liftcT (termCode zero) (tcFn s)) := substtc_inv_liftcT iz (substtc_inv_tcFn s)
+-  have iA : ∀ W, Prf (substtc zero W (substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
+-      =eq substfcT (tcFn v) (tcFn s) (tcFn (forallc f))) :=
++    fun W => Paso2.prf_substtc_termCode_zero 0 W
++  have iL : ∀ W, Prf (substtc zero W (Paso2.liftcT (termCode zero) (tcFn s))
++      =eq Paso2.liftcT (termCode zero) (tcFn s)) := substtc_inv_liftcT iz (substtc_inv_tcFn s)
++  have iA : ∀ W, Prf (substtc zero W (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
++      =eq Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f))) :=
+     substtc_inv_substfcT (substtc_inv_tcFn v) (substtc_inv_tcFn s) (substtc_inv_tcFn (forallc f))
+   -- (1) fuego (a)+(b): la instancia interna del axioma, ya dotada  [LIBRE]
+-  have h1 : Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
+-      (unT 6 (substfcT (succcT (tcFn v)) (liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
++  have h1 : Prf (provFromCode (eqc (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
++      (unT 6 (Paso2.substfcT (succcT (tcFn v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
+     fuego_ab v s f
+   -- (2) `succcT v̇ ↦ (σv)˙`  [LIBRE, sube a Γ por `prf_to_prfH`]
+   have h2 : PrfH [hasWit s] (provFromCode (eqc
+-      (substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
+-      (unT 6 (substfcT (tcFn (succ v)) (liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
++      (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
+     prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+-      (prf_congr_unT (prf_congr_substfcT (prf_eq_symm (prf_tc_succ' v))
++      (prf_congr_unT (Paso2.prf_congr_substfcT (prf_eq_symm (prf_tc_succ' v))
+         (prf_refl _) (prf_refl _))))) h1) _
+   -- (3) `liftcT ⌜0⌝ ṡ ↦ (liftc 0 s)˙` — aqui entra `hLift`, que VIVE EN Γ
+   have h3 : PrfH [hasWit s] (provFromCode (eqc
+-      (unT 6 (substfcT (tcFn (succ v)) (liftcT (termCode zero) (tcFn s)) (tcFn f)))
+-      (unT 6 (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))))) :=
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f)))
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_unT_code 6 _ _
+-      (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL (substtc_inv_tcFn f))) _)
+-      (PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_substfcT_arg2_code (tcFn (succ v)) (tcFn f)
+-        (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))
++      (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL (substtc_inv_tcFn f))) _)
++      (PrfH.mp _ _ _ (prf_to_prfH (Paso2.pcc_congr_substfcT_arg2_code (tcFn (succ v)) (tcFn f)
++        (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))
+         (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn f) iL) _) hLift)
+   -- (4) la HI bajo el `unT 6` — VIVE EN Γ
+   have h4 : PrfH [hasWit s] (provFromCode (eqc
+-      (unT 6 (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f)))
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f)))
+       (unT 6 (tcFn (substfc (succ v) (liftc zero s) f))))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_unT_code 6 _ _
+-      (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn (liftc zero s))
++      (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn (liftc zero s))
+         (substtc_inv_tcFn f))) _) hIHg
+   -- (5) el KIT pliega el `unT 6` en el punto de `forallc`  [LIBRE]
+   have h5 : PrfH [hasWit s] (provFromCode (eqc
+@@ -4048,11 +4048,11 @@
+   -- (7) LA CADENA, ahora entera en `PrfH Γ` via `PrfH_eq_trans_code`
+   exact PrfH_eq_trans_code _ _ _ iA h2
+     (PrfH_eq_trans_code _ _ _
+-      (substtc_inv_unT (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL
++      (substtc_inv_unT (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL
+         (substtc_inv_tcFn f)))
+       h3
+       (PrfH_eq_trans_code _ _ _
+-        (substtc_inv_unT (substtc_inv_substfcT (substtc_inv_tcFn (succ v))
++        (substtc_inv_unT (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v))
+           (substtc_inv_tcFn (liftc zero s)) (substtc_inv_tcFn f)))
+         h4
+         (PrfH_eq_trans_code _ _ _
+@@ -4077,20 +4077,20 @@
+ /-- El predicado de `pcc_eval_substfc` ENRIQUECIDO con la guarda sobre `s` (`#0`). -/
+ def PHI_guarded : Formula :=
+   Formula.forall (Formula.forall (Formula.impl (hasWit (.var 0))
+-    (provFromCode (evalSubstfcCode (.var 1) (.var 0) (.var 2)))))
++    (provFromCode (Paso2.evalSubstfcCode (.var 1) (.var 0) (.var 2)))))
+ 
+ /-- **EL GATE, SUPERADO**: `liftFormula 1 Φ = Φ`, que es lo que exige `prf_strong_induction`. -/
+ theorem PHI_guarded_lift : liftFormula 1 PHI_guarded = PHI_guarded := by
+   simp only [PHI_guarded, liftFormula, liftF_hasWit, liftFormula_provFromCode_open,
+-    liftTerm_evalSubstfcCode, liftTerm, Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
++    Paso2.liftTerm_evalSubstfcCode, liftTerm, Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
+ 
+ /-- La instancia de `Φ` en un codigo `t`: es EXACTAMENTE la forma guardada. -/
+ theorem PHI_guarded_at (t : Term) :
+     substFormula 0 t PHI_guarded
+       = Formula.forall (Formula.forall (Formula.impl (hasWit (.var 0))
+-          (provFromCode (evalSubstfcCode (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t)))))) := by
++          (provFromCode (Paso2.evalSubstfcCode (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t)))))) := by
+   simp only [PHI_guarded, substFormula, substFormula_provFromCode_open, substF_hasWit,
+-    substTerm_evalSubstfcCode, substTerm, substTerms, liftTerm, liftTerms,
++    Paso2.substTerm_evalSubstfcCode, substTerm, substTerms, liftTerm, liftTerms,
+     Nat.reduceLT, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceSub, Nat.reduceGT, reduceIte,
+     if_true]
+ 
+@@ -4109,8 +4109,8 @@
+ /-- CONTROL: sobre un codigo REAL la guarda se descarga y queda la ecuacion PELADA. -/
+ theorem paso2_caso_forall_guarded_real (v f : Term) (t : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero (termCodeM t)))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero (termCodeM t)) f)))) :
+-    Prf (provFromCode (evalSubstfcCode v (termCodeM t) (forallc f))) :=
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero (termCodeM t)) f)))) :
++    Prf (provFromCode (Paso2.evalSubstfcCode v (termCodeM t) (forallc f))) :=
+   prf_mp (paso2_caso_forall_guarded v (termCodeM t) f hIH) (SinWTs.CRIT_hasWit_real t)
+ 
+ end P2G
+--- a/sondeos/ReflectorAtomoAllIn.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ReflectorAtomoAllIn.lean (T18, los dos arreglos)
+@@ -213,7 +213,7 @@
+ theorem hCl_ok : ∀ (k : Nat) (q : Term), liftFormula k (wfAll1' q) = wfAll1' (liftTerm k q) := by
+   intro k q
+   simp only [wfAll1', wfAll1'Body, isTermCodeE1', shapeUn, shapeBin, lor, land, lt, lenc, nthc,
+-    allIn, cons, nil, zero, liftFormula, liftTerm, liftTerms, liftTerm_numeralM,
++    allIn, cons, nil, zero, liftFormula, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM,
+     if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero]
+ 
+ theorem hCs_ok : ∀ (v : Nat) (t q : Term),
+@@ -549,7 +549,7 @@
+   have hlen : PrfH [allIn q (nthc X (numeralM 2)), Formula.eq (lenc X) (numeralM 3)]
+       (Formula.eq (lenc X) (numeralM 3)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH _ (lt (numeralM 2) (lenc X)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+       (prf_to_prfH (prf_lt_numeralM (by omega : 2 < 3)) _)
+   have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM 2)))
+       (tcFn (nthc X (numeralM 2))))) :=
+@@ -1051,7 +1051,7 @@
+   intro k q
+   simp only [wfAll1, wfAll1Body, isTermCodeE1, shapeUn, shapeBin, argsIn_eq_boundedAllIn,
+     liftFormula_boundedAllIn_gen, lor, land, lt, lenc, nthc, cons, nil, zero,
+-    liftFormula, liftTerm, liftTerms, liftTerm_numeralM,
++    liftFormula, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM,
+     if_pos (Nat.zero_lt_succ k), ← FOL.liftTerm_comm_zero]
+ 
+ theorem hCs_lit : ∀ (v : Nat) (t q : Term),
+@@ -1209,7 +1209,7 @@
+   have hlen : Prf (Formula.eq (lenc wV) (numeralM 1)) :=
+     prf_eq_trans (prf_lenc_cons Xv nil) (prf_eq_congr_succ prf_lenc_nil)
+   have hlt1 : PrfH [lt (.var 0) (lenc wV)] (lt (.var 0) (succ zero)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH hlen _)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (prf_to_prfH hlen _)
+       (PrfH.hyp _ _ (List.Mem.head _))
+   have hsplit : PrfH [lt (.var 0) (lenc wV)]
+       (lor (lt (.var 0) zero) (Formula.eq (.var 0) zero)) :=
+--- a/sondeos/ReflectorDesdeConsumidor.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ReflectorDesdeConsumidor.lean (T18, los dos arreglos)
+@@ -124,7 +124,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+--- a/sondeos/ReflectorForallAnidado.lean (archivo/sondeos-2026-10)
++++ b/sondeos/ReflectorForallAnidado.lean (T18, los dos arreglos)
+@@ -308,7 +308,7 @@
+ theorem liftF_isTermCodeB1 (k : Nat) (wT X : Term) :
+     liftFormula k (isTermCodeB1 wT X) = isTermCodeB1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeB1, cOk, consOk, varOkT, funcOkT1, land, lor, liftFormula, liftF_argsIn,
+-    carc, cdrc, lenc, nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    carc, cdrc, lenc, nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem substF_isTermCodeB1 (v : Nat) (t wT X : Term) :
+     substFormula v t (isTermCodeB1 wT X) = isTermCodeB1 (substTerm v t wT) (substTerm v t X) := by
+@@ -759,7 +759,7 @@
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_argsIn_tracked q (nthc X (numeralM 2))) _) hargs
+   -- transporte `tcFn (nthc X 2̄) ⇝ nthcT (tcFn X) 2̇` (una sola Leibniz, cubre cota Y cuerpo)
+   have hlt : PrfH Γ (lt (numeralM 2) (lenc X)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+       (prf_to_prfH (prf_lt_numeralM (by omega : 2 < 3)) _)
+   have hev : PrfH Γ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM 2)))
+       (tcFn (nthc X (numeralM 2))))) :=
+@@ -935,7 +935,7 @@
+ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
+     liftFormula k (isTermCodeE1 wT X) = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -1031,7 +1031,7 @@
+   rw [hnil, hlen]
+   refine prf_deduction ?_
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -1069,7 +1069,7 @@
+       simp only [lenc, wz, Xz, funcc, cons, nil, zero, succ, liftTerm, liftTerms,
+         liftTerm_strCode]
+     rw [hl] at *
+-    exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hlen _) (prfH_hyp_self _)
+   have hsplit : PrfH [lt (.var 0) (liftTerm 0 (lenc wz))]
+       (lor (lt (.var 0) zero) (Formula.eq (.var 0) zero)) :=
+--- a/sondeos/SubCodesCritica.lean (archivo/sondeos-2026-10)
++++ b/sondeos/SubCodesCritica.lean (T18, los dos arreglos)
+@@ -129,7 +129,7 @@
+   ⟨fun c => liftTerm_termsCodeM c ts, fun v s => substTerm_termsCodeM v s ts⟩
+ 
+ theorem closed_nil : CodeClosed nil :=
+-  ⟨fun c => liftTerm_nil c, fun v s => substTerm_nil v s⟩
++  ⟨fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil c, fun v s => ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil v s⟩
+ 
+ mutual
+ theorem closed_mem_subCodesT : ∀ (t x : Term), List.Mem x (subCodesT t) → CodeClosed x
+@@ -343,7 +343,7 @@
+   refine Prf.gen _ (prf_deduction ?_)
+   rw [hlift2, hlift]
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_objList L) _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ theorem prf_wfAll_subCodes (φ : Formula)
+@@ -788,7 +788,7 @@
+   rcases List.mem_cons.mp hx with rfl | h
+   · exact liftTerm_termCodeM c (Term.var 0)
+   · rcases List.mem_cons.mp h with rfl | h2
+-    · simp only [implc, cons, succ, zero, liftTerm, liftTerms, liftTerm_termCodeM, liftTerm_nil]
++    · simp only [implc, cons, succ, zero, liftTerm, liftTerms, liftTerm_termCodeM, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil]
+     · cases h2
+ 
+ theorem junk_subst (v : Nat) (s : Term) : ∀ x : Term, List.Mem x junkW → substTerm v s x = x := by
+@@ -796,7 +796,7 @@
+   rcases List.mem_cons.mp hx with rfl | h
+   · exact substTerm_termCodeM v s (Term.var 0)
+   · rcases List.mem_cons.mp h with rfl | h2
+-    · simp only [implc, cons, succ, zero, substTerm, substTerms, substTerm_termCodeM, substTerm_nil]
++    · simp only [implc, cons, succ, zero, substTerm, substTerms, substTerm_termCodeM, ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil]
+     · cases h2
+ 
+ theorem junk_lift_obj (c : Nat) : liftTerm c (objList junkW) = objList junkW :=
+@@ -807,11 +807,11 @@
+ 
+ theorem junk_lift_imp (c : Nat) : liftTerm c junkImp = junkImp := by
+   simp only [junkImp, implc, cons, succ, zero, liftTerm, liftTerms, liftTerm_termCodeM,
+-    liftTerm_nil]
++    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil]
+ 
+ theorem junk_subst_imp (v : Nat) (s : Term) : substTerm v s junkImp = junkImp := by
+   simp only [junkImp, implc, cons, succ, zero, substTerm, substTerms, substTerm_termCodeM,
+-    substTerm_nil]
++    ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil]
+ 
+ theorem prf_isFCB_junk : Prf (isFCB (objList junkW) junkImp) := by
+   have hvar : Prf (In (termCodeM (Term.var 0)) (objList junkW)) :=
+--- a/sondeos/SubCodesWitness.lean (archivo/sondeos-2026-10)
++++ b/sondeos/SubCodesWitness.lean (T18, los dos arreglos)
+@@ -171,7 +171,7 @@
+   ⟨fun c => liftTerm_termsCodeM c ts, fun v s => substTerm_termsCodeM v s ts⟩
+ 
+ theorem closed_nil : CodeClosed nil :=
+-  ⟨fun c => liftTerm_nil c, fun v s => substTerm_nil v s⟩
++  ⟨fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil c, fun v s => ROBINSON_PlusPlus.Minimal.Axioms.substTerm_nil v s⟩
+ 
+ mutual
+ theorem closed_mem_subCodesT : ∀ (t x : Term), List.Mem x (subCodesT t) → CodeClosed x
+@@ -385,7 +385,7 @@
+   refine Prf.gen _ (prf_deduction ?_)
+   rw [hlift2, hlift]
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_objList L) _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ theorem prf_wfAll_subCodes (φ : Formula)
+--- a/sondeos/SubstfcEx.lean (archivo/sondeos-2026-10)
++++ b/sondeos/SubstfcEx.lean (T18, los dos arreglos)
+@@ -447,7 +447,7 @@
+   rw [hnil]
+   refine Prf.gen _ (prf_deduction ?_)
+   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
+   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
+@@ -496,7 +496,7 @@
+     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+         (lt (pred (.var 0)) (lenc (.var 1))) :=
+       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++        (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+           (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+     have ih := PrfH.mp _ _ _ ihj hltJ
+@@ -557,7 +557,7 @@
+   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+   refine PrfH_and_intro ?_ ?_
+-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++  · exact ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
+   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
+     exact PrfH_congr_liftc _ heq
+@@ -593,7 +593,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -642,7 +642,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc V)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
+   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
+   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
+@@ -735,7 +735,7 @@
+   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
+   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+   have hlt : PrfH Γ (lt i (lenc W)) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
+   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
+     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
+@@ -834,7 +834,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -1535,7 +1535,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -2372,7 +2372,7 @@
+     liftFormula k (isTermCodeE1 wT X)
+       = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
+   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
+-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
++    nthc, cons, nil, zero, liftTerm, liftTerms, ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
+ 
+ theorem liftF_wfAll1 (k : Nat) (w : Term) :
+     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
+@@ -2522,7 +2522,7 @@
+   refine prf_deduction ?_
+   have hargs : PrfH [argsIn w (cons hd tl)] (argsIn w (cons hd tl)) := prfH_hyp_self _
+   have hlt : PrfH [argsIn w (cons hd tl)] (lt zero (lenc (cons hd tl))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons hd tl)) _)
+       (prf_to_prfH (prf_zero_lt_succ (lenc tl)) _)
+   have hin : PrfH [argsIn w (cons hd tl)] (In (nthc (cons hd tl) zero) w) :=
+@@ -2548,7 +2548,7 @@
+   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+       (PrfH.mp _ _ _ (prf_to_prfH
+         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+@@ -2698,7 +2698,7 @@
+           (cons (numeralM 1)
+             (cons (nthc (.var 1) (numeralM 1)) (cons (nthc (.var 1) (numeralM 2)) nil)))) :=
+         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hltb := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+       have hphi := PrfH.mp _ _ _ (PSI_inst hpsi' (nthc (.var 1) (numeralM 2))) hltb
+       have huse := PHI_use (nthc (.var 1) (numeralM 2)) (.var 0) hphi
+@@ -2734,14 +2734,14 @@
+       -- (a) la CABEZA esta en el testigo y es MENOR ⟹ `targetLift (carc X)` por la HI
+       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+         (prf_to_prfH (prf_lenc_cons (carc (.var 1)) (cdrc (.var 1))) _)
+-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++      have hzlt := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 1)))) _)
+       have hin0 := PrfH.mp _ _ _
+         (PrfH_inst_argsIn (.var 0) (.var 1) zero hargs) hzlt
+       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+         (prf_to_prfH (prf_nthc_zero (carc (.var 1)) (cdrc (.var 1))) _)
+       have hinhd := PrfH_congr_In_left hnth0 hin0
+-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlthd := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_left (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_hd := PHI_use (carc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (carc (.var 1))) hlthd)
+@@ -2750,7 +2750,7 @@
+       have hargs_cons := PrfH_congr_argsIn hcons hargs
+       have hargs_tl := PrfH.mp _ _ _
+         (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 1)) (cdrc (.var 1))) _) hargs_cons
+-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
++      have hlttl := ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+         (prf_to_prfH (prf_cantor_mono_right (carc (.var 1)) (cdrc (.var 1))) _)
+       have huse_tl := PHI_use (cdrc (.var 1)) (.var 0)
+         (PrfH.mp _ _ _ (PSI_inst hpsi (cdrc (.var 1))) hlttl)
+@@ -3018,7 +3018,7 @@
+     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
+   refine Prf.gen _ (prf_deduction ?_)
+   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
+-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
++    (ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_lt_subst2
+       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
+ 
+ /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
+@@ -3623,7 +3623,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -3967,7 +3967,7 @@
+     substCodeT v w (unc m a) = unT m (substCodeT v w a) := by
+   show consT (substCodeT v w (numeralM m)) (consT (substCodeT v w a) (termCode nil))
+       = unT m (substCodeT v w a)
+-  rw [substCodeT_closed v w (numeralM m) (fun c => liftTerm_numeralM c m)]
++  rw [substCodeT_closed v w (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)]
+   rfl
+ 
+ theorem substCodeF_AXBODY (m : Nat) (W : Term) :
+@@ -4159,12 +4159,12 @@
+     (mismo `liftcT`, por `rfl`). -/
+ theorem targetLift_bridge (s : Term) :
+     DescMutua.targetLift s
+-      = provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))) := rfl
++      = provFromCode (eqc (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))) := rfl
+ 
+ /-- **DESCENSO_hasWit**, reexpresado en los simbolos que consume el PASO 2. -/
+ theorem DESCENSO_hasWit' (s : Term) :
+     Prf (Formula.impl (hasWit s)
+-      (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))) :=
++      (provFromCode (eqc (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))) :=
+   DescMutua.DESCENSO_hasWit s
+ 
+ /-- **CRIT_hasWit_lift**, con el nombre local. -/
+@@ -4182,57 +4182,57 @@
+     ya en su forma guardada (la que produce `prf_strong_induction` sobre `PHI_guarded`). -/
+ theorem paso2_caso_forall_guarded (v s f : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero s))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero s) f)))) :
+-    Prf (Formula.impl (hasWit s) (provFromCode (evalSubstfcCode v s (forallc f)))) := by
+-  unfold evalSubstfcCode at hIH ⊢
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero s) f)))) :
++    Prf (Formula.impl (hasWit s) (provFromCode (Paso2.evalSubstfcCode v s (forallc f)))) := by
++  unfold Paso2.evalSubstfcCode at hIH ⊢
+   refine prf_deduction ?_
+   -- la GUARDA, disponible en el contexto
+   have hg : PrfH [hasWit s] (hasWit s) := prfH_hyp_self _
+   -- (I) `hLift` DESCARGADA por el DESCENSO
+-  have hLift : PrfH [hasWit s] (provFromCode (eqc (liftcT (termCode zero) (tcFn s))
++  have hLift : PrfH [hasWit s] (provFromCode (eqc (Paso2.liftcT (termCode zero) (tcFn s))
+       (tcFn (liftc zero s)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (DESCENSO_hasWit' s) _) hg
+   -- (II) la guarda SUBE al subcodigo, y con ella se dispara la HI
+   have hgl : PrfH [hasWit s] (hasWit (liftc zero s)) :=
+     PrfH.mp _ _ _ (prf_to_prfH (CRIT_hasWit_lift' s) _) hg
+   have hIHg : PrfH [hasWit s] (provFromCode (eqc
+-      (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))
++      (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))
+       (tcFn (substfc (succ v) (liftc zero s) f)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH hIH _) hgl
+   -- ### invariancias `substtc` (identicas a las de `paso2_caso_forall`)
+   have iz : ∀ W, Prf (substtc zero W (termCode zero) =eq termCode zero) :=
+-    fun W => prf_substtc_termCode_zero 0 W
+-  have iL : ∀ W, Prf (substtc zero W (liftcT (termCode zero) (tcFn s))
+-      =eq liftcT (termCode zero) (tcFn s)) := substtc_inv_liftcT iz (substtc_inv_tcFn s)
+-  have iA : ∀ W, Prf (substtc zero W (substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
+-      =eq substfcT (tcFn v) (tcFn s) (tcFn (forallc f))) :=
++    fun W => Paso2.prf_substtc_termCode_zero 0 W
++  have iL : ∀ W, Prf (substtc zero W (Paso2.liftcT (termCode zero) (tcFn s))
++      =eq Paso2.liftcT (termCode zero) (tcFn s)) := substtc_inv_liftcT iz (substtc_inv_tcFn s)
++  have iA : ∀ W, Prf (substtc zero W (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
++      =eq Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f))) :=
+     substtc_inv_substfcT (substtc_inv_tcFn v) (substtc_inv_tcFn s) (substtc_inv_tcFn (forallc f))
+   -- (1) fuego (a)+(b): la instancia interna del axioma, ya dotada  [LIBRE]
+-  have h1 : Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
+-      (unT 6 (substfcT (succcT (tcFn v)) (liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
++  have h1 : Prf (provFromCode (eqc (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
++      (unT 6 (Paso2.substfcT (succcT (tcFn v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
+     fuego_ab v s f
+   -- (2) `succcT v̇ ↦ (σv)˙`  [LIBRE, sube a Γ por `prf_to_prfH`]
+   have h2 : PrfH [hasWit s] (provFromCode (eqc
+-      (substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
+-      (unT 6 (substfcT (tcFn (succ v)) (liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
++      (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (forallc f)))
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
+     prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+-      (prf_congr_unT (prf_congr_substfcT (prf_eq_symm (prf_tc_succ' v))
++      (prf_congr_unT (Paso2.prf_congr_substfcT (prf_eq_symm (prf_tc_succ' v))
+         (prf_refl _) (prf_refl _))))) h1) _
+   -- (3) `liftcT ⌜0⌝ ṡ ↦ (liftc 0 s)˙` — aqui entra `hLift`, que VIVE EN Γ
+   have h3 : PrfH [hasWit s] (provFromCode (eqc
+-      (unT 6 (substfcT (tcFn (succ v)) (liftcT (termCode zero) (tcFn s)) (tcFn f)))
+-      (unT 6 (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))))) :=
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f)))
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_unT_code 6 _ _
+-      (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL (substtc_inv_tcFn f))) _)
+-      (PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_substfcT_arg2_code (tcFn (succ v)) (tcFn f)
+-        (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))
++      (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL (substtc_inv_tcFn f))) _)
++      (PrfH.mp _ _ _ (prf_to_prfH (Paso2.pcc_congr_substfcT_arg2_code (tcFn (succ v)) (tcFn f)
++        (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))
+         (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn f) iL) _) hLift)
+   -- (4) la HI bajo el `unT 6` — VIVE EN Γ
+   have h4 : PrfH [hasWit s] (provFromCode (eqc
+-      (unT 6 (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f)))
++      (unT 6 (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f)))
+       (unT 6 (tcFn (substfc (succ v) (liftc zero s) f))))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_unT_code 6 _ _
+-      (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn (liftc zero s))
++      (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn (liftc zero s))
+         (substtc_inv_tcFn f))) _) hIHg
+   -- (5) el KIT pliega el `unT 6` en el punto de `forallc`  [LIBRE]
+   have h5 : PrfH [hasWit s] (provFromCode (eqc
+@@ -4249,11 +4249,11 @@
+   -- (7) LA CADENA, ahora entera en `PrfH Γ` via `PrfH_eq_trans_code`
+   exact PrfH_eq_trans_code _ _ _ iA h2
+     (PrfH_eq_trans_code _ _ _
+-      (substtc_inv_unT (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL
++      (substtc_inv_unT (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL
+         (substtc_inv_tcFn f)))
+       h3
+       (PrfH_eq_trans_code _ _ _
+-        (substtc_inv_unT (substtc_inv_substfcT (substtc_inv_tcFn (succ v))
++        (substtc_inv_unT (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v))
+           (substtc_inv_tcFn (liftc zero s)) (substtc_inv_tcFn f)))
+         h4
+         (PrfH_eq_trans_code _ _ _
+@@ -4278,20 +4278,20 @@
+ /-- El predicado de `pcc_eval_substfc` ENRIQUECIDO con la guarda sobre `s` (`#0`). -/
+ def PHI_guarded : Formula :=
+   Formula.forall (Formula.forall (Formula.impl (hasWit (.var 0))
+-    (provFromCode (evalSubstfcCode (.var 1) (.var 0) (.var 2)))))
++    (provFromCode (Paso2.evalSubstfcCode (.var 1) (.var 0) (.var 2)))))
+ 
+ /-- **EL GATE, SUPERADO**: `liftFormula 1 Φ = Φ`, que es lo que exige `prf_strong_induction`. -/
+ theorem PHI_guarded_lift : liftFormula 1 PHI_guarded = PHI_guarded := by
+   simp only [PHI_guarded, liftFormula, liftF_hasWit, liftFormula_provFromCode_open,
+-    liftTerm_evalSubstfcCode, liftTerm, Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
++    Paso2.liftTerm_evalSubstfcCode, liftTerm, Nat.reduceLT, Nat.reduceAdd, reduceIte, if_true]
+ 
+ /-- La instancia de `Φ` en un codigo `t`: es EXACTAMENTE la forma guardada. -/
+ theorem PHI_guarded_at (t : Term) :
+     substFormula 0 t PHI_guarded
+       = Formula.forall (Formula.forall (Formula.impl (hasWit (.var 0))
+-          (provFromCode (evalSubstfcCode (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t)))))) := by
++          (provFromCode (Paso2.evalSubstfcCode (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t)))))) := by
+   simp only [PHI_guarded, substFormula, substFormula_provFromCode_open, substF_hasWit,
+-    substTerm_evalSubstfcCode, substTerm, substTerms, liftTerm, liftTerms,
++    Paso2.substTerm_evalSubstfcCode, substTerm, substTerms, liftTerm, liftTerms,
+     Nat.reduceLT, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceSub, Nat.reduceGT, reduceIte,
+     if_true]
+ 
+@@ -4304,79 +4304,79 @@
+     ##   `hobj` = `prf_substfc_{forall,ex}`              (teorema de `Meta/ArithPrf.lean`)
+     ############################################################################ -/
+ 
+-theorem paso2_caso_un_guarded (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
++theorem paso2_caso_un_guarded (m : Nat) (hmem : forall_3 (Paso2.AXBODY m) ∈ axioms)
+     (hobj : ∀ v s a : Term,
+-      Prf (substfc v s (unc m a) =eq unc m (substfc (succ v) (liftc zero s) a)))
++      Prf (substfc v s (Paso2.unc m a) =eq Paso2.unc m (substfc (succ v) (liftc zero s) a)))
+     (v s f : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero s))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero s) f)))) :
+-    Prf (Formula.impl (hasWit s) (provFromCode (evalSubstfcCode v s (unc m f)))) := by
+-  unfold evalSubstfcCode at hIH ⊢
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero s) f)))) :
++    Prf (Formula.impl (hasWit s) (provFromCode (Paso2.evalSubstfcCode v s (Paso2.unc m f)))) := by
++  unfold Paso2.evalSubstfcCode at hIH ⊢
+   refine prf_deduction ?_
+   have hg : PrfH [hasWit s] (hasWit s) := prfH_hyp_self _
+-  have hLift : PrfH [hasWit s] (provFromCode (eqc (liftcT (termCode zero) (tcFn s))
++  have hLift : PrfH [hasWit s] (provFromCode (eqc (Paso2.liftcT (termCode zero) (tcFn s))
+       (tcFn (liftc zero s)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (DESCENSO_hasWit' s) _) hg
+   have hgl : PrfH [hasWit s] (hasWit (liftc zero s)) :=
+     PrfH.mp _ _ _ (prf_to_prfH (CRIT_hasWit_lift' s) _) hg
+   have hIHg : PrfH [hasWit s] (provFromCode (eqc
+-      (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))
++      (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))
+       (tcFn (substfc (succ v) (liftc zero s) f)))) :=
+     PrfH.mp _ _ _ (prf_to_prfH hIH _) hgl
+   have iz : ∀ W, Prf (substtc zero W (termCode zero) =eq termCode zero) :=
+-    fun W => prf_substtc_termCode_zero 0 W
+-  have iL : ∀ W, Prf (substtc zero W (liftcT (termCode zero) (tcFn s))
+-      =eq liftcT (termCode zero) (tcFn s)) := substtc_inv_liftcT iz (substtc_inv_tcFn s)
+-  have iA : ∀ W, Prf (substtc zero W (substfcT (tcFn v) (tcFn s) (tcFn (unc m f)))
+-      =eq substfcT (tcFn v) (tcFn s) (tcFn (unc m f))) :=
+-    substtc_inv_substfcT (substtc_inv_tcFn v) (substtc_inv_tcFn s) (substtc_inv_tcFn (unc m f))
++    fun W => Paso2.prf_substtc_termCode_zero 0 W
++  have iL : ∀ W, Prf (substtc zero W (Paso2.liftcT (termCode zero) (tcFn s))
++      =eq Paso2.liftcT (termCode zero) (tcFn s)) := substtc_inv_liftcT iz (substtc_inv_tcFn s)
++  have iA : ∀ W, Prf (substtc zero W (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (Paso2.unc m f)))
++      =eq Paso2.substfcT (tcFn v) (tcFn s) (tcFn (Paso2.unc m f))) :=
++    substtc_inv_substfcT (substtc_inv_tcFn v) (substtc_inv_tcFn s) (substtc_inv_tcFn (Paso2.unc m f))
+   -- (1) fuego (a)+(b) GENERICO
+-  have h1 : Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn (unc m f)))
+-      (unT m (substfcT (succcT (tcFn v)) (liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
++  have h1 : Prf (provFromCode (eqc (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (Paso2.unc m f)))
++      (unT m (Paso2.substfcT (succcT (tcFn v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
+     fuego_ab_un m hmem v s f
+   -- (2) `succcT v̇ ↦ (σv)˙`
+   have h2 : PrfH [hasWit s] (provFromCode (eqc
+-      (substfcT (tcFn v) (tcFn s) (tcFn (unc m f)))
+-      (unT m (substfcT (tcFn (succ v)) (liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
++      (Paso2.substfcT (tcFn v) (tcFn s) (tcFn (Paso2.unc m f)))
++      (unT m (Paso2.substfcT (tcFn (succ v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f))))) :=
+     prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+-      (prf_congr_unT (prf_congr_substfcT (prf_eq_symm (prf_tc_succ' v))
++      (prf_congr_unT (Paso2.prf_congr_substfcT (prf_eq_symm (prf_tc_succ' v))
+         (prf_refl _) (prf_refl _))))) h1) _
+   -- (3) `liftcT ⌜0⌝ ṡ ↦ (liftc 0 s)˙` — el DESCENSO, que vive en Γ
+   have h3 : PrfH [hasWit s] (provFromCode (eqc
+-      (unT m (substfcT (tcFn (succ v)) (liftcT (termCode zero) (tcFn s)) (tcFn f)))
+-      (unT m (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))))) :=
++      (unT m (Paso2.substfcT (tcFn (succ v)) (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn f)))
++      (unT m (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f))))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_unT_code m _ _
+-      (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL (substtc_inv_tcFn f))) _)
+-      (PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_substfcT_arg2_code (tcFn (succ v)) (tcFn f)
+-        (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))
++      (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL (substtc_inv_tcFn f))) _)
++      (PrfH.mp _ _ _ (prf_to_prfH (Paso2.pcc_congr_substfcT_arg2_code (tcFn (succ v)) (tcFn f)
++        (Paso2.liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))
+         (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn f) iL) _) hLift)
+   -- (4) la HI bajo el `unT m`
+   have h4 : PrfH [hasWit s] (provFromCode (eqc
+-      (unT m (substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f)))
++      (unT m (Paso2.substfcT (tcFn (succ v)) (tcFn (liftc zero s)) (tcFn f)))
+       (unT m (tcFn (substfc (succ v) (liftc zero s) f))))) :=
+     PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_unT_code m _ _
+-      (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn (liftc zero s))
++      (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) (substtc_inv_tcFn (liftc zero s))
+         (substtc_inv_tcFn f))) _) hIHg
+   -- (5) el KIT pliega el `unT m` en el punto del constructor
+   have h5 : PrfH [hasWit s] (provFromCode (eqc
+       (unT m (tcFn (substfc (succ v) (liftc zero s) f)))
+-      (tcFn (unc m (substfc (succ v) (liftc zero s) f))))) :=
++      (tcFn (Paso2.unc m (substfc (succ v) (liftc zero s) f))))) :=
+     prf_to_prfH (pcc_dot_un m (substfc (succ v) (liftc zero s) f)) _
+   -- (6) la ecuacion OBJETO del axioma, dotada GRATIS — aqui entra `hobj`
+   have h6 : PrfH [hasWit s] (provFromCode (eqc
+-      (tcFn (unc m (substfc (succ v) (liftc zero s) f)))
+-      (tcFn (substfc v s (unc m f))))) :=
++      (tcFn (Paso2.unc m (substfc (succ v) (liftc zero s) f)))
++      (tcFn (substfc v s (Paso2.unc m f))))) :=
+     prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+       (prf_congr_tcFn (prf_eq_symm (hobj v s f)))))
+-      (prf_provFromCode_eqCodeFn_refl (tcFn (unc m (substfc (succ v) (liftc zero s) f))))) _
++      (prf_provFromCode_eqCodeFn_refl (tcFn (Paso2.unc m (substfc (succ v) (liftc zero s) f))))) _
+   -- (7) LA CADENA
+   exact PrfH_eq_trans_code _ _ _ iA h2
+     (PrfH_eq_trans_code _ _ _
+-      (substtc_inv_unT (substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL
++      (substtc_inv_unT (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v)) iL
+         (substtc_inv_tcFn f)))
+       h3
+       (PrfH_eq_trans_code _ _ _
+-        (substtc_inv_unT (substtc_inv_substfcT (substtc_inv_tcFn (succ v))
++        (substtc_inv_unT (Paso2.substtc_inv_substfcT (substtc_inv_tcFn (succ v))
+           (substtc_inv_tcFn (liftc zero s)) (substtc_inv_tcFn f)))
+         h4
+         (PrfH_eq_trans_code _ _ _
+@@ -4389,17 +4389,17 @@
+     `paso2_caso_forall_guarded` original (typechequea contra el). -/
+ theorem paso2_caso_forall_guarded_gen (v s f : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero s))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero s) f)))) :
+-    Prf (Formula.impl (hasWit s) (provFromCode (evalSubstfcCode v s (forallc f)))) :=
+-  paso2_caso_un_guarded 6 mem6 prf_substfc_forall v s f hIH
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero s) f)))) :
++    Prf (Formula.impl (hasWit s) (provFromCode (Paso2.evalSubstfcCode v s (forallc f)))) :=
++  paso2_caso_un_guarded 6 Paso2.mem6 prf_substfc_forall v s f hIH
+ 
+ /-- **★ EL CASO `∃`, CON GUARDA — CERRADO.** Espejo exacto del `∀`: mismo lema,
+     tag 9 en vez de 6, `ax_substfc_ex` en vez de `ax_substfc_forall`. -/
+ theorem paso2_caso_ex_guarded (v s f : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero s))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero s) f)))) :
+-    Prf (Formula.impl (hasWit s) (provFromCode (evalSubstfcCode v s (exc f)))) :=
+-  paso2_caso_un_guarded 9 mem9 prf_substfc_ex v s f hIH
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero s) f)))) :
++    Prf (Formula.impl (hasWit s) (provFromCode (Paso2.evalSubstfcCode v s (exc f)))) :=
++  paso2_caso_un_guarded 9 Paso2.mem9 prf_substfc_ex v s f hIH
+ 
+ /-! ### §N.3 · CONTROLES -/
+ 
+@@ -4416,8 +4416,8 @@
+ /-- CONTROL: sobre un codigo REAL la guarda se descarga y queda la ecuacion PELADA. -/
+ theorem paso2_caso_forall_guarded_real (v f : Term) (t : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero (termCodeM t)))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero (termCodeM t)) f)))) :
+-    Prf (provFromCode (evalSubstfcCode v (termCodeM t) (forallc f))) :=
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero (termCodeM t)) f)))) :
++    Prf (provFromCode (Paso2.evalSubstfcCode v (termCodeM t) (forallc f))) :=
+   prf_mp (paso2_caso_forall_guarded v (termCodeM t) f hIH) (SinWTs.CRIT_hasWit_real t)
+ 
+ /-! ### §N.4 · CONTROLES DE LA FACTORIZACION Y DEL CASO `∃` -/
+@@ -4430,17 +4430,17 @@
+ 
+ /-- **CONTROL C — EL TAG DISCRIMINA DE VERDAD**: la parametrizacion NO colapsa los dos
+     constructores. Si `unc` fuese indiferente al tag, esto seria irrefutable. -/
+-theorem CTRL_tag_discrimina (a : Term) : unc 6 a ≠ unc 9 a := by
++theorem CTRL_tag_discrimina (a : Term) : Paso2.unc 6 a ≠ Paso2.unc 9 a := by
+   intro h
+-  simp only [unc, cons, numeralM, succ, zero, Term.func.injEq, List.cons.injEq,
++  simp only [Paso2.unc, cons, numeralM, succ, zero, Term.func.injEq, List.cons.injEq,
+     and_true, true_and] at h
+   exact absurd h.1 (by decide)
+ 
+ /-- CONTROL D: sobre un codigo REAL la guarda del caso `∃` se descarga tambien. -/
+ theorem paso2_caso_ex_guarded_real (v f : Term) (t : Term)
+     (hIH : Prf (Formula.impl (hasWit (liftc zero (termCodeM t)))
+-                 (provFromCode (evalSubstfcCode (succ v) (liftc zero (termCodeM t)) f)))) :
+-    Prf (provFromCode (evalSubstfcCode v (termCodeM t) (exc f))) :=
++                 (provFromCode (Paso2.evalSubstfcCode (succ v) (liftc zero (termCodeM t)) f)))) :
++    Prf (provFromCode (Paso2.evalSubstfcCode v (termCodeM t) (exc f))) :=
+   prf_mp (paso2_caso_ex_guarded v (termCodeM t) f hIH) (SinWTs.CRIT_hasWit_real t)
+ 
+ /-- CONTROL E: el `Φ` con guarda del §N.2 sigue valiendo tal cual — el gate de
+@@ -4469,7 +4469,7 @@
+   trivial
+ 
+ /-- CONTROL G: `mem9` NO es `mem6` disfrazado — es la pertenencia de `ax_substfc_ex`. -/
+-theorem CTRL_mem9_es_ax_ex : forall_3 (AXBODY 9) = ax_substfc_ex := rfl
++theorem CTRL_mem9_es_ax_ex : forall_3 (Paso2.AXBODY 9) = ax_substfc_ex := rfl
+ 
+ end P2G
+ 
+--- a/sondeos/SubstfcPlanos.lean (archivo/sondeos-2026-10)
++++ b/sondeos/SubstfcPlanos.lean (T18, los dos arreglos)
+@@ -97,7 +97,7 @@
+ 
+ theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
++  prf_substtc_termCode_closed v W (numeralM m) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c m)
+ 
+ theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+     Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+@@ -535,7 +535,7 @@
+     (hB : Prf (provFromCode (evalSubstfcCode v s b))) :
+     Prf (provFromCode (evalSubstfcCode v s (implc a b))) :=
+   paso2_caso_bin 5 v s a b
+-    (pcc_substfc_bin_dot (numeralM 5) (fun c => liftTerm_numeralM c 5)
++    (pcc_substfc_bin_dot (numeralM 5) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 5)
+       (show ax_substfc_impl ∈ axioms by simp [axioms]) v s a b)
+     (prf_substfc_impl v s a b) hA hB
+ 
+@@ -544,7 +544,7 @@
+     (hB : Prf (provFromCode (evalSubstfcCode v s b))) :
+     Prf (provFromCode (evalSubstfcCode v s (andc a b))) :=
+   paso2_caso_bin 7 v s a b
+-    (pcc_substfc_bin_dot (numeralM 7) (fun c => liftTerm_numeralM c 7)
++    (pcc_substfc_bin_dot (numeralM 7) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 7)
+       (show ax_substfc_and ∈ axioms by simp [axioms]) v s a b)
+     (prf_substfc_and v s a b) hA hB
+ 
+@@ -553,7 +553,7 @@
+     (hB : Prf (provFromCode (evalSubstfcCode v s b))) :
+     Prf (provFromCode (evalSubstfcCode v s (orc a b))) :=
+   paso2_caso_bin 8 v s a b
+-    (pcc_substfc_bin_dot (numeralM 8) (fun c => liftTerm_numeralM c 8)
++    (pcc_substfc_bin_dot (numeralM 8) (fun c => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM c 8)
+       (show ax_substfc_or ∈ axioms by simp [axioms]) v s a b)
+     (prf_substfc_or v s a b) hA hB
+ 

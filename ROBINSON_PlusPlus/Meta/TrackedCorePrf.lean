@@ -58,7 +58,6 @@ La infraestructura de este módulo sí se usa (`liftFormula_provFromCode_open`,
 las `Eval*`; grep del 2026‑10‑14). Lo que sigue describe el estado del 2026‑07‑05b.
 -/
 
-set_option linter.unusedSimpArgs false in
 /-- **Clausura genérica de `provFromCode`**: para un código **cerrado** `c`
     (`∀ lvl, liftTerm lvl c = c`), `provFromCode c` es invariante bajo `liftFormula`.
     Generaliza `liftFormula_provCodeC'` (c = `formCode φ`) y `liftFormula_provFromCode_exc`
@@ -66,11 +65,10 @@ set_option linter.unusedSimpArgs false in
 theorem liftFormula_provFromCode (k : Nat) (c : Term) (hc : ∀ lvl, liftTerm lvl c = c) :
     liftFormula k (provFromCode c) = provFromCode c := by
   simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftFormula,
-    liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT,
+    liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, hc]
+    hc]
 
-set_option linter.unusedSimpArgs false in
 /-- **Versión para códigos ABIERTOS**: sin exigir `c` cerrado, el `liftFormula` sobre
     `provFromCode c` se traslada al **código**: `liftFormula k (provFromCode c) = provFromCode (↑c)`.
     (El cuerpo Σ₁ `provFormulaC'` es cerrado; el único slot es `c`, que aparece bajo un binder — de
@@ -81,11 +79,10 @@ set_option linter.unusedSimpArgs false in
 theorem liftFormula_provFromCode_open (k : Nat) (c : Term) :
     liftFormula k (provFromCode c) = provFromCode (liftTerm k c) := by
   simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftFormula,
-    liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT,
+    liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, ← FOL.liftTerm_comm_zero]
+    ← FOL.liftTerm_comm_zero]
 
-set_option linter.unusedSimpArgs false in
 /-- **`substFormula` atraviesa `provFromCode`** y cae sobre el código:
     `substFormula v s (provFromCode c) = provFromCode (substTerm v s c)`.
     (El cuerpo Σ₁ es cerrado; el código está bajo un binder, de ahí `substTerm_lift_comm_zero`.)
@@ -94,10 +91,10 @@ theorem substFormula_provFromCode_open (v : Nat) (s c : Term) :
     substFormula v s (provFromCode c) = provFromCode (substTerm v s c) := by
   have hz : (0 = v + 1) = False := eq_false (by omega)
   have hz2 : (0 > v + 1) = False := eq_false (by omega)
-  simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftTerm,
-    liftTerms, land, chainOk, In, runFn, nil, zero, hz, hz2, ite_false, Nat.reduceAdd,
-    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
-    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, FOL.substTerm_lift_comm_zero]
+  simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms,
+    land, chainOk, In, runFn, nil, zero, hz, hz2, ite_false, Nat.reduceAdd,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
+    ite_true, FOL.substTerm_lift_comm_zero]
 
 /-!
 ### Constructores de código `tcFn`‑based para átomos binarios (§10.2, paso 1)

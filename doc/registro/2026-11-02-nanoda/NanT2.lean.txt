@@ -1,0 +1,47 @@
+import ROBINSON_PlusPlus.Meta.ModeloCodificacion
+open FOL FOL.Metamath.Semantics ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.ModeloCodigo
+open ROBINSON_PlusPlus.Meta.ModeloEstandar ROBINSON_PlusPlus.Meta.ModeloCodificacion
+
+namespace NanT2
+variable {V : Nat}
+
+-- la evaluación, constructor a constructor, con PRUEBA (no `rfl`): `simp` la usa como reescritura con prueba, y el
+-- núcleo no tiene que comparar por definición la evaluación en el modelo concreto
+theorem evB (M : Model Nat) (v : Nat → Nat) : evalFormula M v Formula.bottom = False := by rw [evalFormula]
+theorem evA (M : Model Nat) (v : Nat → Nat) (s : List Char) (ts : List Term) :
+    evalFormula M v (Formula.atom s ts) = M.rel s (evalTerms M v ts) := by rw [evalFormula]
+theorem evQ (M : Model Nat) (v : Nat → Nat) (a b : Term) :
+    evalFormula M v (Formula.eq a b) = (evalTerm M v a = evalTerm M v b) := by rw [evalFormula]
+theorem evI (M : Model Nat) (v : Nat → Nat) (f g : Formula) :
+    evalFormula M v (Formula.impl f g) = (evalFormula M v f → evalFormula M v g) := by rw [evalFormula]
+theorem evF (M : Model Nat) (v : Nat → Nat) (f : Formula) :
+    evalFormula M v (Formula.forall f) = ∀ d, evalFormula M (shiftEnv v d) f := by rw [evalFormula]
+theorem evN (M : Model Nat) (v : Nat → Nat) (f g : Formula) :
+    evalFormula M v (Formula.and f g) = (evalFormula M v f ∧ evalFormula M v g) := by rw [evalFormula]
+theorem evO (M : Model Nat) (v : Nat → Nat) (f g : Formula) :
+    evalFormula M v (Formula.or f g) = (evalFormula M v f ∨ evalFormula M v g) := by rw [evalFormula]
+theorem evE (M : Model Nat) (v : Nat → Nat) (f : Formula) :
+    evalFormula M v (Formula.ex f) = ∃ d, evalFormula M (shiftEnv v d) f := by rw [evalFormula]
+theorem evTv (M : Model Nat) (v : Nat → Nat) (n : Nat) : evalTerm M v (Term.var n) = v n := by rw [evalTerm]
+theorem evTf (M : Model Nat) (v : Nat → Nat) (s : List Char) (ts : List Term) :
+    evalTerm M v (Term.func s ts) = M.func s (evalTerms M v ts) := by rw [evalTerm]
+theorem evTsn (M : Model Nat) (v : Nat → Nat) : evalTerms M v [] = [] := by rw [evalTerms]
+theorem evTsc (M : Model Nat) (v : Nat → Nat) (t : Term) (ts : List Term) :
+    evalTerms M v (t :: ts) = evalTerm M v t :: evalTerms M v ts := by rw [evalTerms]
+
+theorem hw1 (v : Nat → Nat) (t : Term) : evalFormula (MNV V) v (hasWit t) ↔ hasWitN (evalTerm (MNV V) v t) := by
+  simp only [hasWit, isTC1, wfAll1, wfAll1Body, isTermCodeE1, shapeUn, shapeBin, argsIn, argsInBody,
+    land, lor, lt, In, lenc, nthc, cons, nil, zero, lt_sym, in_sym, cons_sym, zero_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, liftTerm, liftTerms, Nat.not_lt_zero, ↓reduceIte, Nat.zero_add,
+    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, ev_lift0, ev_numeralM,
+    MN_lt, MN_mem, MN_lenc, MN_nthc, MN_cons, MN_zero,
+    hasWitN, wfAll1N, isTermCodeE1N, shapeUnN, shapeBinN, argsInN]
+theorem hw2 (v : Nat → Nat) (t : Term) : evalFormula (MNV V) v (hasWit t) ↔ hasWitN (evalTerm (MNV V) v t) := by
+  simp only [hasWit, isTC1, wfAll1, wfAll1Body, isTermCodeE1, shapeUn, shapeBin, argsIn, argsInBody,
+    land, lor, lt, In, lenc, nthc, cons, nil, zero, lt_sym, in_sym, cons_sym, zero_sym,
+    evB, evA, evQ, evI, evF, evN, evO, evE, evTv, evTf, evTsn, evTsc,
+    shiftEnv, liftTerm, liftTerms, Nat.not_lt_zero, ↓reduceIte, Nat.zero_add,
+    ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM, ev_lift0, ev_numeralM,
+    MN_lt, MN_mem, MN_lenc, MN_nthc, MN_cons, MN_zero,
+    hasWitN, wfAll1N, isTermCodeE1N, shapeUnN, shapeBinN, argsInN]
+end NanT2

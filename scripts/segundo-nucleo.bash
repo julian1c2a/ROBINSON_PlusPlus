@@ -9,7 +9,7 @@
 # `con-leche` y `con-ron` (verificados: «a file that declares a theorem of type False is never accepted»). Todos leen
 # una EXPORTACIÓN (NDJSON, de `leanexport`), no los `.olean`.
 #
-# Qué hace, para cada CONJUNTO de titulares (`titulares`: los 32 de `TITULARES`, `Meta/ContratoTitulares.lean`, que son
+# Qué hace, para cada CONJUNTO de titulares (`titulares`: los 35 de `TITULARES`, `Meta/ContratoTitulares.lean`, que son
 # los de `T_UNIVERSO`; `puros`: los 12 de la clase (i), `PUROS` de `Meta/PurezaTitulares.lean`, cuyo cierre no nombra
 # la semántica ni el modelo):
 #   1. Exporta su cierre: `leanexport` escribe cada constante con todas las suyas, tipos y VALORES (las pruebas
@@ -35,10 +35,16 @@
 # arranca («loopback: Failed RTM_NEWADDR: Operation not permitted», y lo cuenta como «kernel rejected the solution»), y
 # no ve el hermano `../FOL`. Los argumentos de cada núcleo son los de `bundledKernels` y `runExternalKernel` de
 # Lake/CLI/Check.lean (v4.35.0), con la misma configuración de nanoda menos el número de hilos (abajo).
+# ✏️ 2026-11-02 (ADR-251): nanoda, con CUATRO hilos también para los titulares. Lo que agotaba la pila de sus hilos
+# era comparar POR DEFINICIÓN la evaluación en el modelo concreto `MNV V` (un átomo, un ∀ o un código cerrado): la hacían
+# los `simp` con las ecuaciones `rfl` de `evalFormula`, los `intro` antes de abrir el axioma y los `show` de las
+# evaluaciones de los códigos. Con lemas de evaluación CON PRUEBA (`evf_*`, `evt_*`, `evc_*` de
+# `Meta/ModeloEstandar.lean`) y los `intro` tras `abre`, el núcleo sólo instancia lemas: nanoda acepta el cierre de los
+# 35 en 4 s y 112 MB (medido en WSL; antes, con un hilo, 527 s y 2,7 GB). Lo de abajo es el registro de antes.
 # ✏️ 2026-10-30 (ADR-228): nanoda, con los 32, agota la pila de sus hilos (también con RUST_MIN_STACK de 1 GiB: los
 # crea con su propio tamaño; medido), en `v_allIn_nil`, `v_chainOk_nil`, los `v_lineWF_*`, `ev_hasWit`… Con UN hilo
 # comprueba en el principal, cuya pila es la del proceso: con `ulimit -s unlimited`, ACEPTA el cierre entero (medido en
-# WSL: 527 s, 2,7 GB). Por eso los 32 van con un hilo y la pila del proceso sin límite; los 12, con cuatro (les bastan).
+# WSL: 527 s, 2,7 GB). Por eso los 32 iban con un hilo y la pila del proceso sin límite; los 12, con cuatro.
 
 set -uo pipefail
 export PATH="/usr/bin:$PATH"
@@ -48,7 +54,7 @@ OUT=${1:-$(mktemp -d)}
 mkdir -p "$OUT" || exit 2
 RESUMEN="${GITHUB_STEP_SUMMARY:-/dev/null}"
 LIMITE=${SEGUNDO_NUCLEO_LIMITE:-1200}          # segundos por núcleo y fichero
-LIMITE_NANODA=${SEGUNDO_NUCLEO_LIMITE_NANODA:-1800}   # nanoda con los 32 va con UN hilo: más tiempo
+LIMITE_NANODA=${SEGUNDO_NUCLEO_LIMITE_NANODA:-$LIMITE}   # ✏️ 2026-11-02 (ADR-251): ya no hace falta más (era 1800, con un hilo)
 DECL=doc/control/segundo-nucleo.tsv
 NUCLEOS="lean paranoid lean4lean nanoda con-leche con-ron"
 FAIL=0
@@ -127,8 +133,7 @@ corre() {
     lean4lean) /usr/bin/time -v -o "$t" timeout "$LIMITE" "$BIN/lean4lean" --import "$f" > "$log" 2>&1 ;;
     nanoda)
       arg="$OUT/$c-nanoda-$e.json"
-      local hilos=4
-      [ "$c" = titulares ] && hilos=1
+      local hilos=4   # ✏️ 2026-11-02 (ADR-251): también los titulares (hasta hoy, con uno)
       python3 -c 'import json, sys; print(json.dumps({"use_stdin": False, "export_file_path": sys.argv[1],
         "permitted_axioms": [a for a in sys.argv[2].split(",") if a], "unpermitted_axiom_hard_error": True,
         "num_threads": int(sys.argv[3]), "nat_extension": True, "string_extension": True}))' "$f" "$ESP" "$hilos" > "$arg"

@@ -113,7 +113,6 @@ theorem prf_eta_of_tag {k m : Nat} {D : Formula} (t : Term)
     exact PrfH_congr_cons_tail (PrfH_congr_cons_head htagc)
   exact PrfH_eq_trans heta hshape
 
-set_option linter.unusedSimpArgs false in
 /-- ⭐⭐ `premsOf` EVALUADO a nivel OBJETO, genérico en el tag, la aridad y el valor. -/
 theorem prf_premsOf_of_tag {k m : Nat} {D : Formula} (t R : Term)
     (hax : Prf (Formula.forall (Formula.impl (tagF k) (lwfVar ⇔ D))))
@@ -130,7 +129,7 @@ theorem prf_premsOf_of_tag {k m : Nat} {D : Formula} (t R : Term)
   let A : Formula := Formula.eq (premsOf (.var 0)) (liftTerm 0 R)
   have hS : ∀ s : Term, substFormula 0 s A = Formula.eq (premsOf s) R := by
     intro s
-    simp only [A, premsOf, cons, nil, substFormula, substTerm, substTerms,
+    simp only [A, premsOf, substFormula, substTerm, substTerms,
       FOL.substTerm_liftTerm, ite_true]
   exact (hS t) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm ht)
     ((hS (etaTag t m k)) ▸ prf_to_prfH hpre _)

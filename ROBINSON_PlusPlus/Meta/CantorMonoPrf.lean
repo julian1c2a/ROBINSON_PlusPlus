@@ -46,14 +46,13 @@ Cadena de definiciones (`Minimal/Axioms.lean`):
 
 /-! ### Paso 1 — el puente `cons ↔ pair` (el único que no es definicional) -/
 
-set_option linter.unusedSimpArgs false in
 /-- **`cons h t = σ (pair h t)`** — instancia de `ax_L0_cons_def` (salida (5) de ADR-093). Es el
     puente entre el constructor de listas (opaco) y la aritmética de Cantor. -/
 theorem prf_cons_def (h t : Term) : Prf (cons h t =eq succ (pair h t)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_L0_cons_def ∈ axioms by simp [axioms])) h) t
-  simp [ax_L0_cons_def, substFormula, substTerm, substTerms, cons, pair, cantor_func,
+  simp [substFormula, substTerm, substTerms, cons, pair, cantor_func,
     cantor_poly, div2, add, mul, succ, two, one, zero,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+    FOL.substTerm_liftTerm] at hh
   exact hh
 
 /-! ### Paso 2 — copias locales por ORDEN DE IMPORTS
@@ -193,7 +192,6 @@ theorem prf_le_double_self_mul_succ {a k : Term} (h : Prf (a =eq succ k)) :
   prf_le_subst2 (prf_eq_symm (prf_mul_succ a a))
     (prf_mp (prf_add_le_mono_right a (mul a a) a) (prf_le_self_mul_self h))
 
-set_option linter.unusedSimpArgs false in
 /-- **`a ≤ a·a` para TODO `a`** — por inducción; el paso no usa la hipótesis (`σk ≤ σk·σk` es
     `prf_le_mul_succ`) y la base es `0·0 = 0`. Sustituye a la hipótesis `a = σk` de
     `prf_le_self_mul_self` donde `a` puede ser `0`. -/
@@ -203,9 +201,9 @@ theorem prf_le_self_mul_self_all (a : Term) : Prf (le a (mul a a)) := by
     · show Prf (le zero (mul zero zero))
       exact prf_mp (prf_le_of_eq zero (mul zero zero)) (prf_eq_symm (prf_mul_zero zero))
     · refine Prf.gen _ ?_
-      simp only [le, lt, substFormula, substTerm, substTerms, zero, succ, mul, liftFormula, liftTerm,
-        liftTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-        reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      simp only [le, lt, substFormula, substTerm, substTerms, succ, mul, liftFormula, liftTerm,
+        liftTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceGT, Nat.reduceSub,
+        reduceIte, ite_true]
       exact prf_deduction (prf_to_prfH (prf_le_mul_succ (succ (.var 0)) (.var 0)) _)
   have ha := prf_spec key a
   simpa only [le, lt, substFormula, substTerm, substTerms, mul, Nat.reduceEqDiff, reduceIte,

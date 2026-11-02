@@ -1,0 +1,2 @@
+orden: git ls-files '*.md' '*.lean' (sin .lake/) | LC_ALL=C grep -o -n -E 'Probe/[A-Za-z0-9_.\-]*'
+rpp: 4a0c00e ADR-237…244: T32, T30, T39, T37, T49, T10 y T69 ce

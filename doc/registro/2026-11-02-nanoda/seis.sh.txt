@@ -1,0 +1,27 @@
+#!/bin/bash
+# seis.sh RAIZ_RPP LISTA ETIQUETA — exporta el cierre de LISTA (con los .olean de RAIZ_RPP) y lo pasa por los seis
+# núcleos, como scripts/segundo-nucleo.bash (nanoda con 4 hilos), con su mutante
+set -u
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+export PATH=$BIN:$PATH ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0
+D=/mnt/d/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/nanoda
+R=$1; LISTA=$2; E=$3; O=/tmp/seis-$E; mkdir -p $O
+export LEAN_PATH=$R/.lake/build/lib/lean:/mnt/e/dropbox/github/lean4/FOL/.lake/build/lib/lean
+"$BIN/leanexport" ROBINSON_PlusPlus.Meta.ContratoTitulares -- $(tr -d '\r' < $LISTA) > $O/exp.ndjson || exit 2
+python3 $D/exportacion.py mutante $O/exp.ndjson $O/mut.ndjson || exit 2
+echo "$E: $(wc -c < $O/exp.ndjson) bytes"
+for k in lean paranoid lean4lean nanoda con-leche con-ron; do
+  for x in exp mut; do
+    f=$O/$x.ndjson; log=$O/$k-$x.log
+    case $k in
+      lean)      /usr/bin/time -f "%e s %M KB" -o $log.t timeout 1200 "$BIN/leanchecker" --from-export $f > $log 2>&1 ;;
+      paranoid)  /usr/bin/time -f "%e s %M KB" -o $log.t timeout 1200 "$BIN/leanchecker-paranoid" --from-export $f > $log 2>&1 ;;
+      lean4lean) /usr/bin/time -f "%e s %M KB" -o $log.t timeout 1200 "$BIN/lean4lean" --import $f > $log 2>&1 ;;
+      nanoda)    python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":sys.argv[1],"permitted_axioms":["propext","Quot.sound","Classical.choice"],"unpermitted_axiom_hard_error":True,"num_threads":4,"nat_extension":True,"string_extension":True}))' $f > $O/nanoda-$x.json
+                 /usr/bin/time -f "%e s %M KB" -o $log.t timeout 1200 "$BIN/nanoda_bin" $O/nanoda-$x.json > $log 2>&1 ;;
+      *)         /usr/bin/time -f "%e s %M KB" -o $log.t timeout 1200 "$BIN/$k" $f > $log 2>&1 ;;
+    esac
+    rc=$?
+    echo "  $k $x rc=$rc $(tail -1 $log.t) :: $(tail -c 140 $log | tr '\n' ' ')"
+  done
+done

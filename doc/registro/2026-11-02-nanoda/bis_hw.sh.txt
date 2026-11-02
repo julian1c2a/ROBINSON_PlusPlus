@@ -1,0 +1,6 @@
+#!/bin/bash
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+D=/mnt/d/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/nanoda
+export LEAN_PATH=/mnt/e/dropbox/github/lean4/ROBINSON_PlusPlus/.lake/build/lib/lean:/mnt/e/dropbox/github/lean4/FOL/.lake/build/lib/lean:$D/olean
+"$BIN/leanexport" "$1" -- "$2" > /tmp/bis.ndjson
+bash $D/biseca.sh /tmp/bis.ndjson

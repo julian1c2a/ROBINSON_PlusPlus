@@ -1,0 +1,28 @@
+Probe/B3_planos_dedup_kit.lean:160:4: error: Application type mismatch: The argument
+  PrfH_leibniz_apply Ac X Y (prfH_hyp_self (provFromCode (eqc X Y))) (prf_to_prfH hAX [provFromCode (eqc X Y)])
+has type
+  (⊢ᴴ hasWitF Ac) → (⊢ᴴ hasWit X) → (⊢ᴴ hasWit Y) → PrfH [provFromCode (eqc X Y)] (provFromCode (substfc zero Y Ac))
+but is expected to have type
+  PrfH [provFromCode (eqc X Y)] (provFromCode (substfc zero Y Ac))
+in the application
+  PrfH.mp [provFromCode (eqc X Y)] (provFromCode (substfc zero Y Ac)) (provFromCode (eqc (F X) (F Y)))
+    (prf_to_prfH (prf_provCode_congr (hcomp Y)) [provFromCode (eqc X Y)])
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self (provFromCode (eqc X Y))) (prf_to_prfH hAX [provFromCode (eqc X Y)]))
+Probe/B3_planos_dedup_kit.lean:218:55: error: Application type mismatch: The argument
+  "liftc"
+has type
+  String
+but is expected to have type
+  List Char
+in the application
+  strCode "liftc"
+'B3PlanosKit.binK_binT' does not depend on any axioms
+'B3PlanosKit.prf_congr_binK' depends on axioms: [propext, Quot.sound]
+'B3PlanosKit.CTRL_prf_congr_binT_desde_binK' depends on axioms: [propext, Quot.sound]
+'B3PlanosKit.CTRL_prf_substtc_binT_desde_binK' depends on axioms: [propext, Quot.sound]
+'B3PlanosKit.pcc_congr_hole_code' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosKit.CTRL_pcc_congr_binT_2_code' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosKit.CTRL_pcc_congr_binT_1_code' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosKit.CTRL_pcc_congr_unT_code' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosKit.CTRL_pcc_congr_consT_arg2_code' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosKit.CTRL_pcc_congr_consT_arg1_code' depends on axioms: [propext, sorryAx, Quot.sound]

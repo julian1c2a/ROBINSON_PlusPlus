@@ -36,14 +36,13 @@ theorem prf_tc_zero : Prf (tcFn zero =eq termCode zero) := by
   simp only [ax_tc_zero, numeralM_eq, strCodeM_eq] at h
   simpa only [termCode, termsCode, zero, nil] using h
 
-set_option linter.unusedSimpArgs false in
 /-- `tcFn (σ x) = ⌜σ·⌝[tcFn x]`. -/
 theorem prf_tc_succ (x : Term) :
     Prf (tcFn (succ x) =eq
       cons (numeral 1) (cons (strCode succ_sym) (cons (cons (tcFn x) nil) nil))) := by
   have h := prf_spec (prf_ax (show ax_tc_succ ∈ axioms by simp [axioms])) x
-  simp [ax_tc_succ, substFormula, substTerm, substTerms, tcFn, succ, cons, nil, zero,
-    substTerm_numeralM, substTerm_strCodeM, substTerm_nil, FOL.substTerm_liftTerm] at h
+  simp [substFormula, substTerm, substTerms, tcFn, succ, cons, nil, zero,
+    substTerm_numeralM, substTerm_strCodeM] at h
   simp only [numeralM_eq, strCodeM_eq] at h
   exact h
 

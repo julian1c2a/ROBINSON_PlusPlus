@@ -1,0 +1,12 @@
+#!/bin/bash
+# nanoda32.sh RAIZ_RPP HILOS [LISTA] — exporta el cierre de los titulares desde los .olean de RAIZ_RPP y lo pasa por nanoda
+set -u
+BIN=$HOME/.elan/toolchains/leanprover--lean4---v4.35.0/bin
+export PATH=$BIN:$PATH ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0
+D=/mnt/d/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/nanoda
+R=$1; H=$2; LISTA=${3:-$D/titulares32.txt}
+export LEAN_PATH=$R/.lake/build/lib/lean:/mnt/e/dropbox/github/lean4/FOL/.lake/build/lib/lean
+/usr/bin/time -f "leanexport %e s %M KB" "$BIN/leanexport" ROBINSON_PlusPlus.Meta.ContratoTitulares -- $(tr -d '\r' < $LISTA) > /tmp/t32.ndjson || exit 2
+echo "exportación: $(wc -c < /tmp/t32.ndjson) bytes"
+python3 -c 'import json,sys; print(json.dumps({"use_stdin":False,"export_file_path":"/tmp/t32.ndjson","permitted_axioms":["propext","Quot.sound","Classical.choice"],"unpermitted_axiom_hard_error":True,"num_threads":int(sys.argv[1]),"nat_extension":True,"string_extension":True,"print_success_message":True}))' "$H" > /tmp/t32.json
+( ulimit -s unlimited; /usr/bin/time -f "nanoda %e s %M KB" timeout 1800 "$BIN/nanoda_bin" /tmp/t32.json > /tmp/t32.log 2>&1; echo "hilos=$H rc=$? :: $(tail -c 300 /tmp/t32.log | tr '\n' ' ')" )

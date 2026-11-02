@@ -417,14 +417,13 @@ def nthLiftPred : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 1)))
     (Formula.eq (nthc (liftsc zero (.var 1)) (.var 0)) (liftc zero (nthc (.var 1) (.var 0)))))
 
-set_option linter.unusedSimpArgs false in
 theorem nthLiftPred_at (L : Term) :
     substFormula 0 L nthLiftPred
       = Formula.forall (Formula.impl (lt (.var 0) (lenc (liftTerm 0 L)))
           (Formula.eq (nthc (liftsc zero (liftTerm 0 L)) (.var 0))
                       (liftc zero (nthc (liftTerm 0 L) (.var 0))))) := by
   simp only [nthLiftPred, lt, lenc, nthc, liftsc, liftc, zero, substFormula, substTerm,
-    substTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceGT, Nat.reduceSub, Nat.reduceEqDiff,
+    substTerms, Nat.reduceAdd, Nat.reduceGT, Nat.reduceSub, Nat.reduceEqDiff,
     reduceIte, ite_true]
 
 theorem nthLiftPred_base : Prf (substFormula 0 nil nthLiftPred) := by
@@ -438,7 +437,6 @@ theorem nthLiftPred_base : Prf (substFormula 0 nil nthLiftPred) := by
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
 
-set_option linter.unusedSimpArgs false in
 theorem nthLiftPred_step :
     Prf (Formula.forall (Formula.forall (Formula.impl (liftFormula 1 nthLiftPred)
       (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 nthLiftPred)))))) := by
@@ -477,9 +475,9 @@ theorem nthLiftPred_step :
     have hP : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0] P0 :=
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
     have ihj := PrfH_spec hP (pred (.var 0))
-    simp only [P0, lt, lenc, nthc, liftsc, liftc, pred, cons, zero, substFormula, substTerm,
-      substTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
-      reduceIte, ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at ihj
+    simp only [P0, lt, lenc, nthc, liftsc, liftc, pred, zero, substFormula, substTerm,
+      substTerms, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
+      reduceIte, ite_true] at ihj
     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (lt (pred (.var 0)) (lenc (.var 1))) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
@@ -524,7 +522,6 @@ theorem liftT_liftc (k : Nat) (t : Term) :
     liftTerm k (liftc zero t) = liftc zero (liftTerm k t) := by
   simp only [liftc, zero, liftTerm, liftTerms]
 
-set_option linter.unusedSimpArgs false in
 theorem prf_boundedIn_liftsc (x w : Term) :
     Prf (Formula.impl (boundedIn x w) (boundedIn (liftc zero x) (liftsc zero w))) := by
   refine prf_ex_elim_imp ?_
@@ -542,8 +539,8 @@ theorem prf_boundedIn_liftsc (x w : Term) :
   have heq : PrfH [land (lt (.var 0) (lenc W)) (Formula.eq (nthc W (.var 0)) X)]
       (Formula.eq (nthc W (.var 0)) X) := PrfH_and_elim_right (prfH_hyp_self _)
   refine PrfH_ex_intro (.var 0) ?_
-  simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
-    zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
+  simp only [substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
+    zero, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro ?_ ?_
   · exact PrfH_lt_subst2
       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
@@ -558,11 +555,10 @@ theorem prf_In_liftsc (x w : Term) :
 
 /-! ## 4 · CLAUSURA DEL PREDICADO BAJO `liftc zero` — el testigo nuevo es `liftsc zero w` -/
 
-set_option linter.unusedSimpArgs false in
 theorem liftF_argsIn (k : Nat) (wT Y : Term) :
     liftFormula k (argsIn wT Y) = argsIn (liftTerm k wT) (liftTerm k Y) := by
   simp only [argsIn, argsInBody, liftFormula, lt, lenc, nthc, In, liftTerm, liftTerms,
-    Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
+    Nat.zero_lt_succ, ite_true, ← FOL.liftTerm_comm_zero]
 
 
 
@@ -572,11 +568,10 @@ theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
   simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
     nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
 
-set_option linter.unusedSimpArgs false in
 theorem liftF_wfAll1 (k : Nat) (w : Term) :
     liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
   simp only [wfAll1, wfAll1Body, liftFormula, liftF_isTermCodeE1, lt, lenc, nthc,
-    liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
+    liftTerm, liftTerms, Nat.zero_lt_succ, ite_true, ← FOL.liftTerm_comm_zero]
 
 /-- Leibniz en el 2º argumento de `argsIn` (la lista de argumentos). -/
 theorem PrfH_congr_argsIn {Γ : List Formula} {wT Y₁ Y₂ : Term} (h : PrfH Γ (Y₁ =eq Y₂))
@@ -1113,7 +1108,6 @@ theorem okE1_Ts : ∀ (ts : List Term) (W : Term)
             simp only [tcodes1s]; exact List.mem_append.mpr (Or.inr hy))) x hB
 end
 
-set_option linter.unusedSimpArgs false in
 /-- **HITO (i) PARA LA VIA 2**: todo termino tiene testigo, y el testigo es **UNA SOLA
     LISTA** — `tcodes1 t`. Cero axiomas, cero simbolos nuevos. -/
 theorem prf_isTC1_tcodes (t : Term) : Prf (isTC1 (objList (tcodes1 t)) (termCodeM t)) := by
@@ -1128,7 +1122,7 @@ theorem prf_isTC1_tcodes (t : Term) : Prf (isTC1 (objList (tcodes1 t)) (termCode
   have hAI : wfAll1 W
       = Formula.forall (Formula.impl (lt (.var 0) (lenc W))
           (isTermCodeE1 W (nthc W (.var 0)))) := by
-    simp only [wfAll1, wfAll1Body, lt, lenc, nthc, liftF_isTermCodeE1, liftTerm, liftTerms, hWl]
+    simp only [wfAll1, wfAll1Body, lt, lenc, nthc, liftTerm, liftTerms, hWl]
   rw [hAI]
   refine prf_bdAll_of_bound _ (lenc W) L.length ?_ (prf_lenc_objList L) ?_
   · simp only [substF_isTermCodeE1, nthc, substTerm, substTerms, hWs, ite_true]
@@ -2044,13 +2038,12 @@ theorem okF : ∀ (phi : Formula) (WF WT : Term)
 
 /-! ## §HW.7 · LOS DOS MOLDES DE `∀` ACOTADO (`wfAll1` y `wfAllF`).
 
-    `prf_wfAllF_of_list` es COPIA LITERAL de `Probe/ADV_novacuo.lean`
+    `prf_wfAllF_of_list` es COPIA LITERAL de `archivo/probe-2026-11-02:Probe/ADV_novacuo.lean`
     (`PROBE_wfAllF_of_list`); `prf_wfAll1_of_list` es la generalizacion evidente de
     `SinWTs.prf_isTC1_tcodes` a una lista cualquiera. (✏️ 2026‑10‑14, ADR‑134: `Probe/` no
     está versionado —lo ignora `.gitignore`—; la copia versionada del mismo lema está en
     `archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean`.) -/
 
-set_option linter.unusedSimpArgs false in
 theorem prf_wfAll1_of_list (L : List Term)
     (hcl : ∀ x, List.Mem x L → SinWTs.CodeClosed x)
     (hnode : ∀ x, List.Mem x L → Prf (SinWTs.isTermCodeE1 (objList L) x)) :
@@ -2062,7 +2055,7 @@ theorem prf_wfAll1_of_list (L : List Term)
   have hAI : SinWTs.wfAll1 (objList L)
       = Formula.forall (Formula.impl (lt (.var 0) (lenc (objList L)))
           (SinWTs.isTermCodeE1 (objList L) (nthc (objList L) (.var 0)))) := by
-    simp only [SinWTs.wfAll1, SinWTs.wfAll1Body, lt, lenc, nthc, SinWTs.liftF_isTermCodeE1,
+    simp only [SinWTs.wfAll1, SinWTs.wfAll1Body, lt, lenc, nthc,
       liftTerm, liftTerms, hWl]
   rw [hAI]
   refine SinWTs.prf_bdAll_of_bound _ (lenc (objList L)) L.length ?_
@@ -2079,7 +2072,6 @@ theorem prf_wfAll1_of_list (L : List Term)
     simpa only [SinWTs.substF_isTermCodeE1, nthc, substTerm, substTerms, hWs,
       substTerm_numeralM, ite_true, reduceIte] using h2
 
-set_option linter.unusedSimpArgs false in
 theorem prf_wfAllF_of_list (LF : List Term) (WT : Term)
     (hWTl : ∀ c : Nat, liftTerm c WT = WT)
     (hWTs : ∀ (v : Nat) (s : Term), substTerm v s WT = WT)
@@ -2094,7 +2086,7 @@ theorem prf_wfAllF_of_list (LF : List Term) (WT : Term)
   have hAI : ENS.wfAllF (objList LF) WT
       = Formula.forall (Formula.impl (lt (.var 0) (lenc (objList LF)))
           (ENS.isFormCodeE2 (objList LF) WT (nthc (objList LF) (.var 0)))) := by
-    simp only [ENS.wfAllF, ENS.wfAllFBody, lt, lenc, nthc, ENS.liftF_isFormCodeE2,
+    simp only [ENS.wfAllF, ENS.wfAllFBody, lt, lenc, nthc,
       liftTerm, liftTerms, hWl, hWTl]
   rw [hAI]
   refine SinWTs.prf_bdAll_of_bound _ (lenc (objList LF)) LF.length ?_

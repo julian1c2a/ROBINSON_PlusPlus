@@ -81,7 +81,6 @@ theorem liftTerm_nil (k : Nat) : liftTerm k nil = nil := rfl
 theorem liftTerm_liftc (k : Nat) (x : Term) :
     liftTerm k (liftc zero x) = liftc zero (liftTerm k x) := rfl
 
-set_option linter.unusedSimpArgs false in
 mutual
 
 theorem liftTerm_substCodeT2 (k v : Nat) (u W : Term) : ∀ t : Term,
@@ -95,7 +94,7 @@ theorem liftTerm_substCodeT2 (k v : Nat) (u W : Term) : ∀ t : Term,
       · by_cases h2 : n = v
         · rw [ite_eq_right h1, ite_eq_left h2, ite_eq_right h1, ite_eq_left h2]
         · rw [ite_eq_right h1, ite_eq_right h2, ite_eq_right h1, ite_eq_right h2]
-          by_cases h3 : n > v + 1 <;> simp only [ite_eq_left, ite_eq_right, h3, reduceIte] <;>
+          by_cases h3 : n > v + 1 <;> simp only [ite_eq_left, h3, reduceIte] <;>
             simp only [varc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeral]
   | .func sym ts => by
       simp only [substCodeT2, funcc, cons, nil, zero, succ, liftTerm, liftTerms,
@@ -143,7 +142,6 @@ theorem substTerm_nil (v : Nat) (s : Term) : substTerm v s nil = nil := rfl
 theorem substTerm_liftc (v : Nat) (s x : Term) :
     substTerm v s (liftc zero x) = liftc zero (substTerm v s x) := rfl
 
-set_option linter.unusedSimpArgs false in
 mutual
 
 theorem substTerm_substCodeT2 (c v : Nat) (s u W : Term) : ∀ t : Term,
@@ -157,7 +155,7 @@ theorem substTerm_substCodeT2 (c v : Nat) (s u W : Term) : ∀ t : Term,
       · by_cases h2 : n = v
         · rw [ite_eq_right h1, ite_eq_left h2, ite_eq_right h1, ite_eq_left h2]
         · rw [ite_eq_right h1, ite_eq_right h2, ite_eq_right h1, ite_eq_right h2]
-          by_cases h3 : n > v + 1 <;> simp only [ite_eq_left, ite_eq_right, h3, reduceIte] <;>
+          by_cases h3 : n > v + 1 <;> simp only [ite_eq_left, h3, reduceIte] <;>
             simp only [varc, cons, nil, zero, substTerm, substTerms, substTerm_numeral]
   | .func sym ts => by
       simp only [substCodeT2, funcc, cons, nil, zero, succ, substTerm, substTerms,
@@ -437,9 +435,8 @@ theorem premsPsi_eq (q i : Term) :
     premsPsi q i = substCodeF2 1 (liftc zero (tcFn i)) (liftc zero (liftc zero (tcFn q)))
       premsBodyF := rfl
 
-set_option linter.unusedSimpArgs false in
 theorem hfv_premsBodyF : liftFormula 3 premsBodyF = premsBodyF := by
-  simp only [premsBodyF, lor, In, boundedCarcLt, nthc, premsOf, carc, lt, nil, zero, succ,
+  simp only [premsBodyF, lor, In, boundedCarcLt, nthc, premsOf, carc, lt, nil, zero,
     land, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT, reduceIte]
 
 /-- Las dos hipótesis del testigo BAJO (el de `i`). -/

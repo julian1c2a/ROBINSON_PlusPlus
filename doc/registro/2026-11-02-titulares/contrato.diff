@@ -1,0 +1,10 @@
+17c17
+< /-- 559 constantes del cierre de los tipos de 32 titulares. -/
+---
+> /-- 563 constantes del cierre de los tipos de 35 titulares. -/
+248a249
+> def 4089042994593695081 ROBINSON_PlusPlus.Meta.PuenteFOL.AxiomasT
+251a253,255
+> thm 2314678460 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico
+> thm 3201601755 ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
+> thm 3330633733 ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo

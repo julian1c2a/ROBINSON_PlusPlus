@@ -1,0 +1,45 @@
+"""dag.py <raiz-rpp> — ¿están los 12 módulos con copias del patrón aguas abajo de EvalArithPrf?
+Lee las líneas `import ROBINSON_PlusPlus.…` de los .lean del árbol de RPP (sólo las de RPP) y calcula
+la clausura transitiva de cada módulo."""
+import os, re, sys
+
+raiz = sys.argv[1]
+mods = {}
+for d, _, fs in os.walk(os.path.join(raiz, "ROBINSON_PlusPlus")):
+    for f in fs:
+        if f.endswith(".lean"):
+            p = os.path.join(d, f)
+            rel = os.path.relpath(p, raiz)[:-5].replace(os.sep, ".")
+            with open(p, encoding="utf-8") as fh:
+                imps = [m.group(1) for m in (re.match(r"^import\s+(ROBINSON_PlusPlus\S*)", l) for l in fh) if m]
+            mods[rel] = imps
+
+memo = {}
+def clausura(m):
+    if m in memo:
+        return memo[m]
+    memo[m] = set()
+    s = set()
+    for i in mods.get(m, []):
+        s.add(i)
+        s |= clausura(i)
+    memo[m] = s
+    return s
+
+doce = ["CodeCtorKit", "EvalArithPrf", "EvalCarcNthcPrf", "EvalLiftfcPrf", "EvalMulPrf", "EvalPredPrf",
+        "EvalSubstfcPrf", "EvalSubsttcPrf", "LiftcCodePrf", "LineWFTrackedPrf", "SubstfcCodePrf",
+        "TrackedAtomsPrf"]
+P = "ROBINSON_PlusPlus.Meta."
+print("módulo\tEvalArithPrf en su clausura\tCodeCtorKit en su clausura\tEvalCarcNthcPrf en su clausura")
+for m in doce:
+    c = clausura(P + m)
+    print(f"{m}\t{(P+'EvalArithPrf') in c or m=='EvalArithPrf'}\t{(P+'CodeCtorKit') in c or m=='CodeCtorKit'}\t{(P+'EvalCarcNthcPrf') in c or m=='EvalCarcNthcPrf'}")
+# control positivo: un módulo que seguro importa a otro
+assert (P + "CodeCtorKit") in clausura(P + "LiftcCodePrf"), "control positivo: LiftcCodePrf importa CodeCtorKit"
+# control negativo: EvalArithPrf no puede estar en su propia clausura
+assert (P + "EvalArithPrf") not in clausura(P + "EvalArithPrf"), "control negativo"
+print("controles: OK (LiftcCodePrf ⊇ CodeCtorKit; EvalArithPrf ∉ su clausura)")
+print("CodeCtorKit en la clausura de EvalArithPrf:", (P + "CodeCtorKit") in clausura(P + "EvalArithPrf"))
+print("EvalArithPrf en la clausura de CodeCtorKit:", (P + "EvalArithPrf") in clausura(P + "CodeCtorKit"))
+print("EvalCarcNthcPrf en la clausura de CodeCtorKit:", (P + "EvalCarcNthcPrf") in clausura(P + "CodeCtorKit"))
+print("SubstfcWitnessPrf en la clausura de EvalArithPrf:", (P + "SubstfcWitnessPrf") in clausura(P + "EvalArithPrf"))

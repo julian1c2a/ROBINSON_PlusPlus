@@ -33,7 +33,8 @@ consecuencia de primer orden de FOL (`AXIOMS.md` §0.1). Este módulo pone el pu
   ni sus clausuras universales, ni todos los teoremas a la vez. Los tres son TITULARES (ADR‑210). Y
   **`modelo_sin_G`**: hay un modelo de todos los teoremas de `Prf` en el que `G` es FALSA, mientras que `G` es
   verdadera en todo modelo estándar (`godelCN_verdadera_de`); `goedel_I_semantico` junta los dos hechos, y de ahí se lee
-  que ese modelo no es estándar (el teorema no lo enuncia: los modelos estándar son sobre ℕ).
+  que ese modelo no es estándar (el teorema no lo enuncia: los modelos estándar son sobre ℕ). ✏️ 2026‑11‑02 (ADR‑250):
+  `prf_completo`, `modelo_sin_G` y `goedel_I_semantico` también son TITULARES, con su `Classical.choice`.
 * **§5 · Las sentencias, con FOL** (T72, ADR‑215): la `IsSentence` de RPP (`liftFormula 0 φ = φ`, `Meta/TarskiPrf.lean`)
   es la de FOL (`FOL.Sentence.IsSentence`: sin variables libres, decidible), `isSentence_iff_fol`; y `G` es una
   sentencia de FOL, así que su valor no depende de la valuación (`godelCN_eval_indep`): el de `modelo_sin_G`, tampoco.
@@ -175,7 +176,8 @@ theorem consistente_de {S : Formula → Prop} {f : Formula} (h : ¬ DerivesSet�
   exact h ⟨Γ, hΓ, Derives₀.dne_rule Γ f hD⟩
 
 /-- 🏁 **`Prf` es COMPLETO** para su teoría: lo que vale en todo modelo de `AxiomasT` (en la valuación en que vale
-    `AxiomasT`), `Prf` lo demuestra. Por la existencia de modelo de FOL y el puente. -/
+    `AxiomasT`), `Prf` lo demuestra. Por la existencia de modelo de FOL y el puente. Titular desde ADR‑250, con el
+    `Classical.choice` de la completitud de FOL. -/
 theorem prf_completo {f : Formula}
     (h : ∀ (D : Type) (M : Model D) (v : Nat → D), (∀ φ, AxiomasT φ → evalFormula M v φ) → evalFormula M v f) :
     Prf f := by
@@ -215,7 +217,8 @@ example : ¬ DerivesSet₀ (fun g => Prf g) ROBINSON_PlusPlus.Meta.GodelTwo.cons
   goedel_II_fol (fun _ h => h)
 
 /-- 🏁 **Un modelo de `T_Prf` en el que `G` es FALSA**: satisface todos los teoremas de `Prf` y no `G`. Por la
-    existencia de modelo de FOL sobre los teoremas de `Prf` y `¬G`, consistentes por `goedel_I` y el puente. -/
+    existencia de modelo de FOL sobre los teoremas de `Prf` y `¬G`, consistentes por `goedel_I` y el puente. Titular
+    desde ADR‑250. -/
 theorem modelo_sin_G : ∃ (D : Type) (M : Model D) (v : Nat → D),
     And (∀ φ, Prf φ → evalFormula M v φ) (¬ evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) := by
   have hc : ¬ DerivesSet₀ (fun g => Prf g) ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
@@ -225,7 +228,7 @@ theorem modelo_sin_G : ∃ (D : Type) (M : Model D) (v : Nat → D),
 
 /-- 🏁 **GÖDEL I SEMÁNTICO**: `G` es verdadera en todo modelo estándar (`godelCN_verdadera_de`) y falsa en un modelo
     de `T_Prf` (`modelo_sin_G`). Junta los dos hechos; que ese modelo no sea estándar es su lectura, no parte del
-    enunciado (los modelos estándar son sobre ℕ). -/
+    enunciado (los modelos estándar son sobre ℕ). Titular desde ADR‑250. -/
 theorem goedel_I_semantico :
     And (∀ (M : Model Nat), ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar M →
           ∀ v, evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)

@@ -1,0 +1,9 @@
+Probe/T48_CoberturaCrit_MUTANTE.lean:46:8: error: Type mismatch
+  rfl
+has type
+  ?m.6 = ?m.6
+but is expected to have type
+  termCodeM (succ zero) = cons (numeralM 1) (cons (strCodeM succ_sym) (cons nil nil))
+'T48Cobertura.isTC1_real_prov' depends on axioms: [propext, Quot.sound]
+'T48Cobertura.isTC1_succ_zero_prov' depends on axioms: [propext, Quot.sound]
+'T48Cobertura.lista_no_vacia' does not depend on any axioms

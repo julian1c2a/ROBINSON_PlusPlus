@@ -1,0 +1,90 @@
+"""nanoda con cuatro hilos: la evaluación con PRUEBA en el `simp` del modelo, y los `intro` después de `abre`.
+
+  aplica_nanoda.py RAIZ   edita RAIZ/ROBINSON_PlusPlus/Meta/ModeloEstandar.lean y ModeloCodificacion.lean
+"""
+import io, os, re, sys
+
+R = sys.argv[1]
+
+
+def lee(p):
+    t = io.open(p, encoding='utf-8', newline='').read()
+    return t.replace('\r\n', '\n'), '\r\n' in t
+
+
+def escribe(p, t, crlf):
+    io.open(p, 'w', encoding='utf-8', newline='').write(t.replace('\n', '\r\n') if crlf else t)
+
+
+LEMAS = '''
+/-! ### La evaluación, constructor a constructor, con PRUEBA
+
+⛔ No van por `rfl`, a propósito (✏️ 2026‑11‑02): `simp` usa un lema `rfl` como reescritura DEFINICIONAL, sin prueba en
+el término, y deja al núcleo comprobar que el objetivo de antes y el de después coinciden por definición. Con las
+ecuaciones de `evalFormula`, `evalTerm` y `evalTerms`, eso es desplegar la evaluación de un átomo en el modelo CONCRETO
+`MNV V`, y nanoda, con cuatro hilos, agota la pila de sus hilos (ADR‑228; medido en WSL: `ev_hasWit` agota, y con estos
+lemas en su `simp` acepta en 0,3 s). Con prueba, el núcleo sólo instancia el lema, que se comprobó una vez, para un
+modelo cualquiera. -/
+
+theorem evf_bot {D : Type} (M : Model D) (v : Nat → D) : evalFormula M v Formula.bottom = False := by
+  rw [evalFormula]
+theorem evf_atom {D : Type} (M : Model D) (v : Nat → D) (s : List Char) (ts : List Term) :
+    evalFormula M v (Formula.atom s ts) = M.rel s (evalTerms M v ts) := by rw [evalFormula]
+theorem evf_eq {D : Type} (M : Model D) (v : Nat → D) (a b : Term) :
+    evalFormula M v (Formula.eq a b) = (evalTerm M v a = evalTerm M v b) := by rw [evalFormula]
+theorem evf_impl {D : Type} (M : Model D) (v : Nat → D) (f g : Formula) :
+    evalFormula M v (Formula.impl f g) = (evalFormula M v f → evalFormula M v g) := by rw [evalFormula]
+theorem evf_forall {D : Type} (M : Model D) (v : Nat → D) (f : Formula) :
+    evalFormula M v (Formula.forall f) = ∀ d, evalFormula M (shiftEnv v d) f := by rw [evalFormula]
+theorem evf_and {D : Type} (M : Model D) (v : Nat → D) (f g : Formula) :
+    evalFormula M v (Formula.and f g) = (evalFormula M v f ∧ evalFormula M v g) := by rw [evalFormula]
+theorem evf_or {D : Type} (M : Model D) (v : Nat → D) (f g : Formula) :
+    evalFormula M v (Formula.or f g) = (evalFormula M v f ∨ evalFormula M v g) := by rw [evalFormula]
+theorem evf_ex {D : Type} (M : Model D) (v : Nat → D) (f : Formula) :
+    evalFormula M v (Formula.ex f) = ∃ d, evalFormula M (shiftEnv v d) f := by rw [evalFormula]
+theorem evt_var {D : Type} (M : Model D) (v : Nat → D) (n : Nat) : evalTerm M v (Term.var n) = v n := by
+  rw [evalTerm]
+theorem evt_func {D : Type} (M : Model D) (v : Nat → D) (s : List Char) (ts : List Term) :
+    evalTerm M v (Term.func s ts) = M.func s (evalTerms M v ts) := by rw [evalTerm]
+theorem evts_nil {D : Type} (M : Model D) (v : Nat → D) : evalTerms M v [] = [] := by rw [evalTerms]
+theorem evts_cons {D : Type} (M : Model D) (v : Nat → D) (t : Term) (ts : List Term) :
+    evalTerms M v (t :: ts) = evalTerm M v t :: evalTerms M v ts := by rw [evalTerms]
+'''
+
+EV = ('evf_bot, evf_atom, evf_eq, evf_impl, evf_forall, evf_and, evf_or, evf_ex, evt_var, evt_func, evts_nil, '
+      'evts_cons,')
+
+# ── ModeloEstandar
+p = os.path.join(R, 'ROBINSON_PlusPlus/Meta/ModeloEstandar.lean')
+t, crlf = lee(p)
+ancla = '\n/-! ### La evaluación de los CÓDIGOS cerrados: por inducción, nunca por cómputo -/\n'
+assert t.count(ancla) == 1
+t = t.replace(ancla, LEMAS + ancla)
+n = 0
+for cab in ('theorem ev_hasWit (v : Nat → Nat)', 'theorem ev_hasWitF (v : Nat → Nat)',
+            'scoped macro "abre" : tactic =>'):
+    i = t.index(cab)
+    j = t.index('evalFormula, evalTerm, evalTerms,', i)
+    assert j - i < 800, cab
+    t = t[:j] + EV + t[j + len('evalFormula, evalTerm, evalTerms,'):]
+    n += 1
+escribe(p, t, crlf)
+print('ModeloEstandar:', n, 'simp con la evaluación con prueba')
+
+# ── ModeloCodificacion
+p = os.path.join(R, 'ROBINSON_PlusPlus/Meta/ModeloCodificacion.lean')
+t, crlf = lee(p)
+L = t.split('\n')
+CAB = re.compile(r'^theorem v_[A-Za-z0-9_]+ : ∀ v : Nat → Nat, evalFormula \(MNV V\) v (ax_[A-Za-z0-9_]+) := by$')
+INT = re.compile(r'^(\s*)intro v((?: [^\s;]+)+); abre;(.*)$')
+k = 0
+for i in range(1, len(L)):
+    m = INT.match(L[i])
+    if not m:
+        continue
+    c = CAB.match(L[i - 1])
+    assert c, (i, L[i - 1])
+    L[i] = f'{m.group(1)}intro v; unfold {c.group(1)}; abre; intro{m.group(2)};{m.group(3)}'
+    k += 1
+escribe(p, '\n'.join(L), crlf)
+print('ModeloCodificacion:', k, 'pruebas con los intro tras abre')

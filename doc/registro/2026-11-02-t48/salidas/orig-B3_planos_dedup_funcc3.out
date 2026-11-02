@@ -1,0 +1,39 @@
+Probe/B3_planos_dedup_funcc3.lean:84:17: error: Application type mismatch: The argument
+  "substfc"
+has type
+  String
+but is expected to have type
+  List Char
+in the application
+  strCode "substfc"
+Probe/B3_planos_dedup_funcc3.lean:86:0: error: Not a definitional equality: the left-hand side
+  substfcT (termCode v) (termCode s) (termCode f)
+is not definitionally equal to the right-hand side
+  termCode (substfc v s f)
+Probe/B3_planos_dedup_funcc3.lean:87:82: error: Type mismatch
+  rfl
+has type
+  ?m.3 = ?m.3
+but is expected to have type
+  substfcT (termCode v) (termCode s) (termCode f) = termCode (substfc v s f)
+Probe/B3_planos_dedup_funcc3.lean:89:8: warning: declaration uses `sorry`
+Probe/B3_planos_dedup_funcc3.lean:96:34: error: Application type mismatch: The argument
+  "substfc"
+has type
+  String
+but is expected to have type
+  List Char
+in the application
+  strCode "substfc"
+Probe/B3_planos_dedup_funcc3.lean:106:13: warning: declaration uses `sorry`
+Probe/B3_planos_dedup_funcc3.lean:104:8: warning: declaration uses `sorry`
+Probe/B3_planos_dedup_funcc3.lean:111:13: warning: declaration uses `sorry`
+Probe/B3_planos_dedup_funcc3.lean:108:8: warning: declaration uses `sorry`
+'B3PlanosFuncc3.prf_substtc_funcc3' depends on axioms: [propext, Quot.sound]
+'B3PlanosFuncc3.prf_congr_funcc3' depends on axioms: [propext, Quot.sound]
+'B3PlanosFuncc3.substfcT_termCode' depends on axioms: [sorryAx]
+'B3PlanosFuncc3.prf_congr_substfcT' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosFuncc3.prf_substtc_substfcT' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosFuncc3.substtc_inv_substfcT' depends on axioms: [propext, sorryAx, Quot.sound]
+'B3PlanosFuncc3.liftTerm_substfcT' depends on axioms: [propext, sorryAx]
+'B3PlanosFuncc3.substTerm_substfcT' depends on axioms: [propext, sorryAx]

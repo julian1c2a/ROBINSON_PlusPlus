@@ -343,7 +343,8 @@ INFORME (no bloquea): el número de abajo se puede seguir en el resumen de cada 
 * **La base sancionada** de `fragmentos.json` incluye `FOL.MetaRules.*` (`imp_intro`, `gen`, `raa`, `dne`,
   `or_elim`…): esa capa se retiró con ADR‑115, y hoy RPP tiene **cero** `axiom` del proyecto. La base de hoy son los
   tres de Lean (`propext`, `Quot.sound`, `Classical.choice`), y los 32 titulares van sin `Classical.choice`
-  (ADR‑191, ADR‑210: en RPP sólo lo usa `prf_sound`, la solidez clásica).
+  (ADR‑191, ADR‑210: en RPP sólo lo usa `prf_sound`, la solidez clásica). ✏️ Después, el mismo día (ADR‑250): 35
+  titulares; los tres semánticos del puente con FOL llevan el de la completitud de FOL, esencial.
 * **Los dos avisos editoriales obligatorios** de `PLAN-LIBRO.md` §6 son FALSOS hoy: el (1) obliga a decir que no hay
   prueba de consistencia, y la hay desde ADR‑120 (`consistencia : ConsistentH`, por el modelo estándar); el (2), que
   Gödel I está a medias (sólo `⊬G`), y `⊬¬G` es teorema desde ADR‑121 (`goedel_I_neg`).
@@ -356,7 +357,7 @@ INFORME (no bloquea): el número de abajo se puede seguir en el resumen de cada 
   (también el semántico, ADR‑175).
 * La **rigidez** del modelo estándar y un **segundo modelo** (ADR‑173, ADR‑175).
 * Los 32 titulares, **por seis núcleos** independientes (ADR‑222, ADR‑228) y sin `Classical.choice` (ADR‑189,
-  ADR‑191, ADR‑210).
+  ADR‑191, ADR‑210). ✏️ ADR‑250 y ADR‑251: los 35, por los seis; los tres semánticos, con su choice.
 * El **puente con FOL** (`Derives₁` → `PrfH`, ADR‑195) y, en FOL, la mitad de Markov y la esencialidad de los
   semánticos (ADR‑220, ADR‑221).
 * Los **docstrings** del build que `DOCSTRINGS-NO-FIABLES.md` daba por no fiables: T31 (ADR‑134) corrigió los del

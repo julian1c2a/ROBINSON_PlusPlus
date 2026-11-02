@@ -3,7 +3,7 @@
 > **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
 > Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
-**Last updated:** 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, y un modelo de T_Prf en que G es falsa. Antes, 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): T_Prf, con 120 axiomas (el verificador antiguo, fuera de T); el resto, igual. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
+**Last updated:** 2026-11-02 — [ADR‑250](DECISIONS.md): los tres semánticos del puente con FOL, titulares (35), con el choice de la completitud de FOL. Antes, 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, y un modelo de T_Prf en que G es falsa. Antes, 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): T_Prf, con 120 axiomas (el verificador antiguo, fuera de T); el resto, igual. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
 2026‑06‑06 para el Nivel C con meta‑axiomas, con su «Resumen al día» del 2026‑07‑20 y un §4 que declaraba fuera de
 alcance lo que hoy está demostrado— está, tal cual, en
 [doc/historia/GODEL-STATUS-hasta-2026-10-21.md](doc/historia/GODEL-STATUS-hasta-2026-10-21.md).
@@ -68,7 +68,7 @@ modelo MNV V₀ + solidez prf_sound_dn ─► consistencia ─► goedel_I, goed
 ```
 
 La clase de cada titular —(i) sin el modelo, (ii) el modelo sólo para la consistencia, (iii) la verdad en el modelo—
-la comprueba cada build para la (i) (`Meta/PurezaTitulares.lean`, T08), y los enunciados de los 32 titulares los fija el
+la comprueba cada build para la (i) (`Meta/PurezaTitulares.lean`, T08), y los enunciados de los 35 titulares los fija el
 contrato (`Meta/ContratoTitulares.lean`, T07).
 
 ---

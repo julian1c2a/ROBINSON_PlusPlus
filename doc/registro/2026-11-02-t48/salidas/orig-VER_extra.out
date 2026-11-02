@@ -1,0 +1,3 @@
+'VerExtra.extra_dup_shapeUn' depends on axioms: [propext, Quot.sound]
+'VerExtra.extra_dup_shapeBin' depends on axioms: [propext, Quot.sound]
+'VerExtra.extra_dup_lenc' depends on axioms: [propext, Quot.sound]

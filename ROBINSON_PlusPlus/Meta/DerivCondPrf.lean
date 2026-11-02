@@ -34,11 +34,10 @@ theorem liftTerm_numeral (c : Nat) : ∀ n : Nat, liftTerm c (numeral n) = numer
       have ih := liftTerm_numeral c n
       simp only [numeral, succ, liftTerm, liftTerms, ih]
 
-set_option linter.unusedSimpArgs false in
 theorem liftTerm_charsCode (c : Nat) : ∀ l : List Char, liftTerm c (charsCode l) = charsCode l
   | [] => rfl
   | _ :: cs => by
-      simp only [charsCode, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeral, liftTerm_charsCode c cs]
+      simp only [charsCode, cons, liftTerm, liftTerms, liftTerm_numeral, liftTerm_charsCode c cs]
 
 theorem liftTerm_strCode (c : Nat) (s : List Char) : liftTerm c (strCode s) = strCode s :=
   liftTerm_charsCode c s
@@ -53,12 +52,11 @@ theorem substTerm_numeral (v : Nat) (s : Term) : ∀ n : Nat, substTerm v s (num
       have ih := substTerm_numeral v s n
       simp only [numeral, succ, substTerm, substTerms, ih]
 
-set_option linter.unusedSimpArgs false in
 theorem substTerm_charsCode (v : Nat) (s : Term) :
     ∀ l : List Char, substTerm v s (charsCode l) = charsCode l
   | [] => rfl
   | _ :: cs => by
-      simp only [charsCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+      simp only [charsCode, cons, substTerm, substTerms, substTerm_numeral,
         substTerm_charsCode v s cs]
 
 theorem substTerm_strCode (v : Nat) (s : Term) (str : List Char) :
@@ -98,23 +96,21 @@ theorem liftTerm_formCode (c : Nat) : ∀ φ : Formula, liftTerm c (formCode φ)
   | .ex a => by
       simp only [formCode, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeral, liftTerm_formCode c a]
 
-set_option linter.unusedSimpArgs false in
 /-- `provCodeC' φ` es **cerrada**: invariante bajo `liftFormula`. -/
 theorem liftFormula_provCodeC' (c : Nat) (φ : Formula) :
     liftFormula c (provCodeC' φ) = provCodeC' φ := by
   simp only [provCodeC', provFormulaC', substFormula, substTerm, substTerms, liftFormula, liftTerm,
-    liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+    liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceEqDiff,
     Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode]
+    liftTerm_formCode]
 
-set_option linter.unusedSimpArgs false in
 theorem d2_prf (A B : Formula) :
     Prf (provCodeC' (Formula.impl A B) ⇒ (provCodeC' A ⇒ provCodeC' B)) := by
   -- elimina el ∃ externo de `provCodeC'(A⇒B)`; testigo `p` = `#0`
   refine prf_ex_elim_imp ?_
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode, liftFormula,
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    liftTerm_formCode, liftFormula,
     liftFormula_provCodeC']
   -- ctx: [P_AB[p=#0]] ; goal: provCodeC' A ⇒ provCodeC' B
   refine deduction_aux ?_ (provCodeC' A)
@@ -123,16 +119,16 @@ theorem d2_prf (A B : Formula) :
   refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
   simp only [List.map_cons, List.map_nil, liftFormula, liftTerm, liftTerms, liftFormula_provCodeC',
     substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
-    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
-    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode]
+    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    ite_true, liftTerm_formCode]
   -- ctx: [A_A (q=#0), provCodeC' A, P_AB (p=#1)] ; goal: provCodeC' B
   -- testigo `r = p ++ q ++ [mpline]`,  mpline = ⌜B⌝ :: 16 :: ⌜A⌝ :: nil
   refine PrfH_ex_intro
     (concat (.var 1) (concat (.var 0)
       (cons (cons (formCode B) (cons (numeralM 16) (cons (formCode A) nil))) nil))) ?_
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm]
   -- abreviaturas
   let Γ : List Formula := [land (chainOk nil (.var 0)) (In (formCode A) (runFn nil (.var 0))),
     provCodeC' A,

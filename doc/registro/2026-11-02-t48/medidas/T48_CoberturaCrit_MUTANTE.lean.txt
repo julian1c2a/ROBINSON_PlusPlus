@@ -1,0 +1,69 @@
+/- T48 · ¿cubre el build lo que medían CRIT‑A y CRIT‑B de `Probe/CritRefl_anidado.lean`?
+
+   CRIT‑A: una instancia CERRADA del reflector de `isTC1` cuyo nodo tiene lista de argumentos NO
+   vacía (`S(0)`), para que el `∀` interno (`argsIn`) no sea vacuo.
+   CRIT‑B: el antecedente (`isTermCodeE1`) rechaza todo código de FÓRMULA (tags 3, 4, 5, 6).
+
+   Aquí sólo se COMPONEN lemas del build; nada se re‑prueba. -/
+import ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
+
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.Godel ROBINSON_PlusPlus.Meta.Provability
+open ROBINSON_PlusPlus.Meta.ReprPrf
+
+namespace T48Cobertura
+
+/-- CRIT‑A, para TODO término real `t`: el antecedente del reflector se cumple con el testigo
+    `objList (tcodes1 t)` del build, y el reflector del build da el `Prov` de extremo a extremo. -/
+theorem isTC1_real_prov (t : Term) :
+    Prf (provFromCode (andc
+      (ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.wfAll1Dot
+        (objList (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.tcodes1 t)))
+      (inFormCodeFn (tcFn (termCodeM t))
+        (tcFn (objList (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.tcodes1 t)))))) :=
+  prf_mp (ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_isTC1_tracked _ _)
+    (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTC1_tcodes t)
+
+/-- El análogo cerrado de `crit_pcc_isTC1_w2`: `σ(0)`, cuyo código tiene lista de argumentos
+    `[⌜0⌝]`, de longitud 1 (lo comprueba `lista_no_vacia`, abajo). -/
+theorem isTC1_succ_zero_prov :
+    Prf (provFromCode (andc
+      (ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.wfAll1Dot
+        (objList (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.tcodes1 (succ zero))))
+      (inFormCodeFn (tcFn (termCodeM (succ zero)))
+        (tcFn (objList (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.tcodes1 (succ zero))))))) :=
+  isTC1_real_prov (succ zero)
+
+/-- La lista de argumentos del código de `σ(0)` NO es vacía: es `[⌜0⌝]`. -/
+theorem lista_no_vacia :
+    termCodeM (succ zero) = cons (numeralM 1)
+      (cons (strCodeM succ_sym) (cons (cons (termCodeM zero) nil) nil)) := by
+  rfl
+
+/-- CONTROL NEGATIVO de `lista_no_vacia`: la de `0` SÍ es vacía, y no casa con la de arriba. -/
+example : termCodeM zero = cons (numeralM 1) (cons (strCodeM zero_sym) (cons nil nil)) := rfl
+example : True := by
+  exact (rfl : termCodeM (succ zero)
+    = cons (numeralM 1) (cons (strCodeM succ_sym) (cons nil nil)))
+  trivial
+
+/-- CRIT‑B, con el lema del build (`CodeWitnessPrf.SinWTs.crit_isTermCodeE1_rejects`), sobre las
+    cuatro formas que el sondeo comprobaba. -/
+example (wT p ts : Term) : Prf (Formula.impl (isTermCodeE1 wT (atomc p ts)) Formula.bottom) :=
+  ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_isTermCodeE1_rejects wT (atomc p ts) 3
+    (by decide) (by decide) (prf_carc_cons _ _)
+example (wT a b : Term) : Prf (Formula.impl (isTermCodeE1 wT (eqc a b)) Formula.bottom) :=
+  ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_isTermCodeE1_rejects wT (eqc a b) 4
+    (by decide) (by decide) (prf_carc_cons _ _)
+example (wT a b : Term) : Prf (Formula.impl (isTermCodeE1 wT (implc a b)) Formula.bottom) :=
+  ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_isTermCodeE1_rejects wT (implc a b) 5
+    (by decide) (by decide) (prf_carc_cons _ _)
+example (wT a : Term) : Prf (Formula.impl (isTermCodeE1 wT (forallc a)) Formula.bottom) :=
+  ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_isTermCodeE1_rejects wT (forallc a) 6
+    (by decide) (by decide) (prf_carc_cons _ _)
+
+end T48Cobertura
+
+#print axioms T48Cobertura.isTC1_real_prov
+#print axioms T48Cobertura.isTC1_succ_zero_prov
+#print axioms T48Cobertura.lista_no_vacia

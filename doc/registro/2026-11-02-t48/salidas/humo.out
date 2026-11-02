@@ -1,0 +1,8 @@
+prf_substtc_binK_at : ∀ (T : Term),
+  (∀ (c : Nat), liftTerm c T = T) →
+    ∀ (n : Nat) (W a b : Term),
+      Prf
+        (ROBINSON_PlusPlus.Minimal.Axioms.substtc (numeral n) W (binK (termCode T) a b) ≐
+          binK (termCode T) (ROBINSON_PlusPlus.Minimal.Axioms.substtc (numeral n) W a)
+            (ROBINSON_PlusPlus.Minimal.Axioms.substtc (numeral n) W b))
+'ROBINSON_PlusPlus.Meta.CodeCtorKit.prf_substtc_binK_at' depends on axioms: [propext, Quot.sound]

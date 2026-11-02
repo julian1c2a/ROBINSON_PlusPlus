@@ -34,7 +34,8 @@ que hay dentro de `hasWit`. El kit de abajo es la mitad de aquel trabajo que **n
 predicado de nodo** — y por eso sirve igual para `isTermCodeE1` (término, C3‑T), para
 `isFormCodeE2` (fórmula, C3‑F) y para `lineOkB` (D3). (✏️ 2026‑10‑14, ADR‑134: el sondeo es hoy
 registro: no compila —rc 1, error en su :355— en ninguna de las cuatro tablas de `sondeos/pasadas/`,
-la última `tabla_adr129.txt`, medida el 2026‑10‑05; lo que de él sirve es este kit.)
+la última `tabla_adr129.txt`, medida el 2026‑10‑05; lo que de él sirve es este kit. ✏️ 2026‑11‑02, ADR‑248: REPARADO,
+compila otra vez —REGISTRO—, y sigue sin sostener nada de hoy.)
 
 ⚠️ **Lo que NO sube y por qué.** De las 81 declaraciones del sondeo, aquí entran **21**: el
 cierre transitivo de las seis piezas genéricas, sin un solo homónimo. El resto es el predicado

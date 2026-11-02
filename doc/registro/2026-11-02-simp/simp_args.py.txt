@@ -1,0 +1,317 @@
+#!/usr/bin/env python3
+"""simp_args.py — quita DE VERDAD los argumentos de simp sin usar que tapaban los `set_option linter.unusedSimpArgs
+false in` (ADR-229 los dejó así: 304 en RPP).
+
+  simp_args.py medir   ORIG RAIZ LISTA LOGS   ronda 1: copia cada fichero de ORIG a RAIZ sin sus líneas
+                                              `set_option linter.unusedSimpArgs false in` y compila (lean --json): los
+                                              avisos dicen QUÉ argumento sobra, con su rango exacto
+  simp_args.py aplicar ORIG RAIZ LISTA LOGS   ronda 2…n: escribe en RAIZ el original menos las líneas menos los
+                                              argumentos señalados, compila, y por cada error o aviso nuevo DESACTIVA la
+                                              unidad (la orden que llevaba la opción) que lo contiene: vuelve a ser la
+                                              original, con su opción. Repite hasta que compile sin errores ni avisos.
+  Escribe LOGS/resumen.json: por fichero, unidades aplicadas y desactivadas, argumentos quitados.
+
+Cada edición es (inicio, fin) sobre el texto ORIGINAL (en LF; los CRLF se restauran al escribir), y pertenece a la
+unidad de la línea `set_option` más cercana por encima: un aviso del linter sólo puede salir de una orden que llevaba
+la opción, porque el árbol compilaba sin avisos.
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+from concurrent.futures import ThreadPoolExecutor
+
+LEAN = r'C:\Users\julia\.elan\toolchains\leanprover--lean4---v4.35.0\bin\lean.exe'
+LEAN_PATH = (r'E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;'
+             r'E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean;'
+             r'c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.35.0\lib\lean')
+OPT_RE = re.compile(r'^[ \t]*set_option linter\.unusedSimpArgs false in[ \t]*$')
+P = int(os.environ.get('P', '6'))
+WS = ' \t\n'
+
+
+def lee(ruta):
+    t = open(ruta, encoding='utf-8', newline='').read()
+    return t.replace('\r\n', '\n'), '\r\n' in t
+
+
+def escribe(ruta, t, crlf):
+    if crlf:
+        t = t.replace('\n', '\r\n')
+    open(ruta, 'w', encoding='utf-8', newline='').write(t)
+
+
+def inicios(t):
+    r = [0]
+    for i, c in enumerate(t):
+        if c == '\n':
+            r.append(i + 1)
+    return r
+
+
+def off(ini, pos):
+    return ini[pos['line'] - 1] + pos['column']
+
+
+def compila(raiz, f, logs):
+    env = dict(os.environ, LEAN_PATH=LEAN_PATH, LEAN_NUM_THREADS='2')
+    log = os.path.join(logs, f.replace('/', '__') + '.jsonl')
+    with open(log, 'w', encoding='utf-8') as fh:
+        rc = subprocess.run([LEAN, '--json', f], cwd=raiz, env=env, stdout=fh, stderr=subprocess.STDOUT).returncode
+    msgs = []
+    for l in open(log, encoding='utf-8', errors='replace'):
+        l = l.strip()
+        if l.startswith('{'):
+            try:
+                msgs.append(json.loads(l))
+            except ValueError:
+                msgs.append({'severity': 'error', 'data': 'JSON roto: ' + l[:200], 'pos': {'line': 1, 'column': 0}})
+        elif l:
+            msgs.append({'severity': 'error', 'data': 'salida no JSON: ' + l[:200], 'pos': {'line': 1, 'column': 0}})
+    return rc, msgs
+
+
+def lineas_opcion(t):
+    """offsets (inicio, fin incluido el \\n) de las líneas de la opción"""
+    out = []
+    ini = inicios(t)
+    for k, s in enumerate(ini):
+        e = ini[k + 1] if k + 1 < len(ini) else len(t)
+        linea = t[s:e].rstrip('\n')
+        if OPT_RE.match(linea):
+            out.append((s, e))
+    return out
+
+
+def edicion_arg(t, s, e):
+    """el (inicio, fin) que hay que borrar para quitar el argumento t[s:e] de su lista, o None si no se reconoce"""
+    n = e
+    while n < len(t) and t[n] in ' \t\n':
+        n += 1
+    p = s - 1
+    while p >= 0 and t[p] in ' \t\n':
+        p -= 1
+    if n < len(t) and t[n] == ',':
+        k = n + 1
+        while k < len(t) and t[k] in ' \t\n':
+            k += 1
+        return (s, k)
+    if n < len(t) and t[n] == ']':
+        if p >= 0 and t[p] == ',':
+            return (p, e)
+        if p >= 0 and t[p] == '[':
+            a = p
+            if a > 0 and t[a - 1] == ' ':
+                a -= 1
+            return (a, n + 1)
+    return None
+
+
+def aplica(t, eds):
+    """el texto con las ediciones (sobre el original, disjuntas) aplicadas, y la tabla para traducir offsets"""
+    eds = sorted(eds)
+    out = []
+    pos = 0
+    tabla = []   # (offset_nuevo_inicio, delta acumulado)
+    borrado = 0
+    for s, e in eds:
+        out.append(t[pos:s])
+        borrado += e - s
+        tabla.append((s - (borrado - (e - s)), borrado))
+        pos = e
+    out.append(t[pos:])
+    return ''.join(out), tabla
+
+
+def a_original(tabla, n):
+    d = 0
+    for ns, acum in tabla:
+        if n >= ns:
+            d = acum
+        else:
+            break
+    return n + d
+
+
+def unidad_de(opciones, o):
+    """la línea de opción más cercana por encima del offset original o (su índice), o None"""
+    u = None
+    for i, (s, e) in enumerate(opciones):
+        if s <= o:
+            u = i
+        else:
+            break
+    return u
+
+
+def medir(orig, raiz, lista, logs):
+    os.makedirs(logs, exist_ok=True)
+    for f in lista:
+        t, crlf = lee(os.path.join(orig, f))
+        ops = lineas_opcion(t)
+        nt, _ = aplica(t, ops)
+        escribe(os.path.join(raiz, f), nt, crlf)
+    with ThreadPoolExecutor(P) as ex:
+        res = dict(zip(lista, ex.map(lambda f: compila(raiz, f, logs), lista)))
+    out = {}
+    for f in lista:
+        rc, msgs = res[f]
+        t, _ = lee(os.path.join(orig, f))
+        ops = lineas_opcion(t)
+        nt, tabla = aplica(t, ops)
+        ini = inicios(nt)
+        avisos = []
+        otros = []
+        for m in msgs:
+            if m.get('kind') == 'linter.unusedSimpArgs':
+                s, e = off(ini, m['pos']), off(ini, m['endPos'])
+                nombre = m['data'].split('\n')[1].strip()
+                avisos.append({'s': a_original(tabla, s), 'e': a_original(tabla, e), 'nombre': nombre,
+                               'texto': nt[s:e]})
+            elif m.get('severity') in ('error', 'warning'):
+                otros.append(m)
+        out[f] = {'rc': rc, 'opciones': len(ops), 'avisos': avisos, 'otros': otros}
+        print(f"{f}: rc {rc}, {len(ops)} opciones, {len(avisos)} argumentos sin usar, {len(otros)} otros")
+    json.dump(out, open(os.path.join(logs, 'ronda1.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+
+def aplicar(orig, raiz, lista, logs):
+    r1 = json.load(open(os.path.join(logs, 'ronda1.json'), encoding='utf-8'))
+    estado = {}
+    for f in lista:
+        t, crlf = lee(os.path.join(orig, f))
+        ops = lineas_opcion(t)
+        eds = {}   # unidad → lista de ediciones
+        raros = []
+        vistos = set()
+        for a in r1[f]['avisos']:
+            if (a['s'], a['e']) in vistos:
+                continue
+            vistos.add((a['s'], a['e']))
+            if ' '.join(t[a['s']:a['e']].split()) != ' '.join(a['texto'].split()):
+                raros.append(('texto distinto', a))
+                continue
+            u = unidad_de(ops, a['s'])
+            if u is None:
+                raros.append(('sin unidad', a))
+                continue
+            eds.setdefault(u, []).append((a['s'], a['e'], a['nombre']))
+        estado[f] = {'t': t, 'crlf': crlf, 'ops': ops, 'eds': eds, 'off': set(), 'raros': raros}
+    pendientes = list(lista)
+    ronda = 2
+    while pendientes:
+        for f in pendientes:
+            st = estado[f]
+            st['texto_eds'] = construye(st)
+            escribe(os.path.join(raiz, f), st['texto_eds'][0], st['crlf'])
+        with ThreadPoolExecutor(P) as ex:
+            res = dict(zip(pendientes, ex.map(lambda f: compila(raiz, f, logs), pendientes)))
+        siguientes = []
+        for f in pendientes:
+            st = estado[f]
+            rc, msgs = res[f]
+            nt, tabla = st['texto_eds']
+            ini = inicios(nt)
+            malas = [m for m in msgs if m.get('severity') in ('error', 'warning')]
+            if not malas and rc == 0:
+                print(f"ronda {ronda} {f}: LIMPIO ({len(st['eds']) - len(st['off'])} unidades aplicadas, "
+                      f"{len(st['off'])} desactivadas)")
+                continue
+            nuevas = set()
+            for m in malas:
+                o = a_original(tabla, off(ini, m['pos']))
+                u = unidad_de(st['ops'], o)
+                if u is None or u in st['off']:
+                    st['raros'].append(('diagnóstico fuera de unidad', {'msg': m['data'][:300], 'pos': m['pos']}))
+                    continue
+                nuevas.add(u)
+                st.setdefault('motivos', {})[u] = m['data'][:300]
+            if not nuevas:
+                print(f"ronda {ronda} {f}: ⛔ {len(malas)} diagnósticos que no sé atribuir; me paro con este fichero")
+                st['atascado'] = [m['data'][:300] for m in malas]
+                continue
+            st['off'] |= nuevas
+            print(f"ronda {ronda} {f}: desactivo {sorted(nuevas)} por {len(malas)} diagnósticos")
+            siguientes.append(f)
+        pendientes = siguientes
+        ronda += 1
+    resumen = {}
+    for f in lista:
+        st = estado[f]
+        quitados = [(st['t'][:s].count('\n') + 1, n) for u, l in st['eds'].items() if u not in st['off']
+                    for (s, e, n) in l]
+        resumen[f] = {'opciones': len(st['ops']), 'unidades_con_avisos': len(st['eds']),
+                      'desactivadas': {str(u): st.get('motivos', {}).get(u, '') for u in sorted(st['off'])},
+                      'quitados': sorted(quitados), 'raros': [(r[0], str(r[1])[:300]) for r in st['raros']],
+                      'atascado': st.get('atascado')}
+    json.dump(resumen, open(os.path.join(logs, 'resumen.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+
+def construye(st):
+    """el original menos las líneas de opción y los argumentos de las unidades activas; los argumentos, de atrás
+    adelante, con una máscara de borrado sobre el ORIGINAL (el contexto de cada uno, saltando lo ya borrado)"""
+    t, ops = st['t'], st['ops']
+    borr = bytearray(len(t) + 1)
+    for i, (s, e) in enumerate(ops):
+        if i in st['off']:
+            continue
+        for k in range(s, e):
+            borr[k] = 1
+    args = sorted([(s, e) for u, l in st['eds'].items() if u not in st['off'] for (s, e, n) in l], reverse=True)
+    for s, e in args:
+        if any(borr[k] for k in range(s, e)):
+            st['raros'].append(('solapado', {'s': s, 'texto': t[s:e]}))
+            continue
+        n = e
+        while n < len(t) and (borr[n] or t[n] in WS):
+            n += 1
+        p = s - 1
+        while p >= 0 and (borr[p] or t[p] in WS):
+            p -= 1
+        rango = None
+        if n < len(t) and t[n] == ',':
+            k = n + 1
+            while k < len(t) and (borr[k] or t[k] in WS):
+                k += 1
+            if '\n' in ''.join(t[j] for j in range(n + 1, k) if not borr[j]) and p >= 0 and t[p] == ',':
+                # el argumento cierra su línea: se borra con el blanco de DELANTE, y el salto de línea se queda
+                rango = (p + 1, n + 1)
+            else:
+                rango = (s, k)
+        elif n < len(t) and t[n] == ']':
+            if p >= 0 and t[p] == ',':
+                rango = (p, e)
+            elif p >= 0 and t[p] == '[':
+                a = p - 1
+                while a >= 0 and borr[a]:
+                    a -= 1
+                rango = (a if a >= 0 and t[a] == ' ' else p, n + 1)
+        if rango is None:
+            st['raros'].append(('contexto no reconocido', {'s': s, 'texto': t[s:e], 'antes': t[max(0, s - 30):s],
+                                                            'despues': t[e:e + 30]}))
+            continue
+        for k in range(rango[0], rango[1]):
+            borr[k] = 1
+    nt = ''.join(c for k, c in enumerate(t) if not borr[k])
+    m = [k for k in range(len(t)) if not borr[k]]
+    return nt, ('mapa', m)
+
+
+def a_original_mapa(tabla, n):
+    m = tabla[1]
+    return m[n] if n < len(m) else len(m)
+
+
+# con construye() la tabla es un mapa explícito
+_a_original = a_original
+def a_original(tabla, n):  # noqa: F811
+    if isinstance(tabla, tuple) and tabla and tabla[0] == 'mapa':
+        return a_original_mapa(tabla, n)
+    return _a_original(tabla, n)
+
+
+if __name__ == '__main__':
+    cmd, orig, raiz, lista_f, logs = sys.argv[1:6]
+    lista = [l.strip() for l in open(lista_f, encoding='utf-8') if l.strip()]
+    {'medir': medir, 'aplicar': aplicar}[cmd](orig, raiz, lista, logs)

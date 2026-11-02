@@ -1,0 +1,4 @@
+ADR-250, 2026-11-02: los tres semánticos del puente con FOL (prf_completo, modelo_sin_G, goedel_I_semantico),
+titulares. modelo.txt: lo que da «#modelo» de sondeos/InduccionTitulares.lean para los tres (la clase (iii)).
+contrato.diff: el cambio de Meta/ContratoTabla.lean al regenerarla (559 → 563 constantes: AxiomasT y los tres). Los seis
+núcleos sobre el cierre de los 35: doc/registro/2026-11-02-nanoda/seis35.out.

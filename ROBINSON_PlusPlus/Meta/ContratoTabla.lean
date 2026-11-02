@@ -14,7 +14,7 @@ clase, su huella y su nombre. La comprueba `#contrato_titulares`, en `Meta/Purez
 
 namespace ROBINSON_PlusPlus.Meta.ContratoTabla
 
-/-- 559 constantes del cierre de los tipos de 32 titulares. -/
+/-- 563 constantes del cierre de los tipos de 35 titulares. -/
 def tabla : String := "
 ind 5186777082224789786 Derives₀
 ctor 3312764733 Derives₀.bot_elim
@@ -246,9 +246,13 @@ def 5482257869310228710 ROBINSON_PlusPlus.Meta.Provability.termCode.match_1
 def 11195034101090334962 ROBINSON_PlusPlus.Meta.Provability.termsCode
 def 14821870038638067166 ROBINSON_PlusPlus.Meta.Provability.termsCode._f
 def 14401384849228394516 ROBINSON_PlusPlus.Meta.Provability.termsCode.match_1
+def 4089042994593695081 ROBINSON_PlusPlus.Meta.PuenteFOL.AxiomasT
 thm 3856473026 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol
 thm 2674866193 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
 thm 2926819187 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol
+thm 2314678460 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico
+thm 3201601755 ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
+thm 3330633733 ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo
 thm 3002450326 ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
 thm 2318897476 ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 thm 3520485007 ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de

@@ -45,13 +45,12 @@ theorem PrfH_leibniz_subst {Γ : List Formula} {A : Formula} {t₁ t₂ : Term}
     (h : PrfH Γ (t₁ =eq t₂)) (hA : PrfH Γ (substFormula 0 t₁ A)) : PrfH Γ (substFormula 0 t₂ A) :=
   PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.leibniz A t₁ t₂)) h) hA
 
-set_option linter.unusedSimpArgs false in
 /-- Transitividad de `=eq` en `PrfH`. -/
 theorem PrfH_eq_trans {Γ : List Formula} {a b c : Term}
     (h1 : PrfH Γ (a =eq b)) (h2 : PrfH Γ (b =eq c)) : PrfH Γ (a =eq c) := by
   let f : Formula := Formula.eq (liftTerm 0 a) (.var 0)
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq a s := by
-    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+    intro s; simp only [f, substFormula, substTerm, FOL.substTerm_liftTerm, ite_true]
   exact (hS c) ▸ PrfH_leibniz_subst (A := f) h2 ((hS b) ▸ h1)
 
 /-- ⭐ Congruencia de `liftc` en el argumento código, en `PrfH`, con el nivel **implícito**.
@@ -109,13 +108,12 @@ theorem PrfH_eq_subst_in {Γ : List Formula} {x t₁ t₂ : Term}
     intro s; simp only [f, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ hin)
 
-set_option linter.unusedSimpArgs false in
 /-- `In x t → In x (cons hd t)` en `PrfH` (vía `ax_L2` + `j2` + `iff` mpr). -/
 theorem PrfH_in_cons_tail {Γ : List Formula} (hd : Term) {x t : Term} (hx : PrfH Γ (In x t)) :
     PrfH Γ (In x (cons hd t)) := by
   have hiff : Prf (In x (cons hd t) ⇔ lor (x =eq hd) (In x t)) := by
     have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_L2_in_cons ∈ axioms by simp [axioms])) x) hd) t
-    simp [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
+    simp [substFormula, substTerm, substTerms, In, cons, lor, iff,
       FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
     exact hh
   have hor : PrfH Γ (lor (x =eq hd) (In x t)) :=
@@ -203,12 +201,11 @@ theorem PrfH_iff_mpr {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) 
     PrfH Γ A :=
   PrfH.mp Γ _ _ (prf_to_prfH (prf_and_elim_right hiff) Γ) hb
 
-set_option linter.unusedSimpArgs false in
 /-- Simetría de `=eq` en `PrfH`. -/
 theorem PrfH_eq_symm {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b)) : PrfH Γ (b =eq a) := by
   let f : Formula := Formula.eq (.var 0) (liftTerm 0 a)
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq s a := by
-    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
+    intro s; simp only [f, substFormula, substTerm, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl a) Γ)
 
 /-- Congruencia de `concat` en el 2º argumento, en `PrfH`. -/
@@ -257,7 +254,6 @@ theorem prf_congr_concat_first {u₁ u₂ t : Term} (h : Prf (u₁ =eq u₂)) :
     intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS u₂) ▸ prf_leibniz_subst (A := f) h ((hS u₁) ▸ prf_refl (concat u₁ t))
 
-set_option linter.unusedSimpArgs false in
 /-- **Asociatividad de `concat` en `Prf`**: `(L ++ M) ++ N =eq L ++ (M ++ N)`.
     Inducción de listas sobre `L` (profundidad 1; `M`,`N` con `liftTerm 0`, normaliza con `norm21`). -/
 theorem prf_concat_assoc (M N L : Term) :
@@ -273,7 +269,7 @@ theorem prf_concat_assoc (M N L : Term) :
         FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        concat, cons, nil, norm21]
+        concat, cons, norm21]
       refine prf_deduction ?_
       have IH : PrfH _ (concat (concat (.var 0) (liftTerm 1 (liftTerm 0 M))) (liftTerm 1 (liftTerm 0 N))
           =eq concat (.var 0) (concat (liftTerm 1 (liftTerm 0 M)) (liftTerm 1 (liftTerm 0 N)))) :=
@@ -309,7 +305,6 @@ theorem prf_concat_nil_right (X : Term) : Prf (concat X nil =eq X) := by
   show Prf (concat X nil =eq X)
   simpa [substFormula, substTerm, substTerms, concat, nil, zero, FOL.substTerm_liftTerm] using hX
 
-set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `In` (contexto izq.)** en `Prf`: `Prf (In x c) → Prf (In x (concat c0 c))`.
     Inducción de listas sobre `c0`; `x`,`c` van con `liftTerm 0` (evitan capturar el
     slot de la lista). -/
@@ -324,7 +319,7 @@ theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (conc
         FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        In, concat, cons, nil, norm21]
+        In, concat, cons, norm21]
       refine prf_deduction (deduction_aux ?_
         (In (liftTerm 1 (liftTerm 0 x)) (liftTerm 1 (liftTerm 0 c)))
         [Formula.impl (In (liftTerm 1 (liftTerm 0 x)) (liftTerm 1 (liftTerm 0 c)))
@@ -358,24 +353,20 @@ theorem PrfH_congr_cons_head {Γ : List Formula} {hd₁ hd₂ t : Term}
     intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS hd₂) ▸ PrfH_leibniz_subst (A := f) h ((hS hd₁) ▸ prf_to_prfH (prf_refl (cons hd₁ t)) Γ)
 
-set_option linter.unusedSimpArgs false in
 /-- `In x (cons hd t)` se descompone en `(x =eq hd) ∨ In x t` (cierre `Prf` de `ax_L2`). -/
 theorem prf_in_cons_iff (x hd t : Term) :
     Prf (In x (cons hd t) ⇔ lor (x =eq hd) (In x t)) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_L2_in_cons ∈ axioms by simp [axioms])) x) hd) t
-  simp [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
+  simp [substFormula, substTerm, substTerms, In, cons, lor, iff,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
-set_option linter.unusedSimpArgs false in
 /-- `In x nil ⇒ ⊥` (cierre `Prf` de `ax_L1`). -/
 theorem prf_not_in_nil (x : Term) : Prf (Formula.impl (In x nil) Formula.bottom) := by
   have hh := prf_spec (prf_ax (show ax_L1_in_nil ∈ axioms by simp [axioms])) x
-  simp [ax_L1_in_nil, substFormula, substTerm, substTerms, In, neg, nil, zero,
-    FOL.substTerm_liftTerm] at hh
+  simp [substFormula, substTerm, substTerms, In, neg, nil, zero] at hh
   exact hh
 
-set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `In` por la derecha** en `Prf`: `Prf (In x L) → Prf (In x (concat L M))`.
     Inducción de listas sobre `L`; `base` vía explosión (`In x nil` es falso), `step`
     vía `or_elim` sobre la descomposición de `ax_L2`. -/
@@ -394,7 +385,7 @@ theorem prf_In_mono_right_imp (x M L : Term) :
     · -- step
       refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        In, concat, cons, nil, norm21]
+        In, concat, cons, norm21]
       refine prf_deduction (deduction_aux ?_
         (In (liftTerm 1 (liftTerm 0 x)) (cons (.var 1) (.var 0)))
         [Formula.impl (In (liftTerm 1 (liftTerm 0 x)) (.var 0))
@@ -429,7 +420,6 @@ theorem prf_In_mono_right_imp (x M L : Term) :
 theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat L M)) :=
   prf_mp (prf_In_mono_right_imp x M L) h
 
-set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `allIn` (contexto izq.)** en `Prf` (implicación): `allIn c M ⇒ allIn (c0 ++ c) M`.
     Inducción sobre `M`; usa `prf_In_mono_imp`. -/
 theorem prf_allIn_mono_imp (c c0 M : Term) :
@@ -444,7 +434,7 @@ theorem prf_allIn_mono_imp (c c0 M : Term) :
         FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        allIn, concat, cons, nil, norm21]
+        allIn, concat, cons, norm21]
       refine prf_deduction (deduction_aux ?_
         (allIn (liftTerm 1 (liftTerm 0 c)) (cons (.var 1) (.var 0)))
         [Formula.impl (allIn (liftTerm 1 (liftTerm 0 c)) (.var 0))
@@ -518,7 +508,6 @@ theorem prfCompPred_spec {s p : Term} (h : Prf (substFormula 0 p (prfCompPred s)
   simpa [prfCompPred, substFormula, substTerm, substTerms, runFn, concat,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
-set_option linter.unusedSimpArgs false in
 /-- **Compositividad de `runFn` en `Prf`** (keystone de `d2_prf`):
     `runFn c (p ++ s) =eq runFn (runFn c p) s`. Inducción de listas sobre `p`
     (acumulador `c` generalizado como `∀` object; normalización vía `norm32`). -/
@@ -527,13 +516,13 @@ theorem prf_runFn_concat (c p s : Term) :
   have key : Prf (Formula.forall (prfCompPred s)) := by
     refine prf_list_induction (prfCompPred s) ?base ?step
     · refine Prf.gen _ ?_
-      simp only [prfCompPred, substFormula, substTerm, substTerms, runFn, concat, nil,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      simp only [substFormula, substTerm, substTerms, runFn, concat, nil,
+        FOL.substTerm_liftLift]
       exact prf_eq_trans (prf_congr_runFn_2 (prf_concat_nil_eq _))
         (prf_eq_symm (prf_congr_runFn_1 (prf_runFn_nil _)))
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [prfCompPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        runFn, concat, cons, nil, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
+        runFn, concat, cons, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
         reduceIte, norm32]
       -- objetivo: (∀c. IH[c]) ⇒ (∀c. Concl[c]); confinación (la IH no contiene c)
       refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
@@ -548,8 +537,7 @@ theorem prf_runFn_concat (c p s : Term) :
         (PrfH.hyp _ _ (List.Mem.head _)) (concat (.var 0) (cons (carc (.var 2)) nil))
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         runFn, concat, cons, nil, carc, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-        Nat.reduceGT, Nat.reduceSub, reduceIte, norm32, norm_s, FOL.substTerm_liftTerm,
-        FOL.substTerm_liftLift] at ihc
+        Nat.reduceGT, Nat.reduceSub, reduceIte, norm_s] at ihc
       refine PrfH_eq_trans (prf_to_prfH (prf_congr_runFn_2 (c := .var 0)
           (prf_concat_cons_eq (.var 2) (.var 1) (liftTerm 2 (liftTerm 0 (liftTerm 0 s))))) _)
         (PrfH_eq_trans (prf_to_prfH (prf_runFn_cons (.var 0) (.var 2)
@@ -572,7 +560,6 @@ theorem prfMonoPred_spec {c0 p : Term} (h : Prf (substFormula 0 p (prfMonoPred c
   simpa [prfMonoPred, substFormula, substTerm, substTerms, chainOk, concat,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
-set_option linter.unusedSimpArgs false in
 /-- **Monotonía de `chainOk` en el contexto** en `Prf` (implicación, keystone d2):
     `chainOk c p ⇒ chainOk (c0 ++ c) p`. Inducción sobre `p` (acumulador `∀c`;
     usa `lineOk_mono`, `concat_assoc`, patrón confinación/`norm32`/`norm_s`). -/
@@ -581,12 +568,12 @@ theorem prf_chainOk_mono_imp (c0 c p : Term) :
   have key : Prf (Formula.forall (prfMonoPred c0)) := by
     refine prf_list_induction (prfMonoPred c0) ?base ?step
     · refine Prf.gen _ ?_
-      simp only [prfMonoPred, substFormula, substTerm, substTerms, chainOk, concat, nil,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      simp only [substFormula, substTerm, substTerms, chainOk, concat, nil,
+        FOL.substTerm_liftLift]
       exact prf_deduction (prf_to_prfH (prf_chainOk_nil _) _)
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [prfMonoPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        chainOk, concat, cons, nil, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
+        chainOk, concat, cons, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
         Nat.reduceSub, reduceIte, norm32]
       refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
       refine prf_deduction (deduction_aux ?_ (chainOk (.var 0) (cons (.var 2) (.var 1)))
@@ -609,8 +596,7 @@ theorem prf_chainOk_mono_imp (c0 c p : Term) :
           (concat (.var 0) (cons (carc (.var 2)) nil))
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         chainOk, concat, cons, nil, carc, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-        Nat.reduceGT, Nat.reduceSub, reduceIte, norm32, norm_s, FOL.substTerm_liftTerm,
-        FOL.substTerm_liftLift] at ihc
+        Nat.reduceGT, Nat.reduceSub, reduceIte, norm_s] at ihc
       have hB := PrfH.mp _ _ _ ihc (PrfH_and_elim_right hsplit)
       have hB' := PrfH_chainOk_subst1 (prf_to_prfH (prf_eq_symm
         (prf_concat_assoc (.var 0) (cons (carc (.var 2)) nil)
@@ -630,21 +616,19 @@ theorem prfWeakPred_spec {p : Term} (h : Prf (substFormula 0 p prfWeakPred)) (c 
   simpa [prfWeakPred, substFormula, substTerm, substTerms, runFn, concat, nil, zero,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
-set_option linter.unusedSimpArgs false in
 /-- **Debilitamiento de `runFn` en `Prf`**: `runFn c p =eq c ++ runFn nil p`. Inducción sobre
     `p` (acumulador `∀c`; usa `concat_assoc`, patrón confinación). -/
 theorem prf_runFn_weaken (c p : Term) : Prf (runFn c p =eq concat c (runFn nil p)) := by
   have key : Prf (Formula.forall prfWeakPred) := by
     refine prf_list_induction prfWeakPred ?base ?step
     · refine Prf.gen _ ?_
-      simp only [prfWeakPred, substFormula, substTerm, substTerms, runFn, concat, nil,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      simp only [substFormula, substTerm, substTerms, runFn, concat, nil]
       exact prf_eq_trans (prf_runFn_nil _) (prf_eq_symm (prf_eq_trans
         (prf_congr_concat_left (prf_runFn_nil nil)) (prf_concat_nil_right _)))
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [prfWeakPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         runFn, concat, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
-        Nat.reduceSub, reduceIte, norm32]
+        Nat.reduceSub, reduceIte]
       refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
       refine prf_deduction ?_
       let IH0 : Formula := liftFormula 0 (Formula.forall (Formula.eq (runFn (.var 0) (.var 1))
@@ -657,7 +641,7 @@ theorem prf_runFn_weaken (c p : Term) : Prf (runFn c p =eq concat c (runFn nil p
           (PrfH.hyp _ _ (List.Mem.head _)) (cons (carc (.var 2)) nil)
       simp only [IH0, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         runFn, concat, cons, nil, zero, carc, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-        Nat.reduceGT, Nat.reduceSub, reduceIte, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at ih1 ih2
+        Nat.reduceGT, Nat.reduceSub, reduceIte] at ih1 ih2
       -- Lhs: runFn #0 (cons #2 #1) =eq concat #0 (concat [carc #2] (runFn nil #1))
       have Lhs := PrfH_eq_trans (prf_to_prfH (prf_runFn_cons (.var 0) (.var 2) (.var 1)) [IH0])
         (PrfH_eq_trans ih1 (prf_to_prfH (prf_concat_assoc (cons (carc (.var 2)) nil)
@@ -693,7 +677,6 @@ theorem prfCompChainPred_spec {s p : Term} (h : Prf (substFormula 0 p (prfCompCh
   simpa [prfCompChainPred, substFormula, substTerm, substTerms, chainOk, runFn, concat, land, iff,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
-set_option linter.unusedSimpArgs false in
 /-- **Composición de `chainOk` en `Prf`** (keystone d2): `chainOk c (p++s) ⇔
     chainOk c p ∧ chainOk (runFn c p) s`. Inducción sobre `p` (acumulador `∀c`;
     patrón confinación/`norm32`/`norm_s`). -/
@@ -702,9 +685,9 @@ theorem prf_chainOk_concat (c p s : Term) :
   have key : Prf (Formula.forall (prfCompChainPred s)) := by
     refine prf_list_induction (prfCompChainPred s) ?base ?step
     · refine Prf.gen _ ?_
-      simp only [prfCompChainPred, substFormula, substTerm, substTerms, liftTerm, liftTerms,
-        chainOk, runFn, concat, nil, zero, iff, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-        Nat.reduceGT, Nat.reduceSub, reduceIte, norm_s, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      simp only [substFormula, substTerm, substTerms, liftTerm, liftTerms,
+        chainOk, runFn, concat, nil, zero, iff, land, Nat.reduceAdd, Nat.reduceEqDiff,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, FOL.substTerm_liftLift]
       refine prf_and_intro (prf_deduction ?fwd) (prf_deduction ?bwd)
       case fwd =>
         have hS : PrfH [chainOk (.var 0) (concat nil (liftTerm 0 s))] (chainOk (.var 0) (liftTerm 0 s)) :=
@@ -721,7 +704,7 @@ theorem prf_chainOk_concat (c p s : Term) :
         exact PrfH_chainOk_subst2 (prf_to_prfH (prf_eq_symm (prf_concat_nil_eq (liftTerm 0 s))) _) hS
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [prfCompChainPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        chainOk, runFn, concat, cons, nil, iff, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+        chainOk, runFn, concat, cons, iff, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
         Nat.reduceGT, Nat.reduceSub, reduceIte, norm32]
       refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
       refine prf_deduction ?_
@@ -738,8 +721,7 @@ theorem prf_chainOk_concat (c p s : Term) :
         unfold ccIHbody at ihc
         simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
           chainOk, runFn, concat, cons, nil, carc, zero, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-          Nat.reduceGT, Nat.reduceSub, reduceIte, norm32, norm_s, FOL.substTerm_liftTerm,
-          FOL.substTerm_liftLift] at ihc
+          Nat.reduceGT, Nat.reduceSub, reduceIte, norm_s] at ihc
         have h1 : PrfH FCTX (chainOk (.var 0) (cons (.var 2) (concat (.var 1) S))) :=
           PrfH_chainOk_subst2 (prf_to_prfH (prf_concat_cons_eq (.var 2) (.var 1) S) _)
             (PrfH.hyp _ _ (List.Mem.head _))
@@ -763,8 +745,7 @@ theorem prf_chainOk_concat (c p s : Term) :
         unfold ccIHbody at ihc
         simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
           chainOk, runFn, concat, cons, nil, carc, zero, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-          Nat.reduceGT, Nat.reduceSub, reduceIte, norm32, norm_s, FOL.substTerm_liftTerm,
-          FOL.substTerm_liftLift] at ihc
+          Nat.reduceGT, Nat.reduceSub, reduceIte, norm_s] at ihc
         have hcons : PrfH BCTX (chainOk (.var 0) (cons (.var 2) (.var 1))) :=
           PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.head _))
         have hrun : PrfH BCTX (chainOk (runFn (.var 0) (cons (.var 2) (.var 1))) S) :=

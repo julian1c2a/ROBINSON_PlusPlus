@@ -48,7 +48,6 @@ theorem liftTerm_implc_open (Ac Bc : Term) :
   intro c
   simp only [implc, cons, nil, zero, succ, liftTerm, liftTerms]
 
-set_option linter.unusedSimpArgs false in
 /-- **MP a nivel de código, con códigos ABIERTOS** (§25.3):
     `Prov(⌜Ac ⇒ Bc⌝) ⇒ (Prov(⌜Ac⌝) ⇒ Prov(⌜Bc⌝))`, **sin** exigir `Ac`, `Bc` cerrados.
 
@@ -69,8 +68,7 @@ theorem pcc_mp_code_open (Ac Bc : Term) :
   -- ANTECEDENTE: el lift atraviesa el `implc`
   simp only [liftTerm_implc_open Ac Bc]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte]
   -- ctx: [P_AB[p=#0]] ; goal: provFromCode ↑Ac ⇒ provFromCode ↑Bc
   refine deduction_aux ?_ (provFromCode (liftTerm 0 Ac))
     [land (chainOk nil (.var 0))
@@ -80,8 +78,8 @@ theorem pcc_mp_code_open (Ac Bc : Term) :
   simp only [List.map_cons, List.map_nil, liftFormula, liftFormula_provFromCode_open,
     liftTerm_implc_open, liftTerm, liftTerms,
     substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
-    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
-    ite_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    ite_true]
   -- abreviaturas: los códigos van DOBLEMENTE lifteados
   let A2 : Term := liftTerm 0 (liftTerm 0 Ac)
   let B2 : Term := liftTerm 0 (liftTerm 0 Bc)
@@ -91,8 +89,8 @@ theorem pcc_mp_code_open (Ac Bc : Term) :
       (cons (cons B2 (cons (numeralM 16) (cons A2 nil))) nil))) ?_
   -- NO colapsar aquí `liftTerm 0 B2`: se cancela con la subst externa `substTerm 0 r (·)`
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm]
   let Γ : List Formula := [land (chainOk nil (.var 0)) (In A2 (runFn nil (.var 0))),
     provFromCode A2,
     land (chainOk nil (.var 1)) (In (implc A2 B2) (runFn nil (.var 1)))]

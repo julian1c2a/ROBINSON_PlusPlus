@@ -1,0 +1,11 @@
+T56 (ADR-245), 2026-11-02: `python3 gen-reference.py --check` (FOL) visto fallar, en un clon --shared de FOL con el
+REFERENCE.md y el gen-reference.py del árbol de trabajo. Copiado de la salida.
+
+  sin mutar                                                   REFERENCE.md §6 al día                       rc=0
+  M1 · un nombre menos en §6 (`herbrand_block₀`)              REFERENCE.md §6 NO está al día: …            rc=1
+  M2 · una declaración nueva en FOL/Markov0.lean              REFERENCE.md §6 NO está al día: …            rc=1
+  M3 · una `private` y una comentada en FOL/Markov0.lean      REFERENCE.md §6 al día (no cuentan)          rc=0
+  M4 · un módulo nuevo (FOL/Nuevo/M.lean)                     REFERENCE.md §6 NO está al día: …            rc=1
+
+Y `[C]` de check-doc-sync.bash (FOL), que comprueba que cada módulo del cierre está en §6, lee ahora la sección
+generada (entre «## 6. Exports» y «## 7.»): con todo, verde (check-doc-sync.bash de FOL, código 0, tras el cambio).

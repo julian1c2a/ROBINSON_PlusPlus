@@ -1,0 +1,7 @@
+Probe/T48_YaEnElBuild_MUTANTE.lean:119:8: error: Type mismatch
+  ROBINSON_PlusPlus.Meta.SubstfcCodePrf.binct_implc
+has type
+  ∀ (a b : Term), binct (numeralM 5) a b = implc a b
+but is expected to have type
+  ∀ (a b : Term), binct (numeralM 7) a b = implc a b
+Probe/T48_YaEnElBuild_MUTANTE.lean:123:2: error: No goals to be solved

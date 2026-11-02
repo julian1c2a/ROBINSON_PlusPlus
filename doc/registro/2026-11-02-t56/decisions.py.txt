@@ -1,0 +1,89 @@
+"""T56: FOL/DECISIONS.md — la marca, y el estado de ADR-003/004/005/006/007/008/010 contra el árbol de hoy."""
+import io, sys
+
+RUTA = sys.argv[1]
+crudo = io.open(RUTA, encoding='utf-8', newline='').read()
+crlf = '\r\n' in crudo
+t = crudo.replace('\r\n', '\n')
+
+
+def cambia(viejo, nuevo):
+    global t
+    n = t.count(viejo)
+    if n != 1:
+        raise SystemExit(f'{n} apariciones de {viejo[:80]!r}')
+    t = t.replace(viejo, nuevo)
+
+
+cambia('**Última actualización:** 2026-10-28 — §MANDATORIES:',
+       '**Last updated:** 2026-11-02 — T56 (ADR‑245 de RPP): el cuerpo, revisado contra el árbol; ADR‑004, 005, 006, 007, '
+       '008 y 010, con su estado de hoy (las sub-librerías retiradas el 2026‑09‑12, la propuesta nunca hecha, las '
+       'anotaciones en desuso); ADR‑003, con lo que hay hoy; el aviso de fichero dormido, con el número de hoy. Antes, '
+       '2026-10-28 — §MANDATORIES:')
+
+# ADR-003
+cambia('de `grep -Fv` cortocircuitando el `&&` previo al `mv`).\n',
+       'de `grep -Fv` cortocircuitando el `&&` previo al `mv`).\n'
+       '✏️ *Nota del 2026-11-02 (T56, ADR‑245 de RPP)*: hoy hay 51 entradas en `locked_files.txt` y 39 en '
+       '`frozen_files.txt`; el gancho es `.githooks/pre-commit`, versionado y activo por `core.hooksPath` (T14, ADR‑234 '
+       'de RPP), con su hermano `.githooks/commit-msg`, que exige el ADR de cada thaw; y la CI lo vigila con '
+       '`check-congelados.bash` y `check-gancho.bash`.\n')
+
+# ADR-004
+cambia('## ADR-004: Convenciones de nombres Mathlib\n\n**Fecha**: 2026-04-20\n**Estado**: Aceptado\n',
+       '## ADR-004: Convenciones de nombres Mathlib\n\n**Fecha**: 2026-04-20\n'
+       '**Estado**: Aceptado — ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): la decisión sigue (`NAMING-CONVENTIONS.md`); lo que '
+       'dice de `MetaRules.lean`, borrado el 2026‑10‑02, es registro\n')
+
+# ADR-005
+cambia('## ADR-005: Namespaces alineados con directorios\n\n**Fecha**: 2026-04-20\n**Estado**: Aceptado\n',
+       '## ADR-005: Namespaces alineados con directorios\n\n**Fecha**: 2026-04-20\n'
+       '**Estado**: Aceptado, con excepciones — ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): `FOLPure`, `PropLogic` y `FOL_poli` '
+       'se retiraron el 2026‑09‑12 (FOL `b97ee6d`; `cuarentena/librerias-retiradas/`). Y la regla no se cumple en todo '
+       'el árbol: `Theorems/Eq.lean` y `SymClasses.lean` declaran en `FOL`, y los módulos de `Calculus/` en `FOL.Calculus`. '
+       'El espacio de nombres de cada módulo, el de hoy, lo da la §6 de `REFERENCE.md`, que se genera de las fuentes\n')
+
+# ADR-006
+cambia('## ADR-006: Subdirectorios temáticos para la organización de módulos\n\n**Fecha**: 2026-04-20\n'
+       '**Estado**: Aceptado\n',
+       '## ADR-006: Subdirectorios temáticos para la organización de módulos\n\n**Fecha**: 2026-04-20\n'
+       '**Estado**: Obsoleto en lo que dice de las sub-librerías — ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): de las cinco '
+       'quedan dos (`FOL` y `TheoryFramework`, desde el 2026‑09‑12). `FOL/Theorems/` conserva los cinco módulos del '
+       'núcleo de `Derives`; la metateoría vive en los `FOL/*0.lean` y en `FOL/Calculus/`, y `TheoryFramework/Instances/` '
+       'tiene sus dos instancias. El barril de cada subdirectorio, como pedía: `FOL/Core.lean` para el núcleo\n')
+
+# ADR-007
+cambia('**Fecha**: 2026-04-20\n**Estado**: Propuesto (no implementado)\n',
+       '**Fecha**: 2026-04-20\n'
+       '**Estado**: Obsoleto — ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): nunca se implementó, y tres de las cuatro '
+       'sub-librerías para las que se proponía se retiraron el 2026‑09‑12. `REFERENCE.md` documenta las dos `lean_lib` '
+       'vivas; su §6, el catálogo de lo que exporta cada módulo, se genera de las fuentes (`gen-reference.py`, con '
+       '`--check` en la CI)\n')
+
+# ADR-008
+cambia('## ADR-008: Sistema de anotaciones en REFERENCE.md\n\n**Fecha**: 2026-04-20\n**Estado**: Aceptado\n',
+       '## ADR-008: Sistema de anotaciones en REFERENCE.md\n\n**Fecha**: 2026-04-20\n'
+       '**Estado**: En desuso — ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): las llevan sólo las entradas de §3 de los módulos '
+       'de abril (y las del apéndice R de `REFERENCE.md`); ningún módulo de la capa ₀ ni posterior las tiene, y nada '
+       'las lee\n')
+
+# ADR-010
+cambia('**Estado**: Aceptado (decisión retroactiva — documenta una arquitectura ya existente)\n',
+       '**Estado**: Obsoleto — ✏️ 2026‑11‑02 (T56, ADR‑245 de RPP): desde el 2026‑09‑12 (FOL `b97ee6d`) el lakefile '
+       'declara dos `lean_lib`, `FOL` y `TheoryFramework`; `FOLPure`, `PropLogic` y `FOL_poli` están en '
+       '`cuarentena/librerias-retiradas/`, fuera del lakefile (`cuarentena/README.md` §7: dos de ellas eran '
+       'inconsistentes). Lo de abajo es registro de la arquitectura de julio. *(Era: «Aceptado (decisión retroactiva — '
+       'documenta una arquitectura ya existente)».)*\n')
+cambia('para no alterar el comportamiento del build sin confirmación del autor.\n',
+       'para no alterar el comportamiento del build sin confirmación del autor.\n'
+       '✏️ *Nota del 2026-11-02 (T56)*: de aquellos cinco módulos sin barril, `Classical.lean` y `Tactics2.lean` ya no '
+       'existen (el segundo se borró en D1, 2026‑09‑27), y `Theorems/Eq.lean` entra por `FOL/Core.lean`; desde T15 '
+       '(ADR‑163 de RPP) los `globs` del lakefile compilan todo el directorio, y [L] de `check-doc-sync.bash` comprueba '
+       'que todo módulo esté en el cierre de imports de un barril.\n')
+
+# el aviso de fichero dormido
+cambia('> ADR‑098 al escribir este aviso (por ADR‑115 el 2026‑10‑02).',
+       '> ADR‑098 al escribir este aviso (por ADR‑115 el 2026‑10‑02; por ADR‑245 el 2026‑11‑02).')
+
+io.open(RUTA, 'w', encoding='utf-8', newline='').write(t.replace('\n', '\r\n') if crlf else t)
+print('ok')

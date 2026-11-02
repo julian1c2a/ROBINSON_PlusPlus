@@ -1,0 +1,50 @@
+ROBINSON_PlusPlus/Full/Induction.lean: rc 0, 2 opciones, 5 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ArithPrf.lean: rc 0, 29 opciones, 61 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/BdAllIntroPrf.lean: rc 0, 1 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/BoundedInPrf.lean: rc 0, 9 opciones, 22 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/CantorMonoPrf.lean: rc 0, 2 opciones, 6 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ChainOkBoundedPrf.lean: rc 0, 27 opciones, 52 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ChainPrf.lean: rc 0, 13 opciones, 41 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/CodeTreeReflect.lean: rc 0, 2 opciones, 2 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean: rc 0, 8 opciones, 13 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean: rc 0, 5 opciones, 7 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/D3DottedPrf.lean: rc 0, 2 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/Delta0ReflectPrf.lean: rc 0, 2 opciones, 10 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/DerivCondPrf.lean: rc 0, 4 opciones, 15 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/DiagonalTwo.lean: rc 0, 1 opciones, 1 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/EvalArithPrf.lean: rc 0, 2 opciones, 2 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean: rc 0, 1 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean: rc 0, 2 opciones, 16 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean: rc 0, 1 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ExIntroCodePrf.lean: rc 0, 2 opciones, 8 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ForallElimCodePrf.lean: rc 0, 1 opciones, 5 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean: rc 0, 1 opciones, 1 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/HasWitTcFnPrf.lean: rc 0, 1 opciones, 1 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean: rc 0, 3 opciones, 5 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean: rc 0, 3 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/LineWFConsPrf.lean: rc 0, 1 opciones, 4 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/LineWFEfqPrf.lean: rc 0, 1 opciones, 1 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/LineWFSchemaPrf.lean: rc 0, 3 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ListEtaPrf.lean: rc 0, 4 opciones, 12 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean: rc 0, 33 opciones, 992 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/MpCodePrf.lean: rc 0, 1 opciones, 8 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/NatArithPrf.lean: rc 0, 7 opciones, 25 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/NatMulPrf.lean: rc 0, 8 opciones, 22 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/NatOrderPrf.lean: rc 0, 6 opciones, 7 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/NumListPrf.lean: rc 0, 3 opciones, 11 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean: rc 0, 3 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean: rc 0, 1 opciones, 2 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ProvFiel.lean: rc 0, 1 opciones, 2 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/ReprPrf.lean: rc 0, 63 opciones, 148 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/RigidezEstandar.lean: rc 0, 15 opciones, 86 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/RunFnBoundedPrf.lean: rc 0, 6 opciones, 26 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/SolidezDobleNegacion.lean: rc 0, 1 opciones, 4 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/StrongInductionPrf.lean: rc 0, 2 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean: rc 0, 12 opciones, 13 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean: rc 0, 5 opciones, 6 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/TcArithPrf.lean: rc 0, 1 opciones, 3 argumentos sin usar, 0 otros
+ROBINSON_PlusPlus/Meta/TrackedCorePrf.lean: rc 0, 3 opciones, 13 argumentos sin usar, 0 otros
+
+real	1m45,603s
+user	0m0,015s
+sys	0m0,030s

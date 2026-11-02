@@ -1,0 +1,55 @@
+#!/bin/bash
+# itera.sh X [estricto|s1|sigue|sigue-s1] — T18: los dos arreglos sobre el sondeo X, iterando hasta que la salida no
+# tenga ningún término ambiguo (formas A/Q/P/N de ambiguos.py) ni ningún `BoundedInPrf.PrfH_lt_subst2`.
+#   estricto: parte de orig/X.lean, cualifica los sitios de salida/X.base.out, renombra subst2 → rpp/sondeos/X.lean
+#   s1:       parte de parcheados/X.lean (el resultado estricto), renombra ADEMÁS subst1 (fuera del encargo)
+#             → rpp/sondeos/X__s1.lean
+#   sigue / sigue-s1: reanuda desde el fichero actual y su última salida (cuando ambiguos.py aprende una forma nueva)
+# Cada vuelta: compila (compila.sh), extrae los ambiguos; si alguno no tiene regla, PARA («?»).
+# Deja ediciones/<F>.itK.tsv (los sitios de cada vuelta) y el registro en ediciones/<F>.log.
+set -u
+T18=/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/t18
+cd "$T18"
+X=$1; MODO=${2:-estricto}
+case "$MODO" in
+  s1|sigue-s1) F=${X}__s1 ;;
+  *) F=$X ;;
+esac
+if [ "$MODO" = s1 ]; then
+  cp parcheados/$X.lean rpp/sondeos/$F.lean
+  py -3.15 renombra.py rpp/sondeos/$F.lean subst1 > ediciones/$F.log
+  PREV=""; k=0
+elif [ "$MODO" = estricto ]; then
+  cp orig/$X.lean rpp/sondeos/$F.lean
+  : > ediciones/$F.log
+  PREV=salida/$X.base.out; k=0
+else
+  k=$(ls salida/$F.it*.out | sed -E 's/.*\.it([0-9]+)\.out/\1/' | sort -n | tail -1)
+  PREV=salida/$F.it$k.out
+  echo "SIGUE desde vuelta $k" >> ediciones/$F.log
+fi
+while :; do
+  if [ -n "$PREV" ]; then
+    py -3.15 ambiguos.py "$PREV" rpp/sondeos/$F.lean > ediciones/$F.it$k.tsv
+    if awk -F'\t' '$4=="?"{f=1} END{exit !f}' ediciones/$F.it$k.tsv; then
+      echo "PARA: ambiguo sin regla en vuelta $k (ediciones/$F.it$k.tsv)" | tee -a ediciones/$F.log; exit 3
+    fi
+    n=$(grep -c . ediciones/$F.it$k.tsv)
+    if [ "$n" -gt 0 ]; then
+      awk -F'\t' 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' ediciones/$F.it$k.tsv > ediciones/$F.it$k.ed
+      py -3.15 parchea.py rpp/sondeos/$F.lean ediciones/$F.it$k.ed >> ediciones/$F.log || { echo "PARA: parchea falló en vuelta $k" | tee -a ediciones/$F.log; exit 4; }
+    fi
+    if [ $k = 0 ] && [ "$MODO" = estricto ]; then py -3.15 renombra.py rpp/sondeos/$F.lean >> ediciones/$F.log; fi
+    if [ $k -gt 0 ] && [ "$n" -eq 0 ] && ! grep -q 'BoundedInPrf.PrfH_lt_subst2' "$PREV"; then break; fi
+  fi
+  k=$((k + 1))
+  ./compila.sh $F it$k >> ediciones/$F.log
+  PREV=salida/$F.it$k.out
+  [ $k -ge 15 ] && { echo "PARA: 15 vueltas" | tee -a ediciones/$F.log; exit 5; }
+done
+echo "FIN $F: $k vueltas; última fila: $(cat salida/$F.it$k.fila | cut -c1-220)" | tee -a ediciones/$F.log
+case "$MODO" in
+  estricto|sigue) cp rpp/sondeos/$F.lean parcheados/$X.lean ;;
+  *) mkdir -p parcheados-s1; cp rpp/sondeos/$F.lean parcheados-s1/$X.lean ;;
+esac
+exit 0

@@ -1,0 +1,9 @@
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 45 · sin pasar por `consistencia`: 45 [FOL.Metamath.Semantics.evalFormula.eq_def,
+ FOL.Metamath.Semantics.eval_liftTerms_ext._f,
+ FOL.Metamath.Semantics.evalTerms] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 91 · sin pasar por `consistencia`: 45 [FOL.Metamath.Semantics.evalFormula.eq_def,
+ FOL.Metamath.Semantics.eval_liftTerms_ext._f,
+ FOL.Metamath.Semantics.evalTerms] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 91 · sin pasar por `consistencia`: 86 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: true

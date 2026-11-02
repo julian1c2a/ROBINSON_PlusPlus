@@ -8,7 +8,9 @@ import ROBINSON_PlusPlus.Meta.ModeloEstandar
 /-!
 # `Meta/ModeloCodificacion.lean` — los 85 de codificación, el ANCLA y los 120 (ADR‑119/120; ✏️ 107 y 142 hasta ADR‑192)
 
-Cada uno de los 85 de `codingAxioms` con el mismo molde: `intro` de los binders, `abre`, y el lema de
+Cada uno de los 85 de `codingAxioms` con el mismo molde: `intro v`, `unfold` del axioma, `abre`, el `intro` de sus
+binders (✏️ 2026‑11‑02, ADR‑251: DESPUÉS de `abre`; antes iba delante, y el núcleo tenía que comparar por definición
+la evaluación de un ∀ en el modelo concreto, que agotaba la pila de los hilos de nanoda) y el lema de
 `Meta/ModeloCodigo.lean` que dice lo que el axioma dice; `lineWF` es, por construcción, `etiqueta < 21 ∧ lineWFT V etiqueta`, y de ahí
 salen también `ax_lineWF_inv` y `ax_lineWF_cons`. ✏️ 2026‑10‑30 (ADR‑228): menos `v_tc_zero`, que va como el ancla, por
 `rw` con lemas ∀: su `abre` era lo único del cierre de los 32 titulares que lean4lean, con‑leche y con‑ron no
@@ -46,83 +48,84 @@ variable {V : Nat}
 
 /-! ## §3 · Los 85 de CODIFICACIÓN, validados
 
-Todos con el mismo molde: `intro` de los binders, `abre`, y el lema de §1ter que dice lo que el axioma dice. -/
+Todos con el mismo molde: `intro v`, `unfold` del axioma, `abre`, el `intro` de los binders (ADR‑251) y el lema de §1ter
+que dice lo que el axioma dice. -/
 
 /-! ### Sustitución y lift sobre códigos de término (11) -/
 
 theorem v_substtc_var_eq : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_var_eq := by
-  intro v k s n; abre; intro h; rw [substtcN_var, ite_eq_left h]
+  intro v; unfold ax_substtc_var_eq; abre; intro k s n; intro h; rw [substtcN_var, ite_eq_left h]
 theorem v_substtc_var_gt : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_var_gt := by
-  intro v k s n; abre; intro h; rw [substtcN_var, ite_eq_right (Nat.ne_of_lt h), ite_eq_left h]
+  intro v; unfold ax_substtc_var_gt; abre; intro k s n; intro h; rw [substtcN_var, ite_eq_right (Nat.ne_of_lt h), ite_eq_left h]
 theorem v_substtc_var_lt : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_var_lt := by
-  intro v k s n; abre; intro h
+  intro v; unfold ax_substtc_var_lt; abre; intro k s n; intro h
   rw [substtcN_var, ite_eq_right (by omega), ite_eq_right (by omega)]
 theorem v_substtc_func : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtc_func := by
-  intro v k s a b; abre; exact substtcN_func k s a b
+  intro v; unfold ax_substtc_func; abre; intro k s a b; exact substtcN_func k s a b
 theorem v_substtsc_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtsc_nil := by
-  intro v k s; abre; exact substtscN_zero k s
+  intro v; unfold ax_substtsc_nil; abre; intro k s; exact substtscN_zero k s
 theorem v_substtsc_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substtsc_cons := by
-  intro v k s a b; abre; exact substtscN_consN k s a b
+  intro v; unfold ax_substtsc_cons; abre; intro k s a b; exact substtscN_consN k s a b
 theorem v_liftc_var_lt : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftc_var_lt := by
-  intro v c n; abre; intro h; rw [liftcN_var, ite_eq_left h]
+  intro v; unfold ax_liftc_var_lt; abre; intro c n; intro h; rw [liftcN_var, ite_eq_left h]
 theorem v_liftc_var_ge : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftc_var_ge := by
-  intro v c n; abre; intro h; rw [liftcN_var, ite_eq_right (by omega)]
+  intro v; unfold ax_liftc_var_ge; abre; intro c n; intro h; rw [liftcN_var, ite_eq_right (by omega)]
 theorem v_liftc_func : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftc_func := by
-  intro v c a b; abre; exact liftcN_func c a b
+  intro v; unfold ax_liftc_func; abre; intro c a b; exact liftcN_func c a b
 theorem v_liftsc_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftsc_nil := by
-  intro v c; abre; exact liftscN_zero c
+  intro v; unfold ax_liftsc_nil; abre; intro c; exact liftscN_zero c
 theorem v_liftsc_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftsc_cons := by
-  intro v c a b; abre; exact liftscN_consN c a b
+  intro v; unfold ax_liftsc_cons; abre; intro c a b; exact liftscN_consN c a b
 
 /-! ### Sustitución y lift sobre códigos de fórmula (16) -/
 
 theorem v_substfc_bottom : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_bottom := by
-  intro v x t; abre; exact substfcN_bot x t
+  intro v; unfold ax_substfc_bottom; abre; intro x t; exact substfcN_bot x t
 theorem v_substfc_atom : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_atom := by
-  intro v x t a b; abre; exact substfcN_atom x t a b
+  intro v; unfold ax_substfc_atom; abre; intro x t a b; exact substfcN_atom x t a b
 theorem v_substfc_eq : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_eq := by
-  intro v x t a b; abre; exact substfcN_eq x t a b
+  intro v; unfold ax_substfc_eq; abre; intro x t a b; exact substfcN_eq x t a b
 theorem v_substfc_impl : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_impl := by
-  intro v x t a b; abre; exact substfcN_impl x t a b
+  intro v; unfold ax_substfc_impl; abre; intro x t a b; exact substfcN_impl x t a b
 theorem v_substfc_forall : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_forall := by
-  intro v x t a; abre; exact substfcN_forall x t a
+  intro v; unfold ax_substfc_forall; abre; intro x t a; exact substfcN_forall x t a
 theorem v_substfc_and : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_and := by
-  intro v x t a b; abre; exact substfcN_and x t a b
+  intro v; unfold ax_substfc_and; abre; intro x t a b; exact substfcN_and x t a b
 theorem v_substfc_or : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_or := by
-  intro v x t a b; abre; exact substfcN_or x t a b
+  intro v; unfold ax_substfc_or; abre; intro x t a b; exact substfcN_or x t a b
 theorem v_substfc_ex : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_substfc_ex := by
-  intro v x t a; abre; exact substfcN_ex x t a
+  intro v; unfold ax_substfc_ex; abre; intro x t a; exact substfcN_ex x t a
 theorem v_liftfc_bottom : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_bottom := by
-  intro v c; abre; exact liftfcN_bot c
+  intro v; unfold ax_liftfc_bottom; abre; intro c; exact liftfcN_bot c
 theorem v_liftfc_atom : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_atom := by
-  intro v c a b; abre; exact liftfcN_atom c a b
+  intro v; unfold ax_liftfc_atom; abre; intro c a b; exact liftfcN_atom c a b
 theorem v_liftfc_eq : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_eq := by
-  intro v c a b; abre; exact liftfcN_eq c a b
+  intro v; unfold ax_liftfc_eq; abre; intro c a b; exact liftfcN_eq c a b
 theorem v_liftfc_impl : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_impl := by
-  intro v c a b; abre; exact liftfcN_impl c a b
+  intro v; unfold ax_liftfc_impl; abre; intro c a b; exact liftfcN_impl c a b
 theorem v_liftfc_forall : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_forall := by
-  intro v c a; abre; exact liftfcN_forall c a
+  intro v; unfold ax_liftfc_forall; abre; intro c a; exact liftfcN_forall c a
 theorem v_liftfc_and : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_and := by
-  intro v c a b; abre; exact liftfcN_and c a b
+  intro v; unfold ax_liftfc_and; abre; intro c a b; exact liftfcN_and c a b
 theorem v_liftfc_or : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_or := by
-  intro v c a b; abre; exact liftfcN_or c a b
+  intro v; unfold ax_liftfc_or; abre; intro c a b; exact liftfcN_or c a b
 theorem v_liftfc_ex : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_liftfc_ex := by
-  intro v c a; abre; exact liftfcN_ex c a
+  intro v; unfold ax_liftfc_ex; abre; intro c a; exact liftfcN_ex c a
 
 /-! ### Accesores (6) -/
 
 theorem v_carc : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_carc := by
-  intro v a b; abre; exact carN_consN a b
+  intro v; unfold ax_carc; abre; intro a b; exact carN_consN a b
 theorem v_cdrc : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_cdrc := by
-  intro v a b; abre; exact cdrN_consN a b
+  intro v; unfold ax_cdrc; abre; intro a b; exact cdrN_consN a b
 theorem v_lenc_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lenc_nil := by
   intro v; unfold ax_lenc_nil; abre; exact lenN_zero
 theorem v_lenc_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lenc_cons := by
-  intro v a b; abre; exact lenN_consN a b
+  intro v; unfold ax_lenc_cons; abre; intro a b; exact lenN_consN a b
 theorem v_nthc_zero : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_nthc_zero := by
-  intro v a b; abre; exact nthN_cz a b
+  intro v; unfold ax_nthc_zero; abre; intro a b; exact nthN_cz a b
 theorem v_nthc_succ : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_nthc_succ := by
-  intro v a b i; abre; exact nthN_cs a b i
+  intro v; unfold ax_nthc_succ; abre; intro a b i; exact nthN_cs a b i
 
 /-! ### La evaluación, constructor a constructor: lemas ∀ por `rfl` (los usan `v_tc_zero` y el ancla, §4) -/
 
@@ -151,22 +154,22 @@ theorem v_tc_zero : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_zero := by
   rw [ev_tcFn, ev_cons, ev_cons, ev_cons, ev_numeralM, ev_strCodeM, ev_nil, ev_zero]
   exact tcFnN.eq_1
 theorem v_tc_succ : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_succ := by
-  intro v n; abre; rfl
+  intro v; unfold ax_tc_succ; abre; intro n; rfl
 theorem v_runFn_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_runFn_nil := by
-  intro v c; abre; exact runFnN_zero c
+  intro v; unfold ax_runFn_nil; abre; intro c; exact runFnN_zero c
 theorem v_runFn_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_runFn_cons := by
-  intro v c l r; abre; exact runFnN_consN c l r
+  intro v; unfold ax_runFn_cons; abre; intro c l r; exact runFnN_consN c l r
 
 /-! ### `allIn` y `chainOk` (4) -/
 
 theorem v_allIn_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_allIn_nil := by
-  intro v c; abre; exact allInN_zero c
+  intro v; unfold ax_allIn_nil; abre; intro c; exact allInN_zero c
 theorem v_allIn_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_allIn_cons := by
-  intro v c a t; abre; exact ⟨(allInN_consN c a t).mp, (allInN_consN c a t).mpr⟩
+  intro v; unfold ax_allIn_cons; abre; intro c a t; exact ⟨(allInN_consN c a t).mp, (allInN_consN c a t).mpr⟩
 theorem v_chainOk_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_nil := by
-  intro v c; abre; exact chainOkN_zero _ c
+  intro v; unfold ax_chainOk_nil; abre; intro c; exact chainOkN_zero _ c
 theorem v_chainOk_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_cons := by
-  intro v c l r; abre; exact ⟨(chainOkN_consN _ c l r).mp, (chainOkN_consN _ c l r).mpr⟩
+  intro v; unfold ax_chainOk_cons; abre; intro c l r; exact ⟨(chainOkN_consN _ c l r).mp, (chainOkN_consN _ c l r).mpr⟩
 
 -- 🗑️ (2026‑10‑27, ADR‑192) Aquí iban las 22 validaciones de `validProofFn` (`v_vpf_*`): sus axiomas salieron de T.
 
@@ -175,103 +178,103 @@ theorem v_chainOk_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_c
 local macro "prems" : tactic => `(tactic| ((simp only [premsOfN, nthN_cz, nthN_cs, nthN_zero_l]) <;> rfl))
 
 theorem v_premsOf_mp : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_mp := by
-  intro v b a; abre; prems
+  intro v; unfold ax_premsOf_mp; abre; intro b a; prems
 theorem v_premsOf_gen : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_gen := by
-  intro v b a; abre; prems
+  intro v; unfold ax_premsOf_gen; abre; intro b a; prems
 theorem v_premsOf_thy : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_thy := by
-  intro v c; abre; prems
+  intro v; unfold ax_premsOf_thy; abre; intro c; prems
 theorem v_premsOf_p1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_p1 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_p1; abre; intro c a b; prems
 theorem v_premsOf_p2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_p2 := by
-  intro v c a b d; abre; prems
+  intro v; unfold ax_premsOf_p2; abre; intro c a b d; prems
 theorem v_premsOf_c1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_c1 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_c1; abre; intro c a b; prems
 theorem v_premsOf_c2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_c2 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_c2; abre; intro c a b; prems
 theorem v_premsOf_c3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_c3 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_c3; abre; intro c a b; prems
 theorem v_premsOf_j1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_j1 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_j1; abre; intro c a b; prems
 theorem v_premsOf_j2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_j2 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_j2; abre; intro c a b; prems
 theorem v_premsOf_j3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_j3 := by
-  intro v c a b d; abre; prems
+  intro v; unfold ax_premsOf_j3; abre; intro c a b d; prems
 theorem v_premsOf_efq : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_efq := by
-  intro v c a; abre; prems
+  intro v; unfold ax_premsOf_efq; abre; intro c a; prems
 theorem v_premsOf_eqrefl : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_eqrefl := by
-  intro v c a; abre; prems
+  intro v; unfold ax_premsOf_eqrefl; abre; intro c a; prems
 theorem v_premsOf_p3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_p3 := by
-  intro v c a; abre; prems
+  intro v; unfold ax_premsOf_p3; abre; intro c a; prems
 theorem v_premsOf_q1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_q1 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_q1; abre; intro c a b; prems
 theorem v_premsOf_q2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_q2 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_q2; abre; intro c a b; prems
 theorem v_premsOf_q3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_q3 := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_q3; abre; intro c a b; prems
 theorem v_premsOf_leibniz : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_leibniz := by
-  intro v c a b d; abre; prems
+  intro v; unfold ax_premsOf_leibniz; abre; intro c a b d; prems
 theorem v_premsOf_ind : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_ind := by
-  intro v c a; abre; prems
+  intro v; unfold ax_premsOf_ind; abre; intro c a; prems
 theorem v_premsOf_qconf : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_qconf := by
-  intro v c a b; abre; prems
+  intro v; unfold ax_premsOf_qconf; abre; intro c a b; prems
 theorem v_premsOf_listInd : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_listInd := by
-  intro v c a; abre; prems
+  intro v; unfold ax_premsOf_listInd; abre; intro c a; prems
 
 /-! ### `lineWF` (23): la RHS de cada etiqueta es, por construcción, la de `lineWFT` -/
 
 local macro "lwf" : tactic => `(tactic| (intro h; exact ⟨(lineWFN_of_tag h (by decide)).mp, (lineWFN_of_tag h (by decide)).mpr⟩))
 
 theorem v_lineWF_mp : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_mp := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_mp; abre; intro x; lwf
 theorem v_lineWF_gen : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_gen := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_gen; abre; intro x; lwf
 theorem v_lineWF_thy : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_thy := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_thy; abre; intro x; lwf
 theorem v_lineWF_p1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_p1 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_p1; abre; intro x; lwf
 theorem v_lineWF_p2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_p2 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_p2; abre; intro x; lwf
 theorem v_lineWF_c1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_c1 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_c1; abre; intro x; lwf
 theorem v_lineWF_c2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_c2 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_c2; abre; intro x; lwf
 theorem v_lineWF_c3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_c3 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_c3; abre; intro x; lwf
 theorem v_lineWF_j1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_j1 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_j1; abre; intro x; lwf
 theorem v_lineWF_j2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_j2 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_j2; abre; intro x; lwf
 theorem v_lineWF_j3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_j3 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_j3; abre; intro x; lwf
 theorem v_lineWF_efq : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_efq := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_efq; abre; intro x; lwf
 theorem v_lineWF_eqrefl : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_eqrefl := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_eqrefl; abre; intro x; lwf
 theorem v_lineWF_p3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_p3 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_p3; abre; intro x; lwf
 theorem v_lineWF_q1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_q1 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_q1; abre; intro x; lwf
 theorem v_lineWF_q2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_q2 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_q2; abre; intro x; lwf
 theorem v_lineWF_q3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_q3 := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_q3; abre; intro x; lwf
 theorem v_lineWF_leibniz : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_leibniz := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_leibniz; abre; intro x; lwf
 theorem v_lineWF_ind : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_ind := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_ind; abre; intro x; lwf
 theorem v_lineWF_qconf : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_qconf := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_qconf; abre; intro x; lwf
 theorem v_lineWF_listInd : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_listInd := by
-  intro v x; abre; lwf
+  intro v; unfold ax_lineWF_listInd; abre; intro x; lwf
 
 theorem v_lineWF_inv : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_inv := by
-  intro v x; abre; intro h
+  intro v; unfold ax_lineWF_inv; abre; intro x; intro h
   have h1 : nthN x 1 < 21 := h.1
   rw [show (0 : Nat) + 1 = 1 from rfl]
   omega
 
 theorem v_lineWF_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_cons := by
-  intro v x; abre; intro h
+  intro v; unfold ax_lineWF_cons; abre; intro x; intro h
   by_cases hx : x = 0
   · exfalso
     subst hx

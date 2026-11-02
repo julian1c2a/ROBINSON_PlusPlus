@@ -1,0 +1,9 @@
+260,261c260,264
+<         ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH Γ
+<           (ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode (ROBINSON_PlusPlus.Meta.Sigma1CorePrf.inFormCodeFn v W))
+---
+>         autoParam (⊢ᴴ ROBINSON_PlusPlus.Minimal.Axioms.hasWit W) A3Directa.PrfH_in_transport._auto_1 →
+>           autoParam (⊢ᴴ ROBINSON_PlusPlus.Minimal.Axioms.hasWit u) A3Directa.PrfH_in_transport._auto_3 →
+>             autoParam (⊢ᴴ ROBINSON_PlusPlus.Minimal.Axioms.hasWit v) A3Directa.PrfH_in_transport._auto_5 →
+>               ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH Γ
+>                 (ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode (ROBINSON_PlusPlus.Meta.Sigma1CorePrf.inFormCodeFn v W))

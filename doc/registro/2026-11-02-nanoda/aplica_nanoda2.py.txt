@@ -1,0 +1,83 @@
+"""nanoda, segunda tanda: las evaluaciones de los códigos cerrados (`ev_charsCodeM`, `ev_termCodeM`, `ev_termsCodeM`,
+`ev_formCodeM`, `ev_listFormCodeM`) por `rw` con lemas con prueba, sin `show` de la evaluación en el modelo concreto."""
+import io, os, re, sys
+
+R = sys.argv[1]
+p = os.path.join(R, 'ROBINSON_PlusPlus/Meta/ModeloEstandar.lean')
+crudo = io.open(p, encoding='utf-8', newline='').read()
+crlf = '\r\n' in crudo
+t = crudo.replace('\r\n', '\n')
+
+AUX = '''theorem evts_cons {D : Type} (M : Model D) (v : Nat → D) (t : Term) (ts : List Term) :
+    evalTerms M v (t :: ts) = evalTerm M v t :: evalTerms M v ts := by rw [evalTerms]
+
+/-- `zero` y `cons` en `MNV V`, con prueba (como los de arriba): las usan las evaluaciones de los códigos cerrados. -/
+theorem evc_zero (v : Nat → Nat) : evalTerm (MNV V) v zero = 0 := by
+  rw [zero, evt_func, evts_nil, zero_sym, MN_zero]
+theorem evc_cons (v : Nat → Nat) (a b : Term) :
+    evalTerm (MNV V) v (cons a b) = consN (evalTerm (MNV V) v a) (evalTerm (MNV V) v b) := by
+  rw [cons, evt_func, evts_cons, evts_cons, evts_nil, cons_sym, MN_cons]
+'''
+viejo = '''theorem evts_cons {D : Type} (M : Model D) (v : Nat → D) (t : Term) (ts : List Term) :
+    evalTerms M v (t :: ts) = evalTerm M v t :: evalTerms M v ts := by rw [evalTerms]
+'''
+assert t.count(viejo) == 1
+t = t.replace(viejo, AUX)
+
+
+def bloque(cab, fin):
+    i = t.index(cab)
+    j = t.index(fin, i)
+    return i, j
+
+
+NUEVO = '''theorem ev_charsCodeM (v : Nat → Nat) : ∀ cs : List Char, evalTerm (MNV V) v (charsCodeM cs) = codeNatChars cs
+  | [] => by rw [charsCodeM, nil, evc_zero, codeNatChars]
+  | c :: cs => by rw [charsCodeM, evc_cons, ev_numeralM, ev_charsCodeM v cs, codeNatChars]
+
+theorem ev_strCodeM (v : Nat → Nat) (s : List Char) : evalTerm (MNV V) v (strCodeM s) = codeNatStr s :=
+  ev_charsCodeM v s
+
+mutual
+theorem ev_termCodeM (v : Nat → Nat) (t : Term) : evalTerm (MNV V) v (termCodeM t) = codeNatTerm t := by
+  match t with
+  | .var n => rw [termCodeM, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_numeralM, codeNatTerm]
+  | .func s ts =>
+    rw [termCodeM, evc_cons, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_strCodeM, ev_termsCodeM v ts,
+      codeNatTerm]
+theorem ev_termsCodeM (v : Nat → Nat) (ts : List Term) : evalTerm (MNV V) v (termsCodeM ts) = codeNatTerms ts := by
+  match ts with
+  | [] => rw [termsCodeM, nil, evc_zero, codeNatTerms]
+  | t :: ts' => rw [termsCodeM, evc_cons, ev_termCodeM v t, ev_termsCodeM v ts', codeNatTerms]
+end
+
+theorem ev_formCodeM (v : Nat → Nat) : ∀ φ : Formula, evalTerm (MNV V) v (formCodeM φ) = codeNat φ
+  | .bottom => by rw [formCodeM, evc_cons, nil, evc_zero, ev_numeralM, codeNat]
+  | .atom p ts => by
+      rw [formCodeM, evc_cons, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_strCodeM, ev_termsCodeM, codeNat]
+  | .eq t u => by
+      rw [formCodeM, evc_cons, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_termCodeM, ev_termCodeM, codeNat]
+  | .impl a b => by
+      rw [formCodeM, evc_cons, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_formCodeM v a, ev_formCodeM v b,
+        codeNat]
+  | Formula.forall a => by
+      rw [formCodeM, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_formCodeM v a, codeNat]
+  | .and a b => by
+      rw [formCodeM, evc_cons, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_formCodeM v a, ev_formCodeM v b,
+        codeNat]
+  | .or a b => by
+      rw [formCodeM, evc_cons, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_formCodeM v a, ev_formCodeM v b,
+        codeNat]
+  | .ex a => by
+      rw [formCodeM, evc_cons, evc_cons, nil, evc_zero, ev_numeralM, ev_formCodeM v a, codeNat]
+
+theorem ev_listFormCodeM (v : Nat → Nat) : ∀ L : List Formula, evalTerm (MNV V) v (listFormCodeM L) = codeNatList L
+  | [] => by rw [listFormCodeM, nil, evc_zero, codeNatList]
+  | f :: fs => by rw [listFormCodeM, evc_cons, ev_formCodeM, ev_listFormCodeM v fs, codeNatList]
+
+'''
+i, _ = bloque('theorem ev_charsCodeM (v : Nat → Nat)', '\n')
+j = t.index('/-! ### Las guardas: su evaluación es la `Prop` de §1ter, para un término ARBITRARIO -/')
+t = t[:i] + NUEVO + t[j:]
+io.open(p, 'w', encoding='utf-8', newline='').write(t.replace('\n', '\r\n') if crlf else t)
+print('ok')

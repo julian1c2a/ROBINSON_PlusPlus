@@ -76,7 +76,6 @@ theorem prf_runFn_nil_cons (line rest : Term) :
       (prf_congr_cons_tail (prf_concat_nil_eq (runFn nil rest)))
   exact prf_eq_trans h1 (prf_eq_trans h2 (prf_eq_trans h3 h4))
 
-set_option linter.unusedSimpArgs false in
 /-- **`lenc (runFn nil p) =eq lenc p`** (el map preserva la longitud). Inducción de listas. -/
 theorem prf_lenc_runFn (p : Term) : Prf (lenc (runFn nil p) =eq lenc p) := by
   have key : Prf (Formula.forall (Formula.eq (lenc (runFn nil (.var 0))) (lenc (.var 0)))) := by
@@ -85,9 +84,8 @@ theorem prf_lenc_runFn (p : Term) : Prf (lenc (runFn nil p) =eq lenc p) := by
       exact prf_eq_congr_lenc (prf_runFn_nil nil)
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-        lenc, runFn, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-        Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+        lenc, runFn, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
       refine prf_deduction ?_
       -- IH : lenc (runFn nil #0) =eq lenc #0
       -- meta: lenc (runFn nil (cons #1 #0)) =eq lenc (cons #1 #0)
@@ -132,19 +130,16 @@ def nthRunPred : Formula :=
   Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 1)))
     (Formula.eq (nthc (runFn nil (.var 1)) (.var 0)) (carc (nthc (.var 1) (.var 0)))))
 
-set_option linter.unusedSimpArgs false in
 /-- Caso base del predicado: `p = nil` (por explosión, `i < lenc nil = 0`). -/
 theorem nthRunPred_base : Prf (substFormula 0 nil nthRunPred) := by
   refine Prf.gen _ ?_
-  simp only [nthRunPred, substFormula, substTerm, substTerms, lt, lenc, nthc, runFn, carc,
-    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  simp only [substFormula, substTerm, substTerms, lt, lenc, nthc, runFn, carc,
+    nil, zero, Nat.reduceEqDiff, reduceIte, ite_true]
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
       (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 
-set_option linter.unusedSimpArgs false in
 /-- Paso `cons` del predicado. Confinación `qconf` (la HI es `∀i`, sin `i` libre) + `PrfH_spec`
     para instanciar la HI en `pred i`; case-split de `i` con `prf_zero_or_eq_succ_pred`. -/
 theorem nthRunPred_step :
@@ -153,8 +148,7 @@ theorem nthRunPred_step :
   refine Prf.gen _ (Prf.gen _ ?_)
   simp only [nthRunPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
     lt, lenc, nthc, runFn, carc, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
-    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true]
   refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
   refine prf_deduction (deduction_aux ?_ (lt (.var 0) (lenc (cons (.var 2) (.var 1)))) _ rfl)
   -- ctx: [ A0 , P0 ] ; #0=i, #1=cola, #2=cabeza
@@ -179,10 +173,9 @@ theorem nthRunPred_step :
     have hP : PrfH [S0, A0, P0] P0 :=
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
     have ihj := PrfH_spec hP (pred (.var 0))
-    simp only [P0, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
-      lt, lenc, nthc, runFn, carc, pred, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT,
-      Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true,
-      FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at ihj
+    simp only [P0, substFormula, substTerm, substTerms,
+      lt, lenc, nthc, runFn, carc, pred, nil, zero,
+      Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, ite_true] at ihj
     -- cota: i < lenc (cons h t) = σ(lenc t) e i = σ(pred i) ⇒ pred i < lenc t
     have hltJ : PrfH [S0, A0, P0] (lt (pred (.var 0)) (lenc (.var 1))) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
@@ -220,14 +213,12 @@ def boundedCarcIn (y p : Term) : Formula :=
   Formula.ex (land (lt (.var 0) (liftTerm 0 (lenc p)))
                    (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)))
 
-set_option linter.unusedSimpArgs false in
 /-- Clausura De Bruijn de `boundedCarcIn` (vía `liftTerm_comm_zero`; NO es defeq). -/
 theorem liftFormula_boundedCarcIn (y p : Term) :
     liftFormula 0 (boundedCarcIn y p) = boundedCarcIn (liftTerm 0 y) (liftTerm 0 p) := by
   simp only [boundedCarcIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc, carc,
-    Nat.zero_lt_succ, reduceIte, ite_true, ← FOL.liftTerm_comm_zero]
+    Nat.zero_lt_succ, ite_true, ← FOL.liftTerm_comm_zero]
 
-set_option linter.unusedSimpArgs false in
 /-- ⇐ : `(∃ i < lenc p. carc (nthc p i) =eq y) ⇒ In y (runFn nil p)`. -/
 theorem prf_In_runFn_of_boundedCarcIn (y p : Term) :
     Prf (boundedCarcIn y p ⇒ In y (runFn nil p)) := by
@@ -242,14 +233,13 @@ theorem prf_In_runFn_of_boundedCarcIn (y p : Term) :
   refine PrfH.mp _ _ _
     (prf_to_prfH (prf_In_of_boundedIn (liftTerm 0 y) (runFn nil (liftTerm 0 p))) _) ?_
   refine PrfH_ex_intro (.var 0) ?_
-  simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, carc, runFn,
-    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
+  simp only [substFormula, substTerm, substTerms, land, lt, nthc, lenc, runFn,
+    nil, zero, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro ?_ ?_
   · exact PrfH_lt_subst2 (prf_to_prfH (prf_eq_symm (prf_lenc_runFn (liftTerm 0 p))) _) hlt
   · exact PrfH_eq_trans
       (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_runFn (liftTerm 0 p) (.var 0)) _) hlt) hcarc
 
-set_option linter.unusedSimpArgs false in
 /-- ⇒ : `In y (runFn nil p) ⇒ (∃ i < lenc p. carc (nthc p i) =eq y)`. -/
 theorem prf_boundedCarcIn_of_In_runFn (y p : Term) :
     Prf (In y (runFn nil p) ⇒ boundedCarcIn y p) := by
@@ -270,8 +260,8 @@ theorem prf_boundedCarcIn_of_In_runFn (y p : Term) :
   have hltp : PrfH [D] (lt (.var 0) (lenc (liftTerm 0 p))) :=
     PrfH_lt_subst2 (prf_to_prfH (prf_lenc_runFn (liftTerm 0 p)) _) hlt
   refine PrfH_ex_intro (.var 0) ?_
-  simp only [boundedCarcIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, carc, runFn,
-    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
+  simp only [substFormula, substTerm, substTerms, land, lt, nthc, lenc, carc,
+    Nat.reduceGT, reduceIte, ite_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro hltp ?_
   exact PrfH_eq_trans
     (PrfH_eq_symm (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_runFn (liftTerm 0 p) (.var 0)) _) hltp))
