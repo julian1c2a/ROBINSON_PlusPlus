@@ -5623,8 +5623,9 @@ citas vivas de `Probe/`, la etiqueta `archivo/probe-2026-11-02`, `doc/registro/2
    * CritRefl_anidado: es el reflector archivado más tres controles, y lo que medía está en el build y más fuerte (el
      reflector de `isTC1`, su rechazo y la no vacuidad para todo término real, también con lista de argumentos no
      vacía). **Descartado.** Los dos hermanos de B3, también.
-3. **El barrido.** `Probe/` (334 `.lean` y lo demás) se ARCHIVA entero en la etiqueta anotada
-   `archivo/probe-2026-11-02` (un commit fuera de `master`, subido; M‑2) y se borra del disco. Las tres citas vivas a un
+3. **El barrido.** Los 334 `.lean` de `Probe/` se ARCHIVAN en la etiqueta anotada `archivo/probe-2026-11-02`
+   (un commit fuera de `master`, subido; M‑2; sin los dos `.olean` ni los dos `.err` vacíos que había) y el
+   directorio se borra del disco. Las tres citas vivas a un
    fichero suyo (`Meta/CodeWitnessPrf.lean`, `sondeos/README.md` y `sondeos/PrfHMono.lean`) llevan la etiqueta delante;
    las de los documentos de registro, no (85 apariciones en 28 ficheros, censadas; ninguna a los cuatro). `simbolos.py`
    ya no mira `Probe/`.
