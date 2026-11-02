@@ -359,6 +359,7 @@ mismo `deltaD`, `ax_axiomsCodeT_def`, el código de `godelBeta'` dentro de `gode
 | `bash cierre-imports.bash` | El cierre de imports de las raíces: el universo de los módulos (`[L]`, `[A]` y `[C]` de `check-doc-sync.bash`; T15 y ADR‑163 de RPP). `--autotest` lo comprueba. (✏️ 2026‑10‑18: aquí estaban `new-module.bash` y `gen-root.bash`, retirados) |
 | `bash check-sorry.bash` | Busca como TOKEN `sorry`, `sorryAx`, `admit` y `stop`, sin comentarios ni literales (`strip-lean.awk`), en todo .lean del árbol de RPP (con `sondeos/`; sin .lake/, Probe/ ni _rpp/). Además, cero en las ocho familias de agujeros de confianza (native_decide, decide +native, unsafe, opaque, implemented_by, extern, ofReduceBool…, skipKernelTC…) en RPP, FOL y TheoryFramework, y ninguna orden `#eval`, `#reduce`, `#guard` ni run_cmd/run_elab/run_meta que evalúe el ancla. Rojo (sale con 1; con 2 si no puede medir); en la CI (el script; a mano, también `make sorry`) |
 | `bash check-doc-sync.bash` | **Comprueba que la documentación cuadra con el código** (§27). `--quick` omite el build |
+| `python3 gen-dependencies.py [--check]` | Escribe `DEPENDENCIES.md` desde las líneas `import` (módulos, aristas, niveles, grafo, barriles); `--check` sale con 1 si lo versionado no es lo que se generaría, y corre en la CI (T30, ADR‑238). Tras añadir, quitar o cambiar un `import`, se regenera |
 | `bash check-estratos.bash` | Censo POR ENTORNO: por cada noción de derivabilidad, sus constructores, los `axiom` que la habitan, su solidez, su completitud y su puente (la tabla de `REFERENCE.md` §0bis); ninguna constante con `sorryAx`, un axioma de confianza, implemented_by/extern o de una librería ajena; los `partial`, con igualdad; un señuelo; y la escalera de binders. Rojo; en la CI (el script; a mano, también `make estratos`) |
 | `bash check-footprints.bash` | El `#print axioms` de cada fila de su tabla, con igualdad, y [COBERTURA]: todo titular que el árbol imprime y todo `#print axioms` de la fuente tienen fila. Rojo; en la CI (el script; a mano, también `make footprints`) |
 | `bash check-choice.bash [--rehacer]` | Toda constante de RPP, FOL y TheoryFramework con `Classical.choice`, `noncomputable` o `String`, contra `doc/control/choice.tsv`, en los dos sentidos (con --rehacer la reescribe, sólo con un ADR; T53, ADR‑193). Rojo; en la CI (el script; a mano, también `make choice`) |
@@ -404,7 +405,7 @@ sin el autotest de la cuenta de `axiom` o sin el resumen de `check-sorry.bash` (
 |---|---|---|
 | **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, el conteo de Meta, cuarentena, `axiom` de Lean, `sorry` y sondeos, también en negrita — contra el estado REAL. Exime un marcador de historia, no una fecha (ADR‑169). Un patrón sin ninguna aparición es ROJO: **`control VACÍO`** (§27.1; ✏️ 2026‑10‑31 (T21, ADR‑235): avisaba hasta ADR‑223) | ✅ sí |
 | **[A2]** | **las mismas cifras en el CUERPO** (de la línea 101 al final, sin DECISIONS.md), con los mismos filtros — §27.2. Las viejas de hoy, en `doc/control/a2-deuda.tsv`, que sólo baja (`bash check-doc-sync.bash --a2-deuda`). ✏️ ADR‑169 | ✅ sí, con trinquete por línea |
-| **[I]** | **frases que un teorema vivo desmiente** («⊬¬G no existe» con `goedel_I_neg` declarado; Rosser o Löb «pendiente»), en los documentos y en los `.lean` de la librería, fuera de registro, citas y vallas. ADR‑169 | ✅ sí |
+| **[I]** | **frases que un teorema vivo desmiente** («⊬¬G no existe» con `goedel_I_neg` declarado; Rosser o Löb «pendiente»; ✏️ 2026‑11‑02, T32, ADR‑237: y la consistencia, o `ConsistentH`, «sin probar», con `consistencia` declarado), en los documentos y en los `.lean` de la librería, fuera de registro, citas y vallas. ADR‑169 | ✅ sí |
 | **[B]** | **citas muertas** en los documentos de B_DOCS_LISTA —los autoritativos (✏️ 2026‑11‑01, T21, ADR‑235: también `PLAN-PRUEBAS.md`, con sus citas adjudicadas; ADR‑185 lo había dejado fuera hasta entonces)—: toda cita entre comillas invertidas con forma de identificador o de ruta tiene que existir, o llevar un marcador a 100 bytes o menos, o, si la declara un sondeo (también uno archivado), que su línea nombre ese sondeo, o estar en la deuda por cita (`doc/control/b-deuda.tsv`). ✏️ ADR‑166; ✏️ 2026‑10‑31 (T21, ADR‑235): decía «en los docs autoritativos» | ✅ sí, con trinquete por cita |
 | **[E]** | **frescura del TITULAR**: el primer sello `**Last updated:**` de todo .md versionado (salvo `doc/book/`) no puede ser anterior al último commit que tocó el documento (ni a hoy, si tiene cambios sin commitear), y un documento sin sello falla. La deuda vieja, en dos tablas —E_DEUDA, la de contenido (la marca, más vieja que el último commit), y E_DEUDA_FORMATO, la de formato (sin marca; vacía desde el 2026‑10‑31)—, rompe en los dos sentidos: un documento que falla fuera de su tabla es rojo, y uno de ellas que ya está bien, también; y tiene TECHO: las tablas de la base verificada (T24, ADR‑233) — §27.3. ✏️ 2026‑10‑31 (T21, ADR‑235): decía «contra la entrada más reciente del `CHANGELOG`» y «aviso»; rompe desde ADR‑072, y mira todo .md desde ADR‑084 | ✅ sí, con deuda declarada |
 | **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
@@ -417,6 +418,11 @@ sin el autotest de la cuenta de `axiom` o sin el resumen de `check-sorry.bash` (
 | **[H]** (sondeos) | los `sondeos/*.lean` = las filas de `sondeos/README.md`, en los dos sentidos. ✏️ ADR‑084 | ✅ sí |
 | **[M]** | cada fila MANDATORY de `DECISIONS.md`, en UNA línea y con cuatro columnas, y cada cita de su columna «Verificación» existe. ✏️ ADR‑133 | ✅ sí |
 | **[T]** | los titulares de T_UNIVERSO están declarados y tienen UNA fila en `TEOREMAS-E-HIPOTESIS.md`, ninguna fila sobra, y T_UNIVERSO = `TITULARES` (`Meta/ContratoTitulares.lean`). ✏️ ADR‑135, ADR‑165 | ✅ sí |
+| **[G]** | **deudas enunciadas que ya tienen testigo**: un `def`/`abbrev X : Prop` sin binders cuyo docstring la anuncia ABIERTA (⬜, «DEUDA» como palabra, «no está hecha», «sin probar», «sin modelo»…) sin decirla pagada, y un `theorem W : X :=` en la librería. Se corrige la CABECERA. ✏️ 2026‑11‑02 (T32, ADR‑237: portado de FOL) | ✅ sí |
+| **[G.2]** | **el censo de los marcadores de deuda** de la prosa de los `.lean` de la librería: cada uno, clasificado en su tabla (ABIERTA, DIFERIDA, OFERTA, HISTORIAL), por fichero y un ancla única; en los dos sentidos. ✏️ 2026‑11‑02 (T32, ADR‑237) | ✅ sí, con tabla |
+| **[P]** | **los footprints de la PROSA** (`[propext, …]` en un `.lean` de FOL, TheoryFramework o RPP) contra la fila de la cita en la TABLA de `check-footprints.bash`, por tramo de línea; las discrepancias que cuentan lo de antes, declaradas (HISTORIAL o ATRIBUCION); en los dos sentidos. ✏️ 2026‑11‑02 (T39, ADR‑240) | ✅ sí, con tabla |
+| **[R]** | **el registro de hallazgos** (`doc/control/hallazgos.tsv`): sus IDs son exactamente los que se extraen hoy de las fuentes de las auditorías, y cada fila tiene estado (hecho con su ADR o su commit, pendiente, descartado, sustituido por un T) con lo que nombra existiendo. ✏️ 2026‑11‑02 (T37, ADR‑241) | ✅ sí |
+| **[S]** | **las citas de sondeos del build**: a un sondeo de CONTROL (evidencia), a uno archivado con su etiqueta, o de PROCEDENCIA, declarada en su tabla por fichero y sondeo; una que no es nada de eso, ROJO. ✏️ 2026‑11‑02 (T10, ADR‑243) | ✅ sí, con tabla |
 
 ✏️ **2026‑10‑18 (ADR‑166, T04): [B] rehecho**, con trinquete por cita. Nació como aviso, «deliberadamente»; desde
 ADR‑084 (2026‑09‑22) rompía, con una deuda por CLAVE (B_DEUDA; con tope desde ADR‑116), y su universo eran siete
@@ -591,7 +597,7 @@ la IA a priorizar qué cargar.
 | `REFERENCE.md` + `doc/REFERENCE-*.md` | Sistema de referencia en árbol (ver §0.5) |
 | `NAMING-CONVENTIONS.md` | Diccionario de nombres + 12 reglas de formación (nombres en inglés, prosa en español) |
 | `DECISIONS.md` | ADRs formales + sección **MANDATORIES** con las directivas no negociables *de este proyecto concreto* |
-| `DEPENDENCIES.md` | Grafo y tabla maestra de dependencias entre módulos |
+| `DEPENDENCIES.md` | Grafo y tabla maestra de dependencias entre módulos: GENERADO por `gen-dependencies.py` (T30, ADR‑238); no se edita a mano |
 | `PLANNING.md` | Visión a largo plazo — ideas y direcciones que aún necesitan madurar |
 | `NEXT-STEPS.md` | Pasos inmediatos y concretos, listos para ejecutar (nombre canónico con guión — nunca `NEXT_STEPS.md`) |
 | `THOUGHTS.md` | Diario de diálogo diseño usuario↔IA — nunca normativo, nunca sustituye una regla de esta guía |
@@ -653,7 +659,7 @@ decisiones, flujo), no el detalle técnico módulo a módulo.
 
 **Pasos:** ejecutar `lake build` para datos frescos → actualizar
 `CURRENT-STATUS-PROJECT.md` → actualizar métricas de `README.md` → añadir un ADR nuevo
-a `DECISIONS.md` si hubo una decisión arquitectónica → revisar `DEPENDENCIES.md` si se
+a `DECISIONS.md` si hubo una decisión arquitectónica → regenerar `DEPENDENCIES.md` (`python3 gen-dependencies.py`) si se
 crearon/movieron módulos → revisar `WORKFLOW.md` si la sesión reveló una regla
 operativa nueva → **cerrar con `bash check-doc-sync.bash` (§27) en verde**.
 

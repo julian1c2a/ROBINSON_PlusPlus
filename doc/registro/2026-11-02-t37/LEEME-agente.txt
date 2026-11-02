@@ -1,0 +1,204 @@
+LEEME — registro de hallazgos para cerrar T37 (borrador del 2026-11-02, sobre RPP 6cdd2dd y FOL b5c5e1c)
+=====================================================================================================
+
+Nada de esto toca los repos: todo vive en esta carpeta del scratchpad. Las rutas sin prefijo son de RPP; «../FOL/…»
+es el repo hermano.
+
+⚠️ «Leída contra el árbol» quiere decir aquí contra lo COMMITEADO: HEAD 6cdd2dd (RPP) y b5c5e1c (FOL). Mientras se hacía
+esto, otros agentes tenían cambios sin commitear en los dos árboles (RPP: build.yml, DEPENDENCIES.md, check-doc-sync.bash,
+Meta/LiftfcWitnessPrf.lean, doc/control/a2-deuda.tsv y b-deuda.tsv, gen-dependencies.py y doc/registro/2026-11-02-t30/,
+-t32/, -t39/; FOL: build.yml y check-doc-sync.bash): parece el trabajo de T30, T32 y T39. Las 347 citas fichero:línea de
+hallazgos.tsv se comprobaron contra HEAD con scripts/verificar_citas.py; cinco ya no coinciden con el árbol de trabajo
+(build.yml:296 y :308, check-doc-sync.bash:1197 y :1375, ../FOL/check-doc-sync.bash:875) porque esos ficheros se están
+editando. Cuando T30, T32 y T39 se cierren, cambia la evidencia de sus filas (MED:MED-08, SUB:SUB-11 → T32; MED:MED-23,
+SUB:SUB-12, DOC:DOC-06 → T30; MED:MED-11, FOL:MED-07 → T39) y quizá la de R3-3-10/11/12/13 (controles de check-doc-sync).
+
+0 · QUÉ HAY
+-----------
+* hallazgos.tsv — 426 filas, una por ID: id · origen · resumen · veredicto · estado · dónde · evidencia. El estado es
+  siempre uno de hecho | pendiente | descartado | sustituido. En «evidencia», lo que va tras « · NOTA:» es comentario
+  mío (parcialidades, inferencias).
+* fuentes/ — las listas de los workflows fuera de git, compactas (lo que habría que versionar en doc/registro):
+  wf_68cece92-90b.json, wf_107c9121-80b.json, wf_e04d70c1-e0c.json, wf_1f61bc0d-738.tsv (los 163 candidatos, con el T
+  del agrupado y el T final de la síntesis), wf_1f61bc0d-738-no-cubierto.json (lo único que sólo estaba en un journal) y
+  EXTRACCION.txt (qué línea de qué journal, agente, sha256 y comparación con la copia versionada).
+* scripts/ — construir.py (genera hallazgos.tsv y fuentes/, con las decisiones de estado escritas dentro, y valida: IDs
+  únicos, todo ADR citado existe, todo T citado existe), reextraer.py (re-extrae el conjunto de IDs SÓLO de ficheros
+  versionados y lo compara con el TSV: hoy 426 = 426, ni sobra ni falta ninguno), verificar_citas.py (cada cita
+  fichero:línea, contra HEAD), extraccion.py, y los auxiliares del censo (censo_ids.py, donde_citados.py, ids_en_adr.py,
+  estado_T.py…). work/ son intermedios.
+* Se ejecutaron con Python 3.15 (<home>\AppData\Local\Python\pythoncore-3.15-64\python.exe, o «py -3.15»):
+  /d/msys64/usr/bin/python3.12.exe lo BLOQUEA hoy una directiva de Control de aplicaciones de Windows.
+
+1 · FUENTES LEÍDAS, Y CUÁLES TRAEN LISTA DE HALLAZGOS
+-----------------------------------------------------
+Con lista (y de ahí sale cada fila):
+  a. doc/registro/2026-10-02-auditoria-base/ronda1/salida_workflow_ronda1.json — ronda 1 (wf_6ab7eb53-016): 36, L1-1…L5-11,
+     con el veredicto de su verificador. (ronda1/resumen.txt es el resumen humano de lo mismo; las sonda_*.lean.txt, pruebas.)
+  b. doc/registro/2026-10-02-auditoria-base/ronda2/salida_workflow_ronda2.json — ronda 2 (wf_0f4ca25d-649): 43: R2-1-1…7,
+     R22-1…11 (la lente R2-2 numera «R22-n»), R2-3-1…10, R2-4-1…9, R2-5-1…6. (resumen.txt, r2l4/, ronda2_R22/: censos y scripts.)
+  c. doc/registro/2026-10-28-ronda3/resultado.json — ronda 3 (wf_c292eb52-d00): 39, R3-1-H1…H4, R3-2-H1…H4, R3-3-01…13,
+     R3-4-01…04, R3-5-01…14. Cerrada en ADR-211…213.
+  d. doc/registro/2026-10-12-auditoria-suelo/candidatos.json — los 163 candidatos de wf_1f61bc0d-738 (seis barridos y sus
+     verificadores), y workflow-cierre.json (wf_7a6e4ce2-b37): el agrupado candidato→T, la crítica (CRI-01…07), la síntesis
+     (los 81 T) y sus descartados. workflow-barridos.json sólo trae el script y el descartado RUT-06.
+  e. doc/registro/2026-10-05-auditoria-adr120-121/workflow.json = wf_68cece92-90b: 31 hallazgos en cuatro lentes, SIN ID.
+  f. doc/registro/2026-10-05-auditoria-adr123/workflow.json = wf_107c9121-80b: tres informes en prosa (adversarial: 6 puntos
+     numerados y 3 viñetas «Other issues»; duplicados; exploración), SIN ID.
+  g. doc/registro/2026-10-05-auditoria-adr124-126/workflow.json = wf_e04d70c1-e0c: dos informes con IDs propios C1…C18 y
+     C1…C20 (colisionan entre sí).
+  h. doc/AUDITORIA-2026-09-11.md — F-1…F-10 y F-1b (las citan PLAN-PRUEBAS, AI-GUIDE, TEOREMAS, CHANGELOG, build.yml,
+     check-doc-sync.bash y tres .lean).
+  i. doc/AUDITORIA-FOL-2026-09-12.md — 36 correcciones A-1…A-7, M-1…M-8, B-1…B-5, R-1…R-10, D-1…D-6 (las citan, vivas,
+     ../FOL/check-axioms.bash, README, REFERENCE, build.yml, TheoryFramework/Logic.lean y MetaTheorems.lean, FOL/Core.lean,
+     y la propia auditoría del suelo: «A-5» en T15; y ADR-027, 028 y 030).
+  j. doc/AUDITORIA-2026-09-18.md — los encargos A1…A5 y los planes G0…G3 (los citan ADR-071…073).
+  k. doc/AUDITORIA-SUELO-2026-10-12.md — los T00…T79 (NO van como fila: llevan su propio «Estado»), la lista CRI y la
+     sección «Descartados» (l. 1272-1283), que se usan para el estado de los candidatos.
+Sin lista de hallazgos (sólo evidencia de estado o mediciones): doc/AUDITORIA-BASE-2026-10-02.md (guarda MEDICIONES, no
+hallazgos), DECISIONS.md (ADR-131…236), doc/historia/DECISIONS-001-130.md, NEXT-STEPS.md, el árbol de los dos repos y
+su git log; doc/registro/2026-10-05-auditoria-adr124-126/sonda-control-tc-cons/ (sondas).
+Fuera de git (comparadas; ver fuentes/EXTRACCION.txt): los journals de wf_68cece92-90b, wf_107c9121-80b, wf_e04d70c1-e0c,
+wf_1f61bc0d-738 y wf_7a6e4ce2-b37 en <home>/.claude/projects/e--Dropbox-GitHub-lean4-ROBINSON-PlusPlus/85b0df6c…/subagents/
+workflows/. ⭐ RESULTADO: las cuatro listas que pide T37 YA ESTÁN VERSIONADAS desde ADR-132 (T00), idénticas (salvo rutas
+saneadas y los nombres de campo abreviados de candidatos.json). Lo único que sólo vivía en un journal son el «no_cubierto»
+y las «fuentes_leidas» de los seis barridos de wf_1f61bc0d-738 (no son hallazgos): fuentes/wf_1f61bc0d-738-no-cubierto.json.
+Otras listas de revisión versionadas que NO van al registro (ningún ID suyo lo cita el repo; las cierra su propio ADR):
+doc/registro/2026-10-05-d7-revision/ (D7: «9 + 10 defectos»), 2026-10-05-adr122-d7-rosser/ (la crítica del plan de Rosser),
+2026-10-12-t02-teoria/ (revisiones de T02), 2026-10-18-t04/ y 2026-10-19-t04/ (las cuatro revisiones de [B]),
+2026-10-19-t04b/ y 2026-10-31-t21/.
+
+2 · LOS IDs
+-----------
+* Tal como los escribe la fuente, con el guion ASCII: las .md escriben a veces «‑» (U+2011, «F‑3», «A‑1»); el TSV normaliza
+  a «-», y cualquier regex de comprobación tiene que aceptar los dos.
+* Prefijo «XXX:» sólo donde el ID solo es ambiguo, y lo que sigue a «:» es la grafía de la fuente:
+  - candidatos del suelo: DIM:ID (MED/FUN/SUB/RUT/FOL/DOC según el barrido). Lo usa ya la auditoría («FOL:SUB-04»): los
+    verificadores reusaron MED-0n, SUB-0n, DOC-0n… en otros barridos, y «MED-01» solo designa CUATRO hallazgos distintos.
+  - A124:Cn y A125:Cn — los C… del propio informe (wf_e04d70c1), que empiezan los dos en C1.
+  - FOL0912:A-1… — «A-1», «M-1», «D-1», «R-1» chocan con las MANDATORIES (M-1…M-14), las decisiones D1-D8 de ADR-101/110,
+    los riesgos R1-R5 de D7…
+  - AUD0918:A1… y AUD0928:F1 — «A1»/«G0» y «F1» son ambiguos (CHANGELOG llama F1/F2/F3 a teoremas de Block7).
+* IDs SINTÉTICOS (la fuente no tiene): A121:<L><n> (L = G goedelI, W W1, T tarski, P promocion, por la posición de la lente
+  en «result»; n = posición en «findings») y A123:R1…R9, D1, D2, S1 (los puntos «**n.**» del informe adversarial; las tres
+  viñetas de «Other issues» en orden; los dos del de duplicados; la exploración, que no es un hallazgo).
+
+3 · CÓMO RE-EXTRAER LOS IDs DE FICHEROS VERSIONADOS (para el bloque de check-doc-sync)
+-------------------------------------------------------------------------------------
+Medido hoy con grep y awk (sin gawk ni nada que mawk no tenga), desde la raíz de RPP:
+  R1     doc/registro/2026-10-02-auditoria-base/ronda1/salida_workflow_ronda1.json
+         grep -oE '"id": "L[1-5]-[0-9]{1,2}"' | sort -u                                                         → 36
+  R2     doc/registro/2026-10-02-auditoria-base/ronda2/salida_workflow_ronda2.json
+         grep -oE '"id": "(R2-[1-5]-[0-9]{1,2}|R22-[0-9]{1,2})"' | sort -u                                       → 43
+  R3     doc/registro/2026-10-28-ronda3/resultado.json
+         grep -oE '"id": "R3-[1-5]-(H[0-9]|[0-9]{2})"' | sort -u                                                 → 39
+  SUELO  doc/registro/2026-10-12-auditoria-suelo/candidatos.json
+         awk -F'"' '/^  "dim": /{d=$4} /^  "id": /{p=(d=="medida")?"MED":(d=="fundamentos")?"FUN":(d=="subterraneo")?"SUB":
+                    (d=="ruta")?"RUT":(d=="fol")?"FOL":"DOC"; print p":"$4}' | sort -u                           → 163
+  CRI    doc/registro/2026-10-12-auditoria-suelo/workflow-cierre.json
+         grep -oE '"id":"CRI-[0-9]{2}"' | sort -u                                                                → 7
+  A121   doc/registro/2026-10-05-auditoria-adr120-121/workflow.json
+         por posición: result[k].findings, k = 0…3 → G, W, T, P (8, 7, 6 y 10). Con grep sólo el total:
+         grep -o '"claim":' | wc -l                                                                              → 31
+  A123   doc/registro/2026-10-05-auditoria-adr123/workflow.json
+         grep -oE '\\n\*\*[0-9]+\. ' | sort -u (R1-R6)                                                           → 6
+         + las 3 viñetas «- **» tras «**Other issues found along the way**» (R7-R9) + D1, D2, S1 fijos
+  A124   doc/registro/2026-10-05-auditoria-adr124-126/workflow.json   grep -oE '\\n\*\*C[0-9]+\.' | sort -u          → 18
+  A125   idem                                                         grep -oE '\\nC[0-9]+\. ' | sort -u             → 20
+  F      doc/AUDITORIA-2026-09-11.md           grep -E '^### F(-|‑)[0-9]+b? · '                                  → 11
+  FOL0912 doc/AUDITORIA-FOL-2026-09-12.md      grep -E '^\*\*[AMBRD](-|‑)[0-9]+ · '                              → 36
+  AUD0918 doc/AUDITORIA-2026-09-18.md          grep -E '^### [AG][0-9] · '                                       → 9
+  AUD0928:F1 — sin fuente versionada: se mantiene a mano.                                                   total 426
+(En los JSON minificados el texto lleva los saltos como «\n» literal, por eso «\\n» en los patrones de A123-A125.)
+scripts/reextraer.py hace lo mismo con json.load y es la implementación de referencia. Como las fuentes de doc/registro
+son de sólo registro (no cambian), para A121/A123 basta con fijar la lista y el sha256 del fichero fuente (EXTRACCION.txt
+y `sha256sum doc/registro/2026-10-05-auditoria-*/workflow.json`): si el fichero cambia, rojo.
+
+Propuesta de bloque (lo que pide T37: «que exija estado a cada ID»):
+  1. E = la unión de lo de arriba; F = la primera columna del registro. E = F en los dos sentidos (comm -3 vacío), o rojo
+     con las dos listas de diferencias.
+  2. Por fila: estado ∈ {hecho, pendiente, descartado, sustituido}; «hecho» exige en «dónde» un ADR-NNN que exista como
+     «## ADR-NNN» en DECISIONS.md o en doc/historia/DECISIONS-001-130.md, o «sin ADR: commit <sha>» / «sin ADR: FOL <sha>»
+     con `git cat-file -e` (en FOL, si ../FOL está; si no, alcance reducido dicho); «sustituido», un «#### Txx ·» que exista
+     en la auditoría o un ID de F; «pendiente», un T que exista o «sin dueño»; «descartado», un «dónde» no vacío.
+  3. Autotest visto fallar: una fila borrada, un ID de más en una copia de una fuente, un «hecho» con ADR-999, un estado
+     inventado y un «dónde» vacío, cada uno rojo.
+  4. Opcional: un techo para el número de «pendiente», como los de [B] y [E].
+
+4 · RECUENTOS (filas de hallazgos.tsv)
+--------------------------------------
+                                          total  hecho  pendiente  descartado  sustituido
+  R1  ronda 1 (L…)                           36     25          8           2           1
+  R2  ronda 2 (R2-…, R22-…)                  43     35          2           4           2
+  R3  ronda 3 (R3-…)                         39     18         21           0           0
+  SUELO candidatos (DIM:ID)                 163      0          0           2         161
+  CRI  crítico del suelo                      7      0          0           0           7
+  A121 wf_68cece92-90b                       31     27          3           1           0
+  A123 wf_107c9121-80b                       12     10          0           2           0
+  A124/A125 wf_e04d70c1-e0c                  38     25          0          13           0
+  F    auditoría del 2026-09-11              11     11          0           0           0
+  FOL0912 auditoría de FOL                   36     27          5           2           2
+  AUD0918 auditoría del 2026-09-18            9      4          1           4           0
+  AUD0928:F1                                  1      1          0           0           0
+  TOTAL                                     426    183         40          30         173
+* «sustituido» apunta al T que absorbió el hallazgo; su estado va en «evidencia». 26 de los 173 caen en un T ABIERTO:
+  T10 (2), T18 (2), T30 (3), T32 (2), T37 (2: FUN:GOB-01 y DOC:AUD-01, este mismo registro), T39 (2), T48 (2+), T49 (4+),
+  T56 (2+), T69 (2), más R22-10, FOL0912:B-4 y FOL0912:R-7.
+* «descartado» incluye 17 hallazgos POSITIVOS (confirman algo y no piden nada: R2-1-6, R2-3-10, A123:R6, A123:D1,
+  A124:C1, C2, C3, C5, C10, C15, C16, A125:C3, C4, C5, C11, C16, C18), con «dónde = sin acción (positivo)», y R2-3-8
+  (informativo). Los demás descartados lo son por refutación o decisión: L5-01 (ADR-122), L5-09 (ADR-117 O8), R2-1-3
+  (obsoleto, ADR-117), RUT:RUT-15 y FOL:SUB-04 (la auditoría, l. 1274-1275), A121:T5 (obsoleto, ADR-121), FOL0912:R-8
+  (ADR-133), FOL0912:R-10 (texto de registro), AUD0918:G0…G3 (refutados; ADR-069).
+* 19 «hecho» se cerraron en un commit, sin ADR (eran de antes de esa disciplina): F-2…F-10 y FOL0912:A-1…A-7, B-1, B-2, D-1.
+  «dónde» dice «sin ADR: commit <sha>»; los commits existen (git cat-file). Si el bloque exige ADR, hay que admitir esa
+  forma o decidir otra cosa.
+
+5 · LOS 40 PENDIENTES, Y LO QUE ES INFERIDO O PIDE UNA DECISIÓN
+---------------------------------------------------------------
+Pendientes (todos «sin dueño» salvo lo dicho; la evidencia, en el TSV):
+  ronda 1: L2-6, L3-5, L4-4, L5-02, L5-04, L5-08, L5-10, L5-11
+  ronda 2: R2-4-5, R2-4-9
+  ronda 3 (los menores que ADR-211 §7 dejó abiertos y siguen igual en el árbol): R3-2-H2, R3-2-H3, R3-2-H4, R3-3-04…R3-3-13,
+           R3-4-04, R3-5-06, R3-5-08, R3-5-09, R3-5-11, R3-5-12, R3-5-13, R3-5-14
+  wf_68cece92: A121:G5 y A121:W2 (el título de §1 de Meta/SolidezVerificador.lean:49) y A121:W7 (Meta/ModeloCodigo.lean:527)
+  viejas: FOL0912:M-3, M-5, B-5, R-6, R-9; AUD0918:A5 (M-14 sin escribir)
+De ellos, PARCIALES (algo se hizo, el resto sigue): L2-6, L4-4, L5-10, R2-4-5, R2-4-9, R3-2-H2, R3-2-H3, R3-3-09, R3-4-04,
+R3-5-08, R3-5-09, R3-5-13, A121:G5, A121:W2, AUD0918:A5.
+PROPUESTAS QUE NUNCA SE DECIDIERON (las doy por pendientes porque lo que describen sigue en el árbol, pero el propietario
+puede descartarlas sin trabajo): L5-02 (recodificar los símbolos), L5-04 (la tabla de reglas como dato de Lean), L5-11 (un
+índice de nombres), FOL0912:B-5 (etiquetar las declaraciones huérfanas de FOL; la cifra es de otro árbol).
+Estados INFERIDOS (razonados desde el ADR o el árbol, sin una línea que los nombre): L3-2, L5-02, L5-04, L5-11, R2-1-5,
+R2-4-4, R2-4-6, R2-5-5, R3-1-H4, A121:P10, A125:C8, A125:C20, FOL0912:M-6, M-7, B-2, B-5, D-6. Y F-10 no se puede
+verificar en el árbol (era la memoria del auditor, fuera del repo).
+No queda ningún ID sin estado.
+
+6 · IDs QUE EL REPO CITA Y NO ESTÁN EN NINGUNA FUENTE (o que no van como fila)
+------------------------------------------------------------------------------
+* «F1» — hallazgo «de la auditoría del 2026-09-28», sin documento versionado; lo citan sondeos/AnclaEqInconsistente.lean:26,
+  ADR-114, 115, 117 y 118. Va como fila AUD0928:F1 (hecho, ADR-117).
+* Los IDs de origen de la auditoría de FOL (AX-1…AX-10, AX-NUEVO-1, CC-01…CC-10, ENG-1…ENG-16, FOL-D2-n, FOL-D4-n,
+  PAT-1…PAT-6, META-1, WL-1, RPP-AX-1/2, FOL-AX-1): sólo los cita esa misma auditoría, como entradas de sus A/M/B/R; no van
+  como fila.
+* Etiquetas que parecen IDs y no son hallazgos de auditoría: M-1…M-14 (MANDATORIES), D1-D8 (ADR-101/110), N1-N7 (las
+  cribas de FOL), O1-O10 (ADR-117), P-1…P-4 y [0]-[6] (commits del 2026-09-11), R1-R5 (riesgos de D7), V8 (PLAN-PRUEBAS),
+  E1…E10 (resultados), y los T00-T79.
+* Censo de lo que T37 llamaba «10–13 identificadores sin estado»: fuera de doc/registro, el repo cita 13 de la ronda 1
+  (L1-1…L1-4, L1-7, L2-3, L2-4, L2-6, L2-7, L4-1, L4-4, L5-01, L5-09) y 6 de la ronda 2 (R2-1-2, R2-4-1, R2-4-9, R2-5-1,
+  R2-5-4, R22-1). Todos tienen fila.
+
+7 · LO QUE T37 DABA POR ABIERTO (2026-10-12), HOY
+--------------------------------------------------
+  L1-7 hecho (ADR-188) · L2-6 pendiente (parcial, ADR-134) · L2-7 hecho (ADR-192) · L4-4 pendiente (la ida, ADR-195; falta
+  la vuelta) · R2-4-9 pendiente (Semantics bloqueado en ADR-165; Properties/Relations de TheoryFramework, sin proteger) ·
+  R2-5-1 hecho (ADR-141) · R2-5-4 hecho (ADR-116, completado por ADR-179, 199 y 212).
+
+8 · OBSERVACIONES DE PASO
+-------------------------
+* T74 figura ✅ (ADR-170), pero su propio texto (doc/AUDITORIA-SUELO-2026-10-12.md:1197) deja ABIERTA la pregunta de la
+  capa Derives: de ahí R2-4-5 pendiente (RPP sigue cargando Lean por FOL.Theorems.Quantifiers → Impl → Tactics) y la nota
+  en R2-4-4 y FOL:FOL-01. T67 figura ✅ y dice que la vuelta no está (L4-4).
+* En la auditoría, las líneas «*Estado…*» de un T no siempre van de la más nueva a la más vieja: en T44 la «(tarde)» va
+  DETRÁS. Quien lea «la primera» se equivoca; construir.py elige por fecha.
+* La evidencia de T37 («DECISIONS.md:8415») es de antes del corte de ADR-142: ese texto vive hoy en
+  doc/historia/DECISIONS-001-130.md.
+* La memoria dice «sin py»: hoy «py -3.15» funciona y el python3.12 de msys está bloqueado por Control de aplicaciones.

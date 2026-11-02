@@ -1,0 +1,56 @@
+== las mutaciones de [R], 2026-11-02, Git Bash, en clones --shared de RPP y FOL (el bloque [R] del árbol de trabajo, tal cual) ==
+
+──── R-M0 · sin mutar (verde esperado)
+  ✓ los 426 IDs de las auditorías tienen su fila y su estado, y son los de sus fuentes (183 hechos, 40 pendientes, 30 descartados, 173 sustituidos)
+FAIL=0
+
+──── R-M1 · se borra la fila de L2-6 (ROJO esperado: un ID de la fuente sin fila)
+  ❌ IDs de las fuentes SIN FILA en doc/control/hallazgos.tsv: L2-6 
+FAIL=1
+
+──── R-M2 · un hallazgo nuevo en una fuente (F-11 en la auditoría del 2026-09-11; ROJO esperado)
+  ❌ IDs de las fuentes SIN FILA en doc/control/hallazgos.tsv: F-11 
+FAIL=1
+
+──── R-M3 · «hecho» con ADR-999 (ROJO esperado)
+  ❌ L1-2: ADR-999 no existe
+FAIL=1
+
+──── R-M4 · un estado inventado (ROJO esperado)
+  ❌ L1-3: estado «cerrado» (hecho, pendiente, descartado o sustituido)
+FAIL=1
+
+──── R-M5 · «dónde» vacío (ROJO esperado)
+  ❌ L1-4: «dónde» vacío
+FAIL=1
+
+──── R-M6 · la fuente de A121 cambia un byte (ROJO esperado: su lista fija ya no vale)
+  ❌ la fuente de A121 (doc/registro/2026-10-05-auditoria-adr120-121/workflow.json) cambió (o falta): su lista fija ya no vale; vuelve a leerla.
+FAIL=1
+
+──── R-M7 · «sin ADR: commit» con un commit que no existe (ROJO esperado)
+  ❌ F-3: el commit deadbee no está en RPP.
+FAIL=1
+
+──── R-M8 · una fila que no sale de ninguna fuente (ROJO esperado)
+  ❌ filas de doc/control/hallazgos.tsv que NO SALEN de ninguna fuente: L9-9 
+FAIL=1
+
+──── R-M9 · una fila repetida (ROJO esperado)
+grep: input file '<tmp>/rmut/RPP/doc/control/hallazgos.tsv' is also the output
+  ✓ los 426 IDs de las auditorías tienen su fila y su estado, y son los de sus fuentes (183 hechos, 40 pendientes, 30 descartados, 173 sustituidos)
+FAIL=0
+
+──── R-M10 · «sustituido» con un T que no existe (ROJO esperado)
+  ❌ L5-03: T99 no es un T de la auditoría
+FAIL=1
+
+──── R-M11 · sin el registro (ROJO esperado)
+  ❌ falta doc/control/hallazgos.tsv.
+FAIL=1
+
+──── R-M9 bis · una fila repetida (ROJO esperado)
+2
+  ❌ IDs repetidos en doc/control/hallazgos.tsv: L1-1 
+  ❌ filas de doc/control/hallazgos.tsv que NO SALEN de ninguna fuente: L1-1 
+FAIL=1

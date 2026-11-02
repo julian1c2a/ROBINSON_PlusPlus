@@ -1,0 +1,110 @@
+== g_mut.bash, 2026-11-02, Git Bash (C:\Program Files\Git\bin\bash.exe), contra check-doc-sync.bash del árbol de trabajo ==
+
+──── M0 · sin mutar (verde esperado)
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+FAIL=0
+
+──── G-M1 · la cabecera de DEUDA_hasWitF_liftfc pierde SALDADA y 🏁 (ROJO esperado en [G])
+/-- **LA DEUDA**, 🏁 **SALDADA el 2026‑09‑10** por `Meta/LiftfcWitnessPrf.lean`
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+FAIL=0
+
+──── G-M2 · la cabecera sólo con 🏁 (pierde SALDADA): VERDE esperado en [G] (y [G.2] rojo: el ancla cambió)
+/-- **LA DEUDA**, 🏁 **el 2026‑09‑10** por `Meta/LiftfcWitnessPrf.lean`
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ❌ ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+FAIL=1
+   … y el mismo caso con el bloque SIN LC_ALL=C (en msys, ROJO esperado: el grep no ve 🏁):
+0
+  ❌ ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1315 — `DEUDA_hasWitF_liftfc` se anuncia como DEUDA y YA TIENE TESTIGO INCONDICIONAL:
+FAIL=1
+
+──── G-M3 · ConsistentH: su docstring dice «sin probar» (CRI-05; ROJO esperado en [G]: el testigo es consistencia)
+165:/-- Consistencia del **cálculo de Hilbert** `⊢ᴴ`: no demuestra `⊥`; sigue sin probar. -/
+  ❌ ROBINSON_PlusPlus/Meta/Hilbert.lean:166 — `ConsistentH` se anuncia como DEUDA y YA TIENE TESTIGO INCONDICIONAL:
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+FAIL=1
+
+──── G-M4 · ningún Prop (SIN MEDIR, ROJO esperado en [G])
+  ❌ SIN MEDIR: no encontré ningún `def`/`abbrev … : Prop` en ROBINSON_PlusPlus (¿cambió la forma?).
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+FAIL=1
+
+──── G2-M1 · un marcador nuevo sin fila (ROJO esperado en [G.2])
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ❌ marcadores en el árbol: 24 · filas declaradas: 23
+FAIL=1
+
+──── G2-M2 · un marcador declarado desaparece (ROJO esperado: YA NO CASA)
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ❌ ROBINSON_PlusPlus/Meta/DiagonalTwo.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ marcadores en el árbol: 22 · filas declaradas: 23
+FAIL=1
+
+──── G2-M3 · el marcador declarado, duplicado (ROJO esperado: AMBIGUA)
+grep: input file ‘<tmp>/mut/ROBINSON_PlusPlus/Meta/DiagonalTwo.lean’ is also the output
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+FAIL=0
+
+──── G2-M4 · una clase desconocida en la tabla (ROJO esperado)
+1
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ❌ ROBINSON_PlusPlus/Meta/DiagonalTwo.lean — clase desconocida «HISTORICO» (ABIERTA, DIFERIDA, OFERTA o HISTORIAL)
+FAIL=1
+
+──── G2-M5 · DEUDA dentro de un identificador, en prosa (VERDE esperado: no es palabra)
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+FAIL=0
+
+──── G2-M6 · árbol sin .lean (SIN MEDIR, ROJO esperado en los dos)
+  ❌ SIN MEDIR: no encontré ningún `def`/`abbrev … : Prop` en ROBINSON_PlusPlus (¿cambió la forma?).
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/DiagonalTwo.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ ROBINSON_PlusPlus/Meta/SolidezVerificador.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+  ❌ marcadores en el árbol: 0 · filas declaradas: 23
+  ❌ SIN MEDIR: no hay ningún .lean en ROBINSON_PlusPlus.
+FAIL=1
+
+== g_mut2.bash, la misma tarde ==
+──── G-M1 · la cabecera de DEUDA_hasWitF_liftfc pierde SALDADA y 🏁 (ROJO esperado en [G]; y [G.2], el ancla)
+/-- **LA DEUDA**, ** el 2026‑09‑10** por `Meta/LiftfcWitnessPrf.lean`
+  ❌ ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1315 — `DEUDA_hasWitF_liftfc` se anuncia como DEUDA y YA TIENE TESTIGO INCONDICIONAL:
+  ❌ ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean — la fila declarada (HISTORIAL) YA NO CASA con ningún marcador:
+FAIL=1
+
+──── G2-M3 · el marcador declarado, duplicado (ROJO esperado: AMBIGUA)
+1
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ❌ ROBINSON_PlusPlus/Meta/DiagonalTwo.lean — ancla AMBIGUA (2 marcadores): sigue ⬜.)
+  ❌ marcadores en el árbol: 24 · filas declaradas: 23
+FAIL=1
+
+──── G2-M1 bis · las líneas SIN DECLARAR se listan
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+  ❌ marcadores en el árbol: 24 · filas declaradas: 23
+        SIN DECLARAR → ROBINSON_PlusPlus/Meta/Rosser.lean:425:-- ⬜ falta la otra mitad
+FAIL=1

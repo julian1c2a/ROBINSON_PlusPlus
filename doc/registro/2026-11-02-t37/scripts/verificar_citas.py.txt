@@ -1,0 +1,49 @@
+"""Comprueba cada cita fichero:línea de hallazgos.tsv contra HEAD (git show) de
+RPP y de FOL, y avisa si en el árbol de trabajo la línea es otra (hay agentes
+trabajando en paralelo). Uso: verificar_citas.py <RPP> <FOL> <hallazgos.tsv>"""
+import re, sys, subprocess, collections
+
+RPP, FOL, TSV = sys.argv[1], sys.argv[2], sys.argv[3]
+cache = {}
+def head(repo, path):
+    k = (repo, path)
+    if k not in cache:
+        r = subprocess.run(['git', '-C', repo, 'show', 'HEAD:' + path], capture_output=True)
+        cache[k] = r.stdout.decode('utf-8', 'replace').split('\n') if r.returncode == 0 else None
+    return cache[k]
+def work(repo, path):
+    try:
+        return open(repo + '/' + path, encoding='utf-8').read().split('\n')
+    except Exception:
+        return None
+
+pat = re.compile(r'((?:\.\./FOL/)?[A-Za-z0-9_./\-]+\.(?:lean|md|bash|tsv|yml|py|txt|json)):(\d+)(?:-(\d+))?((?:\s*(?:y|,)\s*:\d+(?:-\d+)?)*)')
+problemas = collections.OrderedDict()
+n = 0
+for line in open(TSV, encoding='utf-8').read().split('\n')[1:]:
+    if not line:
+        continue
+    c = line.split('\t')
+    rid, ev = c[0], c[6] + ' ' + c[5]
+    for m in pat.finditer(ev):
+        path = m.group(1)
+        repo = RPP
+        if path.startswith('../FOL/'):
+            repo, path = FOL, path[len('../FOL/'):]
+        nums = [int(m.group(2))]
+        for extra in re.findall(r':(\d+)', m.group(4) or ''):
+            nums.append(int(extra))
+        H = head(repo, path)
+        Wk = work(repo, path)
+        for k in nums:
+            n += 1
+            if H is None:
+                problemas.setdefault(rid, []).append('%s: no está en HEAD' % m.group(0))
+            elif k > len(H):
+                problemas.setdefault(rid, []).append('%s:%d fuera de rango en HEAD (%d líneas)' % (path, k, len(H)))
+            elif Wk is not None and (k > len(Wk) or Wk[k - 1] != H[k - 1]):
+                problemas.setdefault(rid, []).append('%s:%d DISTINTA en el árbol de trabajo (HEAD: %r)' % (path, k, H[k - 1][:70]))
+print('citas comprobadas:', n)
+for k, v in problemas.items():
+    for x in v:
+        print(k, '|', x)

@@ -1,0 +1,15 @@
+T30 (ADR-238), 2026-11-02: DEPENDENCIES.md de RPP, CALCULADO por gen-dependencies.py (portado de FOL), y el --check en
+las dos CI.
+
+mutaciones.txt        el --check de RPP y el de FOL, vistos fallar sobre COPIAS (nunca el árbol): verde sin mutar y con
+                      sólo la marca de tiempo cambiada (M4: no cuenta); rojo con un import de más (M1 bis), un módulo
+                      nuevo (M2), uno borrado (M3) y una cifra retocada a mano (M5); con un ciclo (M6), el generador se
+                      niega y dice cuál. En FOL: verde sin mutar, rojo con un módulo nuevo. Antes de regenerar, el
+                      DEPENDENCIES.md a mano daba rc 1.
+mutaciones.sh.txt     los tres guiones (la ruta de la sesión, saneada a <tmp>). El M1 de la primera pasada no se aplicó
+                      (Meta/Rosser.lean no importa Meta.Hilbert; su grep lo enseña: 2 y 2 imports): lo repite t30_mut1.sh.
+
+Las cifras del generado (119 módulos, 389 aristas, profundidad 59) se re-midieron por otro camino el mismo día: los
+módulos con find, las aristas con grep sobre las líneas import (las de los nueve módulos de FOL, una a una) y la
+profundidad con una relajación de punto fijo en awk (59, en Meta.PurezaTitulares, 31 iteraciones). [A] compara además
+«119 módulos activos» y «Meta 116 +» con su propia cuenta en cada ejecución de check-doc-sync.bash.

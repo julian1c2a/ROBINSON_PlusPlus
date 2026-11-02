@@ -1,0 +1,31 @@
+# t30_mut.sh
+set -u
+RPP=/mnt/e/dropbox/github/lean4/ROBINSON_PlusPlus
+M="$1/t30mut"
+fresca() { rm -rf "$M"; mkdir -p "$M"; cp -r "$RPP/ROBINSON_PlusPlus" "$RPP/ROBINSON_PlusPlus.lean" "$RPP/gen-dependencies.py" "$RPP/DEPENDENCIES.md" "$M/"; find "$M" -name '*.olean' -delete 2>/dev/null; }
+caso() { echo "── $1"; (cd "$M" && python3 -I gen-dependencies.py --check; echo "rc=$?"); }
+fresca; caso "M0 sin mutar (rc 0 esperado)"
+fresca; sed -i '0,/^import ROBINSON_PlusPlus.Meta.Hilbert$/s//import ROBINSON_PlusPlus.Meta.Hilbert\nimport ROBINSON_PlusPlus.Meta.Godel/' "$M/ROBINSON_PlusPlus/Meta/Rosser.lean"; grep -c '^import' "$RPP/ROBINSON_PlusPlus/Meta/Rosser.lean" "$M/ROBINSON_PlusPlus/Meta/Rosser.lean"; caso "M1 un import de más en Meta/Rosser.lean (rc 1 esperado)"
+fresca; printf 'import ROBINSON_PlusPlus.Minimal.Axioms\n' > "$M/ROBINSON_PlusPlus/Meta/Nuevo.lean"; caso "M2 un módulo nuevo (rc 1 esperado)"
+fresca; rm "$M/ROBINSON_PlusPlus/Meta/ContratoTabla.lean"; sed -i '/ContratoTabla/d' "$M/ROBINSON_PlusPlus/Meta/PurezaTitulares.lean"; caso "M3 un módulo borrado (rc 1 esperado)"
+fresca; sed -i 's/^\*\*Last updated:\*\* 2026-11-02/**Last updated:** 2027-01-01/' "$M/DEPENDENCIES.md"; caso "M4 sólo la marca de tiempo cambia (rc 0 esperado: la marca no cuenta)"
+fresca; sed -i 's/389 aristas/388 aristas/' "$M/DEPENDENCIES.md"; caso "M5 una cifra retocada a mano (rc 1 esperado)"
+fresca; printf 'import ROBINSON_PlusPlus.Meta.Rosser\n' >> "$M/ROBINSON_PlusPlus/Minimal/SymLit.lean"; caso "M6 un ciclo (Minimal.SymLit importa Meta.Rosser: el generador se niega)"
+rm -rf "$M"
+
+# t30_mut1.sh (M1 bis: el M1 de arriba no se aplicó, Meta/Rosser.lean no importa Meta.Hilbert)
+RPP=/mnt/e/dropbox/github/lean4/ROBINSON_PlusPlus
+M="$1/t30mut"
+rm -rf "$M"; mkdir -p "$M"; cp -r "$RPP/ROBINSON_PlusPlus" "$RPP/ROBINSON_PlusPlus.lean" "$RPP/gen-dependencies.py" "$RPP/DEPENDENCIES.md" "$M/"
+sed -i '0,/^import /s//import ROBINSON_PlusPlus.Meta.Godel\nimport /' "$M/ROBINSON_PlusPlus/Meta/Rosser.lean"
+grep '^import' "$M/ROBINSON_PlusPlus/Meta/Rosser.lean"
+echo "── M1 bis: un import de más en Meta/Rosser.lean (rc 1 esperado)"; (cd "$M" && python3 -I gen-dependencies.py --check; echo "rc=$?")
+rm -rf "$M"
+
+# t30_fol.sh
+F=/mnt/e/dropbox/github/lean4/FOL
+M="$1/t30fol"
+fresca() { rm -rf "$M"; mkdir -p "$M"; cp -r "$F/FOL" "$F/TheoryFramework" "$F/FOL.lean" "$F/TheoryFramework.lean" "$F/gen-dependencies.py" "$F/DEPENDENCIES.md" "$M/"; }
+fresca; echo "── FOL M0 sin mutar (rc 0 esperado)"; (cd "$M" && python3 -I gen-dependencies.py --check; echo "rc=$?")
+fresca; printf 'import FOL.Core\n' > "$M/FOL/NuevoX.lean"; echo "── FOL M1 un módulo nuevo (rc 1 esperado)"; (cd "$M" && python3 -I gen-dependencies.py --check; echo "rc=$?")
+rm -rf "$M"

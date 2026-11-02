@@ -1,0 +1,331 @@
+{
+ "runId": "wf_68cece92-90b",
+ "workflow": "auditar-adr121 (auditoría adversarial de ADR-120/121)",
+ "journal": "<sesión 85b0df6c>/subagents/workflows/wf_68cece92-90b/journal.jsonl",
+ "lineas_result": [
+  6,
+  7,
+  8,
+  9
+ ],
+ "igual_a": "doc/registro/2026-10-05-auditoria-adr120-121/workflow.json (result), byte a byte por lente",
+ "esquema_id": "A121:<L><n>: L = G (refutar:goedelI), W (refutar:W1), T (refutar:tarski), P (refutar:promocion); n = posición en findings (1…)",
+ "veredicto_por_lente": {
+  "refutar:W1": "sostenido-con-reservas",
+  "refutar:tarski": "sostenido-con-reservas",
+  "refutar:goedelI": "sostenido-con-reservas",
+  "refutar:promocion": "sostenido-con-reservas"
+ },
+ "hallazgos": [
+  {
+   "id": "A121:W1",
+   "lente": "refutar:W1",
+   "agentId": "aafcc0a9921f66deb",
+   "linea_journal": 6,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "La cabecera de SolidezVerificador.lean atribuye el módulo a ADR‑122, y ese ADR no existe. El módulo pertenece a ADR‑121.",
+   "arreglo": "Cambiar «ADR‑122» por «ADR‑121» en SolidezVerificador.lean:10."
+  },
+  {
+   "id": "A121:W2",
+   "lente": "refutar:W1",
+   "agentId": "aafcc0a9921f66deb",
+   "linea_journal": 6,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "Tal como está escrito en la docstring, «todo número es el código de un término o de una fórmula» es falso. Lo cierto es que todo número se DECODIFICA a un término y a una fórmula. El «porque» además mezcla dos cosas: la totalidad viene de las ramas por defecto (dflt/⊥), y el espejo con substtcN/substfcN es lo que da la conmutación. «Es el inverso» exagera: dec es solo un inverso por la izquierda (una retracción) de codeNat.",
+   "arreglo": "Escribir «todo número se decodifica a un término (decT) y a una fórmula (dec): las formas que no son de nadie van a dflt o a ⊥; el espejo con substtcN/substfcN es lo que hace conmutar» y «dec es un inverso por la izquierda de codeNat»."
+  },
+  {
+   "id": "A121:W3",
+   "lente": "refutar:W1",
+   "agentId": "aafcc0a9921f66deb",
+   "linea_journal": 6,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "La cabecera de Consistencia.lean está desfasada respecto de su propio código. Afirma que el módulo NO dice V₀ = codeNatList axioms («un cálculo a mano dice que sí, sin medir»), pero el mismo fichero lo demuestra (V₀_eq_codigo, que es la pieza de la que depende la regla thy de W1).",
+   "arreglo": "Quitar V₀ = codeNatList axioms de «Lo que NO dice», añadir V₀_eq_codigo a la lista de la cabecera y poner «de los cuatro»."
+  },
+  {
+   "id": "A121:W4",
+   "lente": "refutar:W1",
+   "agentId": "aafcc0a9921f66deb",
+   "linea_journal": 6,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "(Fuera de la lente, módulo hermano.) La cabecera de TarskiPrf.lean dice que el Tarski SEMÁNTICO en ℕ está pendiente (⬜), pero el fichero lo demuestra. «Ni el ancla» también es discutible.",
+   "arreglo": "Mover tarski_semantico a la lista de lo que el módulo SÍ dice y precisar «no usa prf_ancla» (en lugar de «ni el ancla»)."
+  },
+  {
+   "id": "A121:W5",
+   "lente": "refutar:W1",
+   "agentId": "aafcc0a9921f66deb",
+   "linea_journal": 6,
+   "gravedad": "menor",
+   "medido": false,
+   "afirmacion": "Alcance de W1 (no es un defecto del enunciado): el verificador del modelo ACEPTA conclusiones que no son códigos de ninguna fórmula. Por eso la forma clásica «ℕ ⊨ Prov(n) → n = ⌜φ⌝ con Prf φ» es FALSA para este verificador. W1 está bien enunciado precisamente porque decodifica. El resumen de REFERENCE.md omite «decodificado», y leído literalmente afirma lo falso.",
+   "arreglo": "Añadir «decodificado» en REFERENCE.md:301. Dejar escrito en «Lo que NO dice» del módulo que W1 no da «Prov(n) → n es código», por si Rosser o una reflexión lo necesitan."
+  },
+  {
+   "id": "A121:W6",
+   "lente": "refutar:W1",
+   "agentId": "aafcc0a9921f66deb",
+   "linea_journal": 6,
+   "gravedad": "menor",
+   "medido": false,
+   "afirmacion": "Falta un control de vacuidad: el módulo no demuestra que las hipótesis de W1 sean satisfacibles, ni la equivalencia completa «MNV V₀ ⊨ provCodeC' φ ↔ Prf φ». Además, la ida (ev_provCodeC' + W1 + dec_codeNat) aparece copiada en línea tres veces.",
+   "arreglo": "Añadir `theorem prov_modelo_iff (φ) (v) : evalFormula (MNV V₀) v (provCodeC' φ) ↔ Prf φ` y usarlo en goedel_I_neg, godelCN_verdadera y con_verdadera."
+  },
+  {
+   "id": "A121:W7",
+   "lente": "refutar:W1",
+   "agentId": "aafcc0a9921f66deb",
+   "linea_journal": 6,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "(Detalle de redacción en ModeloCodigo.) La docstring de lineWFT dice que v_lineWF_* «cierra por Iff.rfl», pero el cierre real es la macro lwf con lineWFN_of_tag (.mp/.mpr) y un exact por igualdad definicional. La correspondencia sí la comprueba el núcleo; solo el nombre de la táctica es inexacto.",
+   "arreglo": "Escribir «cierra por `lineWFN_of_tag` (igualdad definicional en el `exact` de la macro `lwf`)»."
+  },
+  {
+   "id": "A121:T1",
+   "lente": "refutar:tarski",
+   "agentId": "a381ea777419736e0",
+   "linea_journal": 7,
+   "gravedad": "medio",
+   "medido": false,
+   "afirmacion": "`tarski` y `tarski_prf` no enuncian el teorema de Tarski. Piden el esquema T para TODA fórmula φ, abiertas incluidas, y esa hipótesis se refuta sin lema diagonal tomando φ := `#0 =eq zero`. Los dos teoremas son ciertos, pero baratos: el nombre, el 🏁 «SIN HIPÓTESIS» y los documentos les atribuyen más contenido del que tienen.",
+   "arreglo": "Poner como teorema titular `prf_tarski` junto con `liar_isSentence`, y dar como corolario sin hipótesis la versión sobre sentencias (`tarski_prf_sentences consistencia`, que hoy no existe). Rebajar `tarski` a una nota o acompañarlo de un `example` que lo derive por la fórmula abierta, sin `prf_diagonal`, que sirva de control de que ese enunciado es débil."
+  },
+  {
+   "id": "A121:T2",
+   "lente": "refutar:tarski",
+   "agentId": "a381ea777419736e0",
+   "linea_journal": 7,
+   "gravedad": "medio",
+   "medido": false,
+   "afirmacion": "`tarski_prf_sentences` restringe φ a sentencias pero no al lenguaje de la teoría. Con un átomo fresco (o una constante fresca), una sentencia refuta la hipótesis sin lema diagonal, así que este enunciado tampoco es el Tarski de los libros, donde φ y `Tr` son del lenguaje de la teoría.",
+   "arreglo": "Añadir una hipótesis de lenguaje: los símbolos de φ ⊆ los de `Tr` ∪ los de los 142. ⚠️ `FOL.Rename.symsFormula` (Rename.lean:428-430; :40 «Sólo símbolos de FUNCIÓN») ignora los símbolos de relación, así que hace falta otro colector. La alternativa es enunciar la forma existencial que la prueba ya da: ∀ Tr (con hTr), ∃ φ, IsSentence φ ∧ símbolos(φ) ⊆ símbolos(Tr) ∪ {substfc, tcFn, 0, σ} ∧ Prf ¬(Tr(⌜φ⌝) ⇔ φ). Es `prf_tarski` + `liar_isSentence` + una cuenta de símbolos."
+  },
+  {
+   "id": "A121:T3",
+   "lente": "refutar:tarski",
+   "agentId": "a381ea777419736e0",
+   "linea_journal": 7,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "`tarski_semantico` cuantifica sobre TODA fórmula (también las abiertas) bajo una asignación v fija. Es más débil que el Tarski semántico estándar, que va sobre sentencias, y el docstring dice más que el enunciado.",
+   "arreglo": "Añadir `tarski_semantico_sentences (hTr) : ¬ ∀ φ, IsSentence φ → (… ↔ …)`, que es la misma prueba con `h (liar Tr) (liar_isSentence hTr)`, o precisar el docstring: «sobre toda fórmula, bajo la asignación v»."
+  },
+  {
+   "id": "A121:T4",
+   "lente": "refutar:tarski",
+   "agentId": "a381ea777419736e0",
+   "linea_journal": 7,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "La cabecera del módulo está desfasada respecto de §7: dice que no hay Tarski semántico, no lista `tarski_semantico`, y su «no usa el ancla» no vale para `tarski` ni para `tarski_semantico`.",
+   "arreglo": "Reescribir el párrafo final de la cabecera: añadir `tarski_semantico` a la lista y limitar «no usa el ancla» a §1-§4."
+  },
+  {
+   "id": "A121:T5",
+   "lente": "refutar:tarski",
+   "agentId": "a381ea777419736e0",
+   "linea_journal": 7,
+   "gravedad": "menor",
+   "medido": false,
+   "afirmacion": "El control negativo de §6 es correcto, pero mide lo que no estaba en duda. Muestra que la consistencia hace falta; no muestra que el enunciado dependa del mentiroso, que es el riesgo real según la lente de vacuidad.",
+   "arreglo": "Añadir el control que sí discrimina: un `example` que derive la conclusión de `tarski` sin `prf_diagonal`, por la fórmula abierta, documentado como prueba de que ese enunciado es débil. Para la versión restringida, dejar enunciado que el mentiroso está en el lenguaje de `Tr` más {substfc, tcFn, 0, σ}."
+  },
+  {
+   "id": "A121:T6",
+   "lente": "refutar:tarski",
+   "agentId": "a381ea777419736e0",
+   "linea_journal": 7,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "Hay documentos que contradicen ADR‑121 en la misma línea donde anuncian Tarski (queda algo fuera de la lente estricta).",
+   "arreglo": "Actualizar los tres banners, la etiqueta ADR de SolidezVerificador y la fila de REFERENCE."
+  },
+  {
+   "id": "A121:G1",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "medio",
+   "medido": true,
+   "afirmacion": "La protección contra autoImplicit que declara el lakefile no actúa en `lake build`. Los módulos sin `set_option autoImplicit false` se compilan con autoImplicit=true y relaxedAutoImplicit=true: 105 de 112 en RPP y los 54 de FOL. Entre ellos está toda la cadena de Gödel I aguas arriba (Hilbert, ProofChain, DiagonalNumeral, DiagonalTwo, GodelTwo, GodelTwoPrf, Representability, Representability2Prf). En esa cadena NO hubo captura (medido), así que el riesgo es latente y no afecta a estos teoremas.",
+   "arreglo": "Añadir al `package` de lakefile.lean, y al de ../FOL/lakefile.lean, `leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]` y recompilar. Lo que rompa era una captura o dependía de autoImplicit."
+  },
+  {
+   "id": "A121:G2",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "Las docstrings de Meta/Consistencia.lean contradicen lo que el propio fichero, y el cambio en curso, demuestran. Además, a `goedel_I` lo llaman «GÖDEL I» cuando es sólo la mitad ⊬G.",
+   "arreglo": "Reescribir la cabecera: V₀_eq_codigo está en este fichero, y ⊬¬G y E10 en SolidezVerificador; los footprints son cuatro. Poner en `goedel_I` «GÖDEL I, la mitad ⊬G, sin hipótesis»."
+  },
+  {
+   "id": "A121:G3",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "Los banners de estado niegan resultados que este mismo cambio demuestra: E10 (G y Con verdaderas) y, en tres documentos, también ⊬¬G.",
+   "arreglo": "Quitar las dos reservas y dejar sólo «Lo que NO dice: Rosser (⊬R ∧ ⊬¬R sólo con ConsistentH, ⬜)»."
+  },
+  {
+   "id": "A121:G4",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "La cabecera de SolidezVerificador afirma que ⊬¬G «sale de la solidez Σ₁ que da el modelo». La prueba usa más: la solidez COMPLETA de Prf en MNV V₀, aplicada a fórmulas que no son Σ₁, y además goedel_I.",
+   "arreglo": "Escribir «sale de la solidez de Prf en el modelo estándar (prf_sound) y de W1»."
+  },
+  {
+   "id": "A121:G5",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "menor",
+   "medido": false,
+   "afirmacion": "La docstring dice «todo número es el código de un término o de una fórmula», y eso es falso tomado al pie de la letra. Lo demostrado es que todo número se DECODIFICA a algo.",
+   "arreglo": "Escribir «todo número se decodifica a un término o a una fórmula»."
+  },
+  {
+   "id": "A121:G6",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "La cabecera de SolidezVerificador cita un ADR que no existe.",
+   "arreglo": "Cambiar ADR‑122 por ADR‑121."
+  },
+  {
+   "id": "A121:G7",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "Ninguna declaración enuncia «G es indecidible». Los documentos lo dan por resultado, pero son dos teoremas en dos módulos.",
+   "arreglo": "Añadir `theorem goedel_I_indecidible : And (¬ Prf godelCN) (¬ Prf (neg godelCN)) := ⟨goedel_I, goedel_I_neg⟩` y su fila en check-footprints."
+  },
+  {
+   "id": "A121:G8",
+   "lente": "refutar:goedelI",
+   "agentId": "a250b413b89e7b617",
+   "linea_journal": 8,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "(Fuera de la lente.) La cabecera de TarskiPrf niega el Tarski semántico que su §7 demuestra, y dice que no usa el ancla cuando `tarski` la usa a través del modelo.",
+   "arreglo": "Actualizar la cabecera. Precisar que prf_tarski y tarski_prf no usan el ancla como paso de Prf, y que tarski sí la usa a través del modelo."
+  },
+  {
+   "id": "A121:P1",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "medio",
+   "medido": true,
+   "afirmacion": "El «check-doc-sync verde» de ADR‑120 §3 no podía ver el defecto que luego puso la CI en rojo. `[E]` está ciego antes del commit: compara la marca «Last updated» con la fecha del último COMMIT que tocó el documento y no mira el árbol de trabajo. ADR‑121 arregla el documento, pero no la herramienta.",
+   "arreglo": "En [E], si `git status --porcelain -- \"$d\"` no está vacío, tomar GIT_DATE=$(date +%F). Añadir un autotest: un .md de prueba con el cuerpo modificado y la marca sin subir debe dar rojo."
+  },
+  {
+   "id": "A121:P2",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "medio",
+   "medido": true,
+   "afirmacion": "Los banners de estado del árbol de trabajo dicen lo contrario de lo que el build demuestra con ADR‑121: siguen diciendo que no se prueba que G y Con sean verdaderas, ni ⊬¬G.",
+   "arreglo": "Reescribir el «Lo que NO dice» de los siete banners: de lo abierto sólo quedan Rosser y el control negativo de ax_tc_cons."
+  },
+  {
+   "id": "A121:P3",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "Hay docstrings de módulo desfasados y una referencia a un ADR que no existe.",
+   "arreglo": "Corregir los tres docstrings y poner ADR‑121."
+  },
+  {
+   "id": "A121:P4",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "El autotest del censo «evaluar el ancla» no cubre `selfAppN` ni `liar`, dos de las cinco fichas que añadió ADR‑120. En total, 12 de las 22 fichas de EV_TOK podrían quitarse o escribirse mal sin que el autotest lo note.",
+   "arreglo": "Generar la ficha a partir de las alternativas del propio EV_TOK, una línea `#eval <ficha>` por alternativa. Como mínimo, añadir `#eval selfAppN ⊥` y `#reduce liar ⊥` a la lista esperada."
+  },
+  {
+   "id": "A121:P5",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "La promoción dejó de publicar los footprints del modelo. Tres de los cinco módulos no tienen ningún titular, aunque ADR‑120 dice «Los cinco, con footprint… en sus titulares». Además, la afirmación «sin Classical.choice» no tiene medición detrás.",
+   "arreglo": "Poner `#print axioms` y fila para MN_axioms y v_ancla. Para un lema de listas (por ejemplo decodeL_encodeL), poner fila con [propext, Quot.sound] o borrar la frase."
+  },
+  {
+   "id": "A121:P6",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "La columna de solidez de check-estratos está bien rellenada, pero sólo comprueba que el teorema exista y que su tipo mencione el inductivo. No comprueba que sea un teorema de solidez.",
+   "arreglo": "Que @SOL exija además que la conclusión tenga la forma `∀ v, evalFormula _ v _` (cabeza `evalFormula`). Corregir el comentario de sincronía o completar §0bis."
+  },
+  {
+   "id": "A121:P7",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": false,
+   "afirmacion": "Que las macros no reserven palabras para quien importe `ROBINSON_PlusPlus` es correcto por la semántica de Lean, pero no está medido: la evidencia que se cita, la tabla de sondeos 32/53, no puede detectar una fuga.",
+   "arreglo": "Añadir un sondeo de control que compile, que importe ROBINSON_PlusPlus y que use abre, prems, lwf, vpf_paso y decodifica como identificadores."
+  },
+  {
+   "id": "A121:P8",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "ADR‑121 mete FOL.Lift0, FOL.Eigenvariable y FOL.Derives0 en el cierre del build y en el de todos los sondeos que importan el barril, sin registrarlo. Con ellos llegan notación y un lema simp globales.",
+   "arreglo": "Registrarlo en ADR‑121 y volver a medir los 85 sondeos, como se hizo en ADR‑120."
+  },
+  {
+   "id": "A121:P9",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "`tarski_prf_sentences` es un titular con fila de footprint y conserva la hipótesis `hcon : ConsistentH`, aunque ya hay un teorema del build que la descarga.",
+   "arreglo": "Añadir `tarski_sentences := tarski_prf_sentences consistencia` y pasarle la fila de footprint."
+  },
+  {
+   "id": "A121:P10",
+   "lente": "refutar:promocion",
+   "agentId": "a560efd3f2b7ce321",
+   "linea_journal": 9,
+   "gravedad": "menor",
+   "medido": true,
+   "afirmacion": "Hay cifras con la etiqueta de ámbito vieja, una medición que no se reproduce y un «uno por símbolo» que no es exacto.",
+   "arreglo": "Al re‑medir, actualizar la etiqueta con fecha y ADR; cambiar 490 por la cifra medida; matizar «uno por símbolo de codificación y de relación»."
+  }
+ ]
+}

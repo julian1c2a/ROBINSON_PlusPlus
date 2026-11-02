@@ -1,0 +1,22 @@
+"""Resume el censo: para cada familia, en que ficheros aparece (fuera de doc/registro)."""
+import sys, collections, re
+
+rows = [l.rstrip('\n').split('\t') for l in open(sys.argv[1], encoding='utf-8')]
+fams = sys.argv[2].split(',') if len(sys.argv) > 2 else None
+
+def grp(f):
+    if f.startswith('doc/registro/'):
+        return 'registro'
+    return f
+
+by = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
+for fam, i, f, ln in rows:
+    if fams and fam not in fams:
+        continue
+    by[fam][grp(f)][i] += 1
+
+for fam in by:
+    print('=====', fam)
+    for f, c in sorted(by[fam].items(), key=lambda kv: -sum(kv[1].values())):
+        ids = sorted(c, key=lambda s: [int(x) if x.isdigit() else x for x in re.split(r'(\d+)', s)])
+        print('  %-60s %4d  %s' % (f, sum(c.values()), ' '.join(ids)[:400]))

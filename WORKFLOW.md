@@ -1,7 +1,7 @@
 # Development Workflow
 
 **Author**: Julián Calderón Almendros
-**Last updated:** 2026-11-01 — [ADR‑235](DECISIONS.md) (T21): los controles, contra el código (el gate es la CI entera; los ganchos versionados de T14; qué mira cada control). Antes, 2026-10-28 — ADR‑212: el orden del bump del toolchain (Parte 4). Antes, 2026-06-05 — Adaptado a flujo IA + opción legacy `git-lock.bash`.
+**Last updated:** 2026-11-02 — ADR‑238 (T30): la fila de DEPENDENCIES.md, generado. Antes, 2026-11-01 — [ADR‑235](DECISIONS.md) (T21): los controles, contra el código (el gate es la CI entera; los ganchos versionados de T14; qué mira cada control). Antes, 2026-10-28 — ADR‑212: el orden del bump del toolchain (Parte 4). Antes, 2026-06-05 — Adaptado a flujo IA + opción legacy `git-lock.bash`.
 
 Guía operativa para colaborar en este proyecto. Cubre los **dos modos** activos: sesiones con asistente IA (modo principal) y trabajo humano con `git-lock.bash` (legacy, opcional).
 
@@ -232,7 +232,7 @@ modelo**, no argumentando.
 | `TEOREMAS-E-HIPOTESIS.md` | Los titulares y quién descarga cada hipótesis ([T]). |
 | `AXIOMS.md` | El inventario de los axiomas (M‑1). |
 | `PLAN-PRUEBAS.md` | Qué comprueba cada control, y qué no (normativo; autoritativo para `check-doc-sync.bash`). |
-| `DEPENDENCIES.md` | Grafo de dependencias ANTERIOR a ADR‑115: no describe el árbol de hoy (el catálogo, en `REFERENCE.md` §1), y ningún control lo compara con los import (T30). ✏️ 2026‑10‑31 (T21, ADR‑235): decía «verificado contra imports». |
+| `DEPENDENCIES.md` | Grafo de dependencias GENERADO por `gen-dependencies.py` desde las líneas `import`, y su `--check` en la CI (T30, ADR‑238): tras cambiar un `import`, se regenera (✏️ 2026‑11‑02: decía que era anterior a ADR‑115 y que ningún control lo comparaba con los import). ✏️ 2026‑10‑31 (T21, ADR‑235): decía «verificado contra imports». |
 | `MINIMAL-AXIOMS.md` | Análisis comparativo del sistema axiomático vs Q/PA⁻. |
 | `DECISIONS.md` | ADRs (decisiones arquitectónicas). |
 | `THOUGHTS.md` | Diario informal (no normativo). |

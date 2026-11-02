@@ -1,0 +1,39 @@
+#!/bin/bash
+# Mutaciones de [S] (T10), en un clon --shared de RPP (nunca el repositorio): el bloque [S] de check-doc-sync.bash del
+# árbol de trabajo, tal cual.
+export PATH="/usr/bin:$PATH"
+RPP=/e/dropbox/github/lean4/ROBINSON_PlusPlus
+S=<tmp>
+C="$S/smut"
+BLK="$S/s_block_only.bash"
+awk '/^# ─── \[S\] LAS CITAS DE SONDEOS DEL BUILD/,/^\[ "\$S_FAIL" = "0" \] \|\| FAIL=1/' "$RPP/check-doc-sync.bash" > "$BLK"
+[ -s "$BLK" ] || { echo "sin bloque"; exit 2; }
+fresca() { rm -rf "$C"; git clone -q --shared "$RPP" "$C"; }
+corre() { (cd "$C" && FAIL=0 && . "$BLK" && echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|FAIL=|^      ROBINSON' | cut -c1-190; }
+caso() { echo; echo "──── $1"; }
+
+caso "S-M0 · sin mutar (verde esperado)"
+fresca; corre
+
+caso "S-M1 · una cita nueva a un sondeo de REGISTRO (ROJO esperado: sin declarar)"
+fresca; printf '%s\n' '-- (lo mide `sondeos/ChoiceFrontera.lean`)' >> "$C/ROBINSON_PlusPlus/Meta/Rosser.lean"; corre
+
+caso "S-M2 · desaparece una de las dos citas de procedencia de Meta/Rosser.lean (ROJO esperado: la fila no cuadra)"
+fresca; LC_ALL=C sed -i 's|(de `sondeos/ExtensionPorReduccion.lean`)|(de la extensión por reducción)|' "$C/ROBINSON_PlusPlus/Meta/Rosser.lean"
+grep -c 'sondeos/ExtensionPorReduccion' "$C/ROBINSON_PlusPlus/Meta/Rosser.lean"; corre
+
+caso "S-M3 · una cita a un sondeo ARCHIVADO sin su etiqueta (ROJO esperado)"
+fresca; printf '%s\n' '-- (de `sondeos/DescensoLiftc.lean`)' >> "$C/ROBINSON_PlusPlus/Meta/Rosser.lean"; corre
+
+caso "S-M4 · una cita archivada con un fichero que no está en la etiqueta (ROJO esperado)"
+fresca; printf '%s\n' '-- (de `archivo/sondeos-2026-10:sondeos/NoExiste.lean`)' >> "$C/ROBINSON_PlusPlus/Meta/Rosser.lean"; corre
+
+caso "S-M5 · una cita nueva a un sondeo de CONTROL (VERDE esperado: puede ser evidencia)"
+fresca; printf '%s\n' '-- (lo vigila `sondeos/CraigEqVacuo.lean`)' >> "$C/ROBINSON_PlusPlus/Meta/Rosser.lean"; corre
+
+caso "S-M6 · sondeos/CONTROLES.txt vacío (SIN MEDIR, ROJO esperado)"
+fresca; : > "$C/sondeos/CONTROLES.txt"; corre
+
+caso "S-M7 · PrfHMono pasa a CONTROL (ROJO esperado: su fila de procedencia sobra; las dos citas son ya de CONTROL)"
+fresca; echo PrfHMono.lean >> "$C/sondeos/CONTROLES.txt"; corre
+rm -rf "$C"

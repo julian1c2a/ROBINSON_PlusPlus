@@ -1,0 +1,18 @@
+== el grep 3.0 de msys (/usr/bin/grep) y el 🏁 (U+1F3C1, fuera del plano básico), 2026-11-02 ==
+$ grep --version | head -1
+grep (GNU grep) 3.0
+$ locale | head -2
+LANG=es_ES.UTF-8
+LC_CTYPE="es_ES.UTF-8"
+$ grep -cF '🏁' ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean
+0
+$ LC_ALL=C grep -cF '🏁' ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean
+4
+$ grep -cF '⬜' ROBINSON_PlusPlus/Meta/DiagonalTwo.lean   # (U+2B1C, plano básico: sí casa)
+1
+$ sed -n '1293s/🏁 X/Y/p' ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean | wc -l   # tampoco sed
+(G-M1 de g_mut.bash: la línea salió intacta; con LC_ALL=C, se aplicó)
+
+== WSL (Ubuntu, el grep de la CI): ==
+grep (GNU grep) 3.12
+4

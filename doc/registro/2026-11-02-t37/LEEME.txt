@@ -1,0 +1,29 @@
+T37 (ADR-241), 2026-11-02: el registro versionado de los hallazgos de las auditorías, doc/control/hallazgos.tsv
+(426 filas, una por ID), y [R] en check-doc-sync.bash, que exige a cada ID su fila y su estado.
+
+Lo construyó un agente de sólo lectura sobre RPP 6cdd2dd y FOL b5c5e1c; el coordinador lo integró y escribió [R].
+
+LEEME-agente.txt      el informe del agente, tal cual (rutas saneadas): las fuentes leídas y cuáles traen lista, el
+                      formato de los IDs (los prefijos de los ambiguos y los SINTÉTICOS de A121 y A123), cómo se
+                      re-extraen de ficheros versionados, los recuentos, los 40 pendientes, los inferidos y lo que
+                      pide una decisión del propietario.
+fuentes/              las listas de los workflows en forma compacta (wf_68cece92-90b, wf_107c9121-80b, wf_e04d70c1-e0c y
+                      los 163 candidatos de wf_1f61bc0d-738), lo único que sólo vivía en un journal (el «no_cubierto» y
+                      las «fuentes_leidas» de los seis barridos: wf_1f61bc0d-738-no-cubierto.json) y EXTRACCION.txt
+                      (qué línea de qué journal, sha256, y la comparación con la copia versionada). ⭐ Las cuatro listas
+                      que T37 daba por «fuera de git» ya las había versionado T00 (ADR-132), idénticas.
+scripts/              los guiones del agente, con «.txt» detrás: construir.py (genera el registro con las decisiones de
+                      estado escritas dentro, y valida IDs únicos, ADR y T existentes), reextraer.py (la re-extracción
+                      con json.load: la implementación de referencia de [R]; el 2026-11-02, 426 = 426 contra el
+                      registro versionado, como [R]), verificar_citas.py (las 347 citas fichero:línea, contra HEAD) y
+                      los auxiliares del censo. Los intermedios (work/) no se guardan: los regenera construir.py.
+mutaciones-R.txt      [R] visto fallar en clones --shared de RPP y FOL: verde sin mutar; rojo con una fila borrada (R-M1),
+                      un hallazgo nuevo en una fuente (R-M2), un ADR que no existe (R-M3), un estado inventado (R-M4),
+                      «dónde» vacío (R-M5), la fuente de A121 cambiada en un byte (R-M6), un commit que no existe
+                      (R-M7), una fila sin fuente (R-M8), una fila repetida (R-M9 bis), un T que no existe (R-M10) y sin
+                      el registro (R-M11).
+mutaciones-R.bash.txt los dos guiones (la ruta de la sesión, saneada a <tmp>).
+
+Las citas fichero:línea de la columna «evidencia» son del 2026-11-02 (RPP 6cdd2dd, FOL b5c5e1c) y envejecen con el
+árbol; [R] no las mira. Los «sustituido» que apuntan a T30, T32, T37 y T39 (cerrados el mismo día) dicen el estado que
+tenían esos T en 6cdd2dd: su evidencia cambia con el cierre, no su estado.

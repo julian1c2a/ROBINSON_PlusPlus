@@ -1,0 +1,67 @@
+"""Comparacion fina del journal de wf_1f61bc0d-738 con candidatos.json."""
+import json, sys, collections
+
+W = sys.argv[1]
+R = sys.argv[2]
+cands = json.load(open(R + '/doc/registro/2026-10-12-auditoria-suelo/candidatos.json', encoding='utf-8'))
+started = {}
+items, verds, nuevos, extra = {}, {}, {}, {}
+for i, l in enumerate(open(W + '/wf_1f61bc0d-738/journal.jsonl', encoding='utf-8'), 1):
+    d = json.loads(l)
+    if d['type'] == 'started':
+        started[d['key']] = d['label']
+    if d['type'] == 'result':
+        lab = started[d['key']]
+        dim = lab.split(':')[1]
+        r = d['result']
+        if lab.startswith('buscar'):
+            items[dim] = r['items']
+            extra[dim] = {'fuentes_leidas': r.get('fuentes_leidas'), 'no_cubierto': r.get('no_cubierto'), 'linea': i}
+        else:
+            verds[dim] = r['veredictos']
+            nuevos[dim] = r['nuevos']
+            extra.setdefault(dim + '#v', {})['linea'] = i
+
+jset = set()
+for dim in items:
+    for it in items[dim]:
+        jset.add((dim, it['id'], 'item'))
+    for nv in nuevos[dim]:
+        jset.add((dim, nv['id'], 'nuevo'))
+cset = set((c['dim'], c['id']) for c in cands)
+print('journal (dim,id):', len(set((a, b) for a, b, _ in jset)), ' candidatos.json:', len(cset))
+print('solo en journal:', sorted(set((a, b) for a, b, _ in jset) - cset))
+print('solo en candidatos:', sorted(cset - set((a, b) for a, b, _ in jset)))
+
+# claves
+print('claves item journal:', sorted(items['ruta'][0].keys()))
+print('claves nuevo journal:', sorted(nuevos['ruta'][0].keys()))
+print('claves veredicto journal:', sorted(verds['ruta'][0].keys()))
+print('claves candidato:', sorted(cands[0].keys()))
+
+# veredicto y titulo
+cd = {(c['dim'], c['id']): c for c in cands}
+bad = 0
+for dim in items:
+    vd = {v['id']: v for v in verds[dim]}
+    for it in items[dim]:
+        c = cd[(dim, it['id'])]
+        v = vd.get(it['id'])
+        if c['titulo'] != it['titulo']:
+            bad += 1; print('titulo distinto', dim, it['id'])
+        if v is None:
+            print('sin veredicto', dim, it['id'])
+        elif v['veredicto'] != c['veredicto']:
+            bad += 1; print('veredicto distinto', dim, it['id'], v['veredicto'], c['veredicto'])
+    for nv in nuevos[dim]:
+        c = cd[(dim, nv['id'])]
+        if c['titulo'] != nv['titulo']:
+            bad += 1; print('titulo distinto (nuevo)', dim, nv['id'])
+        if c['veredicto'] != 'nuevo_verificador':
+            bad += 1; print('nuevo con veredicto', dim, nv['id'], c['veredicto'])
+print('discrepancias de titulo/veredicto:', bad)
+vc = collections.Counter(c['veredicto'] for c in cands)
+print('veredictos en candidatos.json:', vc)
+vj = collections.Counter(v['veredicto'] for dim in verds for v in verds[dim])
+print('veredictos en journal:', vj)
+json.dump(extra, open(sys.argv[3], 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

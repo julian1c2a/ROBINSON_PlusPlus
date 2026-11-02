@@ -2,7 +2,7 @@
 description: Comprueba que la documentación cuadra con el código real (AI-GUIDE §27) y corrige lo que falle
 ---
 
-**Last updated:** 2026-11-01 — revisado ENTERO en T21 (ADR‑235): cada afirmación, contra el código y `.github/workflows/build.yml`. Antes, 2026-09-11 (la marca que no tenía, puesta en T24, ADR‑233, con la fecha de su última revisión real).
+**Last updated:** 2026-11-02 — los cinco bloques nuevos de `check-doc-sync.bash` ([G], [G.2], [P], [R] y [S]; ADR‑237, 240, 241 y 243), la regla de la consistencia de [I] (ADR‑237) y el `--check` de DEPENDENCIES (ADR‑238). Antes, 2026-11-01 — revisado ENTERO en T21 (ADR‑235): cada afirmación, contra el código y `.github/workflows/build.yml`. Antes, 2026-09-11 (la marca que no tenía, puesta en T24, ADR‑233, con la fecha de su última revisión real).
 
 Ejecuta el control de sincronía documentación ↔ código y **deja el repositorio en verde**.
 
@@ -21,9 +21,15 @@ Ejecuta el control de sincronía documentación ↔ código y **deja el reposito
    Rompen también, y se corrigen igual: la VERDAD DEL CÓDIGO si no puede medir (los axiom, los sorry o, sin --quick,
    los jobs); [L], el cierre de imports del barril = el disco = git (ADR‑163); [EOL], ningún blob con CRLF en el
    índice (ADR‑200); [H], el PATH higiénico de los .bash versionados (ADR‑201); [I], las frases que un teorema vivo
-   desmiente (⊬¬G, Rosser y Löb; ADR‑169); [N], las citas por número de línea (ADR‑209); [F], ningún .olean sin
-   fuente; [H], el catálogo de sondeos/, en los dos sentidos (ADR‑084); [M], lo que nombra la columna «Verificación»
-   de los MANDATORIES (ADR‑133); y [T], los titulares y sus filas en `TEOREMAS-E-HIPOTESIS.md` (ADR‑135).
+   desmiente (⊬¬G, Rosser, Löb y, desde ADR‑237, la consistencia «sin probar»; ADR‑169); [N], las citas por número
+   de línea (ADR‑209); [F], ningún .olean sin fuente; [H], el catálogo de sondeos/, en los dos sentidos (ADR‑084);
+   [M], lo que nombra la columna «Verificación» de los MANDATORIES (ADR‑133); [T], los titulares y sus filas en
+   `TEOREMAS-E-HIPOTESIS.md` (ADR‑135); y, desde el 2026‑11‑02, [G] (una deuda enunciada que ya tiene testigo: se
+   corrige su cabecera) y [G.2] (todo marcador de deuda de los `.lean`, clasificado en su tabla; ADR‑237), [P] (un
+   footprint de la prosa que no es el de su fila: se corrige el texto o, si cuenta el de antes, se declara;
+   ADR‑240), [R] (cada ID de las auditorías con su fila y su estado en `doc/control/hallazgos.tsv`; ADR‑241) y [S]
+   (una cita de un sondeo que no es de CONTROL ni archivada se declara como procedencia, o el sondeo pasa a CONTROL;
+   ADR‑243). Y DEPENDENCIES.md no se edita: se regenera con `gen-dependencies.py` (ADR‑238).
 3. **[B] citas muertas** — **rompe**: desde ADR‑084 (2026‑09‑22), con trinquete por símbolo; desde ADR‑166
    (2026‑10‑18), por cita, con la deuda en `doc/control/b-deuda.tsv` y, desde ADR‑167, techo en la base verificada.
    *(✏️ 2026‑10‑31, T21, ADR‑235: decía «desde ADR‑166 (2026‑10‑18) rompe».)* Por cada cita reportada, decide:
@@ -68,7 +74,7 @@ $ARGUMENTS
 («histórico», «previo», «entonces», «retirado»…, lo citado entre «…» y lo tachado), y una cifra vieja sin marcar o
 está en su tabla de deuda o es rojo. [E] mira sólo la FECHA del sello: un banner puede estar **al día en sus cifras y
 mintiendo en su frase** —así llegaron seis documentos autoritativos a llevar el mismo titular falso—, y si el sello se
-sube sin releer la frase, ya no lo ve nadie, salvo [I] para las afirmaciones de su lista (hoy, ⊬¬G, Rosser y Löb). Al subir el sello,
+sube sin releer la frase, ya no lo ve nadie, salvo [I] para las afirmaciones de su lista (hoy, ⊬¬G, Rosser, Löb y la consistencia). Al subir el sello,
 relee lo que el titular afirma. *(✏️ 2026‑10‑31, T21, ADR‑235: decía «Los dos avisos»; [E] rompe desde ADR‑072,
 2026‑09‑18, y [A2] desde ADR‑169, 2026‑10‑19.)*
 

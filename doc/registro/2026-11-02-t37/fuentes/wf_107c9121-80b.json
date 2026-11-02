@@ -1,0 +1,110 @@
+{
+ "runId": "wf_107c9121-80b",
+ "workflow": "adr123-review-and-scout (auditoría adversarial de ADR-123)",
+ "journal": "<sesión 85b0df6c>/subagents/workflows/wf_107c9121-80b/journal.jsonl",
+ "lineas_result": [
+  5,
+  6,
+  7
+ ],
+ "igual_a": "doc/registro/2026-10-05-auditoria-adr123/workflow.json (result.review y result.scout), byte a byte",
+ "esquema_id": "A123:R<n> = el punto «**n.**» del informe review:adversarial (1-6) y, en orden, las tres viñetas de «Other issues found along the way» (7-9); A123:D1/D2 = review:duplicates (ningún duplicado; lo nuevo, contado corto); A123:S1 = scout:junk-guard (exploración, no hallazgo)",
+ "hallazgos": [
+  {
+   "id": "A123:R1",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "\"sin inducción sobre la fórmula y sin tocar a mano un axioma de codificación\"",
+   "veredicto": "imprecise."
+  },
+  {
+   "id": "A123:R2",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "\"No pide Prf guarda: basta que la guarda sea verdadera en el modelo\"",
+   "veredicto": "holds."
+  },
+  {
+   "id": "A123:R3",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "No-vacuity",
+   "veredicto": "holds in substance; the wording is imprecise."
+  },
+  {
+   "id": "A123:R4",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "\"Hoy ningún lema refuta una guarda (0 apariciones de `neg (hasWit` en `Meta/`)\"",
+   "veredicto": "refuted."
+  },
+  {
+   "id": "A123:R5",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "The figures",
+   "veredicto": "«180 líneas»: refuted; «18 teoremas»: holds; «unas 110 de prueba»: imprecise"
+  },
+  {
+   "id": "A123:R6",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "Argument order and direction",
+   "veredicto": "holds."
+  },
+  {
+   "id": "A123:R7",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "\"con las guardas Π₁\"",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A123:R8",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "\"Cuatro piezas que ya estaban … lo único nuevo es que `tcFn` codifica `numeralM`\"",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A123:R9",
+   "agente": "review:adversarial",
+   "agentId": "a000bdb497e1ec004",
+   "linea_journal": 7,
+   "titular": "`ev_numeral` (L56-60)",
+   "veredicto": "re-deriva lo existente"
+  },
+  {
+   "id": "A123:D1",
+   "agente": "review:duplicates",
+   "agentId": "acacfbdff2a31f603",
+   "linea_journal": 5,
+   "titular": "**Exact duplicates: none.** None of the 18 theorems in `sondeos/RosserReflexion.lean` already exists with the same statement, under any name or namespace, in `ROBINSON_PlusPlus/` or `sondeos/`. None of the 18 names appears anywhere else in the repo either (`.lean` or `.md`).",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A123:D2",
+   "agente": "review:duplicates",
+   "agentId": "acacfbdff2a31f603",
+   "linea_journal": 5,
+   "titular": "P/DECISIONS.md:9520 says the only new piece is `tcFn` encoding `numeralM` (`decT_tcFnN`). At the level of declarations that undercounts: besides `decT_tcFnN`, these have no prior counterpart even up to rewriting:",
+   "veredicto": "undercounts"
+  },
+  {
+   "id": "A123:S1",
+   "agente": "scout:junk-guard",
+   "agentId": "a66c7c199985a1a3a",
+   "linea_journal": 6,
+   "titular": "**Scouting report: refuting `hasWit (numeralM 0)` in `Prf` (read-only; nothing was compiled or run)**",
+   "veredicto": "exploración"
+  }
+ ]
+}

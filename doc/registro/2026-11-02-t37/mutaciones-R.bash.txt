@@ -1,0 +1,67 @@
+# r_mut.bash
+#!/bin/bash
+# Mutaciones de [R] (T37), en clones --shared de RPP y FOL (nunca los repositorios): el bloque [R] de check-doc-sync.bash
+# del árbol de trabajo, tal cual, con el registro del árbol de trabajo.
+export PATH="/usr/bin:$PATH"
+RPP=/e/dropbox/github/lean4/ROBINSON_PlusPlus
+FOLD=/e/dropbox/github/lean4/FOL
+S=<tmp>
+W="$S/rmut"; C="$W/RPP"
+BLK="$S/r_block_only.bash"
+awk '/^# ─── \[R\] REGISTRO DE HALLAZGOS/,/^\[ "\$R_FAIL" = "0" \] \|\| FAIL=1/' "$RPP/check-doc-sync.bash" > "$BLK"
+[ -s "$BLK" ] || { echo "sin bloque"; exit 2; }
+rm -rf "$W"; mkdir -p "$W"
+git clone -q --shared "$FOLD" "$W/FOL"
+fresca() { rm -rf "$C"; git clone -q --shared "$RPP" "$C"; mkdir -p "$C/doc/control"; cp "$RPP/doc/control/hallazgos.tsv" "$C/doc/control/"; }
+corre() { (cd "$C" && FAIL=0 && . "$BLK" && echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|FAIL=' | cut -c1-200; }
+caso() { echo; echo "──── $1"; }
+T="$C/doc/control/hallazgos.tsv"
+
+caso "R-M0 · sin mutar (verde esperado)"
+fresca; corre
+
+caso "R-M1 · se borra la fila de L2-6 (ROJO esperado: un ID de la fuente sin fila)"
+fresca; LC_ALL=C sed -i '/^L2-6	/d' "$T"; corre
+
+caso "R-M2 · un hallazgo nuevo en una fuente (F-11 en la auditoría del 2026-09-11; ROJO esperado)"
+fresca; printf '\n### F-11 · un hallazgo de más\n' >> "$C/doc/AUDITORIA-2026-09-11.md"; corre
+
+caso "R-M3 · «hecho» con ADR-999 (ROJO esperado)"
+fresca; LC_ALL=C awk -F'\t' 'BEGIN { OFS = "\t" } $1 == "L1-2" { $6 = "ADR-999" } { print }' "$T" > "$T.x" && mv "$T.x" "$T"; corre
+
+caso "R-M4 · un estado inventado (ROJO esperado)"
+fresca; LC_ALL=C awk -F'\t' 'BEGIN { OFS = "\t" } $1 == "L1-3" { $5 = "cerrado" } { print }' "$T" > "$T.x" && mv "$T.x" "$T"; corre
+
+caso "R-M5 · «dónde» vacío (ROJO esperado)"
+fresca; LC_ALL=C awk -F'\t' 'BEGIN { OFS = "\t" } $1 == "L1-4" { $6 = "" } { print }' "$T" > "$T.x" && mv "$T.x" "$T"; corre
+
+caso "R-M6 · la fuente de A121 cambia un byte (ROJO esperado: su lista fija ya no vale)"
+fresca; printf ' ' >> "$C/doc/registro/2026-10-05-auditoria-adr120-121/workflow.json"; corre
+
+caso "R-M7 · «sin ADR: commit» con un commit que no existe (ROJO esperado)"
+fresca; LC_ALL=C awk -F'\t' 'BEGIN { OFS = "\t" } $5 == "hecho" && $6 ~ /^sin ADR: commit / && !h { $6 = "sin ADR: commit deadbee"; h = 1 } { print }' "$T" > "$T.x" && mv "$T.x" "$T"; corre
+
+caso "R-M8 · una fila que no sale de ninguna fuente (ROJO esperado)"
+fresca; printf 'L9-9\to\tr\tv\thecho\tADR-120\te\n' >> "$T"; corre
+
+caso "R-M9 · una fila repetida (ROJO esperado)"
+fresca; LC_ALL=C grep '^L1-1	' "$T" >> "$T"; corre
+
+caso "R-M10 · «sustituido» con un T que no existe (ROJO esperado)"
+fresca; LC_ALL=C awk -F'\t' 'BEGIN { OFS = "\t" } $5 == "sustituido" && !h { $6 = "T99"; h = 1 } { print }' "$T" > "$T.x" && mv "$T.x" "$T"; corre
+
+caso "R-M11 · sin el registro (ROJO esperado)"
+fresca; rm "$T"; corre
+rm -rf "$W"
+
+# r_mut9.bash (R-M9 bis: el R-M9 de r_mut.bash no se aplicó, el grep se negó a escribir en su entrada)
+export PATH="/usr/bin:$PATH"
+RPP=/e/dropbox/github/lean4/ROBINSON_PlusPlus; FOLD=/e/dropbox/github/lean4/FOL
+S=<tmp>
+W="$S/rmut"; C="$W/RPP"; BLK="$S/r_block_only.bash"
+rm -rf "$W"; mkdir -p "$W"; git clone -q --shared "$FOLD" "$W/FOL"; git clone -q --shared "$RPP" "$C"
+mkdir -p "$C/doc/control"; cp "$RPP/doc/control/hallazgos.tsv" "$C/doc/control/"; T="$C/doc/control/hallazgos.tsv"
+echo; echo "──── R-M9 bis · una fila repetida (ROJO esperado)"
+LC_ALL=C grep '^L1-1	' "$T" > "$W/dup"; cat "$W/dup" >> "$T"; grep -c '^L1-1	' "$T"
+(cd "$C" && FAIL=0 && . "$BLK" && echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|FAIL=' | cut -c1-200
+rm -rf "$W"

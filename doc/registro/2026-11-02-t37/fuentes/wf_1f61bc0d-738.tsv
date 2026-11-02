@@ -1,0 +1,164 @@
+uid	dim	id	gravedad	veredicto_verificador	trabajo_agrupado	trabajo_final	titulo
+MED:MED-01	medida	MED-01	media	real	T06	T06	La pasada de los sondeos no es un control: sin script versionado, sin tabla por fila al día y fuera de la CI (R2‑5‑1)
+MED:MED-02	medida	MED-02	media	real	T07	T07	Los ENUNCIADOS de los titulares no los fija nada: sólo se vigila su footprint
+MED:MED-03	medida	MED-03	media	real	T61	T61	El Classical.choice de goedel_first_prf y goedel_second_prf NO viene de p3, y su origen está sin medir
+MED:MED-04	medida	MED-04	baja	real	T44	T44	Los 11 warnings declarados se arreglan todos con el hint de Lean; tienen posición medida y la tabla por fichero+clase tapa sustituciones
+MED:MED-05	medida	MED-05	media	real	T24	T24	[E] frescura: 34 documentos en deuda y sin tope; seis de los de cabecera están dentro, y README no tiene marca
+MED:MED-06	medida	MED-06	media	real	T04	T04	[B] mira un universo estrecho: siete prefijos, y fuera quedan cientos de nombres y 58 rutas que no existen
+MED:MED-07	medida	MED-07	media	real	T04	T04b	[A] y [A2]: cifras de banner que no compara nadie, patrones que la negrita ciega y un aviso ahogado en ruido
+MED:MED-08	medida	MED-08	media	real	T32	T32	Los marcadores de deuda del CÓDIGO de RPP no los vigila nada: [G] y [G.2] de FOL no se portaron
+MED:MED-09	medida	MED-09	media	real	T49	T49	El libro diverge sin que nada lo mida desde el 2026-09-11
+MED:MED-10	medida	MED-10	baja	real	T06	T06	Los sondeos se compilan con autoImplicit activado, y ninguna sonda de la CI comprueba que siga apagado en el build
+MED:MED-11	medida	MED-11	media	real	T39	T39	FOL tiene controles más débiles que RPP, y su CI no ejecuta las tablas que la vigilan
+MED:MED-12	medida	MED-12	media	real	T41	T41	Nadie vigila el tiempo ni la memoria del build (P‑3)
+MED:MED-13	medida	MED-13	baja	real	T46	T46	La tabla de estratos de REFERENCE §0bis no es «la misma» que la del script
+MED:MED-14	medida	MED-14	baja	real	T53	T53	El cierre de D7 y el censo de choice se midieron una vez, y ningún control impide volver atrás
+MED:MED-15	medida	MED-15	baja	real	T01	T01	Rosser: la cotización vigente no fija su unidad y la Etapa 0 ya la desborda
+MED:MED-16	medida	MED-16	baja	real	T60	T60	Hay inferencias sobre el NÚCLEO que sostienen recetas, sin aislar y con la sonda en el scratchpad
+MED:MED-17	medida	MED-17	media	real	T18	T18	Los precedentes de Rosser están en sondeos rotos o sin redactar, y en total son 10 los sondeos sin describir
+MED:MED-18	medida	MED-18	media	real	T36	T36	Tres deudas declaradas se cayeron del punto de reanudación, y la ronda 2 de la auditoría no está versionada
+MED:MED-19	medida	MED-19	baja	real	T13	T13	El censo de agujeros de confianza deja fuera `partial`, y la cifra con que lo justifica está caducada
+MED:MED-20	medida	MED-20	baja	real	T20	T20	El censo 34 = 24 + 10 de coreAxioms se quedó sin certificado, y el cuerpo de los documentos lo sigue publicando
+MED:MED-21	medida	MED-21	baja	real	T22	T22	La memoria del proyecto publica cifras caducadas
+MED:MED-22	medida	MED-22	baja	real	T50	T50	Los consumidores de FOL no se han medido contra el FOL de hoy
+MED:MED-23	medida	MED-23	baja	real	T30	T30	El DEPENDENCIES.md de RPP es un grafo escrito a mano y caducado, sin generador
+MED:MED-24	medida	MED-24	baja	nuevo_verificador	T59	T59	La «trampa metodológica 2» del catálogo de sondeos está mal diagnosticada y desaconseja la herramienta correcta
+MED:MED-25	medida	MED-25	baja	nuevo_verificador	T44	T44	Las supresiones de linter no las cuenta nadie: 106 `set_option linter.* false` en 94 ficheros, fuera del universo de check-warnings
+MED:MED-26	medida	MED-26	baja	nuevo_verificador	T48	T48	La deuda «PROMOVER 4 de Probe/» se cayó de las listas, y su contenido sólo existe en un directorio que git ignora
+FUN:FUN-01	fundamentos	FUN-01	alta	real	T01	T01	Rosser: fijar el enunciado NO vacuo y el control que lo certifica antes de pagar las 1 400–2 250 líneas
+FUN:FUN-02	fundamentos	FUN-02	media	real	T62	T62	De UNA teoría a TODA extensión: parametrizar Prf y el verificador por la lista de axiomas
+FUN:FUN-03	fundamentos	FUN-03	media	real	T02	T02	La sentencia de Gödel no es aritmética: falta la traducción a {0, σ, +, ×} o la conservatividad de los 107 y el ancla
+FUN:FUN-04	fundamentos	FUN-04	media	real	T02	T02	La teoría de la que hablan los titulares aparece descrita de tres maneras incompatibles: precisar T_Prf (inducción COMPLETA, lenguaje, esquemas)
+FUN:FUN-05	fundamentos	FUN-05	media	real	T67	T67	Falta demostrar que Prf es la demostrabilidad estándar: el puente Prf ↔ DerivesSet₀ y el Gödel I semántico
+FUN:FUN-06	fundamentos	FUN-06	media	real	T07	T07	La ESPECIFICACIÓN no está protegida: falta una huella de enunciados y definiciones
+FUN:FUN-07	fundamentos	FUN-07	media	real	T08	T08	Un control de CIERRE DE DEPENDENCIAS para los titulares condicionales
+FUN:FUN-08	fundamentos	FUN-08	media	real	T61	T61	Classical.choice en los titulares: la causa publicada es falsa para toda la mitad sintáctica
+FUN:FUN-09	fundamentos	FUN-09	baja	dudoso	T61	T61	Ruta constructiva para la consistencia y Gödel (opcional; a la matemática le importa poco)
+FUN:FUN-10	fundamentos	FUN-10	media	real	T06	T06	Nadie compila los sondeos de control, y se compilan con opciones distintas de las del build
+FUN:FUN-11	fundamentos	FUN-11	baja	real	T23	T23	leanchecker: lo que cubre de verdad, contar lo que replaya, y un segundo núcleo
+FUN:FUN-12	fundamentos	FUN-12	baja	real	T46	T46	La columna de solidez de check-estratos está desfasada: LK₀ y LKc ya la tienen, y al resto le basta un corolario
+FUN:FUN-13	fundamentos	FUN-13	baja	real	T68	T68	Axiomas muertos dentro de la teoría: las 22 ecuaciones del verificador viejo validProofFn
+FUN:FUN-14	fundamentos	FUN-14	baja	real	T44	T44	74 límites elevados (maxHeartbeats/maxRecDepth) sin censo ni trinquete
+FUN:FUN-15	fundamentos	FUN-15	baja	real	T41	T41	Evaluación accidental de numerales gigantes: la red de seguridad es de TEXTO y la CI no tiene tiempo límite
+FUN:FUN-16	fundamentos	FUN-16	media	real	T09	T09	TEOREMAS-E-HIPOTESIS.md, el registro de hipótesis, está desfasado y le falta la columna que importa
+FUN:FUN-17	fundamentos	FUN-17	baja	real	T47	T47	Herramientas que fabricaron piezas del build y que no están versionadas
+FUN:FUN-18	fundamentos	FUN-18	baja	real	T40	T40	El par verificado (RPP@sha, FOL@sha) no queda registrado en el repositorio
+FUN:FUN-19	fundamentos	FUN-19	baja	real	T69	T69	Censo de la FORMA lógica de los 142 (para Gentzen y para saber qué teoría es)
+FUN:FUN-20	fundamentos	FUN-20	baja	real	T21	T21	PLAN-PRUEBAS.md sigue describiendo la verificación de antes de ADR‑116
+FUN:GOB-01	fundamentos	GOB-01	media	nuevo_verificador	T37	T37	Los hallazgos de las rondas 1 y 2 de la auditoría no tienen registro versionado de su estado, y el barrido los está redescubriendo
+FUN:CTL-01	fundamentos	CTL-01	baja	nuevo_verificador	T11	T11 y T11b	[COBERTURA] no ve los titulares con prima, y D1 y D2 siguen sin fila de footprint
+FUN:DOC-01	fundamentos	DOC-01	media	nuevo_verificador	T25	T25	Los seis documentos de estado llevan desde el 2026‑09‑18 en la deuda de [E], y el cuerpo del README contradice su banner
+FUN:FND-01	fundamentos	FND-01	baja	nuevo_verificador	T12	T12	Que `godelCN` es una SENTENCIA no está compilado: falta aplicar la lente de vacuidad a `godelCN_indecidible`
+SUB:SUB-01	subterraneo	SUB-01	alta	real	T06	T06	Los sondeos no los compila ninguna CI (R2‑5‑1): ni su compilación, ni sus footprints, ni su censo de agujeros
+SUB:SUB-02	subterraneo	SUB-02	media	real	T06	T06	`lake env lean` no recibe los leanOptions: los sondeos se miden con autoImplicit activado, mientras el editor y `lake lean` lo tienen desactivado
+SUB:MED-01	subterraneo	MED-01	media	real	T10	T10	Los 53 sondeos que no compilan: no hay política (reparar, archivar o borrar) y su tabla fila a fila vive sólo en el scratchpad
+SUB:SUB-03	subterraneo	SUB-03	baja	real	T49	T49	El job `libro` lleva 144 commits sin ejecutar sus controles, y su §2.6 daría ROJO hoy (24 \ident{} que no existen)
+SUB:SUB-04	subterraneo	SUB-04	media	real	T38	T38	CI cruzada: un push de FOL no valida RPP, y RPP no mira si la CI de FOL estaba verde en el FOL@sha que certifica
+SUB:SUB-05	subterraneo	SUB-05	media	real	T40	T40	Reproducibilidad de la CI: elan desde master, acciones sin fijar y con aviso de Node 20, y un certificado del par que caduca con el run
+SUB:SUB-06	subterraneo	SUB-06	media	real	T13	T13	Los censos por ENTORNO (@SORRY, @TRUST, @NATIVO, @AJENO) dan 0 sin fixture que pruebe que pueden dar otra cosa
+SUB:SUB-07	subterraneo	SUB-07	media	real	T42	T42	El toolchain va tres versiones menores por detrás de la política declarada, sin ADR, y la herramienta del bump está rota
+SUB:SUB-08	subterraneo	SUB-08	baja	real	T50	T50	Cinco consumidores de ../FOL por ruta local, cuatro con otro toolchain, y PeanoRF ya roto desde ADR‑115
+SUB:SUB-09	subterraneo	SUB-09	media	real	T14	T14	Gobierno: en RPP el sistema de bloqueo existe sólo en el papel; en FOL el hook no está versionado ni lo respalda la CI; master sin protección
+SUB:SUB-10	subterraneo	SUB-10	baja	real	T52	T52	Herramientas de la plantilla desalineadas: `guarda_y_bloquea` hace `git add .` y push, `gen-root` reescribiría el barril a mano, y 11 scripts no llevan el PATH higiénico
+SUB:SUB-11	subterraneo	SUB-11	media	real	T32	T32	RPP no tiene los controles [G] y [G.2] de FOL (deudas anunciadas en el código), y tiene marcadores ⬜ que parecen caducos
+SUB:SUB-12	subterraneo	SUB-12	baja	real	T30	T30	DEPENDENCIES: el `--check` de FOL no corre en ninguna CI, y el de RPP es a mano y no nombra 18 de los 112 módulos
+SUB:DOC-01	subterraneo	DOC-01	media	real	T21	T21	Las guías de los agentes describen mal los controles: AI-GUIDE §27 y la habilidad /docsync dicen que [B] y [E] son avisos
+SUB:MED-02	subterraneo	MED-02	media	real	T47	T47	Las herramientas que validan los controles (oráculo léxico y mutantes) viven sólo en el scratchpad, y una de ellas ya se ha perdido
+SUB:MED-03	subterraneo	MED-03	media	real	T48	T48	Probe/: 334 .lean fuera de git, ya con cinco precedentes de trabajo perdido, y medido distinto en local y en la CI
+SUB:SUB-13	subterraneo	SUB-13	media	real	T36	T36	Tres pendientes se han caído de la lista vigente de NEXT-STEPS sin que nadie lo decidiera (R2‑5‑1, ronda 3, deuda de ADR‑115 §5)
+SUB:SUB-14	subterraneo	SUB-14	media	real	T07	T07	Ningún control fija los ENUNCIADOS de los titulares: sólo se vigilan sus axiomas
+SUB:SUB-15	subterraneo	SUB-15	baja	real	T23	T23	No hay segundo núcleo: leanchecker vuelve a pasar todo por el mismo kernel
+SUB:SUB-16	subterraneo	SUB-16	baja	real	T44	T44	105 `set_option linter.* false` en el build sin censar: la cifra «11 warnings» no dice su ámbito
+SUB:SUB-17	subterraneo	SUB-17	baja	real	T45	T45	Restos de causas conocidas de verde sin comprobar en los controles
+SUB:SUB-18	subterraneo	SUB-18	baja	real	T15	T15	El dominio de varios controles son globs fijos: una subcarpeta nueva (la FOL/Calculus/ prevista) se les escaparía
+SUB:SUB-19	subterraneo	SUB-19	baja	real	T40	T40	Caché de la CI: el prefijo `lake-v2-` se sube a mano, y la caché de ~/.elan se restaura cuando ya no sirve
+SUB:SUB-20	subterraneo	SUB-20	baja	real	T43	T43	Fin de línea: FOL guarda 46 blobs con CRLF (nueve del build) y RPP no lleva el `tr -d '\r'` de FOL
+SUB:DOC-02	subterraneo	DOC-02	baja	real	T24	T24	Las deudas con trinquete de [E] (34 documentos) y [B] (41 símbolos) apenas bajan
+SUB:DOC-03	subterraneo	DOC-03	alta	nuevo_verificador	T03	T03	La tabla MANDATORIES de DECISIONS.md, de lectura obligatoria antes de tocar un .lean, enuncia M‑11 al revés y da por vigente lo retirado
+SUB:SUB-21	subterraneo	SUB-21	media	nuevo_verificador	T04	T04	[B] absuelve por vocabulario: una fecha ISO o palabras como «falta», «pide», «exige» o «medir» en la línea bastan, y así pasan 28 símbolos muertos
+SUB:SUB-22	subterraneo	SUB-22	media	nuevo_verificador	T14	T14	El gancho pre-commit de FOL no bloquea un congelado si frozen_files.txt tiene CRLF, y nada impide que lo tenga
+SUB:SUB-23	subterraneo	SUB-23	baja	nuevo_verificador	T16	T16	Las herramientas de FOL hacen lo que M‑3 prohíbe: make build, make build-all, make update-toolchain y update-toolchain.bash lanzan lake build desde FOL
+SUB:MED-04	subterraneo	MED-04	media	nuevo_verificador	T10	T10	El build cita sondeos que no compilan: 89 de las 114 citas sondeos/X.lean de los .lean de producción
+RUT:RUT-01	ruta	RUT-01	alta	real	T01	T01	Rosser: falta registrar si va por la ruta H (con el modelo) o por la P (sin él), y la Etapa 0 ya avanza por la H
+RUT:RUT-02	ruta	RUT-02	media	real	T01	T01	Partir Rosser en un `rosser_de` abstracto sobre NegNum y PosNum enunciados, con controles de vacuidad, negativo y de PUREZA del cierre
+RUT:RUT-03	ruta	RUT-03	media	real	T63	T75	W1 (`verificador_solido`) está fijado a V₀ y pasa por la solidez: hacerlo paramétrico en V
+RUT:RUT-04	ruta	RUT-04	media	real	T01	T01	El plan de Rosser en siete etapas, con sus tamaños, riesgos y crítica, sólo existe en un fichero de tarea del scratch de la sesión
+RUT:RUT-05	ruta	RUT-05	media	real	T64	T64	Lo que falta de la Etapa 0 (hasWit hereditaria GENERAL, hasWitF sobre numerales, la línea q1 basura) tiene precedentes que existen pero no compilan
+RUT:RUT-06	ruta	RUT-06	media	duplicado	-	RUT:RUT-04	Etapas 1–7: inventario de lo que falta y de lo que ya existe para reutilizar (antes de construir, buscar)
+RUT:RUT-07	ruta	RUT-07	baja	real	T64	T64	Riesgo de núcleo en NegNum y en la sentencia R: numerales unarios y códigos astronómicos; el comparador por VALOR no compila y el censo «EVALUAR EL ANCLA» vigila por nombres
+RUT:RUT-08	ruta	RUT-08	media	real	T06	T06	Rosser se construye en sondeos/ que la CI no compila; sus precedentes se pudrieron así, y el paso de CI desapareció de la lista vigente
+RUT:RUT-09	ruta	RUT-09	media	real	T61	T61	De dónde viene el Classical.choice de los titulares SINTÁCTICOS tras D7: ADR‑129 lo atribuye a la solidez, y esos módulos no la importan
+RUT:RUT-10	ruta	RUT-10	media	real	T50	T50	PeanoRF: falta escribir en un solo sitio la lista de lo que debe adaptar, y ya estaba roto antes de D7
+RUT:RUT-11	ruta	RUT-11	media	real	T49	T49	El libro espera piezas que ya no existen: 38 de los 103 fragmentos, una base sancionada retirada y dos avisos editoriales que hoy son falsos
+RUT:RUT-12	ruta	RUT-12	media	real	T09	T09	El mapa de teoremas e hipótesis y los documentos de la ruta dicen lo contrario de lo demostrado
+RUT:RUT-13	ruta	RUT-13	baja	real	T66	T66	Un subárbol de 2 919 líneas sin consumidor (CodeDecode→ChainDecode→VerifierSound/OmegaReflect→ChainNegPrf): decidir qué hereda Rosser y retirar el resto
+RUT:RUT-14	ruta	RUT-14	baja	real	T70	T70	El teorema de Löb: están todas las piezas (D1–D3 sobre Prf y el diagonal general) y no se ha escrito
+RUT:RUT-15	ruta	RUT-15	baja	dudoso	-	descartado	La ω‑consistencia honesta no está definida ni demostrada; con el modelo es barata y cierra L1‑4 en positivo
+RUT:RUT-16	ruta	RUT-16	baja	real	T69	T69	Gentzen no está empezado, y tampoco existen sus primeros pasos medibles: censo de la forma de los 142, ¿listInd admisible desde ind?, notaciones hasta ε₀
+RUT:RUT-17	ruta	RUT-17	baja	real	T62	T62	Todo vale para UNA teoría fija: «basta la consistencia simple» sólo tiene contenido para extensiones, y Prf no está parametrizado
+RUT:RUT-18	ruta	RUT-18	baja	real	T65	T75	Que los 142 axiomas no fijen substfc/liftfc sobre la basura, que es la razón de que GuardNeg sea inevitable, es un argumento sin compilar
+RUT:RUT-19	ruta	RUT-19	baja	real	T22	T22	La memoria del frente NegVerifier/D3 conserva estados retirados sin su aviso de corrección
+RUT:RUT-20	ruta	RUT-20	baja	dudoso	T61	T75 y T61	Tarski semántico sólo para MNV V₀, y un byContradiction evitable en goedel_I_neg
+RUT:RUT-N1	ruta	RUT-N1	media	nuevo_verificador	T17	T17	La lista vigente perdió la Ronda 3 de la auditoría y la deuda documental de ADR‑115 §5, y D7 (un cambio en lote) no tuvo su revisión adversarial
+RUT:RUT-N2	ruta	RUT-N2	media	nuevo_verificador	T05	T05	Dos teoremas condicionales de D3 que siguen en el build tienen hipótesis REFUTABLES con el modelo: d3_prf_of_sigma1 y d3_prf_of_reflect_bounded son vacuos
+RUT:RUT-N3	ruta	RUT-N3	media	nuevo_verificador	T18	T18	28 de los 53 sondeos rotos fallaban primero por un nombre movido o una ambigüedad: medir su segundo error antes de re‑derivar los precedentes de Rosser
+RUT:RUT-N4	ruta	RUT-N4	baja	nuevo_verificador	T59	T59	La lección «un crawler de dependencias no sirve en v4.31» sigue escrita, y la refutan las herramientas del propio proyecto
+FOL:SUB-01	fol	SUB-01	media	real	T38	T38	La CI de FOL no vigila sus footprints, estratos ni warnings; la de RPP no se dispara con un push de FOL; nadie compara los toolchains
+FOL:MED-01	fol	MED-01	media	real	T04	T04	El bloque [B] (símbolos muertos) de FOL sólo examina nombres con prefijos de RPP: 4 de 780
+FOL:MED-02	fol	MED-02	media	real	T53	T53	Las cifras de constructividad son del 2026-09-27, nadie las vuelve a medir, y la auditoría podría ser un control
+FOL:MED-03	fol	MED-03	media	real	T19	T19	La «esencialidad MEDIDA» de 10 titulares descansa en experimentos que ya no compilan
+FOL:MED-04	fol	MED-04	baja	real	T71	T71	Que completeness₀ necesite Markov es un «argumento, no compilado»
+FOL:MED-05	fol	MED-05	baja	real	T71	T71	Cinco titulares semánticos con Classical.choice siguen «sin clasificar»
+FOL:MED-06	fol	MED-06	baja	real	T19	T19	ex_elim_refutable puede perder Classical.choice, y su docstring afirma que no
+FOL:MED-07	fol	MED-07	baja	real	T39	T39	Las afirmaciones de footprint escritas en prosa no las vigila nadie
+FOL:SUB-02	fol	SUB-02	media	real	T16	T16	Las entradas al build de FOL que se usan por defecto violan M-3 (y M-3 no se ha vuelto a medir)
+FOL:SUB-03	fol	SUB-03	media	real	T14	T14	La congelación no es permanente en la práctica, y su integridad sólo la protege un hook local
+FOL:SUB-04	fol	SUB-04	baja	real	T17	T17	D7 reescribió 16 módulos congelados y no pasó por una criba con refutación
+FOL:SUB-05	fol	SUB-05	baja	real	T57	T57	Quince `axiom`, algunos con enunciado falso, siguen en el árbol sin vigilancia
+FOL:SUB-06	fol	SUB-06	baja	real	T46	T46	El censo de estratos no cuenta LKp, pone «-» donde hay solidez, y la tabla «misma» de REFERENCE tiene la mitad de filas
+FOL:FUN-01	fol	FUN-01	baja	real	T46	T46	Solidez y completitud por estrato: sólo hay titular para cuatro estratos, y falta la completitud sin cortes
+FOL:FOL-01	fol	FOL-01	baja	real	T74	T74	`Derives` es redundante y su capa no tiene consumidores, pero arrastra los lemas sintácticos que RPP sí usa
+FOL:FUN-02	fol	FUN-02	baja	real	T58	T58	TheoryFramework no dice lo que sus nombres prometen: `models` es consecuencia FINITA y la conservatividad colapsa a equivalencia
+FOL:FOL-02	fol	FOL-02	baja	real	T58	T58	TheoryFramework: una instancia, cero consumidores y cuatro warnings
+FOL:FUN-03	fol	FUN-03	baja	real	T72	T72	FOL no tiene noción de SENTENCIA, y RPP ha tenido que definírsela
+FOL:FUN-04	fol	FUN-04	baja	real	T73	T73	La semántica de FOL sólo habla de modelos en `Type`
+FOL:DOC-01	fol	DOC-01	baja	real	T54	T54	El CHANGELOG no registra 12 commits, y ningún control lo ve
+FOL:DOC-02	fol	DOC-02	baja	real	T56	T56	FOL/DECISIONS.md está dormido y sigue afirmando en presente cosas falsas; tres documentos en deuda [E]
+FOL:DOC-03	fol	DOC-03	media	real	T22	T22	La memoria del chat de FOL repite la doctrina refutada
+FOL:DOC-04	fol	DOC-04	baja	real	T56	T56	REFERENCE.md conserva secciones de módulos borrados; AXIOMS.md, fuera de orden; residuos de la plantilla
+FOL:RUT-01	fol	RUT-01	media	real	T51	T51	X1 está en punto muerto y retiene 16 módulos sin congelar
+FOL:RUT-02	fol	RUT-02	baja	real	T50	T50	Los consumidores de FOL por ruta no tienen política de compatibilidad, y los literales de símbolo viven en un consumidor
+FOL:SUB-07	fol	SUB-07	media	nuevo_verificador	T15	T15	Lo que el build de FOL no compila no lo vigila ninguna CI: la lean_lib FOL no tiene globs y el barril TheoryFramework.lean está fuera del build
+FOL:MED-08	fol	MED-08	media	nuevo_verificador	T14	T14	strip-lean.awk vacía los literales: desde D7, un cambio de SÍMBOLO no lo ve ninguna comparación de «código sin comentarios»
+FOL:DOC-05	fol	DOC-05	baja	nuevo_verificador	T43	T43	El .gitattributes de FOL justifica no usar `* text=auto` con una premisa falsa, y el árbol local y el de la CI no tienen los mismos finales de línea
+DOC:DOC-01	documentos	DOC-01	media	real	T09	T09	TEOREMAS-E-HIPOTESIS.md (el control V8 de «quién descarga cada hipótesis») se contradice a sí mismo y ningún control lo ve
+DOC:DOC-02	documentos	DOC-02	media	real	T26	T26	El cuerpo de CURRENT-STATUS-PROJECT.md (Executive Summary, Status by Module, Pending Work, Architecture) describe el árbol de septiembre como estado actual
+DOC:DOC-03	documentos	DOC-03	media	real	T25	T25	README.md: afirmaciones vigentes falsas fuera del banner (⊬¬G abierta, recuentos, D3 «en curso», instalación y nombres de plantilla)
+DOC:DOC-04	documentos	DOC-04	media	real	T27	T27	REFERENCE.md: cifras contradictorias entre secciones, un «Hoy» caducado y ejemplos que citan símbolos retirados
+DOC:DOC-05	documentos	DOC-05	media	real	T28	T28	GODEL-STATUS.md: «fuera de scope» Gödel II, Rosser y Tarski — y el control lo trata como autoritativo aunque se declara histórico
+DOC:DOC-06	documentos	DOC-06	media	real	T30	T30	DEPENDENCIES.md: grafo, niveles, hojas y exportaciones del árbol retirado, sin generador versionado que permita regenerarlo
+DOC:DOC-07	documentos	DOC-07	media	real	T29	T29	doc/REFERENCE-Incompleteness.md, el nodo del «subsistema activo», no documenta ninguno de los 7 módulos que hoy llevan los titulares
+DOC:DOC-08	documentos	DOC-08	media	real	T35	T35	15 módulos de producción sin bloque `export`, contra la regla «DEBE» de AI-GUIDE §17 — entre ellos los 7 de los titulares — y sin control que lo vea
+DOC:DOC-09	documentos	DOC-09	media	real	T61	T61	La explicación de por qué los titulares conservan Classical.choice tras D7 («es el de la solidez clásica, prf_sound/p3») es falsa para parte de la cadena: hay que medir el origen
+DOC:DOC-10	documentos	DOC-10	media	real	T03	T03	La doctrina M-11 refutada («un axiom que habita Prf prohíbe inducir sobre Prf») sigue enunciada como cierta en el docstring del ancla, en la CI y en el Makefile
+DOC:DOC-11	documentos	DOC-11	media	real	T34	T34	Citas «fichero.lean:N» desplazadas: muestreo de unas 45; la del banner se repite en 9 documentos
+DOC:DOC-12	documentos	DOC-12	media	real	T21	T21	Las guías normativas describen mal los controles: [B] y [E] como avisos, [E] contra el CHANGELOG, check-sorry no bloqueante
+DOC:DOC-13	documentos	DOC-13	alta	real	T04	T04b y T04	check-doc-sync no puede ver la mayoría de estas falsedades: ventana de [A] comida por los banners, exención por fecha, [E] lee el sello equivocado, [B] sólo por prefijos, [C] por subcadena
+DOC:DOC-14	documentos	DOC-14	media	real	T33	T33	Banners «ESTADO REAL» apilados y duplicados en 6–7 documentos: cada ADR los toca todos y la caducidad se multiplica
+DOC:DOC-15	documentos	DOC-15	baja	real	T54	T54	CHANGELOG.md congelado en ADR-113 (2026-09-28) y con un banner que manda a PLAN-FRENTE-A: faltan ADR-114…129
+DOC:DOC-16	documentos	DOC-16	baja	real	T31	T31	Docstrings falsos sin corregir: el caso 1 del registro del libro (CodeWitnessPrf, abierto desde el 2026-09-03) y la contradicción 23/24 de primAxioms
+DOC:DOC-17	documentos	DOC-17	media	real	T20	T20	Varios documentos dan por certificado el censo 24+10 de coreAxioms, que no tiene certificado desde ADR-115
+DOC:DOC-18	documentos	DOC-18	alta	real	T02	T02	README y GODEL-STATUS no dicen de qué teoría son los teoremas de incompletitud: insisten en «Q++ sin esquema de inducción» y Prf incluye inducción completa
+DOC:DOC-19	documentos	DOC-19	baja	real	T55	T55	PLAN-NEGVERIFIER.md y PLAN-FRENTE-A.md se presentan como planes vivos de objetivos ya resueltos por otra vía
+DOC:DOC-20	documentos	DOC-20	baja	real	T21	T21	WORKFLOW.md («⭐ start here», según el README) es de junio: toolchain, jobs y puerta de calidad caducados
+DOC:DOC-21	documentos	DOC-21	baja	real	T22	T22	El índice de memoria (se carga en todas las sesiones) mantiene «hoy» falsos sobre ⊬¬G, cifras y Tarski
+DOC:DOC-22	documentos	DOC-22	baja	real	T06	T06	El alcance de autoImplicit=false (ADR-128) no cubre los sondeos, que son la evidencia de varios ADR, y ningún documento lo dice
+DOC:DOC-23	documentos	DOC-23	baja	real	T02	T02	AXIOMS.md, el «Registro central de axiomas», no dice qué se supone hoy: su «Estado de la cadena real» es de julio
+DOC:DOC-24	documentos	DOC-24	media	real	T24	T24	E_DEUDA = 34 mezcla «sin sello reconocible» con «sello viejo», y no tiene plan de pago
+DOC:DOC-25	documentos	DOC-25	baja	real	T49	T49	El job «libro» de la CI tiene una mina: los fragmentos del libro extraen de FOL/MetaRules.lean, borrado
+DOC:MAND-01	documentos	MAND-01	alta	nuevo_verificador	T03	T03	La tabla MANDATORIES de DECISIONS.md, de lectura obligatoria, enuncia la M-11 refutada y verifica con símbolos retirados
+DOC:NS-01	documentos	NS-01	media	nuevo_verificador	T36	T36	El punto de reanudación de NEXT-STEPS soltó trabajo pendiente sin cerrarlo: ronda 3, la CI de los sondeos de control (R2-5-1), la deuda de ADR-115 §5 y el horizonte Gentzen
+DOC:AUD-01	documentos	AUD-01	media	nuevo_verificador	T37	T37	Los 68 hallazgos de las rondas 1 y 2 de la auditoría de la base viven fuera de los repos: en git hay 10 identificadores y ningún estado
+DOC:MED-01	documentos	MED-01	baja	nuevo_verificador	T11	T11b y T11	D1, D2, `prf_con_imp_godel` y `prfI_sound` no tienen fila en check-footprints, y [COBERTURA] no puede exigirla
+DOC:DOCSTR-01	documentos	DOCSTR-01	baja	nuevo_verificador	T31	T31	Cuatro docstrings del build afirman que la mitad ⊬¬G «no tiene hoy formulación sobre Prf»
+DOC:BLD-01	documentos	BLD-01	media	nuevo_verificador	T15	T15	El flujo documentado para añadir un módulo está roto, y ningún control comprueba que todo .lean del árbol entre en el build

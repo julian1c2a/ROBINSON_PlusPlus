@@ -1,0 +1,142 @@
+import ROBINSON_PlusPlus
+open ROBINSON_PlusPlus.Meta.Hilbert
+namespace ListIndAdmisible
+open Lean Meta Elab Command
+
+namespace Medida
+
+def nombreUsuario (n : Name) : Name := (privateToUserName? n).getD n
+
+def esProyecto (n : Name) : Bool :=
+  let m := nombreUsuario n
+  (`ROBINSON_PlusPlus).isPrefixOf m || (`FOL).isPrefixOf m || (`TheoryFramework).isPrefixOf m
+
+
+def directas (env : Environment) (n : Name) : Array Name :=
+  match env.find? n with
+  | some ci =>
+    let ty := ci.type.getUsedConstants
+    let va := ((ci.value? (allowOpaque := true)).map (·.getUsedConstants)).getD #[]
+    ty ++ va
+  | none => #[]
+
+/-- El cierre de `raiz` (tipos y valores), sin recorrer las dependencias de las constantes de `corte`. -/
+partial def cierreCorte (env : Environment) (raiz : Name) (corte : List Name) : NameSet := Id.run do
+  let mut vis : NameSet := {}
+  let mut pila := #[raiz]
+  while h : pila.size > 0 do
+    let n := pila[pila.size - 1]
+    pila := pila.pop
+    if vis.contains n then continue
+    vis := vis.insert n
+    if corte.contains n && n != raiz then continue
+    for d in directas env n do
+      if !vis.contains d then pila := pila.push d
+  return vis
+
+def cierre (env : Environment) (raiz : Name) : NameSet := cierreCorte env raiz []
+
+def constructores : List (String × List Name) := [
+  ("ind", [``ROBINSON_PlusPlus.Meta.Hilbert.Prf.ind, ``ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.ind,
+    ``ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.ind]),
+  ("listInd", [``ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd, ``ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd,
+    ``ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.listInd]),
+  ("p3", [``ROBINSON_PlusPlus.Meta.Hilbert.Prf.p3, ``ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.p3,
+    ``ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.p3]),
+  ("qconf", [``ROBINSON_PlusPlus.Meta.Hilbert.Prf.qconf, ``ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.qconf,
+    ``ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.qconf])]
+
+/-- Las cuatro traducciones de `InduccionTitulares` (la misma lista). -/
+def traducciones : List Name := [
+  `ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf,
+  `ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH,
+  `ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf,
+  `ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation]
+
+/-- Y las dos que también recorren una derivación reconstruyendo cada paso (leídas en
+    `Meta/HilbertDeduction.lean`: el caso `listInd` de cada una devuelve `PrfH.listInd`, y sólo ése). -/
+def recorridos : List Name := traducciones ++ [
+  `ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux,
+  `ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono]
+
+def fronteraDe (env : Environment) (cie : NameSet) (cs : List Name) : Array Name := Id.run do
+  let mut out := #[]
+  for p in cie.toList do
+    if esProyecto p then
+      if let some ci := env.find? p then
+        if let some v := ci.value? (allowOpaque := true) then
+          let us := v.getUsedConstants
+          if cs.any (us.contains ·) then out := out.push (nombreUsuario p)
+  return out.qsort (fun a b => a.toString < b.toString)
+
+/-- Copia literal del `#induccion` de `sondeos/InduccionTitulares.lean`. -/
+elab "#induccion " id:ident : command => do
+  let env ← getEnv
+  let raiz := id.getId
+  unless env.contains raiz do throwError "no existe {raiz}"
+  let cie := cierre env raiz
+  let mut lineas : Array String := #[]
+  for (k, cs) in constructores do
+    let fr := fronteraDe env cie cs
+    let (tr, resto) := fr.toList.partition (traducciones.contains ·)
+    lineas := lineas.push s!"  {k}: {resto.length} fuera de las traducciones {resto.map toString} · traducciones: {tr.map toString}"
+  logInfo m!"{raiz}: cierre de {cie.size} constantes\n{String.intercalate "\n" lineas.toList}"
+
+/-- El cierre CORTADO en los seis recorridos: por regla, si algún constructor suyo está en él, y la
+    frontera (constantes del cierre cortado, fuera de los recorridos, cuyo valor nombra un constructor). -/
+elab "#induccionSin " id:ident : command => do
+  let env ← getEnv
+  let raiz := id.getId
+  unless env.contains raiz do throwError "no existe {raiz}"
+  let cie := cierreCorte env raiz recorridos
+  let mut lineas : Array String := #[]
+  for (k, cs) in constructores do
+    let dentro := cs.filter (cie.contains ·)
+    let fr := (fronteraDe env cie cs).toList.filter (fun n => !recorridos.contains n)
+    lineas := lineas.push s!"  {k}: constructores en el cierre cortado {dentro.map toString} · frontera fuera de los recorridos {fr.map toString}"
+  let pli := (cierre env raiz).contains ``ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+  let rec_ := recorridos.filter (cie.contains ·)
+  logInfo m!"{raiz}: cierre cortado de {cie.size} constantes · recorridos alcanzados {rec_.map toString} · `prf_list_induction` en el cierre COMPLETO: {pli}\n{String.intercalate "\n" lineas.toList}"
+
+def deValor (env : Environment) (n : Name) : Array Name :=
+  match env.find? n with
+  | some ci => ((ci.value? (allowOpaque := true)).map (·.getUsedConstants)).getD #[]
+  | none => #[]
+
+/-- Un camino MÁS CORTO de `a` a `b` sólo por aristas de VALOR (copia de `InduccionTitulares`). -/
+def camino (env : Environment) (a b : Name) : Option (List Name) := Id.run do
+  let mut padre : Std.HashMap Name Name := {}
+  let mut vis : NameSet := ({} : NameSet).insert a
+  let mut cola := #[a]
+  let mut i := 0
+  while i < cola.size do
+    let n := cola[i]!
+    i := i + 1
+    if nombreUsuario n == b then
+      let mut out := [n]
+      let mut m := n
+      while m != a do
+        m := padre.getD m a
+        out := m :: out
+      return some out
+    for d in deValor env n do
+      if !vis.contains d then
+        vis := vis.insert d
+        padre := padre.insert d n
+        cola := cola.push d
+  return none
+
+elab "#camino " a:ident b:ident : command => do
+  let env ← getEnv
+  match camino env a.getId b.getId with
+  | some ps => logInfo m!"{a.getId} ⟶ {b.getId}: {ps.length - 1} aristas de valor\n  {String.intercalate "\n  ⟶ " (ps.map (toString ∘ nombreUsuario))}"
+  | none => logInfo m!"{a.getId} ⟶ {b.getId}: NINGÚN camino por valores (sólo por tipos, o ninguno)"
+
+end Medida
+
+/-- CONTROL POSITIVO: la misma fórmula por el constructor. La medida tiene que verlo. -/
+theorem control_con_listInd (A : Formula) : Prf (listInductionFormula A) := Prf.listInd A
+
+end ListIndAdmisible
+#induccion ListIndAdmisible.control_con_listInd
+#induccionSin ListIndAdmisible.control_con_listInd

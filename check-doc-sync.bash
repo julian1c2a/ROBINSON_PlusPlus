@@ -19,6 +19,10 @@
 # ✏️ 2026-10-18 (ADR-163, T15): y [L], el universo de los módulos (el cierre de imports del barril = el disco = git).
 # ✏️ 2026-10-31 (T24, ADR-233): y [E], con DOS tablas de deuda —E_DEUDA, la de contenido (marca vieja), y
 # E_DEUDA_FORMATO, la de formato (sin marca; vacía)— y un TECHO en la base verificada, como [A2] y [B].
+# ✏️ 2026-11-02 (T32, T39, T37 y T10; ADR-237, 240, 241 y 243): y cinco bloques más, al final, los cinco ROJOS: [G] y
+# [G.2] (portados de FOL: las deudas enunciadas con testigo y el censo de los marcadores de deuda), [P] (los footprints
+# de la prosa contra las filas de check-footprints.bash), [R] (el registro de hallazgos) y [S] (las citas de sondeos
+# del build: evidencia o procedencia). DEPENDENCIES.md lo genera gen-dependencies.py (T30, ADR-238); su --check, en la CI.
 # ✏️ 2026-10-31 (T21, ADR-235): hoy rompen todos los bloques —[L], [EOL], [H] (el PATH higiénico), [A], [A2], [E],
 # [B], [I], [N], [C], [D], [F], [H] (el catálogo de sondeos/), [M] y [T]— y la VERDAD DEL CÓDIGO si no puede medir;
 # ninguno es sólo aviso. La nota del 2026-10-14 (ADR-135) decía «hoy rompen [A], [B], [C], [D], [E], [F], [H], [M] y
@@ -631,7 +635,7 @@ echo "════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) �
 read -r -d '' E_DEUDA <<'EOF'
 REFERENCE.md
 # CURRENT-STATUS-PROJECT.md — SALDADA el 2026-10-21 (ADR-182, T26): reescrito entero, con su marca.
-DEPENDENCIES.md
+# DEPENDENCIES.md — SALDADA el 2026-11-02 (ADR-238, T30): lo GENERA gen-dependencies.py, y la CI comprueba su --check.
 # README.md — SALDADA el 2026-10-21 (ADR-183, T25): reescrito contra el árbol, con su marca.
 AXIOMS.md
 # GODEL-STATUS.md — SALDADA el 2026-10-21 (ADR-185, T28): reescrito entero, con su marca.
@@ -965,6 +969,10 @@ printf '%s\n' \
   'goedel_I_neg	⊬¬g	(no existe|sigue abiert|abiert[oa]|falta|pendiente)	60	⊬¬g	«⊬¬G» está demostrada: goedel_I_neg (ADR-121)' \
   'rosser	[^a-z0-9_]rosser	[^a-z0-9_]rosser	30	(pendiente|por hacer|por construir|no est(a|á) (hecho|demostrad|cerrad))	Rosser está demostrado: rosser y rosser_ext (ADR-157)' \
   'lob	[^a-z0-9_]l(ö|o)b[^a-z0-9]	[^a-z0-9_]l(ö|o)b[^a-z0-9]	30	(pendiente|por hacer|por construir|no est(a|á) (hecho|demostrad|cerrad))	Löb está demostrado: lob (ADR-159)' \
+  'consistencia	[^a-z0-9_]consistencia[^a-z0-9_]	[^a-z0-9_]consistencia[^a-z0-9_]	50	(sin probar|sin demostrar|sin modelo|no est(a|á) (probad|demostrad))	la consistencia de T_Prf está demostrada: consistencia (ADR-120; CRI-05, T32)' \
+  'consistencia	[^a-z0-9_]consistencia[^a-z0-9_]	(sin probar|sin demostrar|sin modelo)	50	[^a-z0-9_]consistencia[^a-z0-9_]	la consistencia de T_Prf está demostrada: consistencia (ADR-120; CRI-05, T32)' \
+  'consistencia	[^a-z0-9_]consistenth[^a-z0-9_]	[^a-z0-9_]consistenth[^a-z0-9_]	50	(sin probar|sin demostrar|no est(a|á) (probad|demostrad))	«ConsistentH» está demostrada: consistencia (ADR-120; CRI-05, T32)' \
+  'consistencia	[^a-z0-9_]consistenth[^a-z0-9_]	(sin probar|sin demostrar)	50	[^a-z0-9_]consistenth[^a-z0-9_]	«ConsistentH» está demostrada: consistencia (ADR-120; CRI-05, T32)' \
   > "$I_REGLAS"
 # (la ventana se mira a mano, no con un intervalo `{0,60}` ni con «[^TAB]?» repetido: mawk, el awk de la CI, retrocede
 # y con una expresión así no acaba; el fin de frase se vuelve un TAB, y la ventana no lo cruza)
@@ -1018,7 +1026,7 @@ reg { next }
   else if (!ex && prev != "" && !prevhit && (i = choca(prev " " s))) print FILENAME ":" prevn ": " POR[i] "\t" substr(prevraw, 1, 140)
   if (ex) prev = ""; else { prev = s; prevn = FNR; prevraw = $0; prevhit = hit } }'
 # autotest: cada frase que tiene que salir, cada exención, y las evasiones de la revisión adversarial de ADR-169
-printf '%s\n' goedel_I_neg lob rosser > "$I_AUTO/vivos3"
+printf '%s\n' goedel_I_neg lob rosser consistencia > "$I_AUTO/vivos4"
 printf '%s\n' goedel_I_neg > "$I_AUTO/vivos1"
 printf '%s\n' '# Doc' 'La mitad ⊬¬G no existe todavía.' 'Lo que sigue abierto es ⊬¬G.' 'Rosser está pendiente.' \
   'LÖB ESTÁ PENDIENTE.' 'Se dijo «la mitad ⊬¬G no existe».' 'La mitad «⊬¬G» no existe.' '~~⊬¬G no existe~~ ya no.' \
@@ -1026,13 +1034,15 @@ printf '%s\n' '# Doc' 'La mitad ⊬¬G no existe todavía.' 'Lo que sigue abiert
   'La mitad ⊬¬G está demostrada; lo que falta es Con.' 'La mitad ⊬¬G' 'no existe aún.' '```' '~~~' '⊬¬G no existe' '```' \
   '## Notas y registro' '⊬¬G no existe aquí.' '## Hoy' '⊬¬G falta otra vez.' 'Un global pendiente.' \
   'Rosser_ext no está demostrado.' 'El control «`⊬¬G` (Rosser)» y la marca «pendiente», hecho.' \
-  '`⊬¬G` **no** está cerrado.' > "$I_AUTO/doc.md"
+  '`⊬¬G` **no** está cerrado.' 'La consistencia de T_Prf sigue sin probar.' 'Sin modelo no hay consistencia que valga.' \
+  '`ConsistentH` sigue sin demostrar.' 'La consistencia está demostrada; lo sin probar es otro asunto.' \
+  'La inconsistencia sigue sin probar.' 'ConsistentH y un cierre sin modelo.' > "$I_AUTO/doc.md"
 printf '%s\n' 'Rosser está pendiente.' 'La mitad ⊬¬G no existe.' > "$I_AUTO/doc2.md"
 printf '%s\n' '> ⚠️ **DOCUMENTO HISTÓRICO.**' '⊬¬G no existe.' > "$I_AUTO/doc3.md"
 printf '%s\n' 'Este no es un documento histórico.' '⊬¬G no existe.' > "$I_AUTO/doc4.md"
-I_AUTO_SAL=$( (cd "$I_AUTO" && LC_ALL=C awk "$I_AWK" "$I_REGLAS" vivos3 doc.md doc3.md doc4.md && LC_ALL=C awk "$I_AWK" "$I_REGLAS" vivos1 doc2.md) \
+I_AUTO_SAL=$( (cd "$I_AUTO" && LC_ALL=C awk "$I_AWK" "$I_REGLAS" vivos4 doc.md doc3.md doc4.md && LC_ALL=C awk "$I_AWK" "$I_REGLAS" vivos1 doc2.md) \
   | cut -d: -f1,2 | tr '\n' ';')
-I_AUTO_OK='doc.md:2;doc.md:3;doc.md:4;doc.md:5;doc.md:7;doc.md:10;doc.md:11;doc.md:13;doc.md:22;doc.md:24;doc.md:26;doc4.md:2;doc2.md:2;'
+I_AUTO_OK='doc.md:2;doc.md:3;doc.md:4;doc.md:5;doc.md:7;doc.md:10;doc.md:11;doc.md:13;doc.md:22;doc.md:24;doc.md:26;doc.md:27;doc.md:28;doc.md:29;doc4.md:2;doc2.md:2;'
 I_FAIL=0
 I_FALTAN=$(cut -f1 "$I_REGLAS" | LC_ALL=C sort -u | while IFS= read -r s; do grep -qxF "$s" "$DECLS" 2>/dev/null || printf ' %s' "$s"; done)
 I_LEAN=$(printf '%s\n' "$CIERRE" | grep -E '^ROBINSON_PlusPlus(/.*)?[.]lean$')
@@ -1516,6 +1526,461 @@ fi
 rm -f "$T_DECLS" "$T_AUTODOC"
 [ -n "${T_DOC:-}" ] && T_FAIL=1
 [ "$T_FAIL" = "0" ] || FAIL=1
+
+# ─── [G] DEUDAS ENUNCIADAS QUE YA TIENEN TESTIGO — ROJO (T32, ADR-237) ──────────────────────────────────────────
+# ⭐ 2026-11-02 (T32, ADR-237): PORTADO de FOL (su [G], ADR-072 de este repo; su [G.2], 2026-09-23). Ningún control de RPP
+# miraba lo que un docstring AFIRMA QUE FALTA: el patrón de FOL daba 137 líneas en 14 ficheros de RPP (la auditoría,
+# T32), 48 en D3ChainDotPrf.lean, que anunciaba pendiente lo que ya era teorema.
+# [G] (el de FOL, con la forma de RPP): una deuda se ENUNCIA como `Prop` —en RPP, `abbrev DEUDA_X : Prop :=` o
+# `def X : Prop :=`, sin binders— y se paga con un `theorem W : X :=` sin binders delante (un consumidor con hipótesis no
+# paga nada). Si el docstring de la deuda la anuncia ABIERTA (⬜, «DEUDA» como palabra, «no está hecha»…, «sin probar»,
+# «sin modelo») sin decir que está PAGADA, y ya tiene ese testigo, ROJO: se corrige la CABECERA, no el teorema.
+# (La afirmación de que la CONSISTENCIA sigue sin probar —CRI-05 de la auditoría— la vigila [I], que es donde están las
+# frases que un teorema vivo desmiente: su regla de `consistencia`.)
+echo ""
+echo "════ [G] DEUDAS ENUNCIADAS QUE YA TIENEN TESTIGO — ROJO (T32, ADR-237) ════"
+G_SRC="ROBINSON_PlusPlus"
+G_DEBT="⬜|DEUDAS?([^_A-Za-z0-9]|$)|[Nn]o está hecha|[Nn]o está hecho|NO se paga aquí|[Nn]o existe nada|sin probar|sin modelo"
+G_PAID="PAGADA|PAGADO|RESUELTA|RESUELTO|SALDADA|SALDADO|🏁"
+G_FAIL=0
+G_PROPS=$(mktemp)
+grep -rnE "^(def|abbrev) +[A-Za-z_][A-Za-z0-9_'₀₁₂ⁿ]* *: *Prop" $G_SRC --include=*.lean > "$G_PROPS" 2>/dev/null
+G_NPROPS=$(grep -c . "$G_PROPS"); G_NPROPS=${G_NPROPS:-0}
+G_NDEBT=0
+while IFS= read -r gp; do
+  [ -z "$gp" ] && continue
+  GF=${gp%%:*}; grest=${gp#*:}; GL=${grest%%:*}
+  GNAME=$(printf '%s' "$grest" | sed 's/^[0-9]*://' | awk '{print $2}')
+  [ -z "$GNAME" ] && continue
+  # el docstring INMEDIATAMENTE anterior, hasta su `-/` (no hasta una línea en blanco: un docstring largo las lleva)
+  gi=$((GL-1)); GBLK=""
+  while [ "$gi" -gt 0 ]; do
+    gln=$(sed -n "${gi}p" "$GF")
+    case "$gln" in *"-/"*) [ -n "$GBLK" ] && break ;; esac
+    GBLK="$gln
+$GBLK"; gi=$((gi-1))
+    [ $((GL-gi)) -gt 40 ] && break
+  done
+  # ⚠️ LC_ALL=C: el grep 3.0 de msys, en UTF-8, NO casa 🏁 (fuera del plano básico); el de la CI sí. Byte a byte, igual
+  # en los dos (los patrones no llevan multibyte dentro de corchetes).
+  printf '%s' "$GBLK" | LC_ALL=C grep -qE "$G_DEBT" || continue
+  G_NDEBT=$((G_NDEBT + 1))
+  printf '%s' "$GBLK" | LC_ALL=C grep -qE "$G_PAID" && continue
+  GWIT=$(grep -rnE "^(private +|protected +)?theorem +[A-Za-z_][A-Za-z0-9_'₀₁₂ⁿ.]* *: *$GNAME *:=" $G_SRC --include=*.lean 2>/dev/null | head -1)
+  if [ -n "$GWIT" ]; then
+    echo "  ❌ $GF:$GL — \`$GNAME\` se anuncia como DEUDA y YA TIENE TESTIGO INCONDICIONAL:"
+    echo "        $(printf '%s' "$GWIT" | cut -c1-130)"
+    G_FAIL=1
+  fi
+done < "$G_PROPS"
+rm -f "$G_PROPS"
+if [ "$G_NPROPS" = "0" ]; then
+  echo "  ❌ SIN MEDIR: no encontré ningún \`def\`/\`abbrev … : Prop\` en $G_SRC (¿cambió la forma?)."
+  G_FAIL=1
+elif [ "$G_FAIL" = "0" ]; then
+  echo "  ✓ ninguna deuda enunciada tiene ya testigo incondicional ($G_NPROPS enunciados sin binders; $G_NDEBT con su cabecera de deuda)"
+else
+  echo "      ⚠️ La deuda está PAGADA y la cabecera sigue anunciándola abierta: corrige la CABECERA, no el teorema."
+fi
+[ "$G_FAIL" = "0" ] || FAIL=1
+
+# ─── [G.2] CENSO DE MARCADORES DE DEUDA — ROJO, en los DOS sentidos (T32, ADR-237) ─────────────────────────────────
+# [G] sólo lee el docstring pegado a un `Prop`. [G.2] mira TODO marcador de deuda de la prosa de los `.lean` de la
+# librería (⬜, «DEUDA» como palabra, «no está hecha», «no medido»…) y exige que alguien lo haya MIRADO y CLASIFICADO:
+#   ABIERTA   — deuda real y viva; la nota dice qué falta;
+#   DIFERIDA  — se puede hacer y se decidió no hacerlo ahora; la nota dice por qué;
+#   OFERTA    — no es deuda: una alternativa ofrecida al propietario;
+#   HISTORIAL — el marcador cita una deuda pasada (una tabla fechada, una nota ✏️, un título de lo ya pagado); la nota
+#               dice quién la pagó.
+# Rompe en los DOS sentidos: un marcador sin fila, ROJO (clasifícalo); una fila que ya no casa, ROJO (la deuda se pagó o
+# el texto cambió); un ancla que casa dos veces, ROJO (ambigua: no se absuelve por subcadena).
+# ⚠️ Diferencia con FOL: «DEUDA» cuenta como PALABRA, no dentro de un identificador. Los `DEUDA_X` de RPP son los
+# enunciados mismos —y sus pagos—, código y no prosa (con el patrón de FOL eran 112 de las 135 líneas); de ellos se ocupa
+# [G]. Medido el 2026-11-02: 23 marcadores en 7 ficheros, los 23 HISTORIAL.
+echo ""
+echo "════ [G.2] CENSO DE MARCADORES DE DEUDA — ROJO (T32, ADR-237) ════"
+G2_SRC="ROBINSON_PlusPlus"
+G2_PAT="⬜|DEUDAS?([^_A-Za-z0-9]|$)|[Nn]o está hecha|[Nn]o está hecho|NO se paga aquí|[Nn]o existe nada|ÚNICA DEUDA|[Nn]o medido|[Nn]o está medid[oa]|[Nn]o están medid[oa]s"
+G2_FAIL=0
+G2_TAB=$(mktemp); G2_CUR=$(mktemp)
+# ── LA TABLA ──  fichero § ancla (subcadena ÚNICA entre los marcadores de ese fichero) § clase § nota
+cat > "$G2_TAB" <<'G2EOF'
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§sus «queda», «falta» y ⬜ son registro§HISTORIAL§la nota de cabecera (ADR‑134): D3 es teorema, `d3_prf_real`
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§⬜ `pcc_eval_lenc` ya existe§HISTORIAL§la tabla de §3 es del 2026‑09‑10; `pcc_eval_lenc` existe
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§`hbody` (a) · reflexión§HISTORIAL§los siete reflectores, C3 cerrado (`pcc_lineWF_tracked`, 2026‑09‑10)
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§`hbody` (b) · reflexión de `boundedPremsIn`§HISTORIAL§`premsBody_deuda` (`Meta/PremsBdAllPrf.lean`) la paga
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§registro — las dos ⬜ están pagadas§HISTORIAL§la nota de ADR‑134: `hPsiId` en §11, `hbody` en `d3_prf_real`
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§| **`hPsiId`** | ⬜ ver abajo |§HISTORIAL§`hPsiId`, pagada en §11 (la nota de ADR‑134 de la tabla)
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§| **`hbody`** | ⬜ el contenido real§HISTORIAL§`hbody`, pagada: `d3_prf_real` (la nota de ADR‑134 de la tabla)
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§⬜ **no depende de C3**§HISTORIAL§la tabla de §12.1 es del 2026‑09‑10; D3 está demostrada (`d3_prf_real`)
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§**`hbody`**(a) — reflexión§HISTORIAL§los siete reflectores, C3 cerrado (`pcc_lineWF_tracked`)
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§**`hbody`**(b) — reflexión de `boundedPremsIn`§HISTORIAL§`premsBody_deuda` la paga
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§| **(a)** reflexión de `lineWF`§HISTORIAL§los siete reflectores, `ind` y `listInd` incluidos (C3 cerrado, 2026‑09‑10)
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§| **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado sobre argumentos ABSTRACTOS§HISTORIAL§`premsBody_deuda` la ensambla
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§con B1 aún ⬜§HISTORIAL§la propia frase fecha las dos tablas (2026‑09‑10); `d3_prf_real` cierra D3
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§⬜ **tres** piezas nombradas§HISTORIAL§la tabla del 2026‑09‑10 (§13); las tres piezas están, `d3_prf_real`
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§· **B1** ⬜ ·§HISTORIAL§la tabla del 2026‑09‑10 (§13); B1 pagada (`d3_prf_real`)
+ROBINSON_PlusPlus/Meta/DiagonalTwo.lean§sigue ⬜.)§HISTORIAL§nota fechada el 2026‑10‑14; Rosser está demostrado desde ADR‑157 (`Meta/Rosser.lean`)
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean§LA DEUDA, ENUNCIADA (cero `axiom`)§HISTORIAL§`DEUDA_evalLiftfc`, pagada por `pcc_eval_liftfc` (§11)
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean§LA OTRA DEUDA DE `liftfc`§HISTORIAL§`DEUDA_hasWitF_liftfc`, pagada por `deuda_hasWitF_liftfc` (`Meta/LiftfcWitnessPrf.lean`)
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean§**LA DEUDA**, 🏁 **SALDADA el 2026‑09‑10**§HISTORIAL§la misma línea dice que está saldada
+ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean§`hGuard` SIN DEUDAS.§HISTORIAL§el título de un resultado: `hGuard` sin las dos deudas de `Meta/LineWFGuardPrf.lean`
+ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean§🏁 **LA DEUDA, SALDADA.**§HISTORIAL§la misma línea dice que está saldada
+ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean§`hGuard` CERRADA A PARTIR DE LAS DOS DEUDAS§HISTORIAL§las dos deudas las paga `Meta/HasWitFTrackedPrf.lean` (`hGuard` sin ellas)
+ROBINSON_PlusPlus/Meta/SolidezVerificador.lean§decía «`⊬R ∧ ⊬¬R` sólo con `ConsistentH`, ⬜»§HISTORIAL§nota ✏️ de ADR‑175: Rosser, desde ADR‑157
+G2EOF
+
+LC_ALL=C grep -rnE "$G2_PAT" $G2_SRC --include=*.lean 2>/dev/null > "$G2_CUR"
+G2_N=$(grep -c . "$G2_CUR"); G2_N=${G2_N:-0}
+G2_D=$(grep -c . "$G2_TAB"); G2_D=${G2_D:-0}
+# (i) cada fila declarada casa EXACTAMENTE una vez, y su clase es una de las cuatro
+while IFS= read -r g2row; do
+  [ -z "$g2row" ] && continue
+  g2f=$(printf '%s' "$g2row" | awk -F'§' '{print $1}')
+  g2a=$(printf '%s' "$g2row" | awk -F'§' '{print $2}')
+  g2c=$(printf '%s' "$g2row" | awk -F'§' '{print $3}')
+  case "$g2c" in ABIERTA|DIFERIDA|OFERTA|HISTORIAL) ;;
+    *) echo "  ❌ $g2f — clase desconocida «$g2c» (ABIERTA, DIFERIDA, OFERTA o HISTORIAL)"; G2_FAIL=1 ;; esac
+  g2hits=$(LC_ALL=C grep -F -- "$g2a" "$G2_CUR" | grep -c "^$g2f:")   # LC_ALL=C: el 🏁 de dos anclas (ver [G])
+  if [ "$g2hits" = "0" ]; then
+    echo "  ❌ $g2f — la fila declarada ($g2c) YA NO CASA con ningún marcador:"
+    echo "        ancla: $g2a"
+    echo "        ⇒ o la deuda se pagó (quita la fila) o el texto cambió (ajusta el ancla)."
+    G2_FAIL=1
+  elif [ "$g2hits" != "1" ]; then
+    echo "  ❌ $g2f — ancla AMBIGUA ($g2hits marcadores): $g2a"
+    G2_FAIL=1
+  fi
+done < "$G2_TAB"
+# (ii) ningún marcador sin declarar, y el recuento CUADRA (cero y cero también es verde: es la meta)
+if [ "$G2_N" != "$G2_D" ]; then
+  echo "  ❌ marcadores en el árbol: $G2_N · filas declaradas: $G2_D"
+  while IFS= read -r g2l; do
+    [ -z "$g2l" ] && continue
+    g2lf=${g2l%%:*}; g2found=0
+    while IFS= read -r g2row; do
+      [ -z "$g2row" ] && continue
+      g2f=$(printf '%s' "$g2row" | awk -F'§' '{print $1}')
+      [ "$g2f" = "$g2lf" ] || continue
+      g2a=$(printf '%s' "$g2row" | awk -F'§' '{print $2}')
+      case "$g2l" in *"$g2a"*) g2found=1; break ;; esac
+    done < "$G2_TAB"
+    [ "$g2found" = "0" ] && echo "        SIN DECLARAR → $(printf '%s' "$g2l" | cut -c1-118)"
+  done < "$G2_CUR"
+  G2_FAIL=1
+fi
+G2_AB=$(awk -F'§' '$3 == "ABIERTA"' "$G2_TAB" | grep -c .); G2_AB=${G2_AB:-0}
+rm -f "$G2_TAB" "$G2_CUR"
+if [ -z "$(find $G2_SRC -name '*.lean' 2>/dev/null | head -1)" ]; then
+  echo "  ❌ SIN MEDIR: no hay ningún .lean en $G2_SRC."
+  G2_FAIL=1
+elif [ "$G2_FAIL" = "0" ]; then
+  echo "  ✓ los $G2_N marcadores de deuda están TODOS clasificados ($G2_AB abiertos)"
+else
+  echo "      ⚠️ Un marcador sin clasificar es una deuda que nadie ha mirado: clasifícalo en la TABLA de [G.2]."
+fi
+[ "$G2_FAIL" = "0" ] || FAIL=1
+
+
+# ─── [P] FOOTPRINTS EN LA PROSA — ROJO, con trinquete en los DOS sentidos (T39, ADR-240) ─────────────────────────────
+# ⭐ 2026-11-02 (T39, ADR-240). Los `.lean` de FOL y de RPP publican footprints en su PROSA («`lindenbaum_lemma₀` y
+# `henkin_completion₀` miden `[propext, Quot.sound]`»), y nadie los comparaba con lo medido: `check-footprints.bash`
+# vigila sus FILAS, no lo que dice un docstring. Medido el 2026-11-02: un docstring de RPP llevaba desde ADR-189 (T61) un
+# `Classical.choice` que su fila ya no tenía (`prf_hasWitF_liftfc`; corregido el mismo día).
+# Qué compara: cada lista entre corchetes de `propext`, `Quot.sound` y `Classical.choice` de `../FOL/FOL/`,
+# `../FOL/TheoryFramework/` y `ROBINSON_PlusPlus/`, con cada cita entre comillas invertidas de SU TRAMO (lo que va desde el
+# último «; », «. », «— » o «(» de la línea hasta la lista) que tenga fila en la TABLA de `check-footprints.bash` (por su
+# nombre entero o por un final de nombre que sólo tenga una fila). Si no coinciden, es una DISCREPANCIA.
+# ⚠️ Lo que NO mira: una cita y su lista en líneas distintas, y las frases sin corchetes («ningún axioma», que a menudo
+# quiere decir «ningún `axiom` del proyecto»). Es un cruce por tramo: puede emparejar mal, y para eso está la tabla.
+# 🔑 El trinquete, como el de [G.2]: cada discrepancia tiene su fila, clasificada (HISTORIAL: el texto cuenta lo que se
+# medía antes; ATRIBUCION: el cruce empareja la lista con una cita a la que no se refiere), y cada fila casa con una
+# discrepancia de hoy, por fichero, cita y lista (no por número de línea). Una discrepancia que sea un error de hoy no se
+# declara: se corrige el texto.
+echo ""
+echo "════ [P] FOOTPRINTS EN LA PROSA — ROJO, trinquete (T39, ADR-240) ════"
+P_FAIL=0
+P_FILAS=$(mktemp); P_TAB=$(mktemp); P_HOY=$(mktemp); P_AUTO=$(mktemp -d)
+LC_ALL=C awk "/^read -r -d '' TABLA <<'EOF'/{f=1;next} f&&/^EOF\$/{exit} f" check-footprints.bash > "$P_FILAS" 2>/dev/null
+P_AWK='
+function norm(s,   n, z, i, j, t, out) {
+  gsub(/[][` ]/, "", s); n = split(s, z, ",")
+  for (i = 1; i <= n; i++) for (j = i + 1; j <= n; j++) if (z[j] < z[i]) { t = z[i]; z[i] = z[j]; z[j] = t }
+  out = ""; for (i = 1; i <= n; i++) if (z[i] != "") out = out (out == "" ? "" : ",") z[i]
+  return out == "" ? "-" : out }
+BEGIN { FP = "\\[(propext|Quot[.]sound|Classical[.]choice)(, *(propext|Quot[.]sound|Classical[.]choice))*\\]"
+  while ((getline l < FILAS) > 0) { if (split(l, p, "|") < 2) continue; nm = p[1]; full[nm] = norm(p[2] == "-" ? "" : p[2])
+    k = nm; while (sub(/^[^.]*[.]/, "", k)) { if ((k in suf) && suf[k] != nm) amb[k] = 1; suf[k] = nm } } }
+{ linea = $0; resto = linea; base = 0
+  while (match(resto, FP)) {
+    ms = RSTART; ml = RLENGTH; fp = norm(substr(resto, ms, ml)); seg = substr(linea, 1, base + ms - 1)
+    while (match(seg, /(; |[.] |— |\()/)) seg = substr(seg, RSTART + RLENGTH)
+    while (match(seg, /`[^` ]+`/)) {
+      id = substr(seg, RSTART + 1, RLENGTH - 2); seg = substr(seg, RSTART + RLENGTH)
+      nm = (id in full) ? id : (((id in suf) && !(id in amb)) ? suf[id] : "")
+      if (nm == "") continue
+      pares++
+      if (full[nm] != fp) print FILENAME "§" FNR "§" id "§" fp "§" nm "§" full[nm]
+    }
+    base += ms + ml - 1; resto = substr(resto, ms + ml) } }
+END { print "PARES§" pares + 0 }'
+# autotest de salida exacta: una cita que cuadra, una que no, una por su final de nombre, un final ambiguo, dos citas
+# con una lista, una lista sin cita, una cita de OTRO tramo, y una lista de una línea con dos tramos
+printf '%s\n' 'A.B.bien|propext' 'A.B.mal|-' 'A.C.amb|-' 'A.D.amb|-' 'A.E.dos|Quot.sound,propext' 'A.E.tres|Quot.sound,propext' \
+  'A.F.lejos|-' > "$P_AUTO/filas"
+printf '%s\n' '`A.B.bien`, `[propext]`.' '`mal` mide `[propext, Quot.sound]`.' '`amb`, `[propext]`.' \
+  '`dos` y `tres` miden `[propext, Quot.sound]`.' 'A lo sumo `[Classical.choice]` en todo el módulo.' \
+  '`lejos` no; en cambio `[propext]`.' '`bien`, `[propext]`; `mal`, `[propext, Classical.choice, Quot.sound]`.' > "$P_AUTO/doc.lean"
+P_AUTO_SAL=$( (cd "$P_AUTO" && LC_ALL=C awk -v FILAS=filas "$P_AWK" doc.lean) | tr '\n' ';')
+P_AUTO_OK='doc.lean§2§mal§Quot.sound,propext§A.B.mal§-;doc.lean§7§mal§Classical.choice,Quot.sound,propext§A.B.mal§-;PARES§6;'
+# ── LA TABLA ──  fichero § cita (tal cual en el texto) § la lista de la prosa (ordenada) § clase § nota
+cat > "$P_TAB" <<'PEOF'
+../FOL/FOL/Compacity0.lean§evalTerm_updateCsts§Quot.sound,propext§HISTORIAL§«medidos (con `String`)»: D7 la dejó en ningún axioma, y lo dice la nota ✏️ de debajo
+../FOL/FOL/Rename.lean§derives0_rename_conservative§Classical.choice,Quot.sound,propext§HISTORIAL§«Hasta el 2026‑09‑27 aquí decía»: la nota de la auditoría de constructividad
+PEOF
+P_FICH=$( { find ../FOL/FOL ../FOL/TheoryFramework -name '*.lean' 2>/dev/null; find ROBINSON_PlusPlus -name '*.lean' 2>/dev/null; } | LC_ALL=C sort)
+if [ "$P_AUTO_SAL" != "$P_AUTO_OK" ]; then
+  echo "  ❌ NO PUDE MEDIR [P]: el autotest no da lo esperado ($P_AUTO_OK), da: $P_AUTO_SAL"; P_FAIL=1
+elif [ "$(grep -c '|' "$P_FILAS")" -lt 100 ]; then
+  echo "  ❌ NO PUDE MEDIR [P]: la TABLA de check-footprints.bash da $(grep -c '|' "$P_FILAS") filas (¿cambió su forma?)."; P_FAIL=1
+elif ! printf '%s\n' "$P_FICH" | grep -q '^\.\./FOL/FOL/' || ! printf '%s\n' "$P_FICH" | grep -q '^ROBINSON_PlusPlus/'; then
+  echo "  ❌ NO PUDE MEDIR [P]: faltan los .lean de ../FOL o de ROBINSON_PlusPlus."; P_FAIL=1
+elif ! printf '%s\n' "$P_FICH" | tr '\n' '\0' | xargs -0 env LC_ALL=C awk -v FILAS="$P_FILAS" "$P_AWK" > "$P_HOY"; then
+  echo "  ❌ NO PUDE MEDIR [P]: el awk falló."; P_FAIL=1
+else
+  # (xargs puede partir la lista: los PARES se suman)
+  P_PARES=$(LC_ALL=C awk -F'§' '$1 == "PARES" { s += $2 } END { print s + 0 }' "$P_HOY")
+  P_DIS=$(LC_ALL=C grep -v '^PARES§' "$P_HOY")
+  if [ "$P_PARES" = "0" ]; then
+    echo "  ❌ NO PUDE MEDIR [P]: ninguna cita con footprint casa con una fila (¿cambió la forma de la prosa o de la tabla?)."; P_FAIL=1
+  fi
+  # (i) cada fila de la tabla casa con EXACTAMENTE una discrepancia de hoy, y su clase es una de las dos
+  while IFS= read -r prow; do
+    [ -z "$prow" ] && continue
+    pf=$(printf '%s' "$prow" | LC_ALL=C awk -F'§' '{print $1}'); pc=$(printf '%s' "$prow" | LC_ALL=C awk -F'§' '{print $2}')
+    pl=$(printf '%s' "$prow" | LC_ALL=C awk -F'§' '{print $3}'); pk=$(printf '%s' "$prow" | LC_ALL=C awk -F'§' '{print $4}')
+    case "$pk" in HISTORIAL|ATRIBUCION) ;; *) echo "  ❌ $pf — clase desconocida «$pk» (HISTORIAL o ATRIBUCION)"; P_FAIL=1 ;; esac
+    pn=$(printf '%s\n' "$P_DIS" | LC_ALL=C awk -F'§' -v f="$pf" -v c="$pc" -v l="$pl" '$1 == f && $3 == c && $4 == l' | grep -c .)
+    if [ "$pn" = "0" ]; then
+      echo "  ❌ $pf — la fila declarada ($pk) YA NO CASA: \`$pc\` con [$pl]. ⇒ el texto cambió o la fila de la TABLA: quita la fila."; P_FAIL=1
+    elif [ "$pn" != "1" ]; then
+      echo "  ❌ $pf — la fila declarada casa con $pn discrepancias: \`$pc\` con [$pl] (ambigua)."; P_FAIL=1
+    fi
+  done < "$P_TAB"
+  # (ii) ninguna discrepancia sin su fila
+  P_SIN=$(printf '%s\n' "$P_DIS" | grep . | while IFS= read -r pd; do
+    pf=$(printf '%s' "$pd" | LC_ALL=C awk -F'§' '{print $1 "§" $3 "§" $4}')
+    LC_ALL=C awk -F'§' '{print $1 "§" $2 "§" $3}' "$P_TAB" | grep -qxF -- "$pf" || printf '%s\n' "$pd"
+  done)
+  if [ -n "$P_SIN" ]; then
+    printf '%s\n' "$P_SIN" | LC_ALL=C awk -F'§' '{ printf "  ❌ %s:%s — `%s` dice [%s] y su fila (%s) dice [%s]\n", $1, $2, $3, $4, $5, $6 }'
+    echo "      ⇒ si el texto afirma el footprint de HOY, corrígelo; si cuenta el de antes, márcalo y declara la fila en la tabla de [P]."
+    P_FAIL=1
+  fi
+  [ "$P_FAIL" = "0" ] && echo "  ✓ $P_PARES citas con footprint en la prosa (FOL, TheoryFramework y RPP), comparadas con su fila: $((P_PARES - $(grep -c . "$P_TAB"))) cuadran, y las $(grep -c . "$P_TAB") que no, declaradas"
+fi
+rm -rf "$P_FILAS" "$P_TAB" "$P_HOY" "$P_AUTO"
+[ "$P_FAIL" = "0" ] || FAIL=1
+
+
+# ─── [R] REGISTRO DE HALLAZGOS: cada ID de las auditorías, con su estado — ROJO (T37, ADR-241) ───────────────────────
+# ⭐ 2026-11-02 (T37, ADR-241). Los hallazgos de las auditorías (las rondas 1, 2 y 3, los 163 candidatos del suelo y su
+# crítico, las tres auditorías de ADR-121…127 y las tres viejas) vivían en sus artefactos, y en el repositorio aparecían
+# identificadores sin estado. `doc/control/hallazgos.tsv` tiene una fila por ID —origen, resumen, veredicto, estado, dónde
+# y evidencia—, leída contra el árbol el 2026-11-02 (las citas fichero:línea de su evidencia son de ese día: RPP 6cdd2dd,
+# FOL b5c5e1c). Este bloque exige:
+#   (1) que los IDs del registro sean EXACTAMENTE los que se extraen hoy de las fuentes versionadas (los JSON de
+#       `doc/registro/` y las tres auditorías viejas de `doc/`), en los dos sentidos; las dos auditorías sin IDs propios
+#       (A121, A123: el registro les da uno por posición) van con su lista fija y el sha256 de su fuente;
+#   (2) un estado a cada fila: «hecho» con un ADR que exista (o «sin ADR: commit <sha>» / «sin ADR: FOL <sha>», de antes
+#       de esa disciplina, con el commit en su repo), «sustituido» con un T de la auditoría del suelo que exista,
+#       «pendiente» con «sin dueño» o un T que exista, «descartado» con su razón; y que todo ADR-NNN y todo Txx que nombre
+#       la columna «dónde» exista.
+# Lo que NO mira: que el estado sea CIERTO (eso es leer el ADR), ni la evidencia, que es texto de su día.
+echo ""
+echo "════ [R] REGISTRO DE HALLAZGOS — ROJO (T37, ADR-241) ════"
+R_FAIL=0
+R_TSV=doc/control/hallazgos.tsv
+R_DIR=$(mktemp -d)
+R_REG=doc/registro
+# los IDs de las fuentes, como los escribe el registro (el guion U+2011 de los .md, a «-»). Cada fuente nombra un ID
+# varias veces (el hallazgo y su verificación): `sort -u` POR FUENTE; un ID que salga de dos fuentes es una colisión.
+r_extrae() {
+  LC_ALL=C grep -oE '"id": "L[1-5]-[0-9]{1,2}"' "$R_REG/2026-10-02-auditoria-base/ronda1/salida_workflow_ronda1.json" | cut -d'"' -f4 | LC_ALL=C sort -u
+  LC_ALL=C grep -oE '"id": "(R2-[1-5]-[0-9]{1,2}|R22-[0-9]{1,2})"' "$R_REG/2026-10-02-auditoria-base/ronda2/salida_workflow_ronda2.json" | cut -d'"' -f4 | LC_ALL=C sort -u
+  LC_ALL=C grep -oE '"id": "R3-[1-5]-(H[0-9]|[0-9]{2})"' "$R_REG/2026-10-28-ronda3/resultado.json" | cut -d'"' -f4 | LC_ALL=C sort -u
+  LC_ALL=C awk -F'"' '/^  "dim": /{ d = $4 } /^  "id": /{ p = (d == "medida") ? "MED" : (d == "fundamentos") ? "FUN" : (d == "subterraneo") ? "SUB" : (d == "ruta") ? "RUT" : (d == "fol") ? "FOL" : "DOC"; print p ":" $4 }' \
+    "$R_REG/2026-10-12-auditoria-suelo/candidatos.json" | LC_ALL=C sort -u
+  LC_ALL=C grep -oE '"id":"CRI-[0-9]{2}"' "$R_REG/2026-10-12-auditoria-suelo/workflow-cierre.json" | cut -d'"' -f4 | LC_ALL=C sort -u
+  LC_ALL=C grep -oE '\\n\*\*C[0-9]+\.' "$R_REG/2026-10-05-auditoria-adr124-126/workflow.json" | LC_ALL=C sed 's/^\\n\*\*/A124:/; s/\.$//' | LC_ALL=C sort -u
+  LC_ALL=C grep -oE '\\nC[0-9]+\. ' "$R_REG/2026-10-05-auditoria-adr124-126/workflow.json" | LC_ALL=C sed 's/^\\n/A125:/; s/\. $//' | LC_ALL=C sort -u
+  LC_ALL=C grep -E '^### F(-|‑)[0-9]+b? · ' doc/AUDITORIA-2026-09-11.md | LC_ALL=C sed 's/^### //; s/ · .*//; s/‑/-/' | LC_ALL=C sort -u
+  LC_ALL=C grep -E '^\*\*[AMBRD](-|‑)[0-9]+ · ' doc/AUDITORIA-FOL-2026-09-12.md | LC_ALL=C sed 's/^\*\*//; s/ · .*//; s/‑/-/; s/^/FOL0912:/' | LC_ALL=C sort -u
+  LC_ALL=C grep -E '^### [AG][0-9] · ' doc/AUDITORIA-2026-09-18.md | LC_ALL=C sed 's/^### //; s/ · .*//; s/^/AUD0918:/' | LC_ALL=C sort -u
+  # sin IDs propios en su fuente: la lista fija del registro, y el sha256 de la fuente (si cambia, se vuelve a mirar)
+  printf 'A121:%s\n' G1 G2 G3 G4 G5 G6 G7 G8 W1 W2 W3 W4 W5 W6 W7 T1 T2 T3 T4 T5 T6 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10
+  printf 'A123:%s\n' R1 R2 R3 R4 R5 R6 R7 R8 R9 D1 D2 S1
+  # (sin fuente versionada: la auditoría del 2026-09-28, que citan ADR-114…118)
+  echo AUD0928:F1
+}
+R_SHA_A121=64e0959c7a158850e75be82287c90d2ed2e4bffd2d6502df81b9863a1bd86bc3
+R_SHA_A123=28f8b89e1940b5065def7e3e38674929556d1520a0bd0380a51bb034f70d5229
+# la comprobación de cada fila (awk): campos, estado, y lo que nombra «dónde»; ARGV[1] los ADR que existen, ARGV[2] los T
+R_AWK='
+FILENAME == ARGV[1] { adr[$0] = 1; next }
+FILENAME == ARGV[2] { t[$0] = 1; next }
+FNR == 1 { next }
+{ id = $1; e = $5; d = $6
+  if (NF != 7) { print id ": " NF " campos (son 7)"; next }
+  if (e != "hecho" && e != "pendiente" && e != "descartado" && e != "sustituido") { print id ": estado «" e "» (hecho, pendiente, descartado o sustituido)"; next }
+  if (d == "") { print id ": «dónde» vacío"; next }
+  r = d; while (match(r, /ADR-[0-9]+/)) { a = substr(r, RSTART, RLENGTH); r = substr(r, RSTART + RLENGTH); if (!(a in adr)) print id ": " a " no existe" }
+  r = d; while (match(r, /(^|[^A-Za-z0-9_])T[0-9][0-9][a-z]?([^A-Za-z0-9_]|$)/)) { x = substr(r, RSTART, RLENGTH); r = substr(r, RSTART + RLENGTH - 1)
+    gsub(/[^A-Za-z0-9]/, "", x); if (!(x in t)) print id ": " x " no es un T de la auditoría" }
+  if (e == "hecho" && d !~ /^ADR-[0-9]+/ && d !~ /^sin ADR: (commit|FOL) [0-9a-f]+$/) print id ": «hecho» sin ADR (ni «sin ADR: commit <sha>»)"
+  if (e == "sustituido" && d !~ /(^|[^A-Za-z0-9_])T[0-9][0-9][a-z]?([^A-Za-z0-9_]|$)/) print id ": «sustituido» sin el T que lo absorbe"
+  if (e == "pendiente" && d !~ /^sin dueño/ && d !~ /(^|[^A-Za-z0-9_])T[0-9][0-9][a-z]?([^A-Za-z0-9_]|$)/) print id ": «pendiente» sin dueño ni T"
+  if (e == "hecho" && d ~ /^sin ADR: /) { n = split(d, z, " "); print "SHA\t" id "\t" z[3] "\t" z[4] } }'
+# autotest de salida exacta: una fila de cada fallo
+printf '%s\n' ADR-001 ADR-120 > "$R_DIR/adr"; printf '%s\n' T10 T61b > "$R_DIR/t"
+{ printf 'id\torigen\tresumen\tveredicto\testado\tdónde\tevidencia\n'
+  printf 'X1\to\tr\tv\thecho\tADR-120\te\n'
+  printf 'X2\to\tr\tv\thecho\tADR-999\te\n'
+  printf 'X3\to\tr\tv\tcerrado\tADR-120\te\n'
+  printf 'X4\to\tr\tv\tpendiente\t\te\n'
+  printf 'X5\to\tr\tv\tsustituido\tT99\te\n'
+  printf 'X6\to\tr\tv\tsustituido\tT61b (y ADR-001)\te\n'
+  printf 'X7\to\tr\tv\thecho\tsin ADR: commit abc1234\te\n'
+  printf 'X8\to\tr\tv\tpendiente\tya veremos\te\n'
+  printf 'X9\to\tr\tv\thecho\tla nota de ADR-120\te\n'
+  printf 'X10\to\tr\n'; } > "$R_DIR/tsv"
+R_AUTO=$(cd "$R_DIR" && LC_ALL=C awk -F'\t' "$R_AWK" adr t tsv | tr '\t\n' '|;')
+R_AUTO_OK='X2: ADR-999 no existe;X3: estado «cerrado» (hecho, pendiente, descartado o sustituido);X4: «dónde» vacío;X5: T99 no es un T de la auditoría;SHA|X7|commit|abc1234;X8: «pendiente» sin dueño ni T;X9: «hecho» sin ADR (ni «sin ADR: commit <sha>»);X10: 3 campos (son 7);'
+if [ "$R_AUTO" != "$R_AUTO_OK" ]; then
+  echo "  ❌ NO PUDE MEDIR [R]: el autotest no da lo esperado ($R_AUTO_OK), da: $R_AUTO"; R_FAIL=1
+elif [ ! -f "$R_TSV" ]; then
+  echo "  ❌ falta $R_TSV."; R_FAIL=1
+else
+  r_extrae 2>/dev/null | LC_ALL=C sort > "$R_DIR/fuentes"
+  LC_ALL=C awk -F'\t' 'NR > 1 { print $1 }' "$R_TSV" | LC_ALL=C sort > "$R_DIR/registro"
+  R_NF=$(grep -c . "$R_DIR/fuentes"); R_NR=$(grep -c . "$R_DIR/registro")
+  R_DUP=$(LC_ALL=C uniq -d "$R_DIR/registro"); R_DUPF=$(LC_ALL=C uniq -d "$R_DIR/fuentes")
+  [ -n "$R_DUP" ] && { echo "  ❌ IDs repetidos en $R_TSV: $(printf '%s ' $R_DUP)"; R_FAIL=1; }
+  [ -n "$R_DUPF" ] && { echo "  ❌ IDs que salen de DOS fuentes (una colisión: ¿cambió una?): $(printf '%s ' $R_DUPF)"; R_FAIL=1; }
+  R_FALTAN=$(LC_ALL=C comm -23 "$R_DIR/fuentes" "$R_DIR/registro"); R_SOBRAN=$(LC_ALL=C comm -13 "$R_DIR/fuentes" "$R_DIR/registro")
+  [ -n "$R_FALTAN" ] && { echo "  ❌ IDs de las fuentes SIN FILA en $R_TSV: $(printf '%s ' $R_FALTAN)"; R_FAIL=1; }
+  [ -n "$R_SOBRAN" ] && { echo "  ❌ filas de $R_TSV que NO SALEN de ninguna fuente: $(printf '%s ' $R_SOBRAN)"; R_FAIL=1; }
+  for p in "A121 $R_REG/2026-10-05-auditoria-adr120-121/workflow.json $R_SHA_A121" "A123 $R_REG/2026-10-05-auditoria-adr123/workflow.json $R_SHA_A123"; do
+    set -- $p
+    [ "$(sha256sum "$2" 2>/dev/null | cut -c1-64)" = "$3" ] \
+      || { echo "  ❌ la fuente de $1 ($2) cambió (o falta): su lista fija ya no vale; vuelve a leerla."; R_FAIL=1; }
+  done
+  if [ "$R_NF" -lt 400 ]; then echo "  ❌ NO PUDE MEDIR [R]: las fuentes dan $R_NF IDs (¿cambió su forma?)."; R_FAIL=1; fi
+  # los ADR que existen (los de hoy y los de antes de ADR-131, en el histórico) y los T de la auditoría
+  LC_ALL=C grep -ohE '^## ADR-[0-9]+' DECISIONS.md doc/historia/DECISIONS-001-130.md 2>/dev/null | cut -c4- | LC_ALL=C sort -u > "$R_DIR/adr"
+  LC_ALL=C grep -oE '^#### T[0-9][0-9][a-z]? ' doc/AUDITORIA-SUELO-2026-10-12.md | LC_ALL=C sed 's/^#### //; s/ $//' | LC_ALL=C sort -u > "$R_DIR/t"
+  if [ "$(grep -c . "$R_DIR/adr")" -lt 200 ] || [ "$(grep -c . "$R_DIR/t")" -lt 80 ]; then
+    echo "  ❌ NO PUDE MEDIR [R]: $(grep -c . "$R_DIR/adr") ADR y $(grep -c . "$R_DIR/t") T (¿cambió la forma de DECISIONS.md o de la auditoría?)."; R_FAIL=1
+  else
+    R_MAL=$(LC_ALL=C awk -F'\t' "$R_AWK" "$R_DIR/adr" "$R_DIR/t" "$R_TSV")
+    R_SHAS=$(printf '%s\n' "$R_MAL" | grep '^SHA	'); R_MAL=$(printf '%s\n' "$R_MAL" | grep -v '^SHA	' | grep .)
+    if [ -n "$R_MAL" ]; then printf '%s\n' "$R_MAL" | head -20 | sed 's/^/  ❌ /'; R_FAIL=1; fi
+    # «sin ADR: commit <sha>» en RPP, «sin ADR: FOL <sha>» en ../FOL: el commit existe
+    while IFS="$(printf '\t')" read -r _ rid rk rsha; do
+      [ -z "$rid" ] && continue
+      if [ "$rk" = "FOL" ]; then
+        [ -d ../FOL/.git ] || { echo "  ❌ NO PUDE MEDIR [R]: $rid cita un commit de FOL y no está ../FOL."; R_FAIL=1; continue; }
+        git -C ../FOL cat-file -e "$rsha^{commit}" 2>/dev/null || { echo "  ❌ $rid: el commit $rsha no está en FOL."; R_FAIL=1; }
+      else
+        git cat-file -e "$rsha^{commit}" 2>/dev/null || { echo "  ❌ $rid: el commit $rsha no está en RPP."; R_FAIL=1; }
+      fi
+    done <<< "$R_SHAS"
+  fi
+  if [ "$R_FAIL" = "0" ]; then
+    R_EST=$(LC_ALL=C awk -F'\t' 'NR > 1 { n[$5]++ } END { printf "%d hechos, %d pendientes, %d descartados, %d sustituidos", n["hecho"], n["pendiente"], n["descartado"], n["sustituido"] }' "$R_TSV")
+    echo "  ✓ los $R_NR IDs de las auditorías tienen su fila y su estado, y son los de sus fuentes ($R_EST)"
+  fi
+fi
+rm -rf "$R_DIR"
+[ "$R_FAIL" = "0" ] || FAIL=1
+
+
+# ─── [S] LAS CITAS DE SONDEOS DEL BUILD: EVIDENCIA O PROCEDENCIA — ROJO (T10, ADR-243) ─────────────────────────────────
+# ⭐ 2026-11-02 (T10, ADR-243). Los `.lean` del build citan sondeos (`sondeos/X.lean`) de dos maneras que se confundían:
+# como EVIDENCIA («lo refuta `sondeos/X.lean`») y como PROCEDENCIA («promovido de», «copia de», «lo que probó en su día»).
+# La auditoría (T10) midió 89 de 114 citas a sondeos que no compilaban, y tres que decían en presente que uno «probó»
+# algo. Desde ADR-141 cada sondeo tiene clase (CONTROL, REGISTRO, REPARAR, ARCHIVADO; `sondeos/README.md`). La regla:
+#   · una cita a un sondeo de CONTROL (`sondeos/CONTROLES.txt`, que la CI compila en cada push) puede ser evidencia;
+#   · una cita a un sondeo ARCHIVADO lleva su etiqueta (`archivo/sondeos-2026-10:sondeos/X.lean`), y el fichero tiene que
+#     estar en ella;
+#   · una cita a cualquier otro sondeo del árbol (REGISTRO, REPARAR) es PROCEDENCIA, y está DECLARADA en la tabla de
+#     abajo, por fichero y sondeo con su número de citas: alguien la leyó y vio que no sostiene nada de hoy. Una que sí lo
+#     sostenga no se declara: el sondeo pasa a CONTROL;
+#   · una cita a un sondeo que no está en el árbol ni en su etiqueta, ROJO.
+# La tabla rompe en los DOS sentidos, como la de [G.2]: una cita nueva sin fila, o una fila que ya no cuadra, ROJO.
+echo ""
+echo "════ [S] CITAS DE SONDEOS DEL BUILD: EVIDENCIA O PROCEDENCIA — ROJO (T10, ADR-243) ════"
+S_FAIL=0
+S_TAB=$(mktemp); S_HOY=$(mktemp)
+# ── LA TABLA ──  fichero § sondeo (sin `.lean`) § citas § por qué es procedencia
+cat > "$S_TAB" <<'SEOF'
+ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean§AcotarEsLaMismaObligacion§1§los consumidores de la firma que quedan en el sondeo
+ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§A3IsFCBTracked§2§lo que aplicó y lo que no necesitó en su día (nota ✏️ de ADR‑134; REPARAR: no compila)
+ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean§A3IsFCBTracked§3§lo que reflejó, su §2 citada y cómo define su PsiF (REPARAR)
+ROBINSON_PlusPlus/Meta/HilbertDeduction.lean§PrfHMono§2§el rescate de la deuda B6b (2026‑09‑11) y su copia; PrfH_w1 está en el build
+ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean§SegundoMuro§1§una de las copias de la pieza antes de entrar en el build
+ROBINSON_PlusPlus/Meta/ModeloCodigo.lean§ModeloNat§1§de dónde se promovió el modelo (ADR‑119)
+ROBINSON_PlusPlus/Meta/Rosser.lean§ExtensionPorReduccion§2§de dónde se promovió su §1 (ADR‑144)
+ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean§RosserHasWitF§1§el esquema de su §4, hecho general aquí
+ROBINSON_PlusPlus/Meta/Sigma1AtomPrf.lean§D3Sigma1Vacuo§1§la refutación de hbI, fechada (ADR‑132); el teorema vacuo salió del build (ADR‑161)
+ROBINSON_PlusPlus/Meta/Sigma1CorePrf.lean§D3Sigma1Vacuo§1§la refutación de hI, «compilado el 2026‑10‑12» (ADR‑132)
+ROBINSON_PlusPlus/Meta/Sigma1Prf.lean§D3Sigma1Vacuo§1§la refutación de hI, «compilado el 2026‑10‑12» (ADR‑132)
+ROBINSON_PlusPlus/Meta/SolidezPrf.lean§CantorSobreyectivo§1§de dónde se copió wN
+ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean§MergeTestigos§2§de dónde se copió la fusión de testigos, y la copia que sigue fuera
+ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean§A3IsFCBTracked§3§de dónde se promovió el kit genérico, lo que probó y su idioma de bdInB (REPARAR)
+SEOF
+S_CTRL=$(grep -v '^#' sondeos/CONTROLES.txt 2>/dev/null | grep . | sed 's/[.]lean$//' | LC_ALL=C sort -u)
+S_CITAS=$(LC_ALL=C grep -rnoE '(archivo/[A-Za-z0-9_.-]+:)?sondeos/[A-Za-z0-9_]+[.]lean' ROBINSON_PlusPlus --include=*.lean 2>/dev/null)
+S_N=$(printf '%s\n' "$S_CITAS" | grep -c .); S_EV=0; S_AR=0
+if [ -z "$S_CTRL" ]; then
+  echo "  ❌ NO PUDE MEDIR [S]: sondeos/CONTROLES.txt vacío o ausente."; S_FAIL=1
+elif [ "$S_N" -lt 20 ]; then
+  echo "  ❌ NO PUDE MEDIR [S]: $S_N citas de sondeos en el build (¿cambió su forma?)."; S_FAIL=1
+else
+  while IFS= read -r sc; do
+    [ -z "$sc" ] && continue
+    sf=${sc%%:*}; sr=${sc#*:}; sl=${sr%%:*}; sm=${sr#*:}
+    case "$sm" in
+      archivo/*)
+        st=${sm%%:sondeos/*}; sp=${sm#"$st":}
+        if git cat-file -e "$st:$sp" 2>/dev/null; then S_AR=$((S_AR+1))
+        else echo "  ❌ $sf:$sl — \`$sm\`: el fichero no está en esa etiqueta (¿falta un git fetch --tags?)."; S_FAIL=1; fi ;;
+      *)
+        sx=${sm#sondeos/}; sx=${sx%.lean}
+        if printf '%s\n' "$S_CTRL" | grep -qxF -- "$sx"; then S_EV=$((S_EV+1))
+        elif [ -e "$sm" ]; then printf '%s§%s\n' "$sf" "$sx" >> "$S_HOY"
+        else echo "  ❌ $sf:$sl — cita \`$sm\`, que no está en sondeos/: si está archivado, cítalo con su etiqueta (\`archivo/sondeos-2026-10:$sm\`)."; S_FAIL=1; fi ;;
+    esac
+  done <<< "$S_CITAS"
+  S_AGR=$(LC_ALL=C sort "$S_HOY" | LC_ALL=C uniq -c | LC_ALL=C awk '{ n = $1; $1 = ""; sub(/^ /, ""); print $0 "§" n }')
+  S_DECL=$(LC_ALL=C awk -F'§' 'NF >= 3 { print $1 "§" $2 "§" $3 }' "$S_TAB" | LC_ALL=C sort)
+  S_SIN=$(LC_ALL=C comm -23 <(printf '%s\n' "$S_AGR" | grep . | LC_ALL=C sort) <(printf '%s\n' "$S_DECL"))
+  S_SOBRA=$(LC_ALL=C comm -13 <(printf '%s\n' "$S_AGR" | grep . | LC_ALL=C sort) <(printf '%s\n' "$S_DECL"))
+  if [ -n "$S_SIN" ]; then
+    echo "  ❌ citas a sondeos que no son de CONTROL, sin declarar como procedencia (fichero § sondeo § citas):"
+    printf '%s\n' "$S_SIN" | sed 's/^/      /'
+    echo "      ⇒ si la cita dice de dónde viene algo, decláralo en la tabla de [S]; si sostiene algo de HOY, el sondeo pasa a CONTROL."
+    S_FAIL=1
+  fi
+  if [ -n "$S_SOBRA" ]; then
+    echo "  ❌ filas de la tabla de [S] que ya no cuadran con el build (la cita cambió o se fue: ajusta o quita la fila):"
+    printf '%s\n' "$S_SOBRA" | sed 's/^/      /'
+    S_FAIL=1
+  fi
+  [ "$S_FAIL" = "0" ] && echo "  ✓ $S_N citas de sondeos en el build: $S_EV a sondeos de CONTROL, $S_AR a archivados con su etiqueta y $(grep -c . "$S_HOY") de procedencia, declaradas ($(grep -c . "$S_TAB") filas)"
+fi
+rm -f "$S_TAB" "$S_HOY"
+[ "$S_FAIL" = "0" ] || FAIL=1
 
 # ─── RESUMEN ────────────────────────────────────────────────────────────────
 echo

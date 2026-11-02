@@ -1,0 +1,24 @@
+== lake lean sondeos/A3IsFCBTracked.lean, 2026-11-02 (v4.35.0, el build de ese día): rc 1, 19 errores en 941 líneas: 11 «Type mismatch», 1 «Application type mismatch», 4 «unsolved goals», 1 «Ambiguous term» y 2 «Unknown identifier» (`PrfH_lt_subst2`, que ya no está en `BoundedInPrf`); aquí sólo las líneas de error, lo demás es el replay del build ==
+sondeos\A3IsFCBTracked.lean:358:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:367:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:390:2: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:412:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:516:58: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:541:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:548:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:562:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+sondeos\A3IsFCBTracked.lean:554:85: error: unsolved goals
+sondeos\A3IsFCBTracked.lean:584:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:577:65: error: unsolved goals
+sondeos\A3IsFCBTracked.lean:598:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:591:65: error: unsolved goals
+sondeos\A3IsFCBTracked.lean:751:4: error: Ambiguous term
+sondeos\A3IsFCBTracked.lean:747:91: error: unsolved goals
+sondeos\A3IsFCBTracked.lean:799:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:812:4: error: Type mismatch
+sondeos\A3IsFCBTracked.lean:822:88: error: Application type mismatch: The argument
+sondeos\A3IsFCBTracked.lean:904:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+
+== y los dos que la clasificación de las citas consideró promover a CONTROL (no se promovieron: sus citas son de procedencia) ==
+-- lake lean sondeos/PrfHMono.lean: rc 0 en ≈ 4 s; líneas con error, sorry o warning: 0
+-- lake lean sondeos/D3Sigma1Vacuo.lean: rc 0 en ≈ 4 s; líneas con error, sorry o warning: 0

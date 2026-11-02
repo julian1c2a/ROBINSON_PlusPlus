@@ -1,0 +1,108 @@
+# p_mut.bash (P-M0…P-M7; el P-M3 de esta pasada nombraba mal la fila —FOL.Canonical0 en vez de FOL.Lindenbaum0— y no se aplicó: lo repite p_mut3.bash)
+#!/bin/bash
+# Mutaciones de [P] (T39): cada una sobre COPIAS de ROBINSON_PlusPlus/, check-footprints.bash y FOL/TheoryFramework;
+# ninguna toca los repositorios.
+export PATH="/usr/bin:$PATH"
+RPP=/e/dropbox/github/lean4/ROBINSON_PlusPlus
+FOLD=/e/dropbox/github/lean4/FOL
+S=<tmp>
+M="$S/pm"
+BLK="$S/p_block_only.bash"
+awk '/^# ─── \[P\] FOOTPRINTS EN LA PROSA/,/^\[ "\$P_FAIL" = "0" \] \|\| FAIL=1/' "$RPP/check-doc-sync.bash" > "$BLK"
+[ -s "$BLK" ] || { echo "sin bloque"; exit 2; }
+fresca() { rm -rf "$M"; mkdir -p "$M/RPP" "$M/FOL"
+  (cd "$RPP" && find ROBINSON_PlusPlus -name '*.lean' -print0 | xargs -0 cp --parents -t "$M/RPP"; cp check-footprints.bash "$M/RPP/")
+  (cd "$FOLD" && find FOL TheoryFramework -name '*.lean' -print0 | xargs -0 cp --parents -t "$M/FOL"); }
+corre() { (cd "$M/RPP" && FAIL=0 && . "$1" && echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|FAIL=' | cut -c1-170; }
+caso() { echo; echo "──── $1"; }
+
+caso "P-M0 · sin mutar (verde esperado)"
+fresca; corre "$BLK"
+
+caso "P-M1 · RPP: el docstring de prf_hasWitF_liftfc vuelve a decir Classical.choice (ROJO esperado: sin declarar)"
+fresca; f="$M/RPP/ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean"
+LC_ALL=C sed -i 's/^\*\*Footprint\*\* de `prf_hasWitF_liftfc`: `\[propext, Quot.sound\]` (/**Footprint** de `prf_hasWitF_liftfc`: `[propext, Classical.choice, Quot.sound]` (/' "$f"
+grep -n '^\*\*Footprint\*\* de `prf_hasWitF_liftfc`' "$f" | cut -c1-110
+corre "$BLK"
+
+caso "P-M2 · FOL: la línea HISTORIAL de Rename.lean cambia su lista (ROJO esperado: la fila YA NO CASA)"
+fresca; f="$M/FOL/FOL/Rename.lean"
+LC_ALL=C sed -i 's/`derives0_rename_conservative` llevaba `\[propext, Classical.choice, Quot.sound\]`/`derives0_rename_conservative` llevaba `[propext, Quot.sound]`/' "$f"
+grep -c 'llevaba `\[propext, Quot.sound\]`' "$f"
+corre "$BLK"
+
+caso "P-M3 · la fila de lindenbaum_lemma₀ en la TABLA cambia (ROJO esperado: la prosa de FOL la contradice)"
+fresca; grep -n '^FOL.Lindenbaum0.lindenbaum_lemma₀|' "$M/RPP/check-footprints.bash" | head -2
+LC_ALL=C sed -i 's/^FOL.Lindenbaum0.lindenbaum_lemma₀|.*/FOL.Lindenbaum0.lindenbaum_lemma₀|propext/' "$M/RPP/check-footprints.bash"
+corre "$BLK"
+
+caso "P-M4 · una clase desconocida en la tabla (ROJO esperado)"
+fresca; LC_ALL=C sed 's/§HISTORIAL§«Hasta el 2026‑09‑27/§HISTORICO§«Hasta el 2026‑09‑27/' "$BLK" > "$S/p_block_clase.bash"
+grep -c '§HISTORICO§' "$S/p_block_clase.bash"
+corre "$S/p_block_clase.bash"
+
+caso "P-M5 · la TABLA de check-footprints.bash vacía (SIN MEDIR, ROJO esperado)"
+fresca; LC_ALL=C awk "/^read -r -d '' TABLA <<'EOF'/{print; f=1; next} f&&/^EOF\$/{f=0} !f" "$RPP/check-footprints.bash" > "$M/RPP/check-footprints.bash"
+corre "$BLK"
+
+caso "P-M6 · sin ../FOL (SIN MEDIR, ROJO esperado)"
+fresca; rm -rf "$M/FOL"
+corre "$BLK"
+
+caso "P-M7 · la cita y su lista en líneas distintas (VERDE esperado: es lo que [P] NO mira, y lo dice su cabecera)"
+fresca; printf '%s\n' '/-- `prf_hasWitF_liftfc` mide' '`[propext, Classical.choice, Quot.sound]`. -/' >> "$M/RPP/ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean"
+corre "$BLK"
+rm -rf "$M"
+
+# p_mut3.bash
+export PATH="/usr/bin:$PATH"
+RPP=/e/dropbox/github/lean4/ROBINSON_PlusPlus; FOLD=/e/dropbox/github/lean4/FOL
+S=<tmp>
+M="$S/pm"; BLK="$S/p_block_only.bash"
+rm -rf "$M"; mkdir -p "$M/RPP" "$M/FOL"
+(cd "$RPP" && find ROBINSON_PlusPlus -name '*.lean' -print0 | xargs -0 cp --parents -t "$M/RPP"; cp check-footprints.bash "$M/RPP/")
+(cd "$FOLD" && find FOL TheoryFramework -name '*.lean' -print0 | xargs -0 cp --parents -t "$M/FOL")
+echo; echo "──── P-M3 bis · la fila de lindenbaum_lemma₀ en la TABLA cambia (ROJO esperado: la prosa de FOL la contradice)"
+LC_ALL=C sed -i 's/^FOL.Lindenbaum0.lindenbaum_lemma₀|.*/FOL.Lindenbaum0.lindenbaum_lemma₀|propext/' "$M/RPP/check-footprints.bash"
+LC_ALL=C grep -n '^FOL.Lindenbaum0.lindenbaum_lemma₀|' "$M/RPP/check-footprints.bash"
+(cd "$M/RPP" && FAIL=0 && . "$BLK" && echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|FAIL=' | cut -c1-170
+rm -rf "$M"
+
+# p_proto.bash (el prototipo del cruce, antes del bloque: sólo FOL/ y TheoryFramework/)
+#!/bin/bash
+# prototipo del cruce de footprints en prosa (T39): FOL/ y TheoryFramework/ contra las filas de FOL de la TABLA de
+# ../ROBINSON_PlusPlus/check-footprints.bash
+export PATH="/usr/bin:$PATH"
+cd /e/dropbox/github/lean4/FOL || exit 2
+RPP=../ROBINSON_PlusPlus
+FILAS=$(mktemp)
+awk "/^read -r -d '' TABLA <<'EOF'/{f=1;next} f&&/^EOF\$/{exit} f" "$RPP/check-footprints.bash" > "$FILAS"
+echo "filas en la TABLA: $(grep -c . "$FILAS")"
+find FOL TheoryFramework -name '*.lean' | LC_ALL=C sort | xargs env LC_ALL=C awk -v FILAS="$FILAS" '
+function norm(s,   n, z, i, out, t, j, k) {
+  gsub(/[][` ]/, "", s); n = split(s, z, ",")
+  for (i = 1; i <= n; i++) for (j = i + 1; j <= n; j++) if (z[j] < z[i]) { t = z[i]; z[i] = z[j]; z[j] = t }
+  out = ""; for (i = 1; i <= n; i++) if (z[i] != "") out = out (out == "" ? "" : ",") z[i]
+  return out == "" ? "-" : out }
+BEGIN {
+  while ((getline l < FILAS) > 0) { split(l, p, "|"); nm = p[1]; fp = norm(p[2] == "-" ? "" : p[2])
+    full[nm] = fp; k = nm; while (sub(/^[^.]*[.]/, "", k)) { if (k in suf && suf[k] != nm) amb[k] = 1; suf[k] = nm } }
+  FP = "\\[(propext|Quot[.]sound|Classical[.]choice)(, *(propext|Quot[.]sound|Classical[.]choice))*\\]" }
+{ linea = $0; resto = linea; base = 0
+  while (match(resto, FP)) {
+    ms = RSTART; ml = RLENGTH; fp = norm(substr(resto, ms, ml)); antes = substr(linea, 1, base + ms - 1)
+    # el tramo: desde el último «;», «. », «—» o «(» antes del footprint
+    seg = antes; while (match(seg, /(; |[.] |— |\()/)) seg = substr(seg, RSTART + RLENGTH)
+    s2 = seg
+    while (match(s2, /`[A-Za-z_][A-Za-z0-9_.'"'"'₀₁₂₃ᵢ]*`/)) {
+      id = substr(s2, RSTART + 1, RLENGTH - 2); s2 = substr(s2, RSTART + RLENGTH)
+      nm = (id in full) ? id : ((id in suf && !(id in amb)) ? suf[id] : "")
+      if (nm == "") continue
+      vistos++
+      if (full[nm] != fp) print FILENAME ":" FNR ": `" id "` dice " fp " · la fila (" nm ") dice " full[nm] "\t" substr(linea, 1, 150)
+    }
+    base += ms + ml - 1; resto = substr(resto, ms + ml)
+  }
+}
+END { print "pares (cita, fila) comparados: " vistos + 0 > "/dev/stderr" }'
+rm -f "$FILAS"

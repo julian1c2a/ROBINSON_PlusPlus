@@ -1,0 +1,47 @@
+== las mutaciones del [E] de FOL, 2026-11-02, Git Bash, en un clon --shared de FOL (el bloque [E] del árbol de trabajo, tal cual) ==
+
+──── E-M0 · sin mutar; base = master (antes de T39): VERDE, con el aviso de creación
+  ⚠️  la base verificada (b5c5e1c) es de antes de T39: las dos tablas se crean hoy, y no se comparan con nada.
+  25 documentos · deuda declarada: 2 de contenido y 10 de formato   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+FAIL=0
+
+──── E-M0b · base = el commit con las tablas (el techo se aplica): VERDE
+  25 documentos · deuda declarada: 2 de contenido y 10 de formato · techo: los 12 de la base verificada, 8964918   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+FAIL=0
+
+──── E-M1 · README.md editado sin subir su marca (ROJO esperado: porcelain = hoy)
+  ❌ README.md: la marca dice 2026-10-28 y el último commit que lo tocó es 2026-11-02 (hoy, si tiene cambios sin commitear)
+  ⚠️  la base verificada (b5c5e1c) es de antes de T39: las dos tablas se crean hoy, y no se comparan con nada.
+  25 documentos · deuda declarada: 2 de contenido y 10 de formato   ·   sin declarar: 1   ·   saldadas sin quitar: 0
+FAIL=1
+
+──── E-M2 · THOUGHTS.md (deuda de contenido) con su marca de hoy (ROJO esperado: saldada sin quitar)
+  ❌ THOUGHTS.md: la deuda ESTÁ SALDADA — quítalo de su tabla (E_DEUDA o E_DEUDA_FORMATO) de este script.
+  ⚠️  la base verificada (b5c5e1c) es de antes de T39: las dos tablas se crean hoy, y no se comparan con nada.
+  25 documentos · deuda declarada: 1 de contenido y 10 de formato   ·   sin declarar: 0   ·   saldadas sin quitar: 1
+FAIL=1
+
+──── E-M3 · PLANNING.md (deuda de formato) con una marca vieja (ROJO esperado: su deuda es de CONTENIDO)
+  ❌ PLANNING.md: ya tiene marca: su deuda es de CONTENIDO. Pásalo de E_DEUDA_FORMATO a E_DEUDA.
+  ⚠️  la base verificada (b5c5e1c) es de antes de T39: las dos tablas se crean hoy, y no se comparan con nada.
+  25 documentos · deuda declarada: 2 de contenido y 9 de formato   ·   sin declarar: 1   ·   saldadas sin quitar: 0
+FAIL=1
+
+──── E-M4 · el techo: la base no tiene PLANNING.md en sus tablas (ROJO esperado: la deuda SUBE)
+  ❌ la deuda de [E] SUBE: estos documentos no están en las tablas de la base verificada (d1344ca):
+  25 documentos · deuda declarada: 2 de contenido y 10 de formato · techo: los 11 de la base verificada, d1344ca   ·   sin declarar: 1   ·   saldadas sin quitar: 0
+FAIL=1
+
+──── E-M5 · un .md nuevo, versionado y sin marca (ROJO esperado: el universo son TODOS los .md)
+  ❌ NUEVO.md: sin marca `**Last updated:**`
+  ⚠️  la base verificada (b5c5e1c) es de antes de T39: las dos tablas se crean hoy, y no se comparan con nada.
+  26 documentos · deuda declarada: 2 de contenido y 10 de formato   ·   sin declarar: 1   ·   saldadas sin quitar: 0
+FAIL=1
+
+──── E-M6 · un .md en un subdirectorio, con la marca vieja (ROJO esperado)
+  ❌ auditoria/t71-semanticos-2026-10-29/README.md: la marca dice 2026-10-01 y el último commit que lo tocó es 2026-11-02 (hoy, si tiene cambios sin commitear)
+  ⚠️  la base verificada (b5c5e1c) es de antes de T39: las dos tablas se crean hoy, y no se comparan con nada.
+  25 documentos · deuda declarada: 2 de contenido y 10 de formato   ·   sin declarar: 1   ·   saldadas sin quitar: 0
+FAIL=1

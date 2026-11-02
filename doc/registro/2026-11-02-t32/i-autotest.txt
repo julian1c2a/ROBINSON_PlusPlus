@@ -1,0 +1,10 @@
+== el autotest de [I] con las cuatro reglas de la consistencia (T32, CRI-05), 2026-11-02 ==
+(i_auto.bash: las líneas de check-doc-sync.bash desde I_REGLAS=$(mktemp) hasta I_AUTO_OK=, y la comparación)
+tal cual:
+autotest OK
+sin las dos reglas de ConsistentH (grep -v consistenth): falta doc.md:29
+autotest FALLA: doc.md:2;doc.md:3;doc.md:4;doc.md:5;doc.md:7;doc.md:10;doc.md:11;doc.md:13;doc.md:22;doc.md:24;doc.md:26;doc.md:27;doc.md:28;doc4.md:2;doc2.md:2;
+sin la regla «(sin probar|sin demostrar|sin modelo) … consistencia»: falta doc.md:28
+autotest FALLA: doc.md:2;doc.md:3;doc.md:4;doc.md:5;doc.md:7;doc.md:10;doc.md:11;doc.md:13;doc.md:22;doc.md:24;doc.md:26;doc.md:27;doc.md:29;doc4.md:2;doc2.md:2;
+sin la regla «consistencia … (sin probar|…)»: falta doc.md:27
+autotest FALLA: doc.md:2;doc.md:3;doc.md:4;doc.md:5;doc.md:7;doc.md:10;doc.md:11;doc.md:13;doc.md:22;doc.md:24;doc.md:26;doc.md:28;doc.md:29;doc4.md:2;doc2.md:2;

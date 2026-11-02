@@ -1,0 +1,88 @@
+# g_mut.bash (los casos M0, G-M1…G-M4, G2-M1…G2-M6) — G-M1 y G2-M3 no se aplicaron en esta pasada (ver g_mut2)
+#!/bin/bash
+# Mutaciones de [G] y [G.2] (T32): cada una sobre una COPIA fresca del árbol; ninguna toca el repositorio.
+export PATH="/usr/bin:$PATH"
+RPP=/e/dropbox/github/lean4/ROBINSON_PlusPlus
+S=<tmp>
+M="$S/mut"
+BLK="$S/g_block_only.bash"
+# el bloque, tal cual está en check-doc-sync.bash
+awk '/^# ─── \[G\] DEUDAS/,/^\[ "\$G2_FAIL" = "0" \] \|\| FAIL=1/' "$RPP/check-doc-sync.bash" > "$BLK"
+[ -s "$BLK" ] || { echo "sin bloque"; exit 2; }
+
+fresca() { rm -rf "$M"; mkdir -p "$M"; (cd "$RPP" && find ROBINSON_PlusPlus -name '*.lean' -print0 | xargs -0 cp --parents -t "$M"); }
+corre() {  # $1 = fichero con el bloque
+  (cd "$M" && FAIL=0 && . "$1" && echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|FAIL=' | cut -c1-150
+}
+caso() { echo; echo "──── $1"; }
+
+caso "M0 · sin mutar (verde esperado)"
+fresca; corre "$BLK"
+
+caso "G-M1 · la cabecera de DEUDA_hasWitF_liftfc pierde SALDADA y 🏁 (ROJO esperado en [G])"
+fresca; sed -i '1293s/🏁 \*\*SALDADA/**/' "$M/ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean"
+sed -n 1293p "$M/ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean" | cut -c1-100
+corre "$BLK"
+
+caso "G-M2 · la cabecera sólo con 🏁 (pierde SALDADA): VERDE esperado en [G] (y [G.2] rojo: el ancla cambió)"
+fresca; sed -i '1293s/\*\*SALDADA el/**el/' "$M/ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean"
+sed -n 1293p "$M/ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean" | cut -c1-100
+corre "$BLK"
+echo "   … y el mismo caso con el bloque SIN LC_ALL=C (en msys, ROJO esperado: el grep no ve 🏁):"
+sed 's/LC_ALL=C grep -qE "\$G_PAID"/grep -qE "$G_PAID"/' "$BLK" > "$S/g_block_sinC.bash"
+grep -c 'LC_ALL=C grep -qE "$G_PAID"' "$S/g_block_sinC.bash"
+corre "$S/g_block_sinC.bash" | grep -E '\[G\]|DEUDA_hasWitF|FAIL='
+
+caso "G-M3 · ConsistentH: su docstring dice «sin probar» (CRI-05; ROJO esperado en [G]: el testigo es consistencia)"
+fresca; sed -i 's|^/-- Consistencia del \*\*cálculo de Hilbert\*\* `⊢ᴴ`: no demuestra `⊥`. -/|/-- Consistencia del **cálculo de Hilbert** `⊢ᴴ`: no demuestra `⊥`; sigue sin probar. -/|' "$M/ROBINSON_PlusPlus/Meta/Hilbert.lean"
+grep -n 'sigue sin probar' "$M/ROBINSON_PlusPlus/Meta/Hilbert.lean" | cut -c1-100
+corre "$BLK"
+
+caso "G-M4 · ningún Prop (SIN MEDIR, ROJO esperado en [G])"
+fresca; find "$M" -name '*.lean' -exec sed -i 's/: *Prop/: Type/' {} +
+corre "$BLK"
+
+caso "G2-M1 · un marcador nuevo sin fila (ROJO esperado en [G.2])"
+fresca; printf '%s\n' '-- ⬜ falta la otra mitad' >> "$M/ROBINSON_PlusPlus/Meta/Rosser.lean"
+corre "$BLK"
+
+caso "G2-M2 · un marcador declarado desaparece (ROJO esperado: YA NO CASA)"
+fresca; sed -i 's/sigue ⬜\.)/sigue.)/' "$M/ROBINSON_PlusPlus/Meta/DiagonalTwo.lean"
+corre "$BLK"
+
+caso "G2-M3 · el marcador declarado, duplicado (ROJO esperado: AMBIGUA)"
+fresca; grep -h 'sigue ⬜\.)' "$M/ROBINSON_PlusPlus/Meta/DiagonalTwo.lean" >> "$M/ROBINSON_PlusPlus/Meta/DiagonalTwo.lean"
+corre "$BLK"
+
+caso "G2-M4 · una clase desconocida en la tabla (ROJO esperado)"
+fresca; sed 's/§HISTORIAL§nota fechada el 2026‑10‑14/§HISTORICO§nota fechada el 2026‑10‑14/' "$BLK" > "$S/g_block_clase.bash"
+grep -c '§HISTORICO§' "$S/g_block_clase.bash"
+corre "$S/g_block_clase.bash"
+
+caso "G2-M5 · DEUDA dentro de un identificador, en prosa (VERDE esperado: no es palabra)"
+fresca; printf '%s\n' '-- el consumidor usa DEUDA_premsBody y DEUDAS_x' >> "$M/ROBINSON_PlusPlus/Meta/Rosser.lean"
+corre "$BLK"
+
+caso "G2-M6 · árbol sin .lean (SIN MEDIR, ROJO esperado en los dos)"
+rm -rf "$M"; mkdir -p "$M/ROBINSON_PlusPlus"
+corre "$BLK"
+rm -rf "$M"
+
+# g_mut2.bash (G-M1 con LC_ALL=C sed, G2-M3 con un fichero intermedio, G2-M1 con las líneas SIN DECLARAR)
+export PATH="/usr/bin:$PATH"
+RPP=/e/dropbox/github/lean4/ROBINSON_PlusPlus
+S=<tmp>
+M="$S/mut"; BLK="$S/g_block_only.bash"
+fresca() { rm -rf "$M"; mkdir -p "$M"; (cd "$RPP" && find ROBINSON_PlusPlus -name '*.lean' -print0 | xargs -0 cp --parents -t "$M"); }
+corre() { (cd "$M" && FAIL=0 && . "$1" && echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|FAIL=|SIN DECLARAR' | cut -c1-150; }
+echo "──── G-M1 · la cabecera de DEUDA_hasWitF_liftfc pierde SALDADA y 🏁 (ROJO esperado en [G]; y [G.2], el ancla)"
+fresca; LC_ALL=C sed -i '1293s/🏁 \*\*SALDADA/**/' "$M/ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean"
+sed -n 1293p "$M/ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean" | cut -c1-100
+corre "$BLK"
+echo; echo "──── G2-M3 · el marcador declarado, duplicado (ROJO esperado: AMBIGUA)"
+fresca; f="$M/ROBINSON_PlusPlus/Meta/DiagonalTwo.lean"; LC_ALL=C grep -h 'sigue ⬜\.)' "$f" > "$S/dup.txt"; cat "$S/dup.txt" >> "$f"; wc -l < "$S/dup.txt"
+corre "$BLK"
+echo; echo "──── G2-M1 bis · las líneas SIN DECLARAR se listan"
+fresca; printf '%s\n' '-- ⬜ falta la otra mitad' >> "$M/ROBINSON_PlusPlus/Meta/Rosser.lean"
+corre "$BLK"
+rm -rf "$M" "$S/dup.txt"

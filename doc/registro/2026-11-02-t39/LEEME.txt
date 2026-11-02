@@ -1,0 +1,24 @@
+T39 (ADR-239 y ADR-240), 2026-11-02: los controles de documentación de FOL. El [B] rojo con techo ya lo era desde T04
+(ADR-166/167, el mismo núcleo en los dos repos): no se tocó.
+
+mutaciones-E-fol.txt      el [E] de FOL, portado del de RPP (todos los .md versionados, git status --porcelain, el sello
+                          de cabecera, dos tablas y un techo), visto fallar en un clon --shared de FOL: verde sin mutar,
+                          con la base de antes de T39 (aviso de creación) y con la base que ya tiene las tablas (el techo,
+                          12); rojo con un documento editado sin subir su marca (E-M1), una deuda de contenido saldada sin
+                          quitar (E-M2), una de formato que ya tiene marca (E-M3), un documento que no estaba en las tablas
+                          de la base (E-M4, la deuda SUBE), un .md nuevo sin marca (E-M5) y uno de un subdirectorio con la
+                          marca vieja (E-M6).
+mutaciones-E-fol.bash.txt el guion (la ruta de la sesión, saneada a <tmp>).
+mutaciones-P.txt          [P] (en check-doc-sync.bash de RPP: el cruce de los footprints de la PROSA de FOL, TheoryFramework
+                          y RPP con las filas de check-footprints.bash), visto fallar sobre copias: verde sin mutar (59
+                          citas, 2 discrepancias declaradas, HISTORIAL) y con una cita y su lista en líneas distintas (P-M7:
+                          lo que no mira); rojo con el docstring de RPP como estaba (P-M1), con la línea HISTORIAL de
+                          Rename.lean cambiada (P-M2), con una fila de la TABLA cambiada (P-M3 bis: siete citas de FOL la
+                          contradicen), con una clase desconocida (P-M4), sin TABLA (P-M5) y sin ../FOL (P-M6). Al final,
+                          la salida del prototipo antes de corregir el docstring de RPP (LiftfcWitnessPrf.lean, desde
+                          ADR-189 sin Classical.choice).
+mutaciones-P.bash.txt     los guiones de [P] y el prototipo.
+
+Por qué [P] vive en RPP y no en FOL: la TABLA está en RPP, y por M-12 FOL sube primero; en la CI de FOL, RPP es su master
+de antes, y un footprint que cambia en FOL con su fila en el push de RPP que viene detrás la habría bloqueado. En la CI de
+RPP los dos van al día.

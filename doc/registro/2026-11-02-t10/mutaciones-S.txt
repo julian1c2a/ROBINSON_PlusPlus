@@ -1,0 +1,39 @@
+== las mutaciones de [S], 2026-11-02, Git Bash, en un clon --shared de RPP (el bloque [S] del árbol de trabajo, tal cual) ==
+
+──── S-M0 · sin mutar (verde esperado)
+  ✓ 126 citas de sondeos en el build: 26 a sondeos de CONTROL, 78 a archivados con su etiqueta y 22 de procedencia, declaradas (14 filas)
+FAIL=0
+
+──── S-M1 · una cita nueva a un sondeo de REGISTRO (ROJO esperado: sin declarar)
+  ❌ citas a sondeos que no son de CONTROL, sin declarar como procedencia (fichero § sondeo § citas):
+      ROBINSON_PlusPlus/Meta/Rosser.lean§ChoiceFrontera§1
+FAIL=1
+
+──── S-M2 · desaparece una de las dos citas de procedencia de Meta/Rosser.lean (ROJO esperado: la fila no cuadra)
+1
+  ❌ citas a sondeos que no son de CONTROL, sin declarar como procedencia (fichero § sondeo § citas):
+      ROBINSON_PlusPlus/Meta/Rosser.lean§ExtensionPorReduccion§1
+  ❌ filas de la tabla de [S] que ya no cuadran con el build (la cita cambió o se fue: ajusta o quita la fila):
+      ROBINSON_PlusPlus/Meta/Rosser.lean§ExtensionPorReduccion§2
+FAIL=1
+
+──── S-M3 · una cita a un sondeo ARCHIVADO sin su etiqueta (ROJO esperado)
+  ❌ ROBINSON_PlusPlus/Meta/Rosser.lean:425 — cita `sondeos/DescensoLiftc.lean`, que no está en sondeos/: si está archivado, cítalo con su etiqueta (`archivo/sondeos-2026-10:sondeos/De
+FAIL=1
+
+──── S-M4 · una cita archivada con un fichero que no está en la etiqueta (ROJO esperado)
+  ❌ ROBINSON_PlusPlus/Meta/Rosser.lean:425 — `archivo/sondeos-2026-10:sondeos/NoExiste.lean`: el fichero no está en esa etiqueta (¿falta un git fetch --tags?).
+FAIL=1
+
+──── S-M5 · una cita nueva a un sondeo de CONTROL (VERDE esperado: puede ser evidencia)
+  ✓ 127 citas de sondeos en el build: 27 a sondeos de CONTROL, 78 a archivados con su etiqueta y 22 de procedencia, declaradas (14 filas)
+FAIL=0
+
+──── S-M6 · sondeos/CONTROLES.txt vacío (SIN MEDIR, ROJO esperado)
+  ❌ NO PUDE MEDIR [S]: sondeos/CONTROLES.txt vacío o ausente.
+FAIL=1
+
+──── S-M7 · PrfHMono pasa a CONTROL (ROJO esperado: su fila de procedencia sobra; las dos citas son ya de CONTROL)
+  ❌ filas de la tabla de [S] que ya no cuadran con el build (la cita cambió o se fue: ajusta o quita la fila):
+      ROBINSON_PlusPlus/Meta/HilbertDeduction.lean§PrfHMono§2
+FAIL=1

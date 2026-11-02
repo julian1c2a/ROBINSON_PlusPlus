@@ -1,0 +1,19 @@
+T32 (ADR-237), 2026-11-02: [G] y [G.2] portados de FOL a check-doc-sync.bash de RPP, y la regla de la consistencia
+en [I] (CRI-05 de la auditoría).
+
+mutaciones.txt        las mutaciones de [G] y [G.2], cada una sobre una COPIA fresca de los .lean (nunca el árbol): el
+                      bloque de check-doc-sync.bash tal cual, ejecutado en Git Bash. Verde sin mutar; rojo con la cabecera
+                      de DEUDA_hasWitF_liftfc sin «SALDADA» ni 🏁 (G-M1), con «sigue sin probar» en la de ConsistentH
+                      (G-M3, CRI-05), sin ningún Prop (G-M4), con un marcador nuevo (G2-M1), con uno declarado que
+                      desaparece (G2-M2), duplicado (G2-M3), con una clase desconocida (G2-M4) y sin .lean (G2-M6); verde
+                      con «DEUDA» dentro de un identificador (G2-M5) y con 🏁 como única marca de pagada (G-M2), que el
+                      mismo bloque SIN LC_ALL=C pone rojo en msys.
+mutaciones.bash.txt   los dos guiones (g_mut.bash y g_mut2.bash; la ruta de la sesión, saneada a <tmp>). En la primera
+                      pasada, G-M1 y G2-M3 no se aplicaron (el sed de msys tampoco ve 🏁; el grep se negó a escribir en su
+                      entrada): la segunda los repite bien.
+locale.txt            por qué LC_ALL=C: el grep 3.0 de msys, en es_ES.UTF-8, no casa 🏁 (U+1F3C1, fuera del plano
+                      básico: 0 líneas; con LC_ALL=C, 4); ⬜ (U+2B1C) sí. El de la CI (WSL, grep 3.12) casa los dos. Dos
+                      anclas de la tabla de [G.2] llevan 🏁, y salían «YA NO CASA» en local y verdes en la CI. El [G] de
+                      FOL tiene la misma divergencia en su GPAID (sólo en local, y en el sentido del rojo).
+i-autotest.txt        el autotest de [I] con las cuatro reglas nuevas (consistencia y ConsistentH, en los dos órdenes):
+                      verde tal cual, y rojo quitando cada una (falta su línea de doc.md).

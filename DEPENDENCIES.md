@@ -1,336 +1,607 @@
-# Dependency Diagram — ROBINSON_PlusPlus
+# Diagrama de Dependencias — ROBINSON_PlusPlus
 
-> **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
-> Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
+**Last updated:** 2026-11-02 — GENERADO por `python3 gen-dependencies.py` desde las líneas `import`; no se edita a mano.
+**Autor**: Julián Calderón Almendros
 
-**Last updated:** 2026-09-10 — ⚠️ **el grafo NO ha cambiado desde el 2026-09-04**, y se ha **verificado**: los frentes de §3.52–§3.58 no añadieron ni un módulo (121 activos) ni una arista nueva. Las piezas de `hPsiId` entraron en módulos que ya existían (`SubstCodeOpenPrf` §5, `BdAllIntroPrf`), y la referencia de `TrackedAtomsPrf` a `prf_liftc_varc_numeral` (ADR-019) es **cualificada**, no un `import` nuevo: `SubstCodeOpenPrf` ya estaba en su cierre vía `BdAllIntroPrf`. Último cambio real del grafo: 2026-09-04 (+1 módulo, `Meta/EvalLiftcPrf.lean` — el DESCENSO, 20 imports concretos; importa a `LiftcCodePrf` y a `CodeWitnessPrf`, **nunca al revés**: ver ADR-019)
-**Author**: Julián Calderón Almendros
+> ⚠️ Este fichero se **calcula** (T30, ADR‑238). Para actualizarlo: `python3 gen-dependencies.py`; para comprobar
+> que está al día: `python3 gen-dependencies.py --check`, que corre en la CI de RPP. El DEPENDENCIES.md escrito a mano
+> se sustituyó el 2026‑11‑02: desde ADR‑115 describía un árbol de 131 módulos que ya no existía. Está, tal cual, en la
+> historia de git (`git show 6cdd2dd:DEPENDENCIES.md`).
 
-Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.
+## Cifras
 
-> 🗑️ **2026‑10‑02 (ADR‑115) — el grafo de abajo es ANTERIOR a la retirada de `⊢`.** Se borraron 27
-> módulos: `Minimal/Theorems/Block1–8` (10), `Full/{Mod2,Lists,StrongInduction,Bounded,Divisibility,
-> Division,Primality,Factorization}` (8) y `Meta/{AxiomListCode,DerivCond,Induction,LineWFDerives,
-> ListInductionArith,Necessitation,OmegaStrength,Reflection,StepArith}` (9). Quedan **104** (Minimal 1 +
-> Meta 100 + Full 3, antes de ADR‑120), sin ciclos (`lake build` verde). Lo que sigue describe el árbol de **131** y se
-> conserva como registro hasta regenerar la vista.
->
-> 🆕 **2026‑10‑04 (ADR‑117) — dos aristas nuevas y un traslado, sin módulos nuevos (siguen 104).**
-> `Meta/Representability2Prf.lean` importa ahora también `TcArithPrf` y `CodeNumeralPrf` (sin ciclo): ahí se prueba
-> el ancla, `prf_ancla`. Y la familia `codeNat` (`triN`, `consN`, `codeNatChars`, `codeNatStr`,
-> `codeNatTerm`/`codeNatTerms`, `codeNat`) baja de `Meta/CodeNumeralPrf.lean` a `Minimal/Axioms.lean` —el enunciado
-> del axioma diagonal la lleva, y `axioms` no puede importar `Meta`—: `Minimal/Axioms.lean` sigue importando sólo
-> `FOL.FOL` y `FOL.Theorems.Eq`, y `CodeNumeralPrf` la reexporta. La tabla de niveles de §0 no lo recoge.
->
-> 🆕 **2026‑10‑05 (ADR‑129, D7) — un módulo nuevo y una arista.** `Minimal/SymLit.lean` (la macro `sym!"…"`, sin
-> imports) y `Minimal/Axioms.lean` → `Minimal/SymLit.lean`: desde D7, `Minimal/Axioms.lean` importa `FOL.FOL`,
-> `FOL.Theorems.Eq` y `Minimal.SymLit`.
->
-> ⚠️ **Alcance (nota 2026-07-12, ampliada 2026-08-22)**: el **grafo módulo‑a‑módulo** de abajo cubre
-> solo **`Minimal/`** (Axioms + Block1–8, 11 módulos). `Full/` (11 módulos) se documenta en
-> [`doc/REFERENCE-Full.md`](doc/REFERENCE-Full.md). Para **`Meta/`** (106 módulos) se adopta la **vista
-> de subsistema** que esta nota pedía — ver §0 justo debajo. Mantener un grafo módulo‑a‑módulo de
-> `Meta/` aquí quedaría desactualizado de inmediato (`AI-GUIDE.md` §0.5); el detalle por módulo vive
-> en [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md) §3.15–§3.25 y el catálogo
-> completo en [`REFERENCE.md`](REFERENCE.md) §1.5.
+* **119 módulos activos** (Minimal 2 + Meta 116 + Full 1), **389 aristas** `import` entre ellos, profundidad máxima **59**. Sin ciclos.
+* 1 `lean_lib`, `ROBINSON_PlusPlus`, con `globs := #[.andSubmodules …]`: el build compila el barril
+  y TODO su directorio (T15, ADR‑163). Que todo módulo esté además en el cierre de imports del barril lo comprueba [L]
+  de `check-doc-sync.bash`, y la cifra de módulos activos de arriba la compara [A] con la suya.
+* Imports externos de FOL, el único `require`: `FOL.Canonical0` (1), `FOL.Derives1` (1), `FOL.FOL` (18), `FOL.Lift0` (1), `FOL.Semantics` (2), `FOL.Sentence` (1), `FOL.SymLit` (1), `FOL.Theorems.Eq` (15), `FOL.Theorems.Quantifiers` (8) —entre paréntesis, cuántos módulos lo importan directamente; los barriles, aparte—. De fuera de FOL: ninguno.
 
----
+## Por niveles (camino de imports más largo hasta una raíz)
 
-## 0 · `Meta/` — vista de subsistema (verificada 2026-08-22 23:55)
+* **0** — `Meta.ContratoTabla`, `Minimal.SymLit`
+* **1** — `Minimal.Axioms`
+* **2** — `Full.Induction`, `Meta.Godel`
+* **3** — `Meta.Hilbert`, `Meta.Provability`
+* **4** — `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.SubstArith`
+* **5** — `Meta.CheckArith`
+* **6** — `Meta.ProofChain`
+* **7** — `Meta.Representability`
+* **8** — `Meta.Diagonal`, `Meta.ReprPrf`
+* **9** — `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.NumListPrf`
+* **10** — `Meta.NatArithPrf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf`
+* **11** — `Meta.BoundedInPrf`, `Meta.NatOrderPrf`, `Meta.NumCodeClosedPrf`
+* **12** — `Meta.CodeWitnessPrf`, `Meta.NatMulPrf`, `Meta.RunFnBoundedPrf`
+* **13** — `Meta.CantorMonoPrf`, `Meta.ChainOkBoundedPrf`, `Meta.Representability2`
+* **14** — `Meta.DiagonalTwo`, `Meta.LineWFConsPrf`, `Meta.StrongInductionPrf`
+* **15** — `Meta.Div2ParityPrf`
+* **16** — `Meta.CodeNumeralPrf`
+* **17** — `Meta.CodeNatInjPrf`, `Meta.DiagonalNumeral`, `Meta.Representability2Prf`, `Meta.SolidezPrf`
+* **18** — `Meta.DerivCondPrf`, `Meta.ModeloCodigo`
+* **19** — `Meta.ModeloEstandar`, `Meta.Sigma1Prf`, `Meta.SolidezDobleNegacion`
+* **20** — `Meta.HasWitTcFnPrf`, `Meta.ModeloCodificacion`, `Meta.Sigma1CorePrf`
+* **21** — `Meta.ExIntroCodePrf`, `Meta.LineWFCases`, `Meta.SubstfcWitnessPrf`
+* **22** — `Meta.ListEtaPrf`, `Meta.TrackedCorePrf`
+* **23** — `Meta.ForallElimCodePrf`, `Meta.Sigma1AtomPrf`
+* **24** — `Meta.MpCodePrf`
+* **25** — `Meta.EvalArithPrf`
+* **26** — `Meta.EvalMulPrf`
+* **27** — `Meta.DotConsPrf`
+* **28** — `Meta.EvalListPrf`
+* **29** — `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`
+* **30** — `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`
+* **31** — `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.PropCodePrf`
+* **32** — `Meta.D3DottedPrf`
+* **33** — `Meta.D3InDotPrf`
+* **34** — `Meta.BdAllIntroPrf`, `Meta.InAxiomsCodePrf`
+* **35** — `Meta.LineWFTrackedPrf`
+* **36** — `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.LineWFThyPrf`
+* **37** — `Meta.CodeCtorKit`, `Meta.LineWFGuardPrf`
+* **38** — `Meta.CodeTreeReflect`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFEfqPrf`
+* **39** — `Meta.EvalLiftcPrf`, `Meta.LineWFPropPrf`, `Meta.SubstfcCodePrf`, `Meta.TrackedAtomsPrf`
+* **40** — `Meta.D3ChainDotPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTrackedPrf`, `Meta.LineWFAssemblePrf`
+* **41** — `Meta.EvalSubstfcPrf`, `Meta.HasWitFTrackedPrf`, `Meta.PremsOfTagPrf`
+* **42** — `Meta.EvalLiftfcPrf`
+* **43** — `Meta.LiftfcWitnessPrf`
+* **44** — `Meta.SubstTreeReflect`
+* **45** — `Meta.PremsOfDotPrf`
+* **46** — `Meta.D3BodyPrf`
+* **47** — `Meta.PremsBdAllPrf`
+* **48** — `Meta.GodelTwo`
+* **49** — `Meta.GodelTwoPrf`
+* **50** — `Meta.Consistencia`
+* **51** — `Meta.PurezaComando`, `Meta.SolidezVerificador`, `Meta.TarskiPrf`
+* **52** — `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.RosserNumerales`, `Meta.RosserPosNum`, `Meta.RosserW1`
+* **53** — `Meta.RosserNumEval`
+* **54** — `Meta.RigidezEstandar`, `Meta.RosserGuardNeg`
+* **55** — `Meta.PuenteFOL`, `Meta.RosserNegLinea`
+* **56** — `Meta.RosserNegNum`
+* **57** — `Meta.ProvFiel`, `Meta.Rosser`
+* **58** — `Meta.ContratoTitulares`, `Meta.SegundoModelo`
+* **59** — `Meta.PurezaTitulares`
 
-Extraída **por máquina** de los `import` reales de los módulos activos de `Meta/`; el nivel es la
-**longitud del camino más largo** hasta una raíz. **25 niveles, sin ciclos.**
+## Grafo
 
-| nivel | subsistema | módulos |
-|---|---|---|
-| L0–L2 | **cálculo finitario + Nivel B/C** | `Hilbert`, `Godel`, `CodeDecode` · `HilbertDeduction`, `Provability`, «CodeArith» (retirado, ADR‑190) · `HilbertSeq`, `SubstArith`, `CodeDistinct` |
-| L3–L5 | **aritmetización del verificador** | `StepArith` · `CheckArith`, `Induction` · `ProofChain`, `ListInductionArith` |
-| L6–L8 | **representabilidad + capa ω** | `Representability` · `Necessitation`, **`ReprPrf`** · `ArithPrf`, `ChainPrf`, `Diagonal`, `NumListPrf`, `LineWFDerives`, `AxiomListCode` |
-| L9–L12 | **D1/D2 sobre `Prf` + aritmética en `Prf`** | `Representability2`, `DerivCond`, `TcArithPrf`, `SubstCodeOpenPrf`, `NatArithPrf` · `Representability2Prf`, `NumCodeClosedPrf`, `Reflection`, `BoundedInPrf`, `ChainDecode`, `DiagonalTwo`, `NatOrderPrf` · `DerivCondPrf`, `GodelTwo`, `NatMulPrf`, `RunFnBoundedPrf` · `ReflectionPrf`, `ChainOkBoundedPrf`, `CantorMonoPrf` |
-| L13–L16 | **LA REPARACIÓN** (ADR‑012) | `Sigma1Prf`, `LineWFConsPrf`, `StrongInductionPrf` · `Div2ParityPrf`, `Sigma1BoundedPrf` · **`CodeNumeralPrf`** · **`DiagonalNumeral`**, **`Sigma1CorePrf`** |
-| L17–L21 | **sistema de prueba interno a nivel de código** | `ExIntroCodePrf`, `LineWFCases`, `OmegaReflect` · `Sigma1TrackedPrf` · `TrackedCorePrf` · `ForallElimCodePrf`, `Sigma1AtomPrf` · **`MpCodePrf`** |
-| L22–L24 | **LA ESCALERA (a.2)** | **`EvalArithPrf`** → **`EvalMulPrf`** → **`DotConsPrf`** |
-| L25–L28 | **REPATRIADOS** (2026-08-23, paso 1) | **`EvalListPrf`** → `EvalLtPrf`, `EvalRunFnPrf` → `EvalBoundedPrf`, `Delta0ReflectPrf`, `PropCodePrf` → **`D3DottedPrf`** |
-
-### ⚠️ NOVEDADES posteriores a la extracción (la tabla de arriba es del 2026‑08‑22)
-
-Módulos añadidos desde entonces cuyas **aristas** conviene tener a mano, medidas de los `import`
-reales el **2026‑09‑10h** (entonces `131 módulos activos`, Meta 109):
-
-| módulo | importa | quién lo importa | por qué la arista es la que es |
-|---|---|---|---|
-| **`LiftfcWitnessPrf`** | `EvalLiftfcPrf` | `SubstTreeReflect` | descarga `DEUDA_hasWitF_liftfc`, que está **enunciada** en `EvalLiftfcPrf` §12 |
-| **`ListEtaPrf`** | `SubstfcWitnessPrf` | `PremsOfTagPrf` | la η sale de `prf_nil_or_cons`, que vive ahí (rama C de ADR‑020) |
-| **`PremsOfTagPrf`** | `ListEtaPrf`, `LineWFSchemaPrf`, `LineWFAssemblePrf` | — (hoja) | necesita la η, el chasis de esquema (`tagF`/`lencF`) y el ensamblador por tags |
-| **`D3BodyPrf`** | `D3ChainDotPrf`, `SubstTreeReflect`, **`PremsOfDotPrf`** | `PremsBdAllPrf` |
-| **`PremsOfDotPrf`** | `PremsOfTagPrf`, `SubstTreeReflect` | `D3BodyPrf` | **B1**: necesita las 21 ramas OBJETO y el `pcc_tag_vacuous` del ensamblador |
-| **`PremsBdAllPrf`** | `D3BodyPrf` | — (hoja) | **B3**: el chasis interior, que consume el destino medido en `D3BodyPrf` §3 |
-| **`VerifierSound`** | `ChainDecode`, `OmegaReflect` | — (hoja) | **módulo E**: la solidez la da el **decodificador META** (`ChainDecode`), y `NegVerifier`/`StdChain` viven en `OmegaReflect`. ⭐ **No importa nada de la rama D3**: el decisor **no es** el verificador OBJETO |
-
-⭐ **`PremsBdAllPrf` es el nodo más profundo del proyecto** desde el 2026‑09‑10f; hasta esa fecha lo era `D3BodyPrf`, que sigue siendo: es la confluencia de las
-dos ramas largas (C3 por `SubstTreeReflect`, D3 por `D3ChainDotPrf`), que hasta hoy corrían en
-paralelo sin tocarse.
-
-**Hechos estructurales medidos:**
-
-* **`DotConsPrf` (L24) era el módulo más profundo del proyecto** hasta la repatriación del 2026-08-23, que apiló encima `EvalListPrf` y su cascada. La escalera se apoya, en cadena,
-  sobre absolutamente todo lo anterior — por eso no se pudo ni *enunciar* hasta refundar
-  `Sigma1CorePrf` (L16), que es lo que devolvió `MpCodePrf` (L21) de la cuarentena.
-* **`ReprPrf` (L7) es el módulo de mayor *fan‑in* directo** (7 dependientes), seguido de
-  `Representability`, `Hilbert` (5) y `Representability2`, `ArithPrf` (4). Son los puntos donde un
-  cambio de enunciado se propaga más.
-* **Hojas** (nadie las importa, son los frentes): `DotConsPrf`, `GodelTwo`, `ChainDecode`,
-  `OmegaReflect`, `LineWFCases`, `LineWFConsPrf`, `Sigma1BoundedPrf`.
-
-### `cuarentena/` — VACÍA
-
-No participan del grafo anterior. **6 raíces** (tras los pasos 1 y 2 del 2026-08-23):
-`D3InDotPrf` (desbloquea 11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) · `CodeTreeReflect` (2) ·
-`InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1). Grafo interno en [`cuarentena/README.md`](cuarentena/README.md).
-
-### `sondeos/` — 10 experimentos compilados a mano
-
-Fuera del `lake build` (se compilan con `lake env lean sondeos/X.lean`). Catálogo en
-[`sondeos/README.md`](sondeos/README.md).
-
----
-
-## Project Structure (`Minimal/` — ver nota de alcance arriba)
-
-```text
-ROBINSON_PlusPlus/                  # raíz del proyecto Lean
-├── ROBINSON_PlusPlus.lean          # Barrel: importa todos los módulos
-├── lakefile.lean                   # require FOL from "../FOL"
-├── _template.lean                  # Plantillas (no importadas)
-├── Minimal_template.lean
-├── Intermediate_template.lean
-├── Full_template.lean
-└── ROBINSON_PlusPlus/Minimal/
-    ├── Axioms.lean                 # Lenguaje + 141 axiomas objeto (142 desde ADR‑117) + esquemas del verificador
-    └── Theorems/
-        ├── Block1.lean             # Aritmética básica + teo_2_11 (cancelación *2)
-        ├── Block2.lean             # Raíz cuadrada, sqrt_*, succ_le_of_lt, le/lt-trans
-        ├── Block3.lean             # div2/mod2 enumerado por numeral (1918 LOC, sin inducción)
-        ├── Block4.lean             # Cantor: parity_lemma, cantor_totality, cantor_injective_c
-        ├── Block4_C5.lean          # Lema C5 + ~25 helpers de orden/aritmética
-        ├── Block4_C6_C7.lean       # add_left_cancel, mod2_of_even, proj1/proj2, Cantor surj/uniq
-        ├── Block5.lean             # Pares: proj1/2_pair, pair_proj_eq_c, pair_inj
-        ├── Block6.lean             # Listas: cons_neq_nil, concat_assoc (vía ax_C3), in_concat (vía ax_L3)
-        ├── Block7.lean             # Funciones: IsFunction, Functional, F1/F2/F3 (meta-Prop Lean)
-        └── Block8.lean             # Primos + factorización: Dvd, IsPrime, IsFactorization, pow/prod_pairs, Ax-P (TFA)
-```
-
----
-
-## Dependency Graph (Mermaid)
-
-> ✏️ 2026‑10‑19 ([ADR‑170](DECISIONS.md), T74): este grafo es anterior a ADR‑115 (los bloques de `⊢` ya no existen; el
-> núcleo de hoy, en REFERENCE.md §2). De FOL, RPP ya no importa `FOL.Deduction`: no tenía nada en el cono de los
-> titulares y salió del build; `FOL.Tactics`, `FOL.Theorems.Impl`, `FOL.Theorems.Neg` y `FOL.Theorems.Derived` sólo
-> entran a través de `FOL.Theorems.Quantifiers`.
+`A --> B` se lee «`A` importa `B`» (de abajo arriba: las raíces, arriba). Sólo las aristas entre módulos de RPP.
 
 ```mermaid
-graph TD
-    subgraph FOL ["Project: FOL (../FOL)"]
-        direction LR
-        FOL_FOL["FOL.FOL"]
-        FOL_Eq["FOL.Theorems.Eq"]
-        FOL_Tactics["FOL.Tactics"]
-        FOL_Impl["FOL.Theorems.Impl"]
-        FOL_Neg["FOL.Theorems.Neg"]
-        FOL_Derived["FOL.Theorems.Derived"]
-        FOL_Quant["FOL.Theorems.Quantifiers"]
-        FOL_Deduc["FOL.Deduction"]
-    end
-
-    subgraph RPP ["Project: ROBINSON_PlusPlus"]
-        direction TB
-        SymLit["Minimal/SymLit"]
-        Axioms["Minimal/Axioms"]
-        Block1["Block1 (aritmética)"]
-        Block2["Block2 (sqrt + orden)"]
-        Block3["Block3 (div2/mod2)"]
-        Block4["Block4 (Cantor)"]
-        Block4_C5["Block4_C5 (Lema C5 + helpers)"]
-        Block4_C6_C7["Block4_C6_C7 (proj1/2, surj/uniq)"]
-        Block5["Block5 (pares)"]
-        Block6["Block6 (listas)"]
-        Block7["Block7 (funciones)"]
-        Block8["Block8 (primos)"]
-    end
-
-    FOL_FOL --> Axioms
-    FOL_Eq --> Axioms
-    SymLit --> Axioms
-    Axioms --> Block1
-    Axioms --> Block2
-    Axioms --> Block3
-    Axioms --> Block4
-    Axioms --> Block4_C5
-    Axioms --> Block4_C6_C7
-    Axioms --> Block5
-    Axioms --> Block6
-    Axioms --> Block7
-    Axioms --> Block8
-    Block1 --> Block2
-    Block1 --> Block3
-    Block1 --> Block4
-    Block1 --> Block4_C5
-    Block1 --> Block4_C6_C7
-    Block1 --> Block6
-    Block1 --> Block7
-    Block1 --> Block8
-    Block2 --> Block3
-    Block2 --> Block4
-    Block2 --> Block4_C5
-    Block2 --> Block4_C6_C7
-    Block2 --> Block8
-    Block3 --> Block4
-    Block3 --> Block4_C5
-    Block3 --> Block4_C6_C7
-    Block3 --> Block5
-    Block4 --> Block4_C6_C7
-    Block4 --> Block5
-    Block4 --> Block6
-    Block4 --> Block7
-    Block4_C5 --> Block4_C6_C7
-    Block4_C5 --> Block5
-    Block4_C5 --> Block8
-    Block4_C6_C7 --> Block5
-    Block4_C6_C7 --> Block7
-    Block5 --> Block6
-    Block5 --> Block7
+graph BT
+    Full_Induction["Full.Induction"] --> Minimal_Axioms["Minimal.Axioms"]
+    Meta_ArithPrf["Meta.ArithPrf"] --> Full_Induction["Full.Induction"]
+    Meta_ArithPrf["Meta.ArithPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_ArithPrf["Meta.ArithPrf"] --> Meta_SubstArith["Meta.SubstArith"]
+    Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
+    Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"] --> Meta_PropCodePrf["Meta.PropCodePrf"]
+    Meta_BoundedInPrf["Meta.BoundedInPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_BoundedInPrf["Meta.BoundedInPrf"] --> Meta_NumListPrf["Meta.NumListPrf"]
+    Meta_CantorMonoPrf["Meta.CantorMonoPrf"] --> Meta_NatMulPrf["Meta.NatMulPrf"]
+    Meta_ChainOkBoundedPrf["Meta.ChainOkBoundedPrf"] --> Meta_RunFnBoundedPrf["Meta.RunFnBoundedPrf"]
+    Meta_ChainPrf["Meta.ChainPrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_ChainPrf["Meta.ChainPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_CheckArith["Meta.CheckArith"] --> Meta_SubstArith["Meta.SubstArith"]
+    Meta_CodeCtorKit["Meta.CodeCtorKit"] --> Meta_LineWFSchemaPrf["Meta.LineWFSchemaPrf"]
+    Meta_CodeCtorKit["Meta.CodeCtorKit"] --> Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"]
+    Meta_CodeNatInjPrf["Meta.CodeNatInjPrf"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"] --> Meta_Div2ParityPrf["Meta.Div2ParityPrf"]
+    Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_CodeTreeReflect["Meta.CodeTreeReflect"] --> Meta_CodeCtorKit["Meta.CodeCtorKit"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_Godel["Meta.Godel"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_NatOrderPrf["Meta.NatOrderPrf"]
+    Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_Consistencia["Meta.Consistencia"] --> Meta_GodelTwoPrf["Meta.GodelTwoPrf"]
+    Meta_Consistencia["Meta.Consistencia"] --> Meta_ModeloCodificacion["Meta.ModeloCodificacion"]
+    Meta_Consistencia["Meta.Consistencia"] --> Meta_SolidezDobleNegacion["Meta.SolidezDobleNegacion"]
+    Meta_Consistencia["Meta.Consistencia"] --> Meta_SolidezPrf["Meta.SolidezPrf"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_Consistencia["Meta.Consistencia"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_GodelCorolarios["Meta.GodelCorolarios"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_Lob["Meta.Lob"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_ProvFiel["Meta.ProvFiel"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_PuenteFOL["Meta.PuenteFOL"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_PurezaComando["Meta.PurezaComando"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_RigidezEstandar["Meta.RigidezEstandar"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_Rosser["Meta.Rosser"]
+    Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
+    Meta_D3BodyPrf["Meta.D3BodyPrf"] --> Meta_D3ChainDotPrf["Meta.D3ChainDotPrf"]
+    Meta_D3BodyPrf["Meta.D3BodyPrf"] --> Meta_PremsOfDotPrf["Meta.PremsOfDotPrf"]
+    Meta_D3BodyPrf["Meta.D3BodyPrf"] --> Meta_SubstTreeReflect["Meta.SubstTreeReflect"]
+    Meta_D3ChainDotPrf["Meta.D3ChainDotPrf"] --> Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"]
+    Meta_D3ChainDotPrf["Meta.D3ChainDotPrf"] --> Meta_ChainOkBoundedPrf["Meta.ChainOkBoundedPrf"]
+    Meta_D3ChainDotPrf["Meta.D3ChainDotPrf"] --> Meta_D3DottedPrf["Meta.D3DottedPrf"]
+    Meta_D3ChainDotPrf["Meta.D3ChainDotPrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_D3ChainDotPrf["Meta.D3ChainDotPrf"] --> Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"]
+    Meta_D3DottedPrf["Meta.D3DottedPrf"] --> Meta_Delta0ReflectPrf["Meta.Delta0ReflectPrf"]
+    Meta_D3InDotPrf["Meta.D3InDotPrf"] --> Meta_D3DottedPrf["Meta.D3DottedPrf"]
+    Meta_D3InDotPrf["Meta.D3InDotPrf"] --> Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"]
+    Meta_Delta0ReflectPrf["Meta.Delta0ReflectPrf"] --> Meta_EvalBoundedPrf["Meta.EvalBoundedPrf"]
+    Meta_DerivCondPrf["Meta.DerivCondPrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
+    Meta_DerivCondPrf["Meta.DerivCondPrf"] --> Meta_Representability2Prf["Meta.Representability2Prf"]
+    Meta_Diagonal["Meta.Diagonal"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_Diagonal["Meta.Diagonal"] --> Meta_Representability["Meta.Representability"]
+    Meta_DiagonalNumeral["Meta.DiagonalNumeral"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_DiagonalNumeral["Meta.DiagonalNumeral"] --> Meta_DiagonalTwo["Meta.DiagonalTwo"]
+    Meta_DiagonalTwo["Meta.DiagonalTwo"] --> Meta_Diagonal["Meta.Diagonal"]
+    Meta_DiagonalTwo["Meta.DiagonalTwo"] --> Meta_Representability2["Meta.Representability2"]
+    Meta_Div2ParityPrf["Meta.Div2ParityPrf"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
+    Meta_Div2ParityPrf["Meta.Div2ParityPrf"] --> Meta_NatMulPrf["Meta.NatMulPrf"]
+    Meta_Div2ParityPrf["Meta.Div2ParityPrf"] --> Meta_StrongInductionPrf["Meta.StrongInductionPrf"]
+    Meta_DotConsPrf["Meta.DotConsPrf"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
+    Meta_DotConsPrf["Meta.DotConsPrf"] --> Meta_Div2ParityPrf["Meta.Div2ParityPrf"]
+    Meta_DotConsPrf["Meta.DotConsPrf"] --> Meta_EvalMulPrf["Meta.EvalMulPrf"]
+    Meta_DotConsPrf["Meta.DotConsPrf"] --> Meta_MpCodePrf["Meta.MpCodePrf"]
+    Meta_DotConsPrf["Meta.DotConsPrf"] --> Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"]
+    Meta_DotConsPrf["Meta.DotConsPrf"] --> Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"]
+    Meta_EvalArithPrf["Meta.EvalArithPrf"] --> Meta_MpCodePrf["Meta.MpCodePrf"]
+    Meta_EvalArithPrf["Meta.EvalArithPrf"] --> Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"]
+    Meta_EvalArithPrf["Meta.EvalArithPrf"] --> Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"]
+    Meta_EvalArithPrf["Meta.EvalArithPrf"] --> Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"]
+    Meta_EvalBoundedPrf["Meta.EvalBoundedPrf"] --> Meta_EvalLtPrf["Meta.EvalLtPrf"]
+    Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"] --> Meta_EvalNthcPrf["Meta.EvalNthcPrf"]
+    Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"] --> Meta_LineWFConsPrf["Meta.LineWFConsPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_EvalRunFnPrf["Meta.EvalRunFnPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_LiftcCodePrf["Meta.LiftcCodePrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_NatOrderPrf["Meta.NatOrderPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_NumListPrf["Meta.NumListPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_Provability["Meta.Provability"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_Sigma1CorePrf["Meta.Sigma1CorePrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_Sigma1Prf["Meta.Sigma1Prf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_StrongInductionPrf["Meta.StrongInductionPrf"]
+    Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"] --> Meta_TrackedCorePrf["Meta.TrackedCorePrf"]
+    Meta_EvalLiftfcPrf["Meta.EvalLiftfcPrf"] --> Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"]
+    Meta_EvalLiftfcPrf["Meta.EvalLiftfcPrf"] --> Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"]
+    Meta_EvalListPrf["Meta.EvalListPrf"] --> Meta_DotConsPrf["Meta.DotConsPrf"]
+    Meta_EvalListPrf["Meta.EvalListPrf"] --> Meta_EvalArithPrf["Meta.EvalArithPrf"]
+    Meta_EvalListPrf["Meta.EvalListPrf"] --> Meta_NumListPrf["Meta.NumListPrf"]
+    Meta_EvalLtPrf["Meta.EvalLtPrf"] --> Meta_EvalListPrf["Meta.EvalListPrf"]
+    Meta_EvalLtPrf["Meta.EvalLtPrf"] --> Meta_ExIntroCodePrf["Meta.ExIntroCodePrf"]
+    Meta_EvalMulPrf["Meta.EvalMulPrf"] --> Meta_EvalArithPrf["Meta.EvalArithPrf"]
+    Meta_EvalMulPrf["Meta.EvalMulPrf"] --> Meta_NatMulPrf["Meta.NatMulPrf"]
+    Meta_EvalNthcPrf["Meta.EvalNthcPrf"] --> Meta_DotConsPrf["Meta.DotConsPrf"]
+    Meta_EvalNthcPrf["Meta.EvalNthcPrf"] --> Meta_EvalLtPrf["Meta.EvalLtPrf"]
+    Meta_EvalNthcPrf["Meta.EvalNthcPrf"] --> Meta_EvalRunFnPrf["Meta.EvalRunFnPrf"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_CodeCtorKit["Meta.CodeCtorKit"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_EvalArithPrf["Meta.EvalArithPrf"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_MpCodePrf["Meta.MpCodePrf"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"]
+    Meta_EvalPredPrf["Meta.EvalPredPrf"] --> Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"]
+    Meta_EvalRunFnPrf["Meta.EvalRunFnPrf"] --> Meta_EvalListPrf["Meta.EvalListPrf"]
+    Meta_EvalRunFnPrf["Meta.EvalRunFnPrf"] --> Meta_RunFnBoundedPrf["Meta.RunFnBoundedPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_Delta0ReflectPrf["Meta.Delta0ReflectPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_ForallElimCodePrf["Meta.ForallElimCodePrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_LiftcCodePrf["Meta.LiftcCodePrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_PropCodePrf["Meta.PropCodePrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"]
+    Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_Delta0ReflectPrf["Meta.Delta0ReflectPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_EvalLiftcPrf["Meta.EvalLiftcPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_EvalPredPrf["Meta.EvalPredPrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_LiftcCodePrf["Meta.LiftcCodePrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_PropCodePrf["Meta.PropCodePrf"]
+    Meta_EvalSubsttcPrf["Meta.EvalSubsttcPrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_ExIntroCodePrf["Meta.ExIntroCodePrf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
+    Meta_ExIntroCodePrf["Meta.ExIntroCodePrf"] --> Meta_Sigma1CorePrf["Meta.Sigma1CorePrf"]
+    Meta_ForallElimCodePrf["Meta.ForallElimCodePrf"] --> Meta_ExIntroCodePrf["Meta.ExIntroCodePrf"]
+    Meta_ForallElimCodePrf["Meta.ForallElimCodePrf"] --> Meta_TrackedCorePrf["Meta.TrackedCorePrf"]
+    Meta_Godel["Meta.Godel"] --> Minimal_Axioms["Minimal.Axioms"]
+    Meta_GodelCorolarios["Meta.GodelCorolarios"] --> Meta_PurezaComando["Meta.PurezaComando"]
+    Meta_GodelCorolarios["Meta.GodelCorolarios"] --> Meta_SolidezVerificador["Meta.SolidezVerificador"]
+    Meta_GodelTwo["Meta.GodelTwo"] --> Meta_PremsBdAllPrf["Meta.PremsBdAllPrf"]
+    Meta_GodelTwo["Meta.GodelTwo"] --> Meta_ProofChain["Meta.ProofChain"]
+    Meta_GodelTwo["Meta.GodelTwo"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_GodelTwo["Meta.GodelTwo"] --> Meta_Representability2["Meta.Representability2"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_DiagonalNumeral["Meta.DiagonalNumeral"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_DiagonalTwo["Meta.DiagonalTwo"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_GodelTwo["Meta.GodelTwo"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_LineWFCases["Meta.LineWFCases"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_PremsBdAllPrf["Meta.PremsBdAllPrf"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_Representability2Prf["Meta.Representability2Prf"]
+    Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_HasWitFTrackedPrf["Meta.HasWitFTrackedPrf"] --> Meta_HasWitTrackedPrf["Meta.HasWitTrackedPrf"]
+    Meta_HasWitTcFnPrf["Meta.HasWitTcFnPrf"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_HasWitTcFnPrf["Meta.HasWitTcFnPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_HasWitTcFnPrf["Meta.HasWitTcFnPrf"] --> Meta_NumListPrf["Meta.NumListPrf"]
+    Meta_HasWitTcFnPrf["Meta.HasWitTcFnPrf"] --> Meta_Sigma1Prf["Meta.Sigma1Prf"]
+    Meta_HasWitTrackedPrf["Meta.HasWitTrackedPrf"] --> Meta_LiftcCodePrf["Meta.LiftcCodePrf"]
+    Meta_HasWitTrackedPrf["Meta.HasWitTrackedPrf"] --> Meta_LineWFGuardPrf["Meta.LineWFGuardPrf"]
+    Meta_HasWitTrackedPrf["Meta.HasWitTrackedPrf"] --> Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"]
+    Meta_Hilbert["Meta.Hilbert"] --> Full_Induction["Full.Induction"]
+    Meta_Hilbert["Meta.Hilbert"] --> Minimal_Axioms["Minimal.Axioms"]
+    Meta_HilbertDeduction["Meta.HilbertDeduction"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_HilbertSeq["Meta.HilbertSeq"] --> Meta_Godel["Meta.Godel"]
+    Meta_HilbertSeq["Meta.HilbertSeq"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_HilbertSeq["Meta.HilbertSeq"] --> Meta_Provability["Meta.Provability"]
+    Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
+    Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"] --> Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"]
+    Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"] --> Meta_MpCodePrf["Meta.MpCodePrf"]
+    Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"] --> Meta_Representability2Prf["Meta.Representability2Prf"]
+    Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"] --> Meta_Sigma1CorePrf["Meta.Sigma1CorePrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_CodeCtorKit["Meta.CodeCtorKit"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_Delta0ReflectPrf["Meta.Delta0ReflectPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_DotConsPrf["Meta.DotConsPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_EvalArithPrf["Meta.EvalArithPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_EvalLtPrf["Meta.EvalLtPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_EvalRunFnPrf["Meta.EvalRunFnPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_Godel["Meta.Godel"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_MpCodePrf["Meta.MpCodePrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_Provability["Meta.Provability"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_Sigma1Prf["Meta.Sigma1Prf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_LiftcCodePrf["Meta.LiftcCodePrf"] --> Meta_TrackedCorePrf["Meta.TrackedCorePrf"]
+    Meta_LiftfcWitnessPrf["Meta.LiftfcWitnessPrf"] --> Meta_EvalLiftfcPrf["Meta.EvalLiftfcPrf"]
+    Meta_LineWFAssemblePrf["Meta.LineWFAssemblePrf"] --> Meta_LineWFEfqPrf["Meta.LineWFEfqPrf"]
+    Meta_LineWFAssemblePrf["Meta.LineWFAssemblePrf"] --> Meta_LineWFMpPrf["Meta.LineWFMpPrf"]
+    Meta_LineWFAssemblePrf["Meta.LineWFAssemblePrf"] --> Meta_LineWFPropPrf["Meta.LineWFPropPrf"]
+    Meta_LineWFAssemblePrf["Meta.LineWFAssemblePrf"] --> Meta_LineWFThyPrf["Meta.LineWFThyPrf"]
+    Meta_LineWFCases["Meta.LineWFCases"] --> Meta_Provability["Meta.Provability"]
+    Meta_LineWFCases["Meta.LineWFCases"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_LineWFCases["Meta.LineWFCases"] --> Meta_Sigma1CorePrf["Meta.Sigma1CorePrf"]
+    Meta_LineWFCases["Meta.LineWFCases"] --> Minimal_Axioms["Minimal.Axioms"]
+    Meta_LineWFConsPrf["Meta.LineWFConsPrf"] --> Meta_ChainOkBoundedPrf["Meta.ChainOkBoundedPrf"]
+    Meta_LineWFEfqPrf["Meta.LineWFEfqPrf"] --> Meta_CodeCtorKit["Meta.CodeCtorKit"]
+    Meta_LineWFGuardPrf["Meta.LineWFGuardPrf"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_LineWFGuardPrf["Meta.LineWFGuardPrf"] --> Meta_Delta0ReflectPrf["Meta.Delta0ReflectPrf"]
+    Meta_LineWFGuardPrf["Meta.LineWFGuardPrf"] --> Meta_LineWFSchemaPrf["Meta.LineWFSchemaPrf"]
+    Meta_LineWFGuardPrf["Meta.LineWFGuardPrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_LineWFMpPrf["Meta.LineWFMpPrf"] --> Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"]
+    Meta_LineWFPropPrf["Meta.LineWFPropPrf"] --> Meta_CodeTreeReflect["Meta.CodeTreeReflect"]
+    Meta_LineWFSchemaPrf["Meta.LineWFSchemaPrf"] --> Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"]
+    Meta_LineWFThyPrf["Meta.LineWFThyPrf"] --> Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"]
+    Meta_LineWFThyPrf["Meta.LineWFThyPrf"] --> Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_EvalBoundedPrf["Meta.EvalBoundedPrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_EvalListPrf["Meta.EvalListPrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_MpCodePrf["Meta.MpCodePrf"]
+    Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"] --> Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"]
+    Meta_ListEtaPrf["Meta.ListEtaPrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_Lob["Meta.Lob"] --> Meta_PurezaComando["Meta.PurezaComando"]
+    Meta_Lob["Meta.Lob"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
+    Meta_ModeloCodificacion["Meta.ModeloCodificacion"] --> Meta_ModeloEstandar["Meta.ModeloEstandar"]
+    Meta_ModeloCodigo["Meta.ModeloCodigo"] --> Meta_CodeNatInjPrf["Meta.CodeNatInjPrf"]
+    Meta_ModeloCodigo["Meta.ModeloCodigo"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_ModeloEstandar["Meta.ModeloEstandar"] --> Meta_ModeloCodigo["Meta.ModeloCodigo"]
+    Meta_MpCodePrf["Meta.MpCodePrf"] --> Meta_ForallElimCodePrf["Meta.ForallElimCodePrf"]
+    Meta_MpCodePrf["Meta.MpCodePrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_NatArithPrf["Meta.NatArithPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_NatArithPrf["Meta.NatArithPrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
+    Meta_NatMulPrf["Meta.NatMulPrf"] --> Meta_NatOrderPrf["Meta.NatOrderPrf"]
+    Meta_NatOrderPrf["Meta.NatOrderPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"] --> Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"]
+    Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_NumListPrf["Meta.NumListPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_PremsBdAllPrf["Meta.PremsBdAllPrf"] --> Meta_D3BodyPrf["Meta.D3BodyPrf"]
+    Meta_PremsOfDotPrf["Meta.PremsOfDotPrf"] --> Meta_PremsOfTagPrf["Meta.PremsOfTagPrf"]
+    Meta_PremsOfDotPrf["Meta.PremsOfDotPrf"] --> Meta_SubstTreeReflect["Meta.SubstTreeReflect"]
+    Meta_PremsOfTagPrf["Meta.PremsOfTagPrf"] --> Meta_LineWFAssemblePrf["Meta.LineWFAssemblePrf"]
+    Meta_PremsOfTagPrf["Meta.PremsOfTagPrf"] --> Meta_LineWFSchemaPrf["Meta.LineWFSchemaPrf"]
+    Meta_PremsOfTagPrf["Meta.PremsOfTagPrf"] --> Meta_ListEtaPrf["Meta.ListEtaPrf"]
+    Meta_ProofChain["Meta.ProofChain"] --> Full_Induction["Full.Induction"]
+    Meta_ProofChain["Meta.ProofChain"] --> Meta_CheckArith["Meta.CheckArith"]
+    Meta_ProofChain["Meta.ProofChain"] --> Minimal_Axioms["Minimal.Axioms"]
+    Meta_PropCodePrf["Meta.PropCodePrf"] --> Meta_EvalBoundedPrf["Meta.EvalBoundedPrf"]
+    Meta_ProvFiel["Meta.ProvFiel"] --> Meta_RigidezEstandar["Meta.RigidezEstandar"]
+    Meta_ProvFiel["Meta.ProvFiel"] --> Meta_RosserNegNum["Meta.RosserNegNum"]
+    Meta_Provability["Meta.Provability"] --> Meta_Godel["Meta.Godel"]
+    Meta_Provability["Meta.Provability"] --> Minimal_Axioms["Minimal.Axioms"]
+    Meta_PuenteFOL["Meta.PuenteFOL"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_PuenteFOL["Meta.PuenteFOL"] --> Meta_RigidezEstandar["Meta.RigidezEstandar"]
+    Meta_PuenteFOL["Meta.PuenteFOL"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
+    Meta_PurezaComando["Meta.PurezaComando"] --> Meta_Consistencia["Meta.Consistencia"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_Consistencia["Meta.Consistencia"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_ContratoTabla["Meta.ContratoTabla"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_ContratoTitulares["Meta.ContratoTitulares"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_GodelCorolarios["Meta.GodelCorolarios"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_Lob["Meta.Lob"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_PurezaComando["Meta.PurezaComando"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_Rosser["Meta.Rosser"]
+    Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
+    Meta_ReprPrf["Meta.ReprPrf"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_ReprPrf["Meta.ReprPrf"] --> Meta_ProofChain["Meta.ProofChain"]
+    Meta_ReprPrf["Meta.ReprPrf"] --> Meta_Representability["Meta.Representability"]
+    Meta_Representability["Meta.Representability"] --> Full_Induction["Full.Induction"]
+    Meta_Representability["Meta.Representability"] --> Meta_CheckArith["Meta.CheckArith"]
+    Meta_Representability["Meta.Representability"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_Representability["Meta.Representability"] --> Meta_HilbertSeq["Meta.HilbertSeq"]
+    Meta_Representability["Meta.Representability"] --> Meta_ProofChain["Meta.ProofChain"]
+    Meta_Representability["Meta.Representability"] --> Meta_SubstArith["Meta.SubstArith"]
+    Meta_Representability["Meta.Representability"] --> Minimal_Axioms["Minimal.Axioms"]
+    Meta_Representability2["Meta.Representability2"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_Representability2["Meta.Representability2"] --> Meta_ProofChain["Meta.ProofChain"]
+    Meta_Representability2["Meta.Representability2"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_Representability2["Meta.Representability2"] --> Meta_Representability["Meta.Representability"]
+    Meta_Representability2Prf["Meta.Representability2Prf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_Representability2Prf["Meta.Representability2Prf"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_Representability2Prf["Meta.Representability2Prf"] --> Meta_Representability2["Meta.Representability2"]
+    Meta_Representability2Prf["Meta.Representability2Prf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_RosserNumEval["Meta.RosserNumEval"]
+    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_SolidezVerificador["Meta.SolidezVerificador"]
+    Meta_Rosser["Meta.Rosser"] --> Meta_RosserNegNum["Meta.RosserNegNum"]
+    Meta_Rosser["Meta.Rosser"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
+    Meta_RosserGuardNeg["Meta.RosserGuardNeg"] --> Meta_Consistencia["Meta.Consistencia"]
+    Meta_RosserGuardNeg["Meta.RosserGuardNeg"] --> Meta_RosserNumEval["Meta.RosserNumEval"]
+    Meta_RosserNegLinea["Meta.RosserNegLinea"] --> Meta_HasWitTcFnPrf["Meta.HasWitTcFnPrf"]
+    Meta_RosserNegLinea["Meta.RosserNegLinea"] --> Meta_Representability2Prf["Meta.Representability2Prf"]
+    Meta_RosserNegLinea["Meta.RosserNegLinea"] --> Meta_RosserGuardNeg["Meta.RosserGuardNeg"]
+    Meta_RosserNegLinea["Meta.RosserNegLinea"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_RosserNegNum["Meta.RosserNegNum"] --> Meta_PremsOfTagPrf["Meta.PremsOfTagPrf"]
+    Meta_RosserNegNum["Meta.RosserNegNum"] --> Meta_RosserNegLinea["Meta.RosserNegLinea"]
+    Meta_RosserNegNum["Meta.RosserNegNum"] --> Meta_RosserPosNum["Meta.RosserPosNum"]
+    Meta_RosserNegNum["Meta.RosserNegNum"] --> Meta_RosserW1["Meta.RosserW1"]
+    Meta_RosserNumEval["Meta.RosserNumEval"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
+    Meta_RosserNumEval["Meta.RosserNumEval"] --> Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"]
+    Meta_RosserNumEval["Meta.RosserNumEval"] --> Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"]
+    Meta_RosserNumEval["Meta.RosserNumEval"] --> Meta_RosserNumerales["Meta.RosserNumerales"]
+    Meta_RosserNumerales["Meta.RosserNumerales"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_RosserNumerales["Meta.RosserNumerales"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
+    Meta_RosserNumerales["Meta.RosserNumerales"] --> Meta_ModeloEstandar["Meta.ModeloEstandar"]
+    Meta_RosserNumerales["Meta.RosserNumerales"] --> Meta_NumListPrf["Meta.NumListPrf"]
+    Meta_RosserNumerales["Meta.RosserNumerales"] --> Meta_PurezaComando["Meta.PurezaComando"]
+    Meta_RosserPosNum["Meta.RosserPosNum"] --> Meta_PurezaComando["Meta.PurezaComando"]
+    Meta_RosserPosNum["Meta.RosserPosNum"] --> Meta_Representability2Prf["Meta.Representability2Prf"]
+    Meta_RosserPosNum["Meta.RosserPosNum"] --> Meta_SolidezVerificador["Meta.SolidezVerificador"]
+    Meta_RosserW1["Meta.RosserW1"] --> Meta_PurezaComando["Meta.PurezaComando"]
+    Meta_RosserW1["Meta.RosserW1"] --> Meta_SolidezVerificador["Meta.SolidezVerificador"]
+    Meta_RunFnBoundedPrf["Meta.RunFnBoundedPrf"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
+    Meta_SegundoModelo["Meta.SegundoModelo"] --> Meta_ProvFiel["Meta.ProvFiel"]
+    Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"] --> Meta_TrackedCorePrf["Meta.TrackedCorePrf"]
+    Meta_Sigma1CorePrf["Meta.Sigma1CorePrf"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_Sigma1CorePrf["Meta.Sigma1CorePrf"] --> Meta_Sigma1Prf["Meta.Sigma1Prf"]
+    Meta_Sigma1CorePrf["Meta.Sigma1CorePrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_Sigma1Prf["Meta.Sigma1Prf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
+    Meta_SolidezDobleNegacion["Meta.SolidezDobleNegacion"] --> Meta_ModeloCodigo["Meta.ModeloCodigo"]
+    Meta_SolidezDobleNegacion["Meta.SolidezDobleNegacion"] --> Meta_SolidezPrf["Meta.SolidezPrf"]
+    Meta_SolidezPrf["Meta.SolidezPrf"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
+    Meta_SolidezPrf["Meta.SolidezPrf"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_SolidezPrf["Meta.SolidezPrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_SolidezVerificador["Meta.SolidezVerificador"] --> Meta_Consistencia["Meta.Consistencia"]
+    Meta_SolidezVerificador["Meta.SolidezVerificador"] --> Meta_Representability["Meta.Representability"]
+    Meta_StrongInductionPrf["Meta.StrongInductionPrf"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
+    Meta_SubstArith["Meta.SubstArith"] --> Meta_Provability["Meta.Provability"]
+    Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_SubstTreeReflect["Meta.SubstTreeReflect"] --> Meta_CodeTreeReflect["Meta.CodeTreeReflect"]
+    Meta_SubstTreeReflect["Meta.SubstTreeReflect"] --> Meta_EvalLiftfcPrf["Meta.EvalLiftfcPrf"]
+    Meta_SubstTreeReflect["Meta.SubstTreeReflect"] --> Meta_EvalSubstfcPrf["Meta.EvalSubstfcPrf"]
+    Meta_SubstTreeReflect["Meta.SubstTreeReflect"] --> Meta_HasWitFTrackedPrf["Meta.HasWitFTrackedPrf"]
+    Meta_SubstTreeReflect["Meta.SubstTreeReflect"] --> Meta_LiftfcWitnessPrf["Meta.LiftfcWitnessPrf"]
+    Meta_SubstTreeReflect["Meta.SubstTreeReflect"] --> Meta_LineWFAssemblePrf["Meta.LineWFAssemblePrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_CodeCtorKit["Meta.CodeCtorKit"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_DotConsPrf["Meta.DotConsPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_EvalArithPrf["Meta.EvalArithPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_EvalCarcNthcPrf["Meta.EvalCarcNthcPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_EvalLtPrf["Meta.EvalLtPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_Godel["Meta.Godel"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_Hilbert["Meta.Hilbert"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_LiftcCodePrf["Meta.LiftcCodePrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_MpCodePrf["Meta.MpCodePrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_Provability["Meta.Provability"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_Sigma1Prf["Meta.Sigma1Prf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"]
+    Meta_SubstfcCodePrf["Meta.SubstfcCodePrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
+    Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
+    Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"] --> Meta_HasWitTcFnPrf["Meta.HasWitTcFnPrf"]
+    Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"] --> Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"]
+    Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"] --> Meta_StrongInductionPrf["Meta.StrongInductionPrf"]
+    Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"] --> Meta_SubstArith["Meta.SubstArith"]
+    Meta_TarskiPrf["Meta.TarskiPrf"] --> Meta_Consistencia["Meta.Consistencia"]
+    Meta_TarskiPrf["Meta.TarskiPrf"] --> Meta_GodelTwoPrf["Meta.GodelTwoPrf"]
+    Meta_TcArithPrf["Meta.TcArithPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
+    Meta_TcArithPrf["Meta.TcArithPrf"] --> Meta_Representability["Meta.Representability"]
+    Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"]
+    Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_CodeTreeReflect["Meta.CodeTreeReflect"]
+    Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
+    Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_InAxiomsCodePrf["Meta.InAxiomsCodePrf"]
+    Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_LiftcCodePrf["Meta.LiftcCodePrf"]
+    Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_LineWFTrackedPrf["Meta.LineWFTrackedPrf"]
+    Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
+    Meta_TrackedCorePrf["Meta.TrackedCorePrf"] --> Meta_ExIntroCodePrf["Meta.ExIntroCodePrf"]
+    Meta_TrackedCorePrf["Meta.TrackedCorePrf"] --> Meta_HasWitTcFnPrf["Meta.HasWitTcFnPrf"]
+    Minimal_Axioms["Minimal.Axioms"] --> Minimal_SymLit["Minimal.SymLit"]
 ```
 
-> **Nota**: las flechas reflejan `import` directos extraídos de las cabeceras de cada `.lean`. Algunos módulos importan transitivamente (e.g. `Block6` importa `Block5` y de ahí obtiene todo lo que `Block5` reexporta).
+## Tabla
 
----
+| módulo | nivel | importa | lo importan |
+|---|---|---|---|
+| `Meta.ContratoTabla` | 0 | — | `Meta.PurezaTitulares` |
+| `Minimal.SymLit` | 0 | — · externo: `FOL.SymLit` | `Minimal.Axioms` |
+| `Minimal.Axioms` | 1 | `Minimal.SymLit` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Full.Induction`, `Meta.Godel`, `Meta.Hilbert`, `Meta.LineWFCases`, `Meta.ProofChain`, `Meta.Provability`, `Meta.Representability` |
+| `Full.Induction` | 2 | `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Quantifiers` | `Meta.ArithPrf`, `Meta.Hilbert`, `Meta.ProofChain`, `Meta.Representability` |
+| `Meta.Godel` | 2 | `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.CodeWitnessPrf`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.Provability`, `Meta.SubstfcCodePrf` |
+| `Meta.Hilbert` | 3 | `Full.Induction`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.CodeWitnessPrf`, `Meta.Diagonal`, `Meta.EvalLiftcPrf`, `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.ReprPrf`, `Meta.Representability`, `Meta.SolidezPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.Provability` | 3 | `Meta.Godel`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Quantifiers` | `Meta.EvalLiftcPrf`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.LineWFCases`, `Meta.SubstArith`, `Meta.SubstfcCodePrf` |
+| `Meta.HilbertDeduction` | 4 | `Meta.Hilbert` | `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.LiftcCodePrf`, `Meta.PuenteFOL`, `Meta.SolidezPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.HilbertSeq` | 4 | `Meta.Godel`, `Meta.Hilbert`, `Meta.Provability` · externo: `FOL.FOL` | `Meta.Representability` |
+| `Meta.SubstArith` | 4 | `Meta.Provability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ArithPrf`, `Meta.CheckArith`, `Meta.Representability`, `Meta.SubstfcWitnessPrf` |
+| `Meta.CheckArith` | 5 | `Meta.SubstArith` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ProofChain`, `Meta.Representability` |
+| `Meta.ProofChain` | 6 | `Full.Induction`, `Meta.CheckArith`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwo`, `Meta.ReprPrf`, `Meta.Representability`, `Meta.Representability2` |
+| `Meta.Representability` | 7 | `Full.Induction`, `Meta.CheckArith`, `Meta.Hilbert`, `Meta.HilbertSeq`, `Meta.ProofChain`, `Meta.SubstArith`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.Diagonal`, `Meta.ReprPrf`, `Meta.Representability2`, `Meta.SolidezVerificador`, `Meta.TcArithPrf` |
+| `Meta.Diagonal` | 8 | `Meta.Hilbert`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalTwo` |
+| `Meta.ReprPrf` | 8 | `Meta.Hilbert`, `Meta.ProofChain`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.CodeNumeralPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.GodelTwo`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFCases`, `Meta.NumListPrf`, `Meta.Representability2`, `Meta.SubstfcCodePrf` |
+| `Meta.ArithPrf` | 9 | `Full.Induction`, `Meta.ReprPrf`, `Meta.SubstArith` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.NatArithPrf`, `Meta.Representability2Prf`, `Meta.SubstCodeOpenPrf`, `Meta.SubstfcCodePrf`, `Meta.TcArithPrf` |
+| `Meta.ChainPrf` | 9 | `Meta.HilbertDeduction`, `Meta.ReprPrf` | `Meta.CodeWitnessPrf`, `Meta.DerivCondPrf`, `Meta.EvalLiftcPrf`, `Meta.LiftcCodePrf`, `Meta.NatArithPrf` |
+| `Meta.NumListPrf` | 9 | `Meta.ReprPrf` | `Meta.BoundedInPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalListPrf`, `Meta.HasWitTcFnPrf`, `Meta.RosserNumerales` |
+| `Meta.NatArithPrf` | 10 | `Meta.ArithPrf`, `Meta.ChainPrf` | `Meta.BoundedInPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.NatOrderPrf`, `Meta.NumCodeClosedPrf` |
+| `Meta.SubstCodeOpenPrf` | 10 | `Meta.ArithPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.TcArithPrf` | 10 | `Meta.ArithPrf`, `Meta.Representability` | `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Representability2Prf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1CorePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.BoundedInPrf` | 11 | `Meta.NatArithPrf`, `Meta.NumListPrf` | `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.LineWFTrackedPrf`, `Meta.RosserNumEval`, `Meta.RunFnBoundedPrf`, `Meta.SubstfcWitnessPrf` |
+| `Meta.NatOrderPrf` | 11 | `Meta.NatArithPrf` | `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.NatMulPrf` |
+| `Meta.NumCodeClosedPrf` | 11 | `Meta.NatArithPrf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.RosserNumEval`, `Meta.SubstfcCodePrf`, `Meta.SubstfcWitnessPrf` |
+| `Meta.CodeWitnessPrf` | 12 | `Meta.ArithPrf`, `Meta.BoundedInPrf`, `Meta.ChainPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.ReprPrf` | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf`, `Meta.Representability2`, `Meta.RosserNumerales` |
+| `Meta.NatMulPrf` | 12 | `Meta.NatOrderPrf` | `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.EvalMulPrf` |
+| `Meta.RunFnBoundedPrf` | 12 | `Meta.BoundedInPrf` | `Meta.ChainOkBoundedPrf`, `Meta.EvalRunFnPrf` |
+| `Meta.CantorMonoPrf` | 13 | `Meta.NatMulPrf` | `Meta.Div2ParityPrf`, `Meta.DotConsPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.StrongInductionPrf`, `Meta.SubstfcWitnessPrf` |
+| `Meta.ChainOkBoundedPrf` | 13 | `Meta.RunFnBoundedPrf` | `Meta.D3ChainDotPrf`, `Meta.LineWFConsPrf` |
+| `Meta.Representability2` | 13 | `Meta.CodeWitnessPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.Representability2Prf` |
+| `Meta.DiagonalTwo` | 14 | `Meta.Diagonal`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalNumeral`, `Meta.GodelTwoPrf` |
+| `Meta.LineWFConsPrf` | 14 | `Meta.ChainOkBoundedPrf` | `Meta.EvalCarcNthcPrf` |
+| `Meta.StrongInductionPrf` | 14 | `Meta.CantorMonoPrf` | `Meta.Div2ParityPrf`, `Meta.EvalLiftcPrf`, `Meta.SubstfcWitnessPrf` |
+| `Meta.Div2ParityPrf` | 15 | `Meta.CantorMonoPrf`, `Meta.NatMulPrf`, `Meta.StrongInductionPrf` | `Meta.CodeNumeralPrf`, `Meta.DotConsPrf` |
+| `Meta.CodeNumeralPrf` | 16 | `Meta.Div2ParityPrf`, `Meta.ReprPrf` | `Meta.CodeNatInjPrf`, `Meta.DiagonalNumeral`, `Meta.GodelTwoPrf`, `Meta.ModeloCodigo`, `Meta.Representability2Prf`, `Meta.RosserNumerales`, `Meta.Sigma1CorePrf`, `Meta.SolidezPrf` |
+| `Meta.CodeNatInjPrf` | 17 | `Meta.CodeNumeralPrf` | `Meta.ModeloCodigo` |
+| `Meta.DiagonalNumeral` | 17 | `Meta.CodeNumeralPrf`, `Meta.DiagonalTwo` | `Meta.GodelTwoPrf` |
+| `Meta.Representability2Prf` | 17 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.Representability2`, `Meta.TcArithPrf` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DerivCondPrf`, `Meta.GodelTwoPrf`, `Meta.InAxiomsCodePrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum` |
+| `Meta.SolidezPrf` | 17 | `Meta.CodeNumeralPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction` · externo: `FOL.Semantics` | `Meta.Consistencia`, `Meta.SolidezDobleNegacion` |
+| `Meta.DerivCondPrf` | 18 | `Meta.ChainPrf`, `Meta.Representability2Prf` | `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.ExIntroCodePrf`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1Prf`, `Meta.SubstfcCodePrf` |
+| `Meta.ModeloCodigo` | 18 | `Meta.CodeNatInjPrf`, `Meta.CodeNumeralPrf` | `Meta.ModeloEstandar`, `Meta.SolidezDobleNegacion` |
+| `Meta.ModeloEstandar` | 19 | `Meta.ModeloCodigo` · externo: `FOL.Semantics` | `Meta.ModeloCodificacion`, `Meta.RosserNumerales` |
+| `Meta.Sigma1Prf` | 19 | `Meta.DerivCondPrf` | `Meta.EvalLiftcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1CorePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.SolidezDobleNegacion` | 19 | `Meta.ModeloCodigo`, `Meta.SolidezPrf` | `Meta.Consistencia` |
+| `Meta.HasWitTcFnPrf` | 20 | `Meta.CodeWitnessPrf`, `Meta.NatArithPrf`, `Meta.NumListPrf`, `Meta.Sigma1Prf` | `Meta.RosserNegLinea`, `Meta.SubstfcWitnessPrf`, `Meta.TrackedCorePrf` |
+| `Meta.ModeloCodificacion` | 20 | `Meta.ModeloEstandar` | `Meta.Consistencia` |
+| `Meta.Sigma1CorePrf` | 20 | `Meta.CodeNumeralPrf`, `Meta.Sigma1Prf`, `Meta.TcArithPrf` | `Meta.EvalLiftcPrf`, `Meta.ExIntroCodePrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFCases` |
+| `Meta.ExIntroCodePrf` | 21 | `Meta.DerivCondPrf`, `Meta.Sigma1CorePrf` | `Meta.EvalLtPrf`, `Meta.ForallElimCodePrf`, `Meta.TrackedCorePrf` |
+| `Meta.LineWFCases` | 21 | `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1CorePrf`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf` |
+| `Meta.SubstfcWitnessPrf` | 21 | `Meta.BoundedInPrf`, `Meta.CantorMonoPrf`, `Meta.HasWitTcFnPrf`, `Meta.NumCodeClosedPrf`, `Meta.StrongInductionPrf`, `Meta.SubstArith` | `Meta.D3ChainDotPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LineWFGuardPrf`, `Meta.ListEtaPrf`, `Meta.MpCodePrf`, `Meta.RosserNegLinea`, `Meta.TrackedAtomsPrf` |
+| `Meta.ListEtaPrf` | 22 | `Meta.SubstfcWitnessPrf` | `Meta.PremsOfTagPrf` |
+| `Meta.TrackedCorePrf` | 22 | `Meta.ExIntroCodePrf`, `Meta.HasWitTcFnPrf` | `Meta.EvalLiftcPrf`, `Meta.ForallElimCodePrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1AtomPrf` |
+| `Meta.ForallElimCodePrf` | 23 | `Meta.ExIntroCodePrf`, `Meta.TrackedCorePrf` | `Meta.EvalSubstfcPrf`, `Meta.MpCodePrf` |
+| `Meta.Sigma1AtomPrf` | 23 | `Meta.TcArithPrf`, `Meta.TrackedCorePrf` | `Meta.EvalArithPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.MpCodePrf` | 24 | `Meta.ForallElimCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalArithPrf` | 25 | `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Sigma1AtomPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalListPrf`, `Meta.EvalMulPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalMulPrf` | 26 | `Meta.EvalArithPrf`, `Meta.NatMulPrf` | `Meta.DotConsPrf` |
+| `Meta.DotConsPrf` | 27 | `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.EvalMulPrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalListPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalListPrf` | 28 | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.NumListPrf` | `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.LineWFTrackedPrf` |
+| `Meta.EvalLtPrf` | 29 | `Meta.EvalListPrf`, `Meta.ExIntroCodePrf` | `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalRunFnPrf` | 29 | `Meta.EvalListPrf`, `Meta.RunFnBoundedPrf` | `Meta.EvalLiftcPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf` |
+| `Meta.EvalBoundedPrf` | 30 | `Meta.EvalLtPrf` | `Meta.Delta0ReflectPrf`, `Meta.LineWFTrackedPrf`, `Meta.PropCodePrf` |
+| `Meta.EvalNthcPrf` | 30 | `Meta.DotConsPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf` | `Meta.EvalCarcNthcPrf` |
+| `Meta.Delta0ReflectPrf` | 31 | `Meta.EvalBoundedPrf` | `Meta.D3DottedPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf` |
+| `Meta.EvalCarcNthcPrf` | 31 | `Meta.EvalNthcPrf`, `Meta.LineWFConsPrf` | `Meta.D3InDotPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.PropCodePrf` | 31 | `Meta.EvalBoundedPrf` | `Meta.BdAllIntroPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf` |
+| `Meta.D3DottedPrf` | 32 | `Meta.Delta0ReflectPrf` | `Meta.D3ChainDotPrf`, `Meta.D3InDotPrf` |
+| `Meta.D3InDotPrf` | 33 | `Meta.D3DottedPrf`, `Meta.EvalCarcNthcPrf` | `Meta.BdAllIntroPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.BdAllIntroPrf` | 34 | `Meta.D3InDotPrf`, `Meta.PropCodePrf` | `Meta.D3ChainDotPrf`, `Meta.LineWFTrackedPrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.InAxiomsCodePrf` | 34 | `Meta.D3InDotPrf`, `Meta.EvalCarcNthcPrf`, `Meta.MpCodePrf`, `Meta.Representability2Prf`, `Meta.Sigma1CorePrf` | `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LineWFThyPrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.LineWFTrackedPrf` | 35 | `Meta.BdAllIntroPrf`, `Meta.BoundedInPrf`, `Meta.D3InDotPrf`, `Meta.EvalBoundedPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalListPrf`, `Meta.MpCodePrf`, `Meta.Sigma1AtomPrf` | `Meta.CodeCtorKit`, `Meta.LiftcCodePrf`, `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.LineWFThyPrf`, `Meta.RosserNumEval`, `Meta.TrackedAtomsPrf` |
+| `Meta.LineWFMpPrf` | 36 | `Meta.LineWFTrackedPrf` | `Meta.LineWFAssemblePrf` |
+| `Meta.LineWFSchemaPrf` | 36 | `Meta.LineWFTrackedPrf` | `Meta.CodeCtorKit`, `Meta.LineWFGuardPrf`, `Meta.PremsOfTagPrf` |
+| `Meta.LineWFThyPrf` | 36 | `Meta.InAxiomsCodePrf`, `Meta.LineWFTrackedPrf` | `Meta.LineWFAssemblePrf` |
+| `Meta.CodeCtorKit` | 37 | `Meta.LineWFSchemaPrf`, `Meta.LineWFTrackedPrf` | `Meta.CodeTreeReflect`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFEfqPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.LineWFGuardPrf` | 37 | `Meta.CodeWitnessPrf`, `Meta.Delta0ReflectPrf`, `Meta.LineWFSchemaPrf`, `Meta.SubstfcWitnessPrf` | `Meta.HasWitTrackedPrf` |
+| `Meta.CodeTreeReflect` | 38 | `Meta.CodeCtorKit` | `Meta.LineWFPropPrf`, `Meta.SubstTreeReflect`, `Meta.TrackedAtomsPrf` |
+| `Meta.EvalPredPrf` | 38 | `Meta.BoundedInPrf`, `Meta.CodeCtorKit`, `Meta.DerivCondPrf`, `Meta.EvalArithPrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Sigma1AtomPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalSubsttcPrf` |
+| `Meta.LiftcCodePrf` | 38 | `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.CodeCtorKit`, `Meta.CodeWitnessPrf`, `Meta.Delta0ReflectPrf`, `Meta.DerivCondPrf`, `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LineWFTrackedPrf`, `Meta.MpCodePrf`, `Meta.NatArithPrf`, `Meta.NumCodeClosedPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1Prf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf`, `Meta.TrackedCorePrf` | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTrackedPrf`, `Meta.SubstfcCodePrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.LineWFEfqPrf` | 38 | `Meta.CodeCtorKit` | `Meta.LineWFAssemblePrf` |
+| `Meta.EvalLiftcPrf` | 39 | `Meta.ArithPrf`, `Meta.BoundedInPrf`, `Meta.CantorMonoPrf`, `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.DerivCondPrf`, `Meta.EvalRunFnPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LiftcCodePrf`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.NumListPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1CorePrf`, `Meta.Sigma1Prf`, `Meta.StrongInductionPrf`, `Meta.TrackedCorePrf` | `Meta.EvalLiftfcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf` |
+| `Meta.LineWFPropPrf` | 39 | `Meta.CodeTreeReflect` | `Meta.LineWFAssemblePrf` |
+| `Meta.SubstfcCodePrf` | 39 | `Meta.ArithPrf`, `Meta.CodeCtorKit`, `Meta.DerivCondPrf`, `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLtPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LiftcCodePrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1Prf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf` | `Meta.EvalSubstfcPrf` |
+| `Meta.TrackedAtomsPrf` | 39 | `Meta.BdAllIntroPrf`, `Meta.CodeTreeReflect`, `Meta.D3InDotPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcWitnessPrf` | `Meta.D3ChainDotPrf`, `Meta.HasWitTrackedPrf` |
+| `Meta.D3ChainDotPrf` | 40 | `Meta.BdAllIntroPrf`, `Meta.ChainOkBoundedPrf`, `Meta.D3DottedPrf`, `Meta.SubstfcWitnessPrf`, `Meta.TrackedAtomsPrf` | `Meta.D3BodyPrf` |
+| `Meta.EvalSubsttcPrf` | 40 | `Meta.CantorMonoPrf`, `Meta.CodeWitnessPrf`, `Meta.D3InDotPrf`, `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.PropCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.EvalSubstfcPrf` |
+| `Meta.HasWitTrackedPrf` | 40 | `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf`, `Meta.TrackedAtomsPrf` | `Meta.HasWitFTrackedPrf` |
+| `Meta.LineWFAssemblePrf` | 40 | `Meta.LineWFEfqPrf`, `Meta.LineWFMpPrf`, `Meta.LineWFPropPrf`, `Meta.LineWFThyPrf` | `Meta.PremsOfTagPrf`, `Meta.SubstTreeReflect` |
+| `Meta.EvalSubstfcPrf` | 41 | `Meta.CantorMonoPrf`, `Meta.CodeWitnessPrf`, `Meta.D3InDotPrf`, `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalSubsttcPrf`, `Meta.ForallElimCodePrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.PropCodePrf`, `Meta.SubstfcCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.EvalLiftfcPrf`, `Meta.SubstTreeReflect` |
+| `Meta.HasWitFTrackedPrf` | 41 | `Meta.HasWitTrackedPrf` | `Meta.SubstTreeReflect` |
+| `Meta.PremsOfTagPrf` | 41 | `Meta.LineWFAssemblePrf`, `Meta.LineWFSchemaPrf`, `Meta.ListEtaPrf` | `Meta.PremsOfDotPrf`, `Meta.RosserNegNum` |
+| `Meta.EvalLiftfcPrf` | 42 | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf` | `Meta.LiftfcWitnessPrf`, `Meta.SubstTreeReflect` |
+| `Meta.LiftfcWitnessPrf` | 43 | `Meta.EvalLiftfcPrf` | `Meta.SubstTreeReflect` |
+| `Meta.SubstTreeReflect` | 44 | `Meta.CodeTreeReflect`, `Meta.EvalLiftfcPrf`, `Meta.EvalSubstfcPrf`, `Meta.HasWitFTrackedPrf`, `Meta.LiftfcWitnessPrf`, `Meta.LineWFAssemblePrf` | `Meta.D3BodyPrf`, `Meta.PremsOfDotPrf` |
+| `Meta.PremsOfDotPrf` | 45 | `Meta.PremsOfTagPrf`, `Meta.SubstTreeReflect` | `Meta.D3BodyPrf` |
+| `Meta.D3BodyPrf` | 46 | `Meta.D3ChainDotPrf`, `Meta.PremsOfDotPrf`, `Meta.SubstTreeReflect` | `Meta.PremsBdAllPrf` |
+| `Meta.PremsBdAllPrf` | 47 | `Meta.D3BodyPrf` | `Meta.GodelTwo`, `Meta.GodelTwoPrf` |
+| `Meta.GodelTwo` | 48 | `Meta.PremsBdAllPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf` |
+| `Meta.GodelTwoPrf` | 49 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.DerivCondPrf`, `Meta.DiagonalNumeral`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.LineWFCases`, `Meta.PremsBdAllPrf`, `Meta.ReprPrf`, `Meta.Representability2Prf`, `Meta.TcArithPrf` | `Meta.Consistencia`, `Meta.TarskiPrf` |
+| `Meta.Consistencia` | 50 | `Meta.GodelTwoPrf`, `Meta.ModeloCodificacion`, `Meta.SolidezDobleNegacion`, `Meta.SolidezPrf` | `Meta.ContratoTitulares`, `Meta.PurezaComando`, `Meta.PurezaTitulares`, `Meta.RosserGuardNeg`, `Meta.SolidezVerificador`, `Meta.TarskiPrf` |
+| `Meta.PurezaComando` | 51 | `Meta.Consistencia` | `Meta.ContratoTitulares`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaTitulares`, `Meta.RosserNumerales`, `Meta.RosserPosNum`, `Meta.RosserW1` |
+| `Meta.SolidezVerificador` | 51 | `Meta.Consistencia`, `Meta.Representability` | `Meta.GodelCorolarios`, `Meta.RigidezEstandar`, `Meta.RosserPosNum`, `Meta.RosserW1` |
+| `Meta.TarskiPrf` | 51 | `Meta.Consistencia`, `Meta.GodelTwoPrf` · externo: `FOL.Lift0` | `Meta.ContratoTitulares`, `Meta.Lob`, `Meta.PuenteFOL`, `Meta.PurezaTitulares`, `Meta.Rosser` |
+| `Meta.GodelCorolarios` | 52 | `Meta.PurezaComando`, `Meta.SolidezVerificador` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares` |
+| `Meta.Lob` | 52 | `Meta.PurezaComando`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares` |
+| `Meta.RosserNumerales` | 52 | `Meta.CodeNumeralPrf`, `Meta.CodeWitnessPrf`, `Meta.ModeloEstandar`, `Meta.NumListPrf`, `Meta.PurezaComando` | `Meta.RosserNumEval` |
+| `Meta.RosserPosNum` | 52 | `Meta.PurezaComando`, `Meta.Representability2Prf`, `Meta.SolidezVerificador` | `Meta.RosserNegNum` |
+| `Meta.RosserW1` | 52 | `Meta.PurezaComando`, `Meta.SolidezVerificador` | `Meta.RosserNegNum` |
+| `Meta.RosserNumEval` | 53 | `Meta.BoundedInPrf`, `Meta.LineWFTrackedPrf`, `Meta.NumCodeClosedPrf`, `Meta.RosserNumerales` | `Meta.RigidezEstandar`, `Meta.RosserGuardNeg` |
+| `Meta.RigidezEstandar` | 54 | `Meta.RosserNumEval`, `Meta.SolidezVerificador` | `Meta.ContratoTitulares`, `Meta.ProvFiel`, `Meta.PuenteFOL` |
+| `Meta.RosserGuardNeg` | 54 | `Meta.Consistencia`, `Meta.RosserNumEval` | `Meta.RosserNegLinea` |
+| `Meta.PuenteFOL` | 55 | `Meta.HilbertDeduction`, `Meta.RigidezEstandar`, `Meta.TarskiPrf` · externo: `FOL.Canonical0`, `FOL.Derives1`, `FOL.Sentence` | `Meta.ContratoTitulares` |
+| `Meta.RosserNegLinea` | 55 | `Meta.HasWitTcFnPrf`, `Meta.Representability2Prf`, `Meta.RosserGuardNeg`, `Meta.SubstfcWitnessPrf` | `Meta.RosserNegNum` |
+| `Meta.RosserNegNum` | 56 | `Meta.PremsOfTagPrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum`, `Meta.RosserW1` | `Meta.ProvFiel`, `Meta.Rosser` |
+| `Meta.ProvFiel` | 57 | `Meta.RigidezEstandar`, `Meta.RosserNegNum` | `Meta.ContratoTitulares`, `Meta.SegundoModelo` |
+| `Meta.Rosser` | 57 | `Meta.RosserNegNum`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares` |
+| `Meta.ContratoTitulares` | 58 | `Meta.Consistencia`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.ProvFiel`, `Meta.PuenteFOL`, `Meta.PurezaComando`, `Meta.RigidezEstandar`, `Meta.Rosser`, `Meta.TarskiPrf` | `Meta.PurezaTitulares` |
+| `Meta.SegundoModelo` | 58 | `Meta.ProvFiel` | — |
+| `Meta.PurezaTitulares` | 59 | `Meta.Consistencia`, `Meta.ContratoTabla`, `Meta.ContratoTitulares`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.Rosser`, `Meta.TarskiPrf` | — |
 
-## Namespace Hierarchy
+## Barriles
 
-```text
-ROBINSON_PlusPlus
-└── Minimal
-    ├── Axioms
-    └── Theorems
-        ├── Block1
-        ├── Block2
-        ├── Block3
-        ├── Block4
-        ├── Block4_C5
-        ├── Block4_C6_C7
-        ├── Block5
-        ├── Block6
-        ├── Block7
-        └── Block8
-```
+* `ROBINSON_PlusPlus.lean` importa 6: `Minimal.Axioms`, `Meta`, `Full.Induction`; externos: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers`.
+* `ROBINSON_PlusPlus/Meta.lean` importa 118: `Meta.Godel`, `Meta.Provability`, `Meta.HasWitTcFnPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.SubstArith`, `Meta.CheckArith`, `Meta.Representability`, `Meta.Diagonal`, `Meta.ProofChain`, `Meta.Representability2`, `Meta.ReprPrf`, `Meta.ArithPrf`, `Meta.Representability2Prf`, `Meta.ChainPrf`, `Meta.DerivCondPrf`, `Meta.Sigma1Prf`, `Meta.TcArithPrf`, `Meta.NumListPrf`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.NatMulPrf`, `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.CodeNumeralPrf`, `Meta.DiagonalNumeral`, `Meta.Sigma1CorePrf`, `Meta.EvalArithPrf`, `Meta.EvalMulPrf`, `Meta.ExIntroCodePrf`, `Meta.ForallElimCodePrf`, `Meta.LineWFCases`, `Meta.MpCodePrf`, `Meta.Sigma1AtomPrf`, `Meta.TrackedCorePrf`, `Meta.StrongInductionPrf`, `Meta.BoundedInPrf`, `Meta.RunFnBoundedPrf`, `Meta.ChainOkBoundedPrf`, `Meta.SubstCodeOpenPrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstfcWitnessPrf`, `Meta.ListEtaPrf`, `Meta.PremsOfTagPrf`, `Meta.PremsOfDotPrf`, `Meta.DotConsPrf`, `Meta.EvalListPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`, `Meta.Delta0ReflectPrf`, `Meta.D3DottedPrf`, `Meta.PropCodePrf`, `Meta.EvalCarcNthcPrf`, `Meta.D3InDotPrf`, `Meta.BdAllIntroPrf`, `Meta.LineWFTrackedPrf`, `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.CodeCtorKit`, `Meta.EvalPredPrf`, `Meta.CodeWitnessPrf`, `Meta.CodeNatInjPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf`, `Meta.EvalLiftcPrf`, `Meta.LineWFEfqPrf`, `Meta.CodeTreeReflect`, `Meta.LineWFPropPrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFThyPrf`, `Meta.LineWFAssemblePrf`, `Meta.LineWFConsPrf`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.EvalSubsttcPrf`, `Meta.LineWFGuardPrf`, `Meta.EvalSubstfcPrf`, `Meta.D3ChainDotPrf`, `Meta.TrackedAtomsPrf`, `Meta.HasWitTrackedPrf`, `Meta.HasWitFTrackedPrf`, `Meta.SubstTreeReflect`, `Meta.EvalLiftfcPrf`, `Meta.LiftfcWitnessPrf`, `Meta.D3BodyPrf`, `Meta.PremsBdAllPrf`, `Meta.GodelTwoPrf`, `Meta.ModeloCodigo`, `Meta.ModeloEstandar`, `Meta.ModeloCodificacion`, `Meta.SolidezPrf`, `Meta.SolidezDobleNegacion`, `Meta.Consistencia`, `Meta.TarskiPrf`, `Meta.SolidezVerificador`, `Meta.PurezaComando`, `Meta.RosserW1`, `Meta.RosserPosNum`, `Meta.RosserNumerales`, `Meta.RosserNumEval`, `Meta.RosserGuardNeg`, `Meta.RosserNegLinea`, `Meta.RosserNegNum`, `Meta.Rosser`, `Meta.Lob`, `Meta.GodelCorolarios`, `Meta.RigidezEstandar`, `Meta.ProvFiel`, `Meta.SegundoModelo`, `Meta.PuenteFOL`, `Meta.PurezaTitulares`, `Full.Induction`; externos: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers`.
 
-Mapping 1:1 entre rutas de archivo y namespaces (ADR-005).
-
----
-
-## Dependencies by Level
-
-### Level 0 — Foundation
-
-* `FOL.*` (proyecto sibling, dependencia local vía `lakefile.lean`).
-* `Minimal/SymLit.lean` — la macro `sym!"…"` (D7, ADR‑129): sin imports.
-* `Minimal/Axioms.lean` — lenguaje + **141 axiomas objeto** (`def axioms`, línea 1199) + los esquemas del verificador + la capa Δ₀ (`lenc`/`nthc`). Solo importa `FOL.FOL` y `FOL.Theorems.Eq` (✏️ y desde D7, 2026‑10‑05, `Minimal.SymLit`).
-  ✏️ Los 141 valen hasta ADR‑117 (2026‑10‑04): hoy son **142** —los 141 de `axiomsBase` y el ancla diagonal `ax_axiomsCodeT_def`, el último—, y el fichero aloja también la familia `codeNat`, bajada de `Meta/CodeNumeralPrf.lean`. Sigue importando sólo esos dos.
-  ⚠️ Las **6 meta-reglas ω** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) **ya no viven aquí**: se movieron a `FOL/MetaRules.lean` y se re-exportan (ADR-010). *(✏️ 2026‑10‑14, ADR‑134: registro; `FOL/MetaRules.lean` se borró con ADR‑115 §8 y RPP no lo importa: ver más abajo.)*
-
-### Level 1 — Aritmética básica
-
-* `Block1.lean` — depende de `Axioms` + `FOL.Tactics`.
-
-### Level 2 — Estructuras de orden y aritmética derivada
-
-* `Block2.lean` — `Axioms`, `Block1`.
-* `Block3.lean` — `Axioms`, `Block1`, `Block2`.
-
-### Level 3 — Cantor (paridad + totalidad/inyectividad)
-
-* `Block4.lean` — `Axioms`, `Block1`, `Block3`.
-
-### Level 4 — Lema C5 (extracción de `w`)
-
-* `Block4_C5.lean` — `Axioms`, `Block1`, `Block2`, `Block3`.
-
-### Level 5 — Sobreyectividad y unicidad Cantor (proj1/proj2 concretos)
-
-* `Block4_C6_C7.lean` — `Axioms`, `Block1`, `Block2`, `Block3`, `Block4`, `Block4_C5`.
-
-### Level 6 — Pares (Bloque V)
-
-* `Block5.lean` — `Axioms`, `Block1`, `Block3`, `Block4`, `Block4_C5`, `Block4_C6_C7`.
-
-### Level 7 — Listas, funciones, primos
-
-* `Block6.lean` — `Axioms`, `Block1`, `Block4`, `Block5`.
-* `Block7.lean` — `Axioms`, `Block1`, `Block4`, `Block4_C6_C7`, `Block5`.
-* `Block8.lean` — `Axioms`, `Block1`, `Block2`, `Block4_C5`.
-
-### Level N — Barrel
-
-* `ROBINSON_PlusPlus.lean` — `import` de los 11 módulos anteriores.
-
----
-
-## Notable cross-module facts
-
-* 🗑️ Retirado con ADR‑115, con todos los bloques (✏️ 2026‑10‑18): `mod2_of_even` vivía en `Block4_C6_C7` (no en `Block5`) desde 2026-06-03: `proj_is_cantor` (en C6_C7, borrado) lo necesitaba, y `Block5` importaba C6_C7 — moverlo evitaba la dependencia circular.
-* **`proj1`/`proj2`** son defs concretas (`x_of_c`/`y_of_c`) en `Block4_C6_C7`, no símbolos opacos en `Axioms`. Sustituyen al eliminado `ax22`.
-* **`add_left_cancel`** en `Block4_C6_C7` reemplaza al eliminado `ax27`. La prueba PA⁻ usa `lt_add_const_of_le_left` (de `Block4_C5`) + `add_comm'` (también `Block4_C5`) + `ax18`/`ax19`.
-* **`succ_le_of_lt`** en `Block2` se refactorizó para no usar ax27 (vía `ax5+ax3 → a+(σkp+k)=a; ax13` con testigo → `lt a a` → contradice `ax18`).
-* **`teo_2_11`** en `Block1` reemplaza al eliminado `ax28`. Prueba: tricotomía + `mul_two_lt_mono` (en Block1) + `ax18`.
-
----
-
-## Exports by Module
-
-Ver los nodos temáticos [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md) /
-[`REFERENCE-Arithmetic.md`](doc/REFERENCE-Arithmetic.md) (§3.1–§3.11) para listas completas de exports
-por módulo. Resumen:
-
-| Módulo | # defs públicas | # teoremas exportados |
-|---|---:|---:|
-| `Axioms` | 85 | 13 |
-| `Block1` | 3 | 31 |
-| `Block2` | 1 | 13 |
-| `Block3` | 1 | 11 |
-| `Block4` | 2 | 8 |
-| `Block4_C5` | 2 | 35 |
-| `Block4_C6_C7` | 6 | 5 |
-| `Block5` | 1 | 5 |
-| `Block6` | 1 | 7 |
-| `Block7` | 3 | 3 |
-| `Block8` | 3 | 5 |
-
----
-
-## Design Notes
-
-1. **Separation of concerns**: un módulo ↔ un bloque temático de la spec `TuplasFuncionesYListas.md`.
-2. **Minimal dependencies**: cada módulo importa solo lo estrictamente necesario; `open` selectivo.
-3. **Selective exports**: el bloque `export`, donde lo hay (la cadena de Gödel de `Meta/`), enumera la API pública del módulo; es OPCIONAL (✏️ 2026‑10‑28, ADR‑206, T35: decía que todo módulo termina con uno, y 33 no lo hacían).
-4. **Sin Mathlib** (ADR-001): solo `FOL` como dependencia externa.
-5. **One namespace per module** (ADR-005): mirrors file path.
-6. ~~**6 meta-reglas ω** (ADR-010) … re-exportadas desde `Minimal.Axioms`.~~ ✏️ **2026‑10‑02 (ADR‑115):** RPP no usa `⊢`; las meta‑reglas de FOL (4 `axiom`, refutables: L1‑3) ya no se importan, y FOL las borró el mismo día (ADR‑115 §8).
-
----
-
-## Verification Commands
-
-```bash
-lake build                              # build completo (123 jobs a 2026-09-04)
-lake clean                              # reinicia la caché (cuando `Replayed` esconde errores)
-lake env lean sondeos/X.lean            # compila un sondeo (fuera del build)
-lake env lean Probe/X.lean              # scratch de sesión (Probe/ está en .gitignore)
-```
-
-⚠️ **`lake build` puede dar VERDE sin construir lo que crees.** La `lean_lib` sólo construye lo
-**alcanzable desde el módulo raíz**: mover un fichero a `Meta/` sin añadir su `import` en
-`Meta.lean` lo deja **fuera del build**, y el build sale verde. **Señal de alarma: el número de jobs
-no cambia al añadir módulos.** Comprobar siempre que el conteo se mueve.
-
-⚠️ **RPP y FOL, en el MISMO toolchain** (M‑3, reescrita el 2026‑10‑28, ADR‑205): con él, construir FOL desde su raíz o desde la de RPP da lo mismo (medido); aquí, los objetivos de FOL se construyen desde la raíz de RPP con `lake build "@FOL/FOL" "@FOL/TheoryFramework"`. *(Decía «NUNCA `cd FOL && lake build` — desajuste de toolchain»: no lo había.)*

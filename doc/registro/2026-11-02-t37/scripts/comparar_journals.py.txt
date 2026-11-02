@@ -1,0 +1,106 @@
+"""Compara los resultados de los journals (fuera de git) con las copias
+versionadas en doc/registro. Uso: comparar_journals.py <dir_workflows> <repo>"""
+import json, sys, collections, hashlib, re
+
+W = sys.argv[1]
+R = sys.argv[2]
+
+def journal(wf):
+    res = []
+    started = {}
+    for i, l in enumerate(open(W + '/' + wf + '/journal.jsonl', encoding='utf-8'), 1):
+        d = json.loads(l)
+        if d['type'] == 'started':
+            started[d['key']] = d['label']
+        if d['type'] == 'result':
+            res.append((i, started.get(d['key']), d['agentId'], d['result']))
+    return res
+
+def h(x):
+    return hashlib.sha256(json.dumps(x, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()[:12]
+
+# Normalizacion: la copia versionada sanea rutas locales (<sesion>, <tmp>, <home>...)
+def san(s):
+    return s
+
+print('=== wf_68cece92-90b vs doc/registro/2026-10-05-auditoria-adr120-121/workflow.json')
+v = json.load(open(R + '/doc/registro/2026-10-05-auditoria-adr120-121/workflow.json', encoding='utf-8'))
+vres = {x['lens']: x for x in v['result']}
+for ln, label, aid, r in journal('wf_68cece92-90b'):
+    same = vres.get(r['lens'])
+    print(ln, label, aid, 'hallazgos', len(r['findings']), 'igual_a_versionado:', same == r if same else 'NO ESTA')
+    if same and same != r:
+        a = json.dumps(r, ensure_ascii=False); b = json.dumps(same, ensure_ascii=False)
+        print('   len', len(a), len(b))
+
+print('=== wf_107c9121-80b vs doc/registro/2026-10-05-auditoria-adr123/workflow.json')
+v = json.load(open(R + '/doc/registro/2026-10-05-auditoria-adr123/workflow.json', encoding='utf-8'))
+vals = v['result']['review'] + v['result']['scout']
+for ln, label, aid, r in journal('wf_107c9121-80b'):
+    print(ln, label, aid, 'len', len(r), 'igual_a_versionado:', r in vals)
+    if r not in vals:
+        for x in vals:
+            if x[:200] == r[:200]:
+                # diferencias
+                import difflib
+                dd = [d for d in difflib.ndiff(r.splitlines(), x.splitlines()) if d[:1] in '+-']
+                print('   diferencias de linea:', len(dd)); print('   ', '\n    '.join(dd[:10]))
+
+print('=== wf_e04d70c1-e0c vs doc/registro/2026-10-05-auditoria-adr124-126/workflow.json')
+v = json.load(open(R + '/doc/registro/2026-10-05-auditoria-adr124-126/workflow.json', encoding='utf-8'))
+vals = [v['result']['adr124'], v['result']['adr125_126']]
+for ln, label, aid, r in journal('wf_e04d70c1-e0c'):
+    print(ln, label, aid, 'len', len(r), 'igual_a_versionado:', r in vals)
+    if r not in vals:
+        for x in vals:
+            if x[:100] == r[:100]:
+                import difflib
+                dd = [d for d in difflib.ndiff(r.splitlines(), x.splitlines()) if d[:1] in '+-']
+                print('   diferencias de linea:', len(dd)); print('   ', '\n    '.join(dd[:12]))
+
+print('=== wf_1f61bc0d-738 vs doc/registro/2026-10-12-auditoria-suelo/candidatos.json')
+cands = json.load(open(R + '/doc/registro/2026-10-12-auditoria-suelo/candidatos.json', encoding='utf-8'))
+DIM = {'buscar:medida': 'medida', 'buscar:fundamentos': 'fundamentos', 'buscar:subterraneo': 'subterraneo',
+       'buscar:ruta': 'ruta', 'buscar:fol': 'fol', 'buscar:documentos': 'documentos'}
+items = {}
+verds = {}
+nuevos = {}
+for ln, label, aid, r in journal('wf_1f61bc0d-738'):
+    if label.startswith('buscar:'):
+        dim = DIM[label]
+        items[dim] = r['items']
+        print(ln, label, 'items', len(r['items']), 'keys_result', sorted(r.keys()))
+    else:
+        dim = label.split(':')[1]
+        verds[dim] = r.get('veredictos', [])
+        nuevos[dim] = r.get('nuevos', [])
+        print(ln, label, 'veredictos', len(r.get('veredictos', [])), 'nuevos', len(r.get('nuevos', [])), 'keys_result', sorted(r.keys()))
+tot_items = sum(len(x) for x in items.values())
+tot_nuevos = sum(len(x) for x in nuevos.values())
+print('items', tot_items, 'nuevos', tot_nuevos, 'total', tot_items + tot_nuevos, 'candidatos.json', len(cands))
+# comprobar cada candidato
+cd = collections.defaultdict(dict)
+for c in cands:
+    cd[c['dim']][c['id']] = c
+miss = []
+for dim in items:
+    for it in items[dim]:
+        c = cd[dim].get(it['id'])
+        if c is None:
+            miss.append((dim, it['id']))
+            continue
+        for k, val in it.items():
+            if c.get(k) != val:
+                miss.append((dim, it['id'], 'campo distinto', k))
+    for nv in nuevos[dim]:
+        c = cd[dim].get(nv['id'])
+        if c is None:
+            miss.append((dim, nv['id'], 'nuevo no esta'))
+    vd = {x['id']: x for x in verds[dim]}
+    for cid, c in cd[dim].items():
+        x = vd.get(cid)
+        if x and x.get('veredicto') != c.get('veredicto'):
+            miss.append((dim, cid, 'veredicto', x.get('veredicto'), c.get('veredicto')))
+print('discrepancias:', len(miss))
+for m in miss[:40]:
+    print('  ', m)

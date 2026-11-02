@@ -1,0 +1,30 @@
+"""Para un conjunto de IDs (regex), lista en que ADR de DECISIONS.md y del
+historico aparece cada uno, con linea. Uso: ids_en_adr.py <repo> <regex>"""
+import re, sys, collections
+
+repo = sys.argv[1]
+rx = re.compile(sys.argv[2])
+H = re.compile(r'[‑‐‒–]')
+
+def scan(path):
+    cur = None
+    res = collections.defaultdict(list)
+    for ln, line in enumerate(open(path, encoding='utf-8'), 1):
+        m = re.match(r'^## (ADR[-‑]\d+)', line)
+        if m:
+            cur = H.sub('-', m.group(1))
+        l2 = H.sub('-', line)
+        for mm in rx.finditer(l2):
+            res[mm.group(0)].append((cur or 'cabecera', ln))
+    return res
+
+for f in ['DECISIONS.md', 'doc/historia/DECISIONS-001-130.md']:
+    r = scan(repo + '/' + f)
+    print('=====', f)
+    def key(s):
+        return [int(x) if x.isdigit() else x for x in re.split(r'(\d+)', s)]
+    for i in sorted(r, key=key):
+        d = collections.OrderedDict()
+        for adr, ln in r[i]:
+            d.setdefault(adr, []).append(ln)
+        print('  %-10s %s' % (i, '; '.join('%s:%s' % (a, ','.join(map(str, l))) for a, l in d.items())))

@@ -1,0 +1,50 @@
+"""Extrae de doc/AUDITORIA-SUELO-2026-10-12.md, por cada T, la linea de su
+cabecera y su linea de Estado MAS RECIENTE (por fecha; a igual fecha, la que
+lleva ✅), con los ADR que nombra."""
+import re, sys, json
+
+path = sys.argv[1]
+out = sys.argv[2]
+H = re.compile(r'[‑‐]')
+lines = open(path, encoding='utf-8').read().split('\n')
+T = {}
+cur = None
+for i, l in enumerate(lines, 1):
+    m = re.match(r'^#### (T\d+[a-z]?) · (.*)', l)
+    if m:
+        cur = m.group(1)
+        T[cur] = {'linea': i, 'titulo': m.group(2), 'estados': []}
+        continue
+    if l.startswith('## '):
+        cur = None
+    if cur and l.startswith('*Estado'):
+        T[cur]['estados'].append((i, H.sub('-', l)))
+
+ORD = {'': 0, 'mañana': 1, 'tarde': 2, 'noche': 3}
+def clave(e):
+    i, l = e
+    m = re.match(r'\*Estado el (\d{4}-\d{2}-\d{2})(?: \(([^)]*)\))?', l)
+    fecha = m.group(1) if m else '0000'
+    extra = (m.group(2) or '') if m else ''
+    franja = 0
+    for k, v in ORD.items():
+        if k and k in extra:
+            franja = max(franja, v)
+    if 'al final' in extra or 'después' in extra:
+        franja += 0.5
+    return (fecha, franja, '✅' in l)
+
+res = {}
+for t, d in T.items():
+    if d['estados']:
+        i, l = max(d['estados'], key=clave)
+        adrs = re.findall(r'ADR-(\d{3})', l)
+        res[t] = {'linea': d['linea'], 'titulo': d['titulo'], 'estado_linea': i, 'estado': l[:600],
+                  'adrs': list(dict.fromkeys(adrs)), 'icono': ('✅' if '✅' in l else '🏁' if '🏁' in l else '🟡' if '🟡' in l else '🟢' if '🟢' in l else '⏸' if '⏸' in l else '?'),
+                  'n_estados': len(d['estados'])}
+    else:
+        res[t] = {'linea': d['linea'], 'titulo': d['titulo'], 'estado_linea': None, 'estado': '', 'adrs': [], 'icono': '-', 'n_estados': 0}
+json.dump(res, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+for t in sorted(res, key=lambda s: (int(re.match(r'T(\d+)', s).group(1)), s)):
+    r = res[t]
+    print('%-5s L%-5s E%-5s %-3s %-24s %s' % (t, r['linea'], r['estado_linea'], r['icono'], ','.join(r['adrs']), r['estado'][:110]))

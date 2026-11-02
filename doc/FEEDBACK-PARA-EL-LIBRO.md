@@ -311,3 +311,60 @@ justo lo contrario.
 de PeanoRF — su gate lo clasifica **por el TIPO** del constructor, no por su nombre. Es el mismo
 criterio que `check-estratos.bash` usa ya para los `axiom` que habitan inductivos, aplicado a un eje
 distinto (los **constructores**). Ver ADR-065 §3.
+
+
+## 2026-11-02 · T49: la deriva del libro, MEDIDA (sin tocar `doc/book/`) — ADR‑242
+
+El libro está **en espera** desde el 2026‑10‑14 (decisión del propietario: vivo, hasta que el proyecto esté más
+adelantado), y su job de la CI sólo corre cuando un push a master toca `doc/book/`. Esta entrada es la foto de lo que
+el código ha dejado atrás desde entonces; la salida entera de las dos mediciones, en
+`doc/registro/2026-11-02-t49/`. Desde ADR‑242, la CI de RPP repite las dos en cada run, también el nocturno, como
+INFORME (no bloquea): el número de abajo se puede seguir en el resumen de cada run.
+
+### 1 · Lo que ya no casa (medido el 2026‑11‑02 sobre RPP 6cdd2dd y FOL b5c5e1c)
+
+* **42 de los 103 fragmentos** de `doc/book/fragmentos.json` fallan en `extraer.py` (la auditoría había medido 38):
+  * 24, una declaración que ya no está en su módulo: `prf_to_derives`, `prf0_to_derives`, `ax_induction`,
+    `add_comm_thm`, `Provable`, `provable_formCode_iff`, `repr_pos`, `triN`, `consN`, `two_mul_consN`, `codeNat`,
+    `hFN`, `Reflects`, `diag_arith_num`, `godelCN_fixedpoint_N`, `provCode_transfer`, `godelCN_fixedpoint`,
+    `ConsistentOmega`, `consistentH_of_omega`, `goedel_first_unprovable`, `goedel_first_numeral`,
+    `goedel_first_unrefutable`, `goedel_first_undecidable`, `d3_teorema` (son las claves del manifiesto; algunas
+    declaraciones existen en OTRO módulo —`triN`, `consN` y `codeNat` bajaron a `Minimal/Axioms.lean` con ADR‑117—, y
+    las demás se retiraron con la capa `⊢`, ADR‑115, o con su vía, ADR‑160 y ADR‑161);
+  * 17, un módulo que ya no existe: `fol_gen`, `fol_imp_intro` (`FOL/MetaRules.lean`, ADR‑115), `lemma_C5`,
+    `cantor_surjectivity`, `pair_inj`, `teo_F3`, `ax_p_tfa` (`Minimal/Theorems/Block*`, ADR‑115), `tfa_numeral`,
+    `exists_prime_factor` (`Full/Factorization.lean`, `Full/PrimeFactor.lean`), `piloto_codeN_axioma`,
+    `piloto_hFN_axioma`, `descarga_hFN` (sondeos archivados, ADR‑141), `reflects_of_omega`, `OmegaConsistent`,
+    `NegVerifier`, `goedel_first_undecidable_omega` (`Meta/OmegaReflect.lean`, ADR‑160) y `cons_ne_head`
+    (`Meta/CodeDistinct.lean`);
+  * 1, fuera del build: `fol_deduction_theorem` (`FOL/Deduction.lean` salió del cono de RPP con ADR‑170).
+* **35 referencias sin respaldo** en los capítulos (`simbolos.py`; la auditoría había medido 24 `\ident{}`): 29
+  `\ident{}` y 6 `\modulo{}`.
+* **La base sancionada** de `fragmentos.json` incluye `FOL.MetaRules.*` (`imp_intro`, `gen`, `raa`, `dne`,
+  `or_elim`…): esa capa se retiró con ADR‑115, y hoy RPP tiene **cero** `axiom` del proyecto. La base de hoy son los
+  tres de Lean (`propext`, `Quot.sound`, `Classical.choice`), y los 32 titulares van sin `Classical.choice`
+  (ADR‑191, ADR‑210: en RPP sólo lo usa `prf_sound`, la solidez clásica).
+* **Los dos avisos editoriales obligatorios** de `PLAN-LIBRO.md` §6 son FALSOS hoy: el (1) obliga a decir que no hay
+  prueba de consistencia, y la hay desde ADR‑120 (`consistencia : ConsistentH`, por el modelo estándar); el (2), que
+  Gödel I está a medias (sólo `⊬G`), y `⊬¬G` es teorema desde ADR‑121 (`goedel_I_neg`).
+
+### 2 · Lo nuevo que el libro puede contar (desde su última sincronía)
+
+* La **consistencia** de `T_Prf`, demostrada (ADR‑120), y sin lógica clásica en la semántica doble‑negada (ADR‑191).
+* **Gödel I entero** (`⊬G` y `⊬¬G`, ADR‑121), **D3** sobre `Prf` (ADR‑134), **Gödel II** sin hipótesis y su forma de
+  libro (`G ⇔ Con'`, `Con'` indecidible; ADR‑162), **Rosser** (ADR‑157 y ADR‑158), **Löb** (ADR‑159) y **Tarski**
+  (también el semántico, ADR‑175).
+* La **rigidez** del modelo estándar y un **segundo modelo** (ADR‑173, ADR‑175).
+* Los 32 titulares, **por seis núcleos** independientes (ADR‑222, ADR‑228) y sin `Classical.choice` (ADR‑189,
+  ADR‑191, ADR‑210).
+* El **puente con FOL** (`Derives₁` → `PrfH`, ADR‑195) y, en FOL, la mitad de Markov y la esencialidad de los
+  semánticos (ADR‑220, ADR‑221).
+* Los **docstrings** del build que `DOCSTRINGS-NO-FIABLES.md` daba por no fiables: T31 (ADR‑134) corrigió los del
+  censo de entonces (los «pendiente» de C3 y D3, la ruta vacua `hI`/`hbI`, la deuda B6b, la fórmula de Cantor y la de
+  `consN`…), y desde el 2026‑11‑02 los vigilan [I] (también la consistencia «sin probar»), [G], [G.2] y [P] (los
+  footprints de la prosa) de `check-doc-sync.bash`.
+
+### 3 · Qué NO se ha hecho
+
+Nada de `doc/book/` ni de `PLAN-LIBRO.md` se ha tocado: son de la tarea del libro (`PLAN-LIBRO.md` §0). Reactivarlo
+es decisión del propietario; cuando se haga, esta entrada es la lista de partida.

@@ -1,0 +1,143 @@
+== sondeos/CensoFormaAxiomas.lean, 2026-11-02 (lake lean, v4.35.0, el build de ese día; ≈ 5 s): la salida de #censo_forma, entera ==
+axiomsBase: 34 de la teoría + 85 de codificación = 119; con el ancla, 120
+n	grupo	axioma	clase (todo cuantificador cuenta)	clase (los acotados, Δ₀)	∀	∃	acotados
+1	teoría	ax2_peano_succ_neq_zero	Π₁	Π₁	1	0	0
+2	teoría	ax3_peano_succ_inj	Π₁	Π₁	2	0	0
+3	teoría	ax4_add_zero	Π₁	Π₁	1	0	0
+4	teoría	ax5_add_succ	Π₁	Π₁	2	0	0
+5	teoría	ax6_add_comm	Π₁	Π₁	2	0	0
+6	teoría	ax7_add_assoc	Π₁	Π₁	3	0	0
+7	teoría	ax8_mul_zero	Π₁	Π₁	1	0	0
+8	teoría	ax9_mul_succ	Π₁	Π₁	2	0	0
+9	teoría	ax10_mul_comm	Π₁	Π₁	2	0	0
+10	teoría	ax11_mul_assoc	Π₁	Π₁	3	0	0
+11	teoría	ax12_mul_distrib	Π₁	Π₁	3	0	0
+12	teoría	ax13_lt_def	Π₂	Π₂	2	2	0
+13	teoría	ax14_sqrt_le	Π₁	Π₁	1	0	0
+14	teoría	ax15_lt_succ_sqrt	Π₁	Π₁	1	0	0
+15	teoría	ax16_mod2_succ	Π₁	Π₁	1	0	0
+16	teoría	ax17_div_mod_eq	Π₁	Π₁	1	0	0
+17	teoría	ax18_lt_irrefl	Π₁	Π₁	1	0	0
+18	teoría	ax19_lt_trichotomy	Π₁	Π₁	2	0	0
+19	teoría	ax21_mod2_range	Π₁	Π₁	1	0	0
+20	teoría	ax24_mod2_of_even	Π₁	Π₁	2	0	0
+21	teoría	ax25_pred_zero	Δ₀	Δ₀	0	0	0
+22	teoría	ax26_pred_succ	Π₁	Π₁	1	0	0
+23	teoría	ax_L0_cons_def	Π₁	Π₁	2	0	0
+24	teoría	ax_L1_in_nil	Π₁	Π₁	1	0	0
+25	teoría	ax_L2_in_cons	Π₁	Π₁	3	0	0
+26	teoría	ax_C1_concat_nil	Π₁	Π₁	1	0	0
+27	teoría	ax_C2_concat_cons	Π₁	Π₁	3	0	0
+28	teoría	ax_C3_concat_assoc	Π₁	Π₁	3	0	0
+29	teoría	ax_L3_in_concat	Π₁	Π₁	3	0	0
+30	teoría	ax29_sub_witness	Π₁	Π₁	2	0	0
+31	teoría	ax_pow_zero	Π₁	Π₁	1	0	0
+32	teoría	ax_pow_succ	Π₁	Π₁	2	0	0
+33	teoría	ax_prodp_nil	Δ₀	Δ₀	0	0	0
+34	teoría	ax_prodp_cons	Π₁	Π₁	3	0	0
+35	codificación	ax_substtc_var_eq	Π₁	Π₁	3	0	0
+36	codificación	ax_substtc_var_gt	Π₁	Π₁	3	0	0
+37	codificación	ax_substtc_var_lt	Π₁	Π₁	3	0	0
+38	codificación	ax_substtc_func	Π₁	Π₁	4	0	0
+39	codificación	ax_substtsc_nil	Π₁	Π₁	2	0	0
+40	codificación	ax_substtsc_cons	Π₁	Π₁	4	0	0
+41	codificación	ax_liftc_var_lt	Π₁	Π₁	2	0	0
+42	codificación	ax_liftc_var_ge	Π₁	Π₁	2	0	0
+43	codificación	ax_liftc_func	Π₁	Π₁	3	0	0
+44	codificación	ax_liftsc_nil	Π₁	Π₁	1	0	0
+45	codificación	ax_liftsc_cons	Π₁	Π₁	3	0	0
+46	codificación	ax_substfc_bottom	Π₁	Π₁	2	0	0
+47	codificación	ax_substfc_atom	Π₁	Π₁	4	0	0
+48	codificación	ax_substfc_eq	Π₁	Π₁	4	0	0
+49	codificación	ax_substfc_impl	Π₁	Π₁	4	0	0
+50	codificación	ax_substfc_forall	Π₁	Π₁	3	0	0
+51	codificación	ax_substfc_and	Π₁	Π₁	4	0	0
+52	codificación	ax_substfc_or	Π₁	Π₁	4	0	0
+53	codificación	ax_substfc_ex	Π₁	Π₁	3	0	0
+54	codificación	ax_liftfc_bottom	Π₁	Π₁	1	0	0
+55	codificación	ax_liftfc_atom	Π₁	Π₁	3	0	0
+56	codificación	ax_liftfc_eq	Π₁	Π₁	3	0	0
+57	codificación	ax_liftfc_impl	Π₁	Π₁	3	0	0
+58	codificación	ax_liftfc_forall	Π₁	Π₁	2	0	0
+59	codificación	ax_liftfc_and	Π₁	Π₁	3	0	0
+60	codificación	ax_liftfc_or	Π₁	Π₁	3	0	0
+61	codificación	ax_liftfc_ex	Π₁	Π₁	2	0	0
+62	codificación	ax_carc	Π₁	Π₁	2	0	0
+63	codificación	ax_cdrc	Π₁	Π₁	2	0	0
+64	codificación	ax_tc_zero	Δ₀	Δ₀	0	0	0
+65	codificación	ax_tc_succ	Π₁	Π₁	1	0	0
+66	codificación	ax_runFn_nil	Π₁	Π₁	1	0	0
+67	codificación	ax_runFn_cons	Π₁	Π₁	3	0	0
+68	codificación	ax_allIn_nil	Π₁	Π₁	1	0	0
+69	codificación	ax_allIn_cons	Π₁	Π₁	3	0	0
+70	codificación	ax_chainOk_nil	Π₁	Π₁	1	0	0
+71	codificación	ax_chainOk_cons	Π₁	Π₁	3	0	0
+72	codificación	ax_lineWF_mp	Π₁	Π₁	1	0	0
+73	codificación	ax_premsOf_mp	Π₁	Π₁	2	0	0
+74	codificación	ax_lineWF_gen	Π₁	Π₁	1	0	0
+75	codificación	ax_premsOf_gen	Π₁	Π₁	2	0	0
+76	codificación	ax_lineWF_thy	Π₁	Π₁	1	0	0
+77	codificación	ax_premsOf_thy	Π₁	Π₁	1	0	0
+78	codificación	ax_lineWF_p1	Π₁	Π₁	1	0	0
+79	codificación	ax_premsOf_p1	Π₁	Π₁	3	0	0
+80	codificación	ax_lineWF_p2	Π₁	Π₁	1	0	0
+81	codificación	ax_premsOf_p2	Π₁	Π₁	4	0	0
+82	codificación	ax_lineWF_c1	Π₁	Π₁	1	0	0
+83	codificación	ax_premsOf_c1	Π₁	Π₁	3	0	0
+84	codificación	ax_lineWF_c2	Π₁	Π₁	1	0	0
+85	codificación	ax_premsOf_c2	Π₁	Π₁	3	0	0
+86	codificación	ax_lineWF_c3	Π₁	Π₁	1	0	0
+87	codificación	ax_premsOf_c3	Π₁	Π₁	3	0	0
+88	codificación	ax_lineWF_j1	Π₁	Π₁	1	0	0
+89	codificación	ax_premsOf_j1	Π₁	Π₁	3	0	0
+90	codificación	ax_lineWF_j2	Π₁	Π₁	1	0	0
+91	codificación	ax_premsOf_j2	Π₁	Π₁	3	0	0
+92	codificación	ax_lineWF_j3	Π₁	Π₁	1	0	0
+93	codificación	ax_premsOf_j3	Π₁	Π₁	4	0	0
+94	codificación	ax_lineWF_efq	Π₁	Π₁	1	0	0
+95	codificación	ax_premsOf_efq	Π₁	Π₁	2	0	0
+96	codificación	ax_lineWF_eqrefl	Π₁	Π₁	1	0	0
+97	codificación	ax_premsOf_eqrefl	Π₁	Π₁	2	0	0
+98	codificación	ax_lineWF_p3	Π₁	Π₁	1	0	0
+99	codificación	ax_premsOf_p3	Π₁	Π₁	2	0	0
+100	codificación	ax_lineWF_q1	Π₃	Π₂	13	6	12
+101	codificación	ax_premsOf_q1	Π₁	Π₁	3	0	0
+102	codificación	ax_lineWF_q2	Π₃	Π₂	13	6	12
+103	codificación	ax_premsOf_q2	Π₁	Π₁	3	0	0
+104	codificación	ax_lineWF_q3	Π₃	Π₂	9	4	8
+105	codificación	ax_premsOf_q3	Π₁	Π₁	3	0	0
+106	codificación	ax_lineWF_leibniz	Π₃	Π₂	17	8	16
+107	codificación	ax_premsOf_leibniz	Π₁	Π₁	4	0	0
+108	codificación	ax_lineWF_ind	Π₃	Π₂	9	4	8
+109	codificación	ax_premsOf_ind	Π₁	Π₁	2	0	0
+110	codificación	ax_lineWF_qconf	Π₃	Π₂	9	4	8
+111	codificación	ax_premsOf_qconf	Π₁	Π₁	3	0	0
+112	codificación	ax_lineWF_listInd	Π₃	Π₂	9	4	8
+113	codificación	ax_premsOf_listInd	Π₁	Π₁	2	0	0
+114	codificación	ax_lenc_nil	Δ₀	Δ₀	0	0	0
+115	codificación	ax_lenc_cons	Π₁	Π₁	2	0	0
+116	codificación	ax_nthc_zero	Π₁	Π₁	2	0	0
+117	codificación	ax_nthc_succ	Π₁	Π₁	3	0	0
+118	codificación	ax_lineWF_inv	Π₁	Π₁	1	0	0
+119	codificación	ax_lineWF_cons	Π₁	Π₁	1	0	0
+120	ancla	ax_axiomsCodeT_def	Δ₀	Δ₀	0	0	0
+
+recuento por grupo y clase (todo cuantificador cuenta):
+  ancla · Δ₀: 1
+  codificación · Δ₀: 2
+  codificación · Π₁: 76
+  codificación · Π₃: 7
+  teoría · Δ₀: 2
+  teoría · Π₁: 31
+  teoría · Π₂: 1
+
+recuento por grupo y clase (los acotados, Δ₀):
+  ancla · Δ₀: 1
+  codificación · Δ₀: 2
+  codificación · Π₁: 76
+  codificación · Π₂: 7
+  teoría · Δ₀: 2
+  teoría · Π₁: 31
+  teoría · Π₂: 1
+
+con algún ∃ (8): ax13_lt_def, ax_lineWF_q1, ax_lineWF_q2, ax_lineWF_q3, ax_lineWF_leibniz, ax_lineWF_ind, ax_lineWF_qconf, ax_lineWF_listInd

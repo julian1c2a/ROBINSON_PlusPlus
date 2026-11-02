@@ -1,0 +1,11 @@
+T49 (ADR-242), 2026-11-02: la deriva del libro frente al código, medida sin tocar el libro.
+
+simbolos.txt   doc/book/scripts/simbolos.py en modo informe: 171 identificadores y 23 módulos citados por los capítulos;
+               35 sin respaldo (29 \ident{} y 6 \modulo{}). La auditoría (2026-10-12) había medido 24 \ident{}.
+extraer.txt    doc/book/scripts/extraer.py sin Lean: 42 de los 103 fragmentos de doc/book/fragmentos.json fallan (un
+               módulo que no existe, una declaración que no aparece en su módulo, o un módulo fuera del build); la
+               auditoría había medido 38. No escribe nada si falla.
+
+Los dos, en clones --shared de RPP (6cdd2dd), FOL (b5c5e1c) y Peano, para no tocar el árbol (extraer.py escribe su
+extracción si no falla). Lo que dicen, para la tarea del libro: doc/FEEDBACK-PARA-EL-LIBRO.md, la entrada del 2026-11-02.
+Desde ADR-242 la CI de RPP ejecuta los dos en cada run, también el nocturno, como INFORME (no bloquea): su resumen.

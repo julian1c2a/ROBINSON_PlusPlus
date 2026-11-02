@@ -1,0 +1,52 @@
+"""Censo de identificadores de hallazgos en los ficheros versionados de un repo.
+Uso: censo_ids.py <repo> <salida.tsv>
+Escribe una fila por (familia, id normalizado, fichero, linea)."""
+import re, subprocess, sys, collections, os
+
+repo = sys.argv[1]
+out = sys.argv[2]
+
+H = r'[-‑‐‒–]'  # guion y variantes (U+2011 no separable, etc.)
+FAM = [
+    ('R1', re.compile(r'(?<![A-Za-z0-9_])L([1-5])' + H + r'(\d{1,2})(?![0-9])')),
+    ('R2', re.compile(r'(?<![A-Za-z0-9_])R2' + H + r'([1-5])' + H + r'(\d{1,2})(?![0-9])')),
+    ('R22', re.compile(r'(?<![A-Za-z0-9_])R22' + H + r'(\d{1,2})(?![0-9])')),
+    ('R3', re.compile(r'(?<![A-Za-z0-9_])R3' + H + r'([1-5])' + H + r'(H\d{1,2}|\d{2})(?![0-9])')),
+    ('SUELO', re.compile(r'(?<![A-Za-z0-9_])(MED|FUN|SUB|RUT|FOL|DOC|GOB|CTL|FND|MAND|NS|AUD|DOCSTR|BLD)' + H + r'(\d{2}|N\d)(?![0-9])')),
+    ('SUELO_UID', re.compile(r'(?<![A-Za-z0-9_])(MED|FUN|SUB|RUT|FOL|DOC):(MED|FUN|SUB|RUT|FOL|DOC|GOB|CTL|FND|MAND|NS|AUD|DOCSTR|BLD)' + H + r'(\d{2}|N\d)(?![0-9])')),
+    ('CRI', re.compile(r'(?<![A-Za-z0-9_])CRI' + H + r'(\d{1,2})(?![0-9])')),
+    ('F0911', re.compile(r'(?<![A-Za-z0-9_])F' + H + r'(\d{1,2}b?)(?![0-9])')),
+    ('FOLAUD', re.compile(r'(?<![A-Za-z0-9_])(AX|CC|ENG|PAT|META|WL)' + H + r'(\d{1,2}|NUEVO' + H + r'1)(?![0-9])')),
+    ('FOLAUD2', re.compile(r'(?<![A-Za-z0-9_])(FOL|RPP)' + H + r'(AX' + H + r'\d|D\d)(?![0-9])')),
+]
+
+def norm(s):
+    return re.sub(H, '-', s)
+
+files = subprocess.run(['git', '-C', repo, 'ls-files', '-z'], capture_output=True).stdout.decode('utf-8').split('\0')
+rows = []
+for f in files:
+    if not f:
+        continue
+    p = os.path.join(repo, f)
+    if not os.path.isfile(p):
+        continue
+    try:
+        data = open(p, encoding='utf-8').read()
+    except Exception:
+        continue
+    for ln, line in enumerate(data.split('\n'), 1):
+        for fam, rx in FAM:
+            for m in rx.finditer(line):
+                rows.append((fam, norm(m.group(0)), f, ln))
+
+with open(out, 'w', encoding='utf-8') as fo:
+    for r in rows:
+        fo.write('\t'.join(str(x) for x in r) + '\n')
+
+byfam = collections.defaultdict(collections.Counter)
+for fam, i, f, ln in rows:
+    byfam[fam][i] += 1
+for fam in byfam:
+    print('==', fam, len(byfam[fam]), 'ids distintos;', sum(byfam[fam].values()), 'apariciones')
+    print('  ', ' '.join(sorted(byfam[fam], key=lambda s: [int(x) if x.isdigit() else x for x in re.split(r'(\d+)', s)])))

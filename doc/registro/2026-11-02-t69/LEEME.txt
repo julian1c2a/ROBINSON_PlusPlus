@@ -1,0 +1,14 @@
+T69 (ADR-244), 2026-11-02: Gentzen, los primeros pasos medibles. Lo que dice cada medida, en doc/GENTZEN-ALCANCE.md.
+
+censo.txt                la salida entera de sondeos/CensoFormaAxiomas.lean (≈ 5 s): la clase sintáctica de los 120
+                         axiomas en la jerarquía aritmética, con los átomos como Δ₀, y aparte con los cuantificadores
+                         acotados como Δ₀. 112 son Π₁ o Δ₀; 8 son Π₂ (ax13_lt_def y siete ax_lineWF_*).
+listind.txt              los mensajes de sondeos/ListIndAdmisible.lean (≈ 6 s), re-ejecutado por el coordinador tras el
+                         agente que lo escribió: listInd_admisible (Prf (listInductionFormula A) para toda A) compila, y
+                         su prueba no construye ningún paso listInd ni p3 (las cuatro funciones que nombran el
+                         constructor son recorridos que copian los pasos que reciben; cortado el cierre en ellas, la
+                         frontera de listInd es vacía); los dos controles positivos salen rojos; #print axioms,
+                         [propext, Quot.sound].
+control-ciego.lean.txt   la copia LITERAL de la orden de medida, y su salida (control-ciego.txt): con ella el control
+control-ciego.txt        positivo sale ciego («listInd: 0»), porque mira sólo los espacios de nombres del build. El
+                         sondeo amplía esProyecto con el suyo, y lo dice en su cabecera.

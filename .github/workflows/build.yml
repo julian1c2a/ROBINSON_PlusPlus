@@ -277,6 +277,13 @@ jobs:
         # nadie más que una ejecución local. `lake build` ya está cacheado aquí arriba.
         run: bash check-doc-sync.bash
 
+      # ⭐ AÑADIDO el 2026-11-02 (T30, ADR-238). DEPENDENCIES.md se CALCULA de las líneas `import` (`gen-dependencies.py`,
+      # portado de FOL); a mano llevaba desde ADR-115 describiendo un árbol de 131 módulos que ya no existía. Rojo si lo
+      # versionado no es lo que se generaría (la marca `**Last updated:**` aparte). Probado con el fallo puesto: el
+      # DEPENDENCIES.md a mano, rc 1; un `import` de más en un módulo, rc 1.
+      - name: DEPENDENCIES.md al día
+        run: python3 gen-dependencies.py --check
+
       # ⭐⭐ AÑADIDO el 2026-09-18 (ADR-065). Nace de un fallo MEDIDO: ADR-057/058/059 cerraron
       # las tres con «0 warnings» y era falso — la cifra cierta era la de la `lean_lib FOL`
       # sola. Lo que fallaba no era la cifra: era que NADA la reejecutaba. Las demás cifras de
@@ -304,6 +311,33 @@ jobs:
         run: |
           python3 scripts/pruebas/validar_strip.py awk
           python3 scripts/lineWFT_generar.py
+
+      # ⭐ AÑADIDO el 2026-11-02 (T49, ADR-242). El libro está en ESPERA (decisión del propietario, 2026-10-14) y su job
+      # sólo corre cuando un push a master toca `doc/book/`: su deriva frente al código no la veía nadie (medido ese día:
+      # 42 de 103 fragmentos rotos y 35 `\ident{}`/`\modulo{}` sin respaldo). Aquí, en CADA run —también el nocturno—,
+      # el INFORME de `simbolos.py` y de `extraer.py`, al resumen del run. NO bloquea (`continue-on-error`): el libro no
+      # se toca hasta que el propietario lo reactive; lo que dice, a `doc/FEEDBACK-PARA-EL-LIBRO.md`. Peano es el
+      # proyecto que el libro cita (PROYECTOS_CITADOS de extraer.py): sin él, sus citas saldrían como desconocidas.
+      - name: Checkout Peano (lo cita el libro; para el informe de abajo)
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: julian1c2a/Peano
+          ref: master
+          path: Peano
+
+      - name: El libro frente al código (informe; no bloquea)
+        continue-on-error: true
+        run: |
+          {
+            echo "### El libro frente al código (T49: informe, no bloquea)"
+            echo '```'
+            python3 doc/book/scripts/simbolos.py | tail -n 1
+            python3 doc/book/scripts/extraer.py > "$RUNNER_TEMP/libro-extraer.txt" 2>&1 && echo "extraer.py: sin problemas" \
+              || grep -m1 -E 'EXTRACCIÓN FALLIDA|problema' "$RUNNER_TEMP/libro-extraer.txt" || echo "extraer.py: falló sin resumen"
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          git status --porcelain -- doc/book
 
       # ⭐ Anadido el 2026-09-11 (auditoria, F-8): los controles del LIBRO solo corrian a mano,
       # asi que lo IMPRESO podia desviarse del arbol sin que nadie lo notara.

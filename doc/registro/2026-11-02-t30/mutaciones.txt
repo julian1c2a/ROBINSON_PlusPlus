@@ -1,0 +1,36 @@
+== las mutaciones de gen-dependencies.py --check, 2026-11-02, en WSL (Python 3.14.4), sobre copias ==
+── M0 sin mutar (rc 0 esperado)
+DEPENDENCIES.md al día
+rc=0
+/mnt/e/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/Rosser.lean:2
+<tmp>/t30mut/ROBINSON_PlusPlus/Meta/Rosser.lean:2
+── M1 un import de más en Meta/Rosser.lean (rc 1 esperado)
+DEPENDENCIES.md al día
+rc=0
+── M2 un módulo nuevo (rc 1 esperado)
+DEPENDENCIES.md NO está al día: python3 gen-dependencies.py
+rc=1
+── M3 un módulo borrado (rc 1 esperado)
+DEPENDENCIES.md NO está al día: python3 gen-dependencies.py
+rc=1
+── M4 sólo la marca de tiempo cambia (rc 0 esperado: la marca no cuenta)
+DEPENDENCIES.md al día
+rc=0
+── M5 una cifra retocada a mano (rc 1 esperado)
+DEPENDENCIES.md NO está al día: python3 gen-dependencies.py
+rc=1
+── M6 un ciclo (Minimal.SymLit importa Meta.Rosser: el generador se niega)
+ciclo de imports en ROBINSON_PlusPlus.Full.Induction -> ROBINSON_PlusPlus.Minimal.Axioms -> ROBINSON_PlusPlus.Minimal.SymLit -> ROBINSON_PlusPlus.Meta.Rosser -> ROBINSON_PlusPlus.Meta.RosserNegNum -> ROBINSON_PlusPlus.Meta.PremsOfTagPrf -> ROBINSON_PlusPlus.Meta.LineWFAssemblePrf -> ROBINSON_PlusPlus.Meta.LineWFEfqPrf -> ROBINSON_PlusPlus.Meta.CodeCtorKit -> ROBINSON_PlusPlus.Meta.LineWFSchemaPrf -> ROBINSON_PlusPlus.Meta.LineWFTrackedPrf -> ROBINSON_PlusPlus.Meta.BdAllIntroPrf -> ROBINSON_PlusPlus.Meta.D3InDotPrf -> ROBINSON_PlusPlus.Meta.D3DottedPrf -> ROBINSON_PlusPlus.Meta.Delta0ReflectPrf -> ROBINSON_PlusPlus.Meta.EvalBoundedPrf -> ROBINSON_PlusPlus.Meta.EvalLtPrf -> ROBINSON_PlusPlus.Meta.EvalListPrf -> ROBINSON_PlusPlus.Meta.DotConsPrf -> ROBINSON_PlusPlus.Meta.CantorMonoPrf -> ROBINSON_PlusPlus.Meta.NatMulPrf -> ROBINSON_PlusPlus.Meta.NatOrderPrf -> ROBINSON_PlusPlus.Meta.NatArithPrf -> ROBINSON_PlusPlus.Meta.ArithPrf -> ROBINSON_PlusPlus.Full.Induction
+rc=1
+import ROBINSON_PlusPlus.Meta.Godel
+import ROBINSON_PlusPlus.Meta.RosserNegNum
+import ROBINSON_PlusPlus.Meta.TarskiPrf
+── M1 bis: un import de más en Meta/Rosser.lean (rc 1 esperado)
+DEPENDENCIES.md NO está al día: python3 gen-dependencies.py
+rc=1
+── FOL M0 sin mutar (rc 0 esperado)
+DEPENDENCIES.md al día
+rc=0
+── FOL M1 un módulo nuevo (rc 1 esperado)
+DEPENDENCIES.md NO está al día: py gen-dependencies.py
+rc=1

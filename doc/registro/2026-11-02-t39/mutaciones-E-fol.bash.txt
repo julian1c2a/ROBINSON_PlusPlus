@@ -1,0 +1,44 @@
+#!/bin/bash
+# Mutaciones del [E] de FOL (T39), en un clon --shared de FOL (nunca el repositorio): el bloque [E] de su
+# check-doc-sync.bash del árbol de trabajo, tal cual.
+export PATH="/usr/bin:$PATH"
+FOLD=/e/dropbox/github/lean4/FOL
+S=<tmp>
+C="$S/folclone"
+BLK="$S/e_fol_block.bash"
+awk '/^echo "════ \[E\] FRESCURA DEL TITULAR/,/^# ─── 3\. SÍMBOLOS MUERTOS/' "$FOLD/check-doc-sync.bash" > "$BLK"
+[ -s "$BLK" ] || { echo "sin bloque"; exit 2; }
+DOCS_FOL=$(grep -E '^AUTHORITATIVE=|^AUTHORITATIVE="\$AUTHORITATIVE' "$FOLD/check-doc-sync.bash")
+clon() {  # un clon con HEAD = el master de FOL + un commit con el check-doc-sync.bash del árbol de trabajo
+  rm -rf "$C"; git clone -q --shared "$FOLD" "$C" && cd "$C" || exit 2
+  git config user.email t@t; git config user.name t; git config core.hooksPath /dev/null
+  git update-ref refs/remotes/origin/master "$(git rev-parse HEAD)"
+  cp "$FOLD/check-doc-sync.bash" .; git commit -qam "el [E] de T39" --no-verify; cd - >/dev/null; }
+corre() { (cd "$C" && eval "$DOCS_FOL"; DOCS="$AUTHORITATIVE"; FAIL=0; . "$BLK"; echo "FAIL=$FAIL") 2>&1 | grep -E '❌|✓|⚠️|FAIL=|documentos ·' | grep -v 'El titular es una FRASE' | cut -c1-170; }
+caso() { echo; echo "──── $1"; }
+
+caso "E-M0 · sin mutar; base = master (antes de T39): VERDE, con el aviso de creación"
+clon; corre
+
+caso "E-M0b · base = el commit con las tablas (el techo se aplica): VERDE"
+clon; (cd "$C" && git update-ref refs/remotes/origin/master HEAD); corre
+
+caso "E-M1 · README.md editado sin subir su marca (ROJO esperado: porcelain = hoy)"
+clon; (cd "$C" && echo "" >> README.md); corre
+
+caso "E-M2 · THOUGHTS.md (deuda de contenido) con su marca de hoy (ROJO esperado: saldada sin quitar)"
+clon; (cd "$C" && sed -i "s/^\*\*Last updated:\*\* 2026-04-20 00:00/**Last updated:** $(date +%F)/" THOUGHTS.md && git commit -qam x --no-verify); corre
+
+caso "E-M3 · PLANNING.md (deuda de formato) con una marca vieja (ROJO esperado: su deuda es de CONTENIDO)"
+clon; (cd "$C" && sed -i '1i **Last updated:** 2026-01-01' PLANNING.md && git commit -qam x --no-verify); corre
+
+caso "E-M4 · el techo: la base no tiene PLANNING.md en sus tablas (ROJO esperado: la deuda SUBE)"
+clon; (cd "$C" && git reset -q --soft HEAD~1 && sed -i '/^PLANNING.md$/d' check-doc-sync.bash && git commit -qam "base sin PLANNING" --no-verify \
+  && git update-ref refs/remotes/origin/master HEAD && cp "$FOLD/check-doc-sync.bash" . && git commit -qam "con PLANNING" --no-verify); corre
+
+caso "E-M5 · un .md nuevo, versionado y sin marca (ROJO esperado: el universo son TODOS los .md)"
+clon; (cd "$C" && printf '# Nuevo\n' > NUEVO.md && git add NUEVO.md && git commit -qm x --no-verify); corre
+
+caso "E-M6 · un .md en un subdirectorio, con la marca vieja (ROJO esperado)"
+clon; (cd "$C" && sed -i 's/^\*\*Last updated:\*\* 2026-10-29/**Last updated:** 2026-10-01/' auditoria/t71-semanticos-2026-10-29/README.md && git commit -qam x --no-verify); corre
+rm -rf "$C"

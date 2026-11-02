@@ -1,0 +1,16 @@
+T10 (ADR-243), 2026-11-02: las citas de sondeos del build, separadas en evidencia y procedencia, con un control ([S]).
+
+mutaciones-S.txt      [S] visto fallar en un clon --shared de RPP: verde sin mutar (126 citas: 26 a sondeos de CONTROL, 78 a
+                      archivados con su etiqueta, 22 de procedencia en 14 filas) y con una cita nueva a un sondeo de
+                      CONTROL (S-M5); rojo con una cita nueva a uno de REGISTRO (S-M1), una de procedencia que desaparece
+                      (S-M2), una a un archivado sin su etiqueta (S-M3), una archivada que no está en la etiqueta (S-M4),
+                      sin CONTROLES.txt (S-M6) y con un sondeo de REGISTRO que pasa a CONTROL (S-M7: su fila sobra).
+mutaciones-S.bash.txt el guion (la ruta de la sesión, saneada a <tmp>).
+compilacion.txt       A3IsFCBTracked (REPARAR) no compila: 19 errores desde la línea 358 (dos, un lema que ya no está); sus ocho citas son
+                      de procedencia (lo que probó, aplicó, reflejó y de dónde se promovió el kit). PrfHMono y D3Sigma1Vacuo
+                      (REGISTRO) compilan en ≈ 4 s: sus citas se leyeron como procedencia (el rescate de B6b del 2026-09-11;
+                      la refutación de hI/hbI fechada en ADR-132), y no hizo falta promoverlos.
+
+La clasificación de las 22 citas de procedencia, una a una, en la tabla de [S] (check-doc-sync.bash). Ninguna cita del
+build dice ya en presente que un sondeo de REGISTRO o REPARAR sostiene algo de hoy: lo que sostiene el build está en el
+build, y las tres citas de A3IsFCBTracked que la auditoría vio en presente llevan su nota de ADR-134.

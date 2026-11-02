@@ -1,0 +1,56 @@
+== las mutaciones de [P], 2026-11-02, Git Bash, sobre copias (el bloque de check-doc-sync.bash tal cual) ==
+
+──── P-M0 · sin mutar (verde esperado)
+  ✓ 59 citas con footprint en la prosa (FOL, TheoryFramework y RPP), comparadas con su fila: 57 cuadran, y las 2 que no, declaradas
+FAIL=0
+
+──── P-M1 · RPP: el docstring de prf_hasWitF_liftfc vuelve a decir Classical.choice (ROJO esperado: sin declarar)
+51:**Footprint** de `prf_hasWitF_liftfc`: `[propext, Classical.choice, Quot.sound]` (✏️ 2026‑11‑02, T3
+  ❌ ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean:51 — `prf_hasWitF_liftfc` dice [Classical.choice,Quot.sound,propext] y su fila (ROBINSON_PlusPlus.Meta.LiftfcWitnessP
+FAIL=1
+
+──── P-M2 · FOL: la línea HISTORIAL de Rename.lean cambia su lista (ROJO esperado: la fila YA NO CASA)
+1
+  ❌ ../FOL/FOL/Rename.lean — la fila declarada (HISTORIAL) YA NO CASA: `derives0_rename_conservative` con [Classical.choice,Quot.sound,propext]. ⇒ el texto cambió 
+FAIL=1
+
+──── P-M3 · la fila de lindenbaum_lemma₀ en la TABLA cambia (ROJO esperado: la prosa de FOL la contradice)
+  ✓ 59 citas con footprint en la prosa (FOL, TheoryFramework y RPP), comparadas con su fila: 57 cuadran, y las 2 que no, declaradas
+FAIL=0
+
+──── P-M4 · una clase desconocida en la tabla (ROJO esperado)
+1
+  ❌ ../FOL/FOL/Rename.lean — clase desconocida «HISTORICO» (HISTORIAL o ATRIBUCION)
+FAIL=1
+
+──── P-M5 · la TABLA de check-footprints.bash vacía (SIN MEDIR, ROJO esperado)
+  ❌ NO PUDE MEDIR [P]: la TABLA de check-footprints.bash da 0 filas (¿cambió su forma?).
+FAIL=1
+
+──── P-M6 · sin ../FOL (SIN MEDIR, ROJO esperado)
+  ❌ NO PUDE MEDIR [P]: faltan los .lean de ../FOL o de ROBINSON_PlusPlus.
+FAIL=1
+
+──── P-M7 · la cita y su lista en líneas distintas (VERDE esperado: es lo que [P] NO mira, y lo dice su cabecera)
+  ✓ 59 citas con footprint en la prosa (FOL, TheoryFramework y RPP), comparadas con su fila: 57 cuadran, y las 2 que no, declaradas
+FAIL=0
+
+──── P-M3 bis · la fila de lindenbaum_lemma₀ en la TABLA cambia (ROJO esperado: la prosa de FOL la contradice)
+246:FOL.Lindenbaum0.lindenbaum_lemma₀|propext
+  ❌ ../FOL/FOL/Canonical0.lean:68 — `lindenbaum_lemma₀` dice [Quot.sound,propext] y su fila (FOL.Lindenbaum0.lindenbaum_lemma₀) dice [propext]
+  ❌ ../FOL/FOL/DecEq.lean:79 — `lindenbaum_lemma₀` dice [Quot.sound,propext] y su fila (FOL.Lindenbaum0.lindenbaum_lemma₀) dice [propext]
+  ❌ ../FOL/FOL/Finitary0.lean:81 — `lindenbaum_lemma₀` dice [Quot.sound,propext] y su fila (FOL.Lindenbaum0.lindenbaum_lemma₀) dice [propext]
+  ❌ ../FOL/FOL/Propositional0.lean:31 — `lindenbaum_lemma₀` dice [Quot.sound,propext] y su fila (FOL.Lindenbaum0.lindenbaum_lemma₀) dice [propext]
+  ❌ ../FOL/FOL/Skolem0.lean:112 — `lindenbaum_lemma₀` dice [Quot.sound,propext] y su fila (FOL.Lindenbaum0.lindenbaum_lemma₀) dice [propext]
+  ❌ ../FOL/FOL/SkolemN0.lean:225 — `lindenbaum_lemma₀` dice [Quot.sound,propext] y su fila (FOL.Lindenbaum0.lindenbaum_lemma₀) dice [propext]
+  ❌ ../FOL/TheoryFramework/Instances/FOL.lean:63 — `lindenbaum_lemma₀` dice [Quot.sound,propext] y su fila (FOL.Lindenbaum0.lindenbaum_lemma₀) dice [propext]
+FAIL=1
+
+== el prototipo (p_proto.bash) sobre FOL/ y TheoryFramework/, y sobre ROBINSON_PlusPlus/ (p_rpp.bash), antes de corregir el docstring de RPP ==
+filas en la TABLA: 646
+pares (cita, fila) comparados: 50
+FOL/Compacity0.lean:109: `evalTerm_updateCsts` dice Quot.sound,propext · la fila (FOL.Compacity0.evalTerm_updateCsts) dice -	`evalTerm_updateCsts` y `hasLargeModels_shift`, `[propext, Quot.sound]`, `evalFormula_updateCsts`,
+FOL/Rename.lean:82: `derives0_rename_conservative` dice Classical.choice,Quot.sound,propext · la fila (FOL.Rename.derives0_rename_conservative) dice Quot.sound,propext	tiene inversa"», que `derives0_rename_conservative` llevaba `[propext, Classical.choice, Quot.sound]`
+filas en la TABLA: 646
+pares (cita, fila) comparados: 9
+ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean:51: `prf_hasWitF_liftfc` dice Classical.choice,Quot.sound,propext · la fila (ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf.prf_hasWitF_liftfc) dice Quot.sound,propext	**Footprint** de `prf_hasWitF_liftfc`: `[propext, Classical.choice, Quot.sound]` — net-0 puro. ✏️ D7

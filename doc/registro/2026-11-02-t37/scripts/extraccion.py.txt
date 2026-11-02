@@ -1,0 +1,75 @@
+"""Escribe fuentes/EXTRACCION.txt: por cada workflow fuera de git, las lineas
+del journal, el agente, el sha256 del resultado y si es igual a la copia
+versionada. Uso: extraccion.py <repo> <dir_workflows> <dir_salida>"""
+import json, sys, os, hashlib, re
+
+R, W, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
+def h(x):
+    if not isinstance(x, str):
+        x = json.dumps(x, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(x.encode('utf-8')).hexdigest()
+def journal(wf):
+    st, out = {}, []
+    for i, l in enumerate(open(os.path.join(W, wf, 'journal.jsonl'), encoding='utf-8'), 1):
+        d = json.loads(l)
+        if d['type'] == 'started':
+            st[d['key']] = (d['label'], d['agentId'])
+        elif d['type'] in ('result', 'failed'):
+            out.append((i, d['type'], st[d['key']][0], st[d['key']][1], d.get('result')))
+    return out
+def vj(p):
+    return json.load(open(os.path.join(R, p), encoding='utf-8'))
+def san(s):
+    # el saneado de doc/registro (README): rutas locales -> <tmp>, <home>, <sesión>
+    s = re.sub(r'C:\\msys64\\tmp\\claude\\[^\\]+\\[^\\]+', '<tmp>', s)
+    s = re.sub(r'C:\\Users\\<usuario>', '<home>', s)
+    return s
+
+L = []
+L.append('EXTRACCIÓN de las listas de hallazgos de los workflows fuera de git (T37)')
+L.append('Fecha: 2026-11-02. Journals en <home>/.claude/projects/e--Dropbox-GitHub-lean4-ROBINSON-PlusPlus/85b0df6c-1e14-407d-a9ae-04b9e8841ed5/subagents/workflows/<runId>/journal.jsonl')
+L.append('(una línea {"type":"result"} por agente; los agent-*.jsonl, transcripciones, NO se copian).')
+L.append('Cada resultado se comparó con su copia versionada en doc/registro/ (rescatada por T00, ADR-132, el 2026-10-12).')
+L.append('')
+
+v68 = {x['lens']: x for x in vj('doc/registro/2026-10-05-auditoria-adr120-121/workflow.json')['result']}
+L.append('== wf_68cece92-90b (auditar-adr121: la auditoría adversarial de ADR-120/121) → fuentes/wf_68cece92-90b.json')
+for i, t, lab, aid, r in journal('wf_68cece92-90b'):
+    L.append('  l.%d %s %s agente %s · %d hallazgos · sha256 %s · igual a doc/registro/2026-10-05-auditoria-adr120-121/workflow.json: %s'
+             % (i, t, lab, aid, len(r['findings']), h(r)[:16], v68.get(r['lens']) == r))
+v123 = vj('doc/registro/2026-10-05-auditoria-adr123/workflow.json')['result']
+vals = v123['review'] + v123['scout']
+L.append('== wf_107c9121-80b (adr123-review-and-scout: la auditoría de ADR-123) → fuentes/wf_107c9121-80b.json')
+for i, t, lab, aid, r in journal('wf_107c9121-80b'):
+    L.append('  l.%d %s %s agente %s · %d caracteres · sha256 %s · igual a doc/registro/2026-10-05-auditoria-adr123/workflow.json: %s'
+             % (i, t, lab, aid, len(r), h(r)[:16], r in vals))
+v124 = vj('doc/registro/2026-10-05-auditoria-adr124-126/workflow.json')['result']
+L.append('== wf_e04d70c1-e0c (adr124-126-audit: la auditoría de ADR-124/125/126) → fuentes/wf_e04d70c1-e0c.json')
+for i, t, lab, aid, r in journal('wf_e04d70c1-e0c'):
+    k = 'adr124' if lab == 'audit:adr124' else 'adr125_126'
+    L.append('  l.%d %s %s agente %s · %d caracteres · sha256 %s · igual: %s · igual tras sanear las rutas: %s'
+             % (i, t, lab, aid, len(r), h(r)[:16], v124[k] == r, v124[k] == san(r)))
+L.append('== wf_1f61bc0d-738 (suelo-firme: los seis barridos de la auditoría del suelo) → fuentes/wf_1f61bc0d-738.tsv y fuentes/wf_1f61bc0d-738-no-cubierto.json')
+cands = vj('doc/registro/2026-10-12-auditoria-suelo/candidatos.json')
+for i, t, lab, aid, r in journal('wf_1f61bc0d-738'):
+    if t == 'failed':
+        L.append('  l.%d FALLÓ %s agente %s (límite de sesión; la crítica y la síntesis las rehízo wf_7a6e4ce2-b37)' % (i, lab, aid))
+    elif lab.startswith('buscar:'):
+        dim = lab.split(':')[1]
+        ok = all(any(c['dim'] == dim and c['id'] == it['id'] and c['titulo'] == it['titulo'] for c in cands) for it in r['items'])
+        L.append('  l.%d %s agente %s · %d candidatos · sha256 %s · todos en candidatos.json con el mismo título: %s'
+                 % (i, lab, aid, len(r['items']), h(r)[:16], ok))
+    else:
+        dim = lab.split(':')[1]
+        okv = all(any(c['dim'] == dim and c['id'] == v['id'] and c['veredicto'] == v['veredicto'] for c in cands) for v in r['veredictos'])
+        okn = all(any(c['dim'] == dim and c['id'] == n['id'] and c['veredicto'] == 'nuevo_verificador' for c in cands) for n in r['nuevos'])
+        L.append('  l.%d %s agente %s · %d veredictos y %d nuevos · sha256 %s · veredictos iguales: %s · nuevos presentes: %s'
+                 % (i, lab, aid, len(r['veredictos']), len(r['nuevos']), h(r)[:16], okv, okn))
+L.append('')
+L.append('Conclusión: las cuatro listas YA están versionadas y son las mismas (salvo el saneado de rutas de doc/registro/README.md y los')
+L.append('nombres de campo abreviados de candidatos.json). Lo único que sólo estaba en un journal: el «no_cubierto» y las «fuentes_leidas»')
+L.append('de los seis barridos de wf_1f61bc0d-738 (no son hallazgos), copiados a fuentes/wf_1f61bc0d-738-no-cubierto.json.')
+L.append('La síntesis (wf_7a6e4ce2-b37) también tiene journal fuera de git; su copia versionada (workflow-cierre.json) coincide en los')
+L.append('miembros de cada T del agrupado, los IDs del crítico y los 81 T de la síntesis; sólo difiere en rutas saneadas.')
+open(os.path.join(OUT, 'fuentes', 'EXTRACCION.txt'), 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
+print('\n'.join(L))

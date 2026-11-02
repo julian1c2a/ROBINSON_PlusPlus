@@ -1,0 +1,49 @@
+== doc/book/scripts/extraer.py (sin Lean), el mismo día y en los mismos clones: rc 1, y no escribió nada (git status limpio) ==
+
+✗ EXTRACCIÓN FALLIDA — 42 problema(s):
+
+  ✗ [fol_deduction_theorem] ../FOL/FOL/Deduction.lean NO es alcanzable desde ROBINSON_PlusPlus.lean: no está en el build. §2.2(a) lo prohíbe como teorema del libro. Si es un sondeo, decláralo con "capa": "sondeo".
+  ✗ [fol_gen] el módulo ../FOL/FOL/MetaRules.lean no existe
+  ✗ [fol_imp_intro] el módulo ../FOL/FOL/MetaRules.lean no existe
+  ✗ [prf_to_derives] la declaración `prf_to_derives` no aparece en ROBINSON_PlusPlus/Meta/Hilbert.lean
+  ✗ [prf0_to_derives] la declaración `prf0_to_derives` no aparece en ROBINSON_PlusPlus/Meta/Hilbert.lean
+  ✗ [lemma_C5] el módulo ROBINSON_PlusPlus/Minimal/Theorems/Block4_C5.lean no existe
+  ✗ [cantor_surjectivity] el módulo ROBINSON_PlusPlus/Minimal/Theorems/Block4_C6_C7.lean no existe
+  ✗ [pair_inj] el módulo ROBINSON_PlusPlus/Minimal/Theorems/Block5.lean no existe
+  ✗ [teo_F3] el módulo ROBINSON_PlusPlus/Minimal/Theorems/Block7.lean no existe
+  ✗ [ax_p_tfa] el módulo ROBINSON_PlusPlus/Minimal/Theorems/Block8.lean no existe
+  ✗ [ax_induction] la declaración `ax_induction` no aparece en ROBINSON_PlusPlus/Full/Induction.lean
+  ✗ [add_comm_thm] la declaración `add_comm_thm` no aparece en ROBINSON_PlusPlus/Full/Induction.lean
+  ✗ [tfa_numeral] el módulo ROBINSON_PlusPlus/Full/Factorization.lean no existe
+  ✗ [Provable] la declaración `Provable` no aparece en ROBINSON_PlusPlus/Meta/Provability.lean
+  ✗ [provable_formCode_iff] la declaración `provable_formCode_iff` no aparece en ROBINSON_PlusPlus/Meta/Provability.lean
+  ✗ [repr_pos] la declaración `repr_pos'` no aparece en ROBINSON_PlusPlus/Meta/Representability2.lean
+  ✗ [triN] la declaración `triN` no aparece en ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean
+  ✗ [consN] la declaración `consN` no aparece en ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean
+  ✗ [two_mul_consN] la declaración `two_mul_consN` no aparece en ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean
+  ✗ [codeNat] la declaración `codeNat` no aparece en ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean
+  ✗ [hFN] la declaración `hFN` no aparece en ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean
+  ✗ [piloto_codeN_axioma] el módulo sondeos/PilotoDiagonal.lean no existe
+  ✗ [piloto_hFN_axioma] el módulo sondeos/PilotoDiagonal.lean no existe
+  ✗ [descarga_hFN] el módulo sondeos/DescargaHFN.lean no existe
+  ✗ [reflects_of_omega] el módulo ROBINSON_PlusPlus/Meta/OmegaReflect.lean no existe
+  ✗ [Reflects] la declaración `Reflects` no aparece en ROBINSON_PlusPlus/Meta/DiagonalTwo.lean
+  ✗ [exists_prime_factor] el módulo ROBINSON_PlusPlus/Full/PrimeFactor.lean no existe
+  ✗ [cons_ne_head] el módulo ROBINSON_PlusPlus/Meta/CodeDistinct.lean no existe
+  ✗ [diag_arith_num] la declaración `diag_arith_num` no aparece en ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean
+  ✗ [godelCN_fixedpoint_N] la declaración `godelCN_fixedpoint_N` no aparece en ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean
+  ✗ [provCode_transfer] la declaración `provCode_transfer` no aparece en ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean
+  ✗ [godelCN_fixedpoint] la declaración `godelCN_fixedpoint` no aparece en ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean
+  ✗ [ConsistentOmega] la declaración `ConsistentOmega` no aparece en ROBINSON_PlusPlus/Meta/Hilbert.lean
+  ✗ [OmegaConsistent] el módulo ROBINSON_PlusPlus/Meta/OmegaReflect.lean no existe
+  ✗ [consistentH_of_omega] la declaración `consistentH_of_omega` no aparece en ROBINSON_PlusPlus/Meta/Hilbert.lean
+  ✗ [goedel_first_unprovable] la declaración `goedel_first_unprovable_real'` no aparece en ROBINSON_PlusPlus/Meta/DiagonalTwo.lean
+  ✗ [goedel_first_numeral] la declaración `goedel_first_numeral` no aparece en ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean
+  ✗ [goedel_first_unrefutable] la declaración `goedel_first_unrefutable_real'` no aparece en ROBINSON_PlusPlus/Meta/DiagonalTwo.lean
+  ✗ [goedel_first_undecidable] la declaración `goedel_first_undecidable_numeral` no aparece en ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean
+  ✗ [NegVerifier] el módulo ROBINSON_PlusPlus/Meta/OmegaReflect.lean no existe
+  ✗ [goedel_first_undecidable_omega] el módulo ROBINSON_PlusPlus/Meta/OmegaReflect.lean no existe
+  ✗ [d3_teorema] la declaración `d3` no aparece en ROBINSON_PlusPlus/Meta/GodelTwo.lean
+
+PLAN-LIBRO.md §2.1-§2.3: el libro no puede desincronizarse en silencio del código.
+⚠ [pcc_eval_premsOf] `pcc_eval_premsOf` empieza por `pcc_`, que suele hablar de Prov, pero se declara codigo

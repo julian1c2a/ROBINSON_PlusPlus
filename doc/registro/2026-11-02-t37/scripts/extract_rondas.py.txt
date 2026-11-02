@@ -1,0 +1,39 @@
+"""Extrae los hallazgos (id, titulo, gravedad, veredicto) de las rondas 1 y 2
+de la auditoria de la base, desde los JSON versionados."""
+import json, sys
+
+def main(path, outpath):
+    d = json.load(open(path, encoding='utf-8'))
+    rows = []
+    for lente in d['result']:
+        lname = lente.get('lente')
+        aud = lente.get('auditoria') or {}
+        ver = lente.get('verificacion') or {}
+        verd = {}
+        for v in ver.get('veredictos', []) or []:
+            verd[v.get('id')] = v
+        for h in aud.get('hallazgos', []) or []:
+            hid = h.get('id')
+            v = verd.get(hid, {})
+            rows.append({
+                'id': hid,
+                'lente': lname,
+                'titulo': h.get('titulo'),
+                'gravedad': h.get('gravedad'),
+                'nivel': h.get('nivel'),
+                'veredicto': v.get('veredicto'),
+                'gravedad_corregida': v.get('gravedad_corregida'),
+                'razon': (v.get('razon') or '')[:300],
+                'keys': sorted(h.keys()),
+            })
+        extra = [k for k in verd if k not in {h.get('id') for h in aud.get('hallazgos', [])}]
+        if extra:
+            print('VEREDICTOS SIN HALLAZGO en', lname, extra, file=sys.stderr)
+    with open(outpath, 'w', encoding='utf-8') as f:
+        json.dump(rows, f, ensure_ascii=False, indent=1)
+    for r in rows:
+        print('\t'.join(str(x) for x in [r['id'], r['lente'], r['gravedad'], r['veredicto'], r['gravedad_corregida'], (r['titulo'] or '')[:140]]))
+    print('TOTAL', len(rows), file=sys.stderr)
+
+if __name__ == '__main__':
+    main(sys.argv[1], sys.argv[2])

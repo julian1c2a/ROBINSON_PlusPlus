@@ -48,8 +48,9 @@ que la hipótesis de inducción hace falta a un nivel **distinto** del que se co
 **cuantificado dentro de `Φ`**, exactamente por la misma razón que en el chasis de
 `pcc_eval_liftfc` (§3.53.3) y en A5.
 
-**Footprint** de `prf_hasWitF_liftfc`: `[propext, Classical.choice, Quot.sound]` — net-0 puro. ✏️ D7
-(2026‑10‑05): `prf_hasWit_liftc_at` y `prf_hasWitArgs_liftsc_of` salen ya `[propext, Quot.sound]`.
+**Footprint** de `prf_hasWitF_liftfc`: `[propext, Quot.sound]` (✏️ 2026‑11‑02, T39: sin la elección desde
+ADR‑189, T61; decía `[propext, Classical.choice, Quot.sound]`, net-0 puro). ✏️ D7 (2026‑10‑05):
+`prf_hasWit_liftc_at` y `prf_hasWitArgs_liftsc_of` salen ya `[propext, Quot.sound]`.
 -/
 
 open FOL

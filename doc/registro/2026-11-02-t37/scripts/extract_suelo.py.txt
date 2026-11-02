@@ -1,0 +1,57 @@
+"""Extrae los candidatos de la auditoria del suelo (candidatos.json) y el
+agrupado/critica/sintesis de workflow-cierre.json: uid -> T que lo absorbio."""
+import json, sys, collections
+
+reg = sys.argv[1]  # doc/registro/2026-10-12-auditoria-suelo
+out = sys.argv[2]
+
+cands = json.load(open(reg + '/candidatos.json', encoding='utf-8'))
+cierre = json.load(open(reg + '/workflow-cierre.json', encoding='utf-8'))
+barr = json.load(open(reg + '/workflow-barridos.json', encoding='utf-8'))
+
+DIMPFX = {'medida': 'MED', 'fundamentos': 'FUN', 'subterraneo': 'SUB',
+          'ruta': 'RUT', 'fol': 'FOL', 'documentos': 'DOC'}
+
+uids = collections.Counter()
+for c in cands:
+    uids[DIMPFX[c['dim']] + ':' + c['id']] += 1
+print('uids repetidos:', [k for k, v in uids.items() if v > 1], file=sys.stderr)
+
+agr = cierre['result']['agrupado']
+member = collections.defaultdict(list)
+agr_title = {}
+for t in agr['trabajos']:
+    agr_title[t['tid']] = t['titulo']
+    for m in t.get('miembros', []):
+        member[m].append(t['tid'])
+print('miembros que no son candidatos:', sorted(set(member) - set(uids)), file=sys.stderr)
+print('candidatos sin trabajo:', sorted(set(uids) - set(member)), file=sys.stderr)
+multi = {k: v for k, v in member.items() if len(v) > 1}
+print('candidatos en varios trabajos:', multi, file=sys.stderr)
+
+sint = cierre['result']['sintesis']
+sint_title = {}
+for g in sint['grupos']:
+    for t in g['trabajos']:
+        sint_title[t['tid']] = t['titulo']
+
+print('--- agrupado vs sintesis (titulos)', file=sys.stderr)
+for tid in sorted(set(agr_title) | set(sint_title)):
+    print(tid, '| A:', (agr_title.get(tid) or '-')[:70], '| S:', (sint_title.get(tid) or '-')[:70], file=sys.stderr)
+
+crit = cierre['result']['critica']['nuevos']
+res = []
+for c in cands:
+    u = DIMPFX[c['dim']] + ':' + c['id']
+    res.append({'uid': u, 'id': c['id'], 'dim': c['dim'], 'titulo': c.get('titulo'),
+                'categoria': c.get('categoria'), 'gravedad': c.get('gravedad'),
+                'veredicto': c.get('veredicto'), 'trabajos_agrupado': member.get(u, [])})
+json.dump({'candidatos': res,
+           'critica': [{'id': x['id'], 'titulo': x.get('titulo'), 'gravedad': x.get('gravedad'), 'prioridad': x.get('prioridad'), 'keys': sorted(x.keys())} for x in crit],
+           'agr_title': agr_title, 'sint_title': sint_title,
+           'descartados_barridos': barr['result'].get('descartados'),
+           'descartados_agrupado': agr.get('descartados'),
+           'descartados_sintesis': sint.get('descartados')},
+          open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+for r in res:
+    print('\t'.join([r['uid'], r['gravedad'] or '', r['veredicto'] or '', ','.join(r['trabajos_agrupado']), (r['titulo'] or '')[:100]]))

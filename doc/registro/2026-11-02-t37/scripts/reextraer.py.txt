@@ -1,0 +1,57 @@
+"""Re-extrae, SOLO de ficheros versionados de RPP, el conjunto esperado de IDs
+del registro de T37, y lo compara con la columna id de hallazgos.tsv.
+Es la implementacion de referencia del bloque de check-doc-sync que pide T37.
+Uso: reextraer.py <repo_RPP> <hallazgos.tsv>"""
+import json, re, sys, os, collections
+
+R = sys.argv[1]
+H = r'[-‑]'           # el guion de los .md es a veces U+2011
+def rd(p): return open(os.path.join(R, p), encoding='utf-8').read()
+def js(p): return json.loads(rd(p))
+esperado = collections.OrderedDict()
+
+def add(fam, ids):
+    esperado[fam] = list(dict.fromkeys(ids))
+
+# R1, R2, R3: el campo "id" de los hallazgos de cada lente
+add('R1', [h['id'] for l in js('doc/registro/2026-10-02-auditoria-base/ronda1/salida_workflow_ronda1.json')['result'] for h in l['auditoria']['hallazgos']])
+add('R2', [h['id'] for l in js('doc/registro/2026-10-02-auditoria-base/ronda2/salida_workflow_ronda2.json')['result'] for h in l['auditoria']['hallazgos']])
+add('R3', [h['id'] for l in js('doc/registro/2026-10-28-ronda3/resultado.json') for h in l['auditoria']['hallazgos']])
+# SUELO: DIM:ID
+P = {'medida': 'MED', 'fundamentos': 'FUN', 'subterraneo': 'SUB', 'ruta': 'RUT', 'fol': 'FOL', 'documentos': 'DOC'}
+add('SUELO', [P[c['dim']] + ':' + c['id'] for c in js('doc/registro/2026-10-12-auditoria-suelo/candidatos.json')])
+cierre = js('doc/registro/2026-10-12-auditoria-suelo/workflow-cierre.json')['result']
+add('CRI', [x['id'] for x in cierre['critica']['nuevos']])
+# A121: posicion de la lente en result (G, W, T, P) y del hallazgo en findings
+L = 'GWTP'
+add('A121', ['A121:%s%d' % (L[k], n) for k, l in enumerate(js('doc/registro/2026-10-05-auditoria-adr120-121/workflow.json')['result']) for n in range(1, len(l['findings']) + 1)])
+# A123: puntos «**n.**» del informe adversarial, viñetas de «Other issues», duplicados y exploración
+w = js('doc/registro/2026-10-05-auditoria-adr123/workflow.json')['result']
+adv = w['review'][1]
+ids = ['A123:R' + m.group(1) for m in re.finditer(r'^\*\*(\d+)\. ', adv, re.M)]
+otro = adv.split('**Other issues found along the way**')[1]
+ids += ['A123:R%d' % (len(ids) + k) for k, _ in enumerate(re.finditer(r'^- \*\*', otro, re.M), 1)]
+ids += ['A123:D1', 'A123:D2', 'A123:S1']
+add('A123', ids)
+# A124 / A125: los Cn de los dos informes
+w = js('doc/registro/2026-10-05-auditoria-adr124-126/workflow.json')['result']
+add('A124', ['A124:C' + m.group(1) for m in re.finditer(r'^\*\*C(\d+)\.', w['adr124'], re.M)])
+add('A125', ['A125:C' + m.group(1) for m in re.finditer(r'^C(\d+)\. ', w['adr125_126'], re.M)])
+# las auditorias viejas, por sus cabeceras
+add('F', ['F-' + m.group(1) for m in re.finditer(r'^### F' + H + r'(\d+b?) · ', rd('doc/AUDITORIA-2026-09-11.md'), re.M)])
+add('FOL0912', ['FOL0912:%s-%s' % (m.group(1), m.group(2)) for m in re.finditer(r'^\*\*([AMBRD])' + H + r'(\d+) · ', rd('doc/AUDITORIA-FOL-2026-09-12.md'), re.M)])
+add('AUD0918', ['AUD0918:' + m.group(1) for m in re.finditer(r'^### ([AG]\d) · ', rd('doc/AUDITORIA-2026-09-18.md'), re.M)])
+# sin fuente versionada: se mantiene a mano
+add('MANUAL', ['AUD0928:F1'])
+
+todos = [i for v in esperado.values() for i in v]
+for k, v in esperado.items():
+    print('%-8s %4d' % (k, len(v)))
+print('TOTAL   ', len(todos), '(únicos: %d)' % len(set(todos)))
+tsv = [l.split('\t')[0] for l in open(sys.argv[2], encoding='utf-8').read().splitlines()[1:]]
+print('filas en hallazgos.tsv:', len(tsv))
+print('esperados sin fila:', sorted(set(todos) - set(tsv)))
+print('filas sin fuente:', sorted(set(tsv) - set(todos)))
+estados = {l.split('\t')[0]: l.split('\t')[4] for l in open(sys.argv[2], encoding='utf-8').read().splitlines()[1:]}
+mal = [i for i, e in estados.items() if e not in ('hecho', 'pendiente', 'descartado', 'sustituido')]
+print('estados no válidos:', mal)

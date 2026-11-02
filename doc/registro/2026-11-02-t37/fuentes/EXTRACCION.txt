@@ -1,0 +1,38 @@
+EXTRACCIÓN de las listas de hallazgos de los workflows fuera de git (T37)
+Fecha: 2026-11-02. Journals en <home>/.claude/projects/e--Dropbox-GitHub-lean4-ROBINSON-PlusPlus/85b0df6c-1e14-407d-a9ae-04b9e8841ed5/subagents/workflows/<runId>/journal.jsonl
+(una línea {"type":"result"} por agente; los agent-*.jsonl, transcripciones, NO se copian).
+Cada resultado se comparó con su copia versionada en doc/registro/ (rescatada por T00, ADR-132, el 2026-10-12).
+
+== wf_68cece92-90b (auditar-adr121: la auditoría adversarial de ADR-120/121) → fuentes/wf_68cece92-90b.json
+  l.6 result refutar:W1 agente aafcc0a9921f66deb · 7 hallazgos · sha256 aa8df83bd5c65bdc · igual a doc/registro/2026-10-05-auditoria-adr120-121/workflow.json: True
+  l.7 result refutar:tarski agente a381ea777419736e0 · 6 hallazgos · sha256 c13afbc0b2b6b157 · igual a doc/registro/2026-10-05-auditoria-adr120-121/workflow.json: True
+  l.8 result refutar:goedelI agente a250b413b89e7b617 · 8 hallazgos · sha256 5ef3c3c808938c84 · igual a doc/registro/2026-10-05-auditoria-adr120-121/workflow.json: True
+  l.9 result refutar:promocion agente a560efd3f2b7ce321 · 10 hallazgos · sha256 de9b3835003f201e · igual a doc/registro/2026-10-05-auditoria-adr120-121/workflow.json: True
+== wf_107c9121-80b (adr123-review-and-scout: la auditoría de ADR-123) → fuentes/wf_107c9121-80b.json
+  l.5 result review:duplicates agente acacfbdff2a31f603 · 7033 caracteres · sha256 e483538a91a58589 · igual a doc/registro/2026-10-05-auditoria-adr123/workflow.json: True
+  l.6 result scout:junk-guard agente a66c7c199985a1a3a · 9827 caracteres · sha256 233aaa0e589ff1e7 · igual a doc/registro/2026-10-05-auditoria-adr123/workflow.json: True
+  l.7 result review:adversarial agente a000bdb497e1ec004 · 11801 caracteres · sha256 33bce1dcbb0ee62f · igual a doc/registro/2026-10-05-auditoria-adr123/workflow.json: True
+== wf_e04d70c1-e0c (adr124-126-audit: la auditoría de ADR-124/125/126) → fuentes/wf_e04d70c1-e0c.json
+  l.4 result audit:adr125-126 agente ae735af5ee3d69894 · 12939 caracteres · sha256 52057e31fd96a863 · igual: True · igual tras sanear las rutas: True
+  l.5 result audit:adr124 agente a662c46a7d518bee6 · 12330 caracteres · sha256 137516d541ef4894 · igual: False · igual tras sanear las rutas: True
+== wf_1f61bc0d-738 (suelo-firme: los seis barridos de la auditoría del suelo) → fuentes/wf_1f61bc0d-738.tsv y fuentes/wf_1f61bc0d-738-no-cubierto.json
+  l.8 buscar:ruta agente a4c7f025a6bac9ab2 · 20 candidatos · sha256 6e9c376e97eb73e1 · todos en candidatos.json con el mismo título: True
+  l.10 buscar:documentos agente af7d549fe6dcb2d68 · 25 candidatos · sha256 5e585519f764fa0c · todos en candidatos.json con el mismo título: True
+  l.12 buscar:fundamentos agente adb4105320e91aece · 20 candidatos · sha256 9ff2ce90aa1add39 · todos en candidatos.json con el mismo título: True
+  l.14 buscar:subterraneo agente a4b8358457574fca9 · 25 candidatos · sha256 d4f495263849886c · todos en candidatos.json con el mismo título: True
+  l.16 buscar:medida agente a6cf921ab4dec3605 · 23 candidatos · sha256 544669b6e84dbd39 · todos en candidatos.json con el mismo título: True
+  l.18 buscar:fol agente abca873dc51819b80 · 25 candidatos · sha256 00a322d2eea2885a · todos en candidatos.json con el mismo título: True
+  l.20 verificar:ruta agente a4cc89d66febe54f0 · 20 veredictos y 4 nuevos · sha256 17171d3fb9dabc4e · veredictos iguales: True · nuevos presentes: True
+  l.21 verificar:fundamentos agente ad27e850eb0b7f7c5 · 20 veredictos y 4 nuevos · sha256 3c13db096f45eeb6 · veredictos iguales: True · nuevos presentes: True
+  l.22 verificar:documentos agente a5931001e95de35a2 · 25 veredictos y 6 nuevos · sha256 5b5d45b9c2395247 · veredictos iguales: True · nuevos presentes: True
+  l.23 verificar:fol agente a29a5c6260277a285 · 25 veredictos y 3 nuevos · sha256 5196c8bb7a8c14ba · veredictos iguales: True · nuevos presentes: True
+  l.24 verificar:medida agente a8ad93ac7d0d524a6 · 23 veredictos y 3 nuevos · sha256 3afc99d487083c9e · veredictos iguales: True · nuevos presentes: True
+  l.25 verificar:subterraneo agente a5d5b5de565a8a3ce · 25 veredictos y 5 nuevos · sha256 2a021ba81f44bf13 · veredictos iguales: True · nuevos presentes: True
+  l.27 FALLÓ critica agente ae3a2d8c2fc3cada9 (límite de sesión; la crítica y la síntesis las rehízo wf_7a6e4ce2-b37)
+  l.29 FALLÓ sintesis agente a5ad2d862f9da4ee3 (límite de sesión; la crítica y la síntesis las rehízo wf_7a6e4ce2-b37)
+
+Conclusión: las cuatro listas YA están versionadas y son las mismas (salvo el saneado de rutas de doc/registro/README.md y los
+nombres de campo abreviados de candidatos.json). Lo único que sólo estaba en un journal: el «no_cubierto» y las «fuentes_leidas»
+de los seis barridos de wf_1f61bc0d-738 (no son hallazgos), copiados a fuentes/wf_1f61bc0d-738-no-cubierto.json.
+La síntesis (wf_7a6e4ce2-b37) también tiene journal fuera de git; su copia versionada (workflow-cierre.json) coincide en los
+miembros de cada T del agrupado, los IDs del crítico y los 81 T de la síntesis; sólo difiere en rutas saneadas.

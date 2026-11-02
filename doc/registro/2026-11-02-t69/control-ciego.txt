@@ -1,0 +1,11 @@
+== control-ciego.lean.txt (la copia LITERAL de #induccion de sondeos/InduccionTitulares.lean, sin ampliar esProyecto), 2026-11-02, lake lean: rc 0. El control positivo control_con_listInd (:= Prf.listInd A) sale «listInd: 0 fuera de las traducciones []»: CIEGO, porque las constantes de un sondeo no están en los tres espacios de nombres que mira. Por eso el sondeo amplía esProyecto. ==
+ListIndAdmisible.control_con_listInd: cierre de 272 constantes
+  ind: 0 fuera de las traducciones [] · traducciones: []
+  listInd: 0 fuera de las traducciones [] · traducciones: []
+  p3: 0 fuera de las traducciones [] · traducciones: []
+  qconf: 0 fuera de las traducciones [] · traducciones: []
+ListIndAdmisible.control_con_listInd: cierre cortado de 272 constantes · recorridos alcanzados [] · `prf_list_induction` en el cierre COMPLETO: false
+  ind: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  listInd: constructores en el cierre cortado [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd] · frontera fuera de los recorridos []
+  p3: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  qconf: constructores en el cierre cortado [] · frontera fuera de los recorridos []

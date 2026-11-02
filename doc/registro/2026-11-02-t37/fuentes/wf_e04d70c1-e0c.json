@@ -1,0 +1,317 @@
+{
+ "runId": "wf_e04d70c1-e0c",
+ "workflow": "adr124-126-audit (auditoría adversarial de ADR-124/125/126)",
+ "journal": "<sesión 85b0df6c>/subagents/workflows/wf_e04d70c1-e0c/journal.jsonl",
+ "lineas_result": [
+  4,
+  5
+ ],
+ "igual_a": "doc/registro/2026-10-05-auditoria-adr124-126/workflow.json (result.adr124 y result.adr125_126); adr125_126 byte a byte; adr124 sólo difiere en dos rutas saneadas (<tmp>, <home>)",
+ "esquema_id": "A124:C<n> = «**Cn.**» del informe audit:adr124 (C1-C18); A125:C<n> = «Cn.» del informe audit:adr125-126 (C1-C20). Los C… son del propio informe; el prefijo los distingue, porque los dos empiezan en C1",
+ "hallazgos": [
+  {
+   "id": "A124:C1",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "`control_tc_cons` states that the model refutes `ax_tc_cons`, for every `V` — holds.**",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A124:C2",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "The informal argument (\"cons a b vale un sucesor; tcFnN de un sucesor tiene UN argumento; el axioma pide DOS\") — holds.**",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A124:C3",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "Module docstrings say no code is evaluated and the closed codes enter as variables of one `rfl` lemma (`MC:24-25`, `MC:361-362`) — holds.**",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A124:C4",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "ADR text \"entran como TÉRMINOS variables de dos lemas `rfl` (`ev_tc_cons_izq`, `ev_tc_cons_der`)\" (`DECISIONS.md:9580-9581`) — imprecise.** Only `ev_tc_cons_der` takes the codes as variables `N`, `S`; `ev_tc_cons_izq` contains no closed code. Suggested text:",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A124:C5",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"La forma de ADR‑119 (`abre` sobre la hipótesis concreta) pasaba de 14 GB\" — holds, as a reported measurement.**",
+   "veredicto": "holds, as a reported measurement"
+  },
+  {
+   "id": "A124:C6",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\">3 GB en 14 s\" (`DECISIONS.md:9576`, `MC:27`, `MC:363`) — a measurement, but unverifiable from any saved file.**",
+   "veredicto": "unverifiable"
+  },
+  {
+   "id": "A124:C7",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"toda variante que acababa en `sorry` compilaba en 4 s\" (`DECISIONS.md:9576-9577`) — refuted by the session's own probes.**",
+   "veredicto": "refuted"
+  },
+  {
+   "id": "A124:C8",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"porque la β‑reducción del término DESCARTA la prueba de una hipótesis que nadie usa, y el NÚCLEO no la veía\" — an inference stated as fact, and too general.**",
+   "veredicto": "inference stated as fact"
+  },
+  {
+   "id": "A124:C9",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"Lo que agota la memoria es el núcleo comprobando la prueba de `simp` sobre una hipótesis con códigos CERRADOS (`strCodeM cons_sym`, `numeralM 1`)\" (and the commit's \"Lo caro era el núcleo…\") — unverifiable without running Lean.**",
+   "veredicto": "unverifiable"
+  },
+  {
+   "id": "A124:C10",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "`triN` is unary recursion — holds.** `Axioms.lean:626-628`: `triN (n+1) = triN n + (n+1)`, so `triN k` costs k unfolding steps. The kernel's fast arithmetic only speeds up the additions.",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A124:C11",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"desplegar `consN` sobre ellos evalúa números triangulares de cientos de miles\" — imprecise, and an unlabelled estimate.**",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A124:C12",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"4 s, 0,77 GB, en el sondeo de prueba\" — unverifiable.** That probe is `SP\\rosser\\CtlO.lean`, which is not versioned. Its timestamps show about 3.3 s; the 0.77 GB figure is in no file. The fix is the wording in C4.",
+   "veredicto": "unverifiable"
+  },
+  {
+   "id": "A124:C13",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "The key‑lesson line (`DECISIONS.md:9583-9584`) — imprecise**, because of the `have` exception. Suggested text:",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A124:C14",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "Module docstrings — imprecise.** In both places \"medido\" ends up covering the kernel attribution, which is only inferred.",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A124:C15",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"cinco teoremas\" — holds.** The five are at `MC:365`, `:370`, `:380`, `:383` and `:389`.",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A124:C16",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "\"9 951 constantes (cinco más)\" against ADR‑121's 9 946 (`DECISIONS.md:9443`) — holds** (the count itself was not re-run).",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A124:C17",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "`RPP\\NEXT-STEPS.md:28-29` — the main claim holds; the parenthetical is imprecise.**",
+   "veredicto": "main claim holds; parenthetical imprecise"
+  },
+  {
+   "id": "A124:C18",
+   "agente": "audit:adr124",
+   "agentId": "a662c46a7d518bee6",
+   "linea_journal": 5,
+   "titular": "ADR §3's \"check-doc-sync verde\" — unverifiable from saved files.**",
+   "veredicto": "unverifiable"
+  },
+  {
+   "id": "A125:C1",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "DECISIONS.md:9633 says \"Por primera vez, la guarda de término ENTERA —con su ∃ eliminado— refutada en Prf, y sobre un NUMERAL\". **Refuted as worded.** Only the numeral part is new.",
+   "veredicto": "refuted as worded"
+  },
+  {
+   "id": "A125:C2",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "\"nada de hasWitF\" (DECISIONS.md:9647, :9682) and NEXT‑STEPS.md:25 (hasWitF still pending). **Imprecise: precedents are omitted.**",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C3",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "`prf_neg_hasWit_zero` (:69). **Holds.** `neg` is `impl … bottom` (FOL/FOL.lean:103), and `numeralM 0 = zero = nil` (Minimal/Axioms.lean:571, 131).",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A125:C4",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "`prf_neg_hasWit_tag` (:80) and `prf_neg_hasWit_num` (:106): k ∉ {0,1}, any `r`, no Prf hypotheses. **Holds.**",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A125:C5",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "`prf_neg_hasWit_prof2` (:161). **Holds.**",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A125:C6",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "The ⟨…⟩ notation. **Imprecise.**",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C7",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "\"profundidad 2\" (DECISIONS.md:9646, 9657, 9660, 9666; RosserBasura.lean:14, 111; NEXT‑STEPS.md:24). **Imprecise, never defined.**",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C8",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "\"a profundidad 0, 1 y 2\" (NEXT‑STEPS.md:24, DECISIONS.md:9683). **Imprecise.**",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C9",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "\"la refutación HEREDITARIA a profundidad 2\" (title at :9657, also DECISIONS.md:3). **Imprecise:** it is one case, one level of descent.",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C10",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "`control_codigo_no_refutable` (:195) states `¬ Prf (neg (hasWit (numeralM (codeNatTerm t))))`. **The statement holds.**",
+   "veredicto": "statement holds; conclusion imprecise"
+  },
+  {
+   "id": "A125:C11",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "ADR‑126 (:9676): \"210 líneas, 16 teoremas\" **holds**. The time, memory, 0 errors/warnings, the `#print axioms` results and \"a la tercera\" are **unverifiable without running Lean**.",
+   "veredicto": "holds"
+  },
+  {
+   "id": "A125:C12",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "ADR‑125 (:9641): \"106 líneas\" is **refuted**. The file at commit 5ac4cab has **107** lines (wc and awk; `--stat` shows 107 insertions). \"7 teoremas\" **holds**. Rewording: «107 líneas».",
+   "veredicto": "refuted"
+  },
+  {
+   "id": "A125:C13",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "\"189 + 210\" **holds**. \"la superan\" is **imprecise**:",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C14",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "\"la Etapa 0 tiene sus tres piezas\" (:9682–9683). **Refuted.** The three pieces are defined in ADR‑123 §1–§2 (DECISIONS.md:9539–9540, 9551–9552), not ADR‑122 §2: the reflection, a depth‑2 guard, and a junk q1 line. The same paragraph says the q1 line is missing.",
+   "veredicto": "refuted"
+  },
+  {
+   "id": "A125:C15",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "Two more **imprecise** statements:",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C16",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "All the lemmas **exist with the claimed roles**:",
+   "veredicto": "exist with the claimed roles"
+  },
+  {
+   "id": "A125:C17",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "\"más tres congruencias\" (:9670) and \"Lo nuevo: … y la congruencia de carc\" (:9639, RosserBasura.lean:22). **Imprecise: these are duplicates.**",
+   "veredicto": "imprecise: duplicates"
+  },
+  {
+   "id": "A125:C18",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": ":13 and :15 **hold**. \"35 de 88\" is right: the table has 85 rows with 32 compiling, plus 3 new files, and sondeos/ has 88 `.lean` files. \"que ningún otro sondeo abre\" holds: only RosserReflexion opens ModeloCodificacion, and the five ADR‑124 theorems carry no attributes. \"compila (4 s)\" is unverifiable.",
+   "veredicto": "hold"
+  },
+  {
+   "id": "A125:C19",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": ":11 \"Cuáles compilan HOY — medido\". **Imprecise.** The 32 earlier results are carried over from before ADR‑124's build change, not re‑run.",
+   "veredicto": "imprecise"
+  },
+  {
+   "id": "A125:C20",
+   "agente": "audit:adr125-126",
+   "agentId": "ae735af5ee3d69894",
+   "linea_journal": 4,
+   "titular": "Lines 18–22 **hold**. Lines 23–25 are **imprecise** (C7, C8, C10, C2).",
+   "veredicto": "imprecise"
+  }
+ ]
+}

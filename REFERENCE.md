@@ -153,7 +153,7 @@ temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo 
 REFERENCE, `AI-GUIDE.md` §0.5).
 
 **119 módulos activos** (Minimal 2 + Meta 116 + Full 1) + barrel `Meta.lean` + raíz
-`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **44** `sondeos/`
+`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **46** `sondeos/`
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)). ✏️ 2026‑10‑21
 ([ADR‑184](DECISIONS.md), T27): es la ÚNICA línea de cifras del documento, y `[A]` de `check-doc-sync.bash` la
 compara con el árbol en cada push; las que había en §1.5, §2 y §5 se quitaron o son registro con fecha. Las
