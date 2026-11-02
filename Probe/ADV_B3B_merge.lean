@@ -1,0 +1,747 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+import ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
+import ROBINSON_PlusPlus.Meta.MpCodePrf
+import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
+import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+
+open ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Godel
+open ROBINSON_PlusPlus.Meta.Provability
+open ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.ReprPrf
+open ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.TcArithPrf
+open ROBINSON_PlusPlus.Meta.Sigma1Prf
+open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
+open ROBINSON_PlusPlus.Meta.MpCodePrf
+open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
+open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+
+set_option linter.unusedSimpArgs false
+set_option maxHeartbeats 1000000
+
+namespace ROBINSON_PlusPlus.Meta.EvalArithPrf
+
+/-!
+## META — NIVEL D real (§21): **evaluación provable** de la aritmética — base de `+`
+
+**Qué es la evaluación provable.** El cuerpo Δ₀ del verificador contiene términos simbólicos
+(`ȧ + ḃ`, `nthc L̇ i̇`, …) aplicados a **numerales**. La Σ₁‑completitud provable necesita que la
+teoría objeto demuestre **internamente** que esos términos **evalúan** al numeral de su valor:
+
+```text
+⊢ Prov( ⌜ ȧ + ḃ  =  (a + b)˙ ⌝ )        (`ṫ` = `tcFn t`, el «numeral‑de»)
+```
+
+Aquí `ȧ + ḃ` es el código del **término simbólico** (`addcT (tcFn a) (tcFn b)`), mientras que
+`(a+b)˙` es el código del **numeral del valor** (`tcFn (add a b)`). Son códigos distintos, y ése era
+el hueco que §18 identificó como «la bestia».
+
+**Este módulo cierra la BASE** (`b = 0`), reuniendo las tres piezas de las secciones anteriores:
+
+* `pcc_ax4_inst` (§19.3) — instancia de `ax4` **codificado** con testigo `tcFn a`.
+* `prf_substfc_arith_open` (§20) — **computa** el `substfc` con testigo‑código arbitrario.
+* `prf_tc_zero` / `prf_congr_tcFn` + `prf_provCode_congr` — transporte Leibniz de códigos.
+
+El caso `σ` es gratis (`prf_tc_succ`); el paso inductivo de `+` queda para `pcc_axiom_inst2` (`ax5`).
+-/
+
+/-! ### Constructor de código del término `x + y` -/
+
+/-- Código object del término `x + y` desde los códigos `x`, `y` de sus argumentos:
+    `⟨1, ⌜+⌝, [x, y]⟩`. Es `termCode` de `add` con los argumentos ya codificados. -/
+def addcT (x y : Term) : Term := funcc (strCode add_sym) (cons x (cons y nil))
+
+/-- **Puente definicional** con `termCode` (por definición de `termCode` sobre `.func`). -/
+theorem addcT_termCode (a b : Term) : addcT (termCode a) (termCode b) = termCode (add a b) := rfl
+
+/-- **Congruencia** de `addcT` en ambos argumentos (`Prf`). -/
+theorem prf_congr_addcT {x x' y y' : Term}
+    (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
+    Prf (addcT x y =eq addcT x' y') := by
+  unfold addcT funcc
+  exact prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head
+    (prf_eq_trans (prf_congr_cons_head hx) (prf_congr_cons_tail (prf_congr_cons_head hy)))))
+
+/-! ### El enunciado de la evaluación provable de `+` -/
+
+/-- Código de la fórmula `ȧ + ḃ = (a+b)˙`: *el término simbólico suma de los numerales de `a` y `b`
+    es igual al numeral del valor `a+b`*. Es lo que hay que demostrar **dentro** de `Prov`. -/
+def evalAddCode (a b : Term) : Term :=
+  eqCodeFn (addcT (tcFn a) (tcFn b)) (tcFn (add a b))
+
+/-! ### Base de la inducción: `b = 0` -/
+
+/-- Paso intermedio: la instancia **codificada** de `ax4` con testigo `tcFn a`, ya **computada**.
+    Da `Prov(⌜ȧ + ⌜0⌝ = ȧ⌝)` — nótese `⌜0⌝ = termCode zero`, aún no `tcFn zero`. -/
+theorem pcc_ax4_computed (a : Term) :
+    Prf (provFromCode (eqCodeFn (addcT (tcFn a) (termCode zero)) (tcFn a))) :=
+  prf_mp
+    (prf_provCode_congr
+      (prf_substfc_arith_open 0 (tcFn a) (add (.var 0) zero =eq (.var 0))))
+    (pcc_ax4_inst (tcFn a))
+
+/-- **BASE de la evaluación provable de `+`**: `⊢ Prov(⌜ȧ + 0̇ = (a+0)˙⌝)`.
+
+    De `pcc_ax4_computed` (que da `Prov(⌜ȧ + ⌜0⌝ = ȧ⌝)`) transportando los **códigos** por Leibniz:
+
+    * `⌜0⌝ =eq tcFn zero` — `prf_tc_zero` (simétrico);
+    * `tcFn a =eq tcFn (add a zero)` — congruencia de `tcFn` sobre `add a 0 =eq a` (`prf_add_zero_t`). -/
+theorem pcc_eval_add_zero (a : Term) : Prf (provFromCode (evalAddCode a zero)) := by
+  have hz : Prf (termCode zero =eq tcFn zero) := prf_eq_symm prf_tc_zero
+  have ha : Prf (tcFn a =eq tcFn (add a zero)) :=
+    prf_eq_symm (prf_congr_tcFn (prf_add_zero_t a))
+  exact prf_mp
+    (prf_provCode_congr
+      (prf_congr_eqCodeFn (prf_congr_addcT (prf_refl (tcFn a)) hz) ha))
+    (pcc_ax4_computed a)
+
+/-! ### (B) Cómputo de la instancia codificada de `ax5`
+
+`substCodeF 1 W₁` sobre el cuerpo de `ax5` **computa por `rfl`**:
+
+```text
+substCodeF 1 W₁ (ȧ + σv₀ = σ(ȧ + v₀))  =  eqCodeFn (addcT W₁ (succcT ⌜v₀⌝)) (succcT (addcT W₁ ⌜v₀⌝))
+```
+
+Así que la composición **no necesita una inducción general** sobre fórmulas (§22.3 (B)): basta
+computar el `substfc` externo sobre ese código explícito, con (A) (`prf_substtc_tcFn`) para que el
+`W₁` incrustado sobreviva intacto. -/
+
+/-- Código object del término `σ x` desde el código `x`: `⟨1, ⌜σ⌝, [x]⟩`. -/
+def succcT (x : Term) : Term := funcc (strCode succ_sym) (cons x nil)
+
+/-- `prf_tc_succ` dice exactamente `tcFn (σx) =eq succcT (tcFn x)` (definicional). -/
+theorem prf_tc_succ' (x : Term) : Prf (tcFn (succ x) =eq succcT (tcFn x)) := prf_tc_succ x
+
+/-- Congruencia de `succcT`. -/
+theorem prf_congr_succcT {x y : Term} (h : Prf (x =eq y)) : Prf (succcT x =eq succcT y) :=
+  prf_congr_funcc2 (prf_congr_cons_head h)
+
+/-! #### `substtc` atraviesa los constructores de código de término -/
+
+/-- `substtc` sobre un `funcc` de **un** argumento. -/
+theorem prf_substtc_funcc1 (v W sc x : Term) :
+    Prf (substtc v W (funcc sc (cons x nil)) =eq funcc sc (cons (substtc v W x) nil)) :=
+  prf_eq_trans (prf_substtc_func v W sc (cons x nil))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_substtsc_cons v W x nil)
+        (prf_congr_cons_tail (prf_substtsc_nil v W))))
+
+/-- `substtc` sobre un `funcc` de **dos** argumentos. -/
+theorem prf_substtc_funcc2 (v W sc x y : Term) :
+    Prf (substtc v W (funcc sc (cons x (cons y nil)))
+      =eq funcc sc (cons (substtc v W x) (cons (substtc v W y) nil))) :=
+  prf_eq_trans (prf_substtc_func v W sc (cons x (cons y nil)))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_substtsc_cons v W x (cons y nil))
+        (prf_congr_cons_tail
+          (prf_eq_trans (prf_substtsc_cons v W y nil)
+            (prf_congr_cons_tail (prf_substtsc_nil v W))))))
+
+/-! ### El KIT TERNARIO — `funcc3` y la imagen DOTADA de `substfc`
+
+    ⚠️ **Bajado de `sondeos/SubstfcPlanos.lean` en B3 (2026‑09‑04), y AQUI porque este es su
+    sitio mas alto posible**: `prf_substtc_funcc3`/`prf_congr_funcc3` son el escalon ternario
+    del binario que ya vivia justo arriba, y no mencionan nada del frente `substfc`.
+
+    🔑 **Es lo que mas paga de todo el sondeo**: `prf_substtc_funcc3` y `prf_congr_funcc3`
+    estan copiados a mano en **NUEVE** sondeos cada uno. Promoverlos una vez los quita de
+    todos ellos.
+
+    ⛔ **`substfcT` es una DEFINICION y se queda en definicion.** Postular su ecuacion de
+    recursion como axioma OBJETO (`ax_tc_substfc`) hace la teoria **INCONSISTENTE** —
+    derivacion guardada en el proyecto. `substfcT_termCode` es un puente `:= rfl`, no un
+    axioma; esa es toda la diferencia. -/
+
+theorem prf_substtc_funcc3 (v W sc x y z : Term) :
+    Prf (substtc v W (funcc sc (cons x (cons y (cons z nil))))
+      =eq funcc sc (cons (substtc v W x) (cons (substtc v W y) (cons (substtc v W z) nil)))) :=
+  prf_eq_trans (prf_substtc_func v W sc (cons x (cons y (cons z nil))))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_substtsc_cons v W x (cons y (cons z nil)))
+        (prf_congr_cons_tail
+          (prf_eq_trans (prf_substtsc_cons v W y (cons z nil))
+            (prf_congr_cons_tail
+              (prf_eq_trans (prf_substtsc_cons v W z nil)
+                (prf_congr_cons_tail (prf_substtsc_nil v W))))))))
+
+theorem prf_congr_funcc3 {sc x x' y y' z z' : Term}
+    (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) (hz : Prf (z =eq z')) :
+    Prf (funcc sc (cons x (cons y (cons z nil)))
+      =eq funcc sc (cons x' (cons y' (cons z' nil)))) :=
+  prf_congr_funcc2 (prf_eq_trans (prf_congr_cons_head hx)
+    (prf_congr_cons_tail (prf_eq_trans (prf_congr_cons_head hy)
+      (prf_congr_cons_tail (prf_congr_cons_head hz)))))
+
+/-- El constructor de código `substfc` (DEFINICIÓN; ninguna ecuación suya se postula). -/
+def substfcT (v s f : Term) : Term :=
+  funcc (strCode "substfc") (cons v (cons s (cons f nil)))
+
+theorem substfcT_termCode (v s f : Term) :
+    substfcT (termCode v) (termCode s) (termCode f) = termCode (substfc v s f) := rfl
+
+theorem prf_congr_substfcT {v v' s s' f f' : Term}
+    (hv : Prf (v =eq v')) (hs : Prf (s =eq s')) (hf : Prf (f =eq f')) :
+    Prf (substfcT v s f =eq substfcT v' s' f') := prf_congr_funcc3 hv hs hf
+
+theorem prf_substtc_substfcT (v W x y z : Term) :
+    Prf (substtc v W (substfcT x y z)
+      =eq substfcT (substtc v W x) (substtc v W y) (substtc v W z)) :=
+  prf_substtc_funcc3 v W (strCode "substfc") x y z
+
+theorem substtc_inv_substfcT {X Y Z : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))
+    (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :
+    ∀ W, Prf (substtc zero W (substfcT X Y Z) =eq substfcT X Y Z) := fun W =>
+  prf_eq_trans (prf_substtc_substfcT zero W X Y Z) (prf_congr_substfcT (hX W) (hY W) (hZ W))
+
+theorem liftTerm_substfcT (k : Nat) (v s f : Term) :
+    liftTerm k (substfcT v s f) = substfcT (liftTerm k v) (liftTerm k s) (liftTerm k f) := by
+  simp only [substfcT, funcc, cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+theorem substTerm_substfcT (k : Nat) (u v s f : Term) :
+    substTerm k u (substfcT v s f)
+      = substfcT (substTerm k u v) (substTerm k u s) (substTerm k u f) := by
+  simp only [substfcT, funcc, cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+
+/-- `substtc` sobre `succcT`. -/
+theorem prf_substtc_succcT (v W x : Term) :
+    Prf (substtc v W (succcT x) =eq succcT (substtc v W x)) :=
+  prf_substtc_funcc1 v W (strCode succ_sym) x
+
+/-- `substtc` sobre `addcT`. -/
+theorem prf_substtc_addcT (v W x y : Term) :
+    Prf (substtc v W (addcT x y) =eq addcT (substtc v W x) (substtc v W y)) :=
+  prf_substtc_funcc2 v W (strCode add_sym) x y
+
+/-- `substtc zero W ⌜v₀⌝ =eq W` (la variable de código `0` recibe el testigo). -/
+theorem prf_substtc_varc0 (W : Term) : Prf (substtc zero W (varc (numeral 0)) =eq W) :=
+  prf_mp (prf_substtc_var_eq zero W (numeral 0)) (prf_refl zero)
+
+/-! #### La instancia de `ax5`, computada -/
+
+/-- **Instancia codificada de `ax5` ya computada**: `⊢ Prov(⌜ȧ + σḃ = σ(ȧ + ḃ)⌝)`.
+
+    De `pcc_ax5_inst (tcFn a) (tcFn b)`, normalizando el `liftc zero (tcFn a)` con (A)
+    (`prf_liftc_tcFn`) y computando el `substfc` externo sobre el código explícito, donde (A)
+    (`prf_substtc_tcFn`) garantiza que el `tcFn a` incrustado sobrevive intacto. -/
+theorem pcc_ax5_computed (a b : Term) :
+    Prf (provFromCode
+      (eqCodeFn (addcT (tcFn a) (succcT (tcFn b))) (succcT (addcT (tcFn a) (tcFn b))))) := by
+  -- abreviaturas
+  let W1 : Term := liftc zero (tcFn a)
+  let B : Term := tcFn b
+  -- (1) el `substfc` INTERNO se computa (y `substCodeF 1 W1 (cuerpo) ` es `rfl`)
+  have hin : Prf (substfc (succ zero) W1
+      (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0))))
+      =eq eqCodeFn (addcT W1 (succcT (varc (numeral 0))))
+                   (succcT (addcT W1 (varc (numeral 0))))) :=
+    prf_substfc_arith_open 1 W1 (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0)))
+  -- (2) (A): `liftc zero (tcFn a) =eq tcFn a` ⇒ normaliza `W1 → tcFn a` dentro del código
+  have hnorm : Prf (eqCodeFn (addcT W1 (succcT (varc (numeral 0))))
+                             (succcT (addcT W1 (varc (numeral 0))))
+      =eq eqCodeFn (addcT (tcFn a) (succcT (varc (numeral 0))))
+                   (succcT (addcT (tcFn a) (varc (numeral 0))))) := by
+    have hA : Prf (W1 =eq tcFn a) := prf_liftc_tcFn a
+    exact prf_congr_eqCodeFn
+      (prf_congr_addcT hA (prf_refl _))
+      (prf_congr_succcT (prf_congr_addcT hA (prf_refl _)))
+  -- (3) el `substfc` EXTERNO sobre el código explícito
+  have hout : Prf (substfc zero B
+      (eqCodeFn (addcT (tcFn a) (succcT (varc (numeral 0))))
+                (succcT (addcT (tcFn a) (varc (numeral 0)))))
+      =eq eqCodeFn (addcT (tcFn a) (succcT B)) (succcT (addcT (tcFn a) B))) := by
+    refine prf_eq_trans
+      (prf_substfc_eq zero B (addcT (tcFn a) (succcT (varc (numeral 0))))
+        (succcT (addcT (tcFn a) (varc (numeral 0))))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · -- lado izquierdo: ȧ + σ v₀  ↦  ȧ + σ ḃ
+      refine prf_eq_trans (prf_substtc_addcT zero B (tcFn a) (succcT (varc (numeral 0)))) ?_
+      refine prf_congr_addcT (prf_substtc_tcFn B a) ?_
+      exact prf_eq_trans (prf_substtc_succcT zero B (varc (numeral 0)))
+        (prf_congr_succcT (prf_substtc_varc0 B))
+    · -- lado derecho: σ(ȧ + v₀)  ↦  σ(ȧ + ḃ)
+      refine prf_eq_trans (prf_substtc_succcT zero B (addcT (tcFn a) (varc (numeral 0)))) ?_
+      refine prf_congr_succcT ?_
+      exact prf_eq_trans (prf_substtc_addcT zero B (tcFn a) (varc (numeral 0)))
+        (prf_congr_addcT (prf_substtc_tcFn B a) (prf_substtc_varc0 B))
+  -- (4) ensamblar: transporta la instancia de `ax5` por toda la cadena de igualdades de código
+  have hchain : Prf (substfc zero B (substfc (succ zero) W1
+      (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0)))))
+      =eq eqCodeFn (addcT (tcFn a) (succcT B)) (succcT (addcT (tcFn a) B))) :=
+    prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
+  exact prf_mp (prf_provCode_congr hchain) (pcc_ax5_inst (tcFn a) B)
+
+/-! ### Lógica ecuacional INTERNA sobre códigos (§25.4)
+
+Con **`pcc_leibniz_code`** (Leibniz codificado, testigo de una línea, §25.2) y **`pcc_mp_code_open`**
+(MP con códigos abiertos, §25.3) se razona ecuacionalmente **dentro de `Prov`**.
+
+Una restricción real: al sustituir en el código‑contexto `Ac`, el `substtc` alcanza también los
+subtérminos ya presentes. Por eso los lemas piden que el código fijo sea **`substtc`‑invariante**
+(`∀ W, substtc zero W X =eq X`), hipótesis que (A) (`prf_substtc_tcFn`) y las ecuaciones de `funcc`
+descargan para todos los códigos que construimos (`tcFn`, `addcT`, `succcT`). -/
+
+/-- **Leibniz codificado, aplicado**: de `Prov(⌜t₁ = t₂⌝)` y `Prov(⌜Ac[t₁]⌝)` sale `Prov(⌜Ac[t₂]⌝)`.
+    Dos usos de `pcc_mp_code_open` sobre `pcc_leibniz_code`. -/
+theorem pcc_leibniz_apply (Ac t₁ t₂ : Term)
+    (heq : Prf (provFromCode (eqc t₁ t₂)))
+    (h1 : Prf (provFromCode (substfc zero t₁ Ac))) :
+    Prf (provFromCode (substfc zero t₂ Ac)) :=
+  pcc_mp_code_apply
+    (pcc_mp_code_apply (pcc_leibniz_code Ac t₁ t₂) heq)
+    h1
+
+/-- **Transitividad interna de `=`** sobre códigos: `Prov(⌜X=Y⌝) → Prov(⌜Y=Z⌝) → Prov(⌜X=Z⌝)`.
+    Leibniz con el contexto `Ac := (X = v₀)`, sustituyendo `v₀ ↦ Y` y luego `v₀ ↦ Z`. -/
+theorem pcc_eq_trans_code (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (h1 : Prf (provFromCode (eqc X Y))) (h2 : Prf (provFromCode (eqc Y Z))) :
+    Prf (provFromCode (eqc X Z)) := by
+  let Ac : Term := eqc X (varc (numeral 0))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc X t) := fun t =>
+    prf_eq_trans (prf_substfc_eq zero t X (varc (numeral 0)))
+      (prf_congr_eqCodeFn (hX t) (prf_substtc_varc0 t))
+  have hY : Prf (provFromCode (substfc zero Y Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp Y))) h1
+  have hZ : Prf (provFromCode (substfc zero Z Ac)) := pcc_leibniz_apply Ac Y Z h2 hY
+  exact prf_mp (prf_provCode_congr (hcomp Z)) hZ
+
+/-- **Congruencia interna de `σ`** sobre códigos: `Prov(⌜X=Y⌝) → Prov(⌜σX = σY⌝)`.
+    Leibniz con el contexto `Ac := (σX = σv₀)`; la base `Ac[X]` es la **reflexividad codificada**
+    (`prf_provFromCode_eqCodeFn_refl`, libre de muro). -/
+theorem pcc_congr_succ_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (heq : Prf (provFromCode (eqc X Y))) :
+    Prf (provFromCode (eqc (succcT X) (succcT Y))) := by
+  let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (succcT X) (succcT t)) := by
+    intro t
+    refine prf_eq_trans (prf_substfc_eq zero t (succcT X) (succcT (varc (numeral 0)))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · exact prf_eq_trans (prf_substtc_succcT zero t X) (prf_congr_succcT (hX t))
+    · exact prf_eq_trans (prf_substtc_succcT zero t (varc (numeral 0)))
+        (prf_congr_succcT (prf_substtc_varc0 t))
+  have hrefl : Prf (provFromCode (eqc (succcT X) (succcT X))) :=
+    prf_provFromCode_eqCodeFn_refl (succcT X)
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X))) hrefl
+  have hAY : Prf (provFromCode (substfc zero Y Ac)) := pcc_leibniz_apply Ac X Y heq hAX
+  exact prf_mp (prf_provCode_congr (hcomp Y)) hAY
+
+/-! #### Invariancias `substtc` de los códigos que usamos (descargan `hX`) -/
+
+/-- `tcFn a` es `substtc`‑invariante (es (A), `prf_substtc_tcFn`). -/
+theorem substtc_inv_tcFn (a : Term) : ∀ W, Prf (substtc zero W (tcFn a) =eq tcFn a) :=
+  fun W => prf_substtc_tcFn W a
+
+/-- `succcT X` es `substtc`‑invariante si `X` lo es. -/
+theorem substtc_inv_succcT {X : Term} (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    ∀ W, Prf (substtc zero W (succcT X) =eq succcT X) :=
+  fun W => prf_eq_trans (prf_substtc_succcT zero W X) (prf_congr_succcT (hX W))
+
+/-- `addcT X Y` es `substtc`‑invariante si `X` e `Y` lo son. -/
+theorem substtc_inv_addcT {X Y : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
+    ∀ W, Prf (substtc zero W (addcT X Y) =eq addcT X Y) :=
+  fun W => prf_eq_trans (prf_substtc_addcT zero W X Y) (prf_congr_addcT (hX W) (hY W))
+
+/-! ### Formas IMPLICACIÓN de los combinadores internos
+
+`prf_nat_induction` exige el paso como `Prf (Φ ⇒ Φ[σ#0])`, no como una función `Prf → Prf`. Los
+combinadores internos ya son implicaciones por dentro (`pcc_mp_code_open`), así que basta reordenar. -/
+
+/-- Leibniz aplicado, en forma implicación sobre la **igualdad** (la premisa `Ac[t₁]` va cerrada). -/
+theorem pcc_leibniz_apply_imp (Ac t₁ t₂ : Term)
+    (h1 : Prf (provFromCode (substfc zero t₁ Ac))) :
+    Prf (provFromCode (eqc t₁ t₂) ⇒ provFromCode (substfc zero t₂ Ac)) := by
+  have hI : Prf (provFromCode (eqc t₁ t₂)
+      ⇒ provFromCode (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) :=
+    prf_mp (pcc_mp_code_open (eqc t₁ t₂)
+      (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) (pcc_leibniz_code Ac t₁ t₂)
+  refine prf_deduction ?_
+  have himp := PrfH.mp _ _ _ (prf_to_prfH hI _) (prfH_hyp_self (provFromCode (eqc t₁ t₂)))
+  exact PrfH.mp _ _ _
+    (PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open (substfc zero t₁ Ac) (substfc zero t₂ Ac)) _)
+      himp)
+    (prf_to_prfH h1 _)
+
+/-- **Transitividad interna**, en forma implicación sobre la segunda igualdad. -/
+theorem pcc_eq_trans_code_imp (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (h1 : Prf (provFromCode (eqc X Y))) :
+    Prf (provFromCode (eqc Y Z) ⇒ provFromCode (eqc X Z)) := by
+  let Ac : Term := eqc X (varc (numeral 0))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc X t) := fun t =>
+    prf_eq_trans (prf_substfc_eq zero t X (varc (numeral 0)))
+      (prf_congr_eqCodeFn (hX t) (prf_substtc_varc0 t))
+  have hY : Prf (provFromCode (substfc zero Y Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp Y))) h1
+  have himp : Prf (provFromCode (eqc Y Z) ⇒ provFromCode (substfc zero Z Ac)) :=
+    pcc_leibniz_apply_imp Ac Y Z hY
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Z)) _)
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
+
+/-- **Congruencia interna de `σ`**, en forma implicación. -/
+theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (succcT X) (succcT Y))) := by
+  let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (succcT X) (succcT t)) := by
+    intro t
+    refine prf_eq_trans (prf_substfc_eq zero t (succcT X) (succcT (varc (numeral 0)))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · exact prf_eq_trans (prf_substtc_succcT zero t X) (prf_congr_succcT (hX t))
+    · exact prf_eq_trans (prf_substtc_succcT zero t (varc (numeral 0)))
+        (prf_congr_succcT (prf_substtc_varc0 t))
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
+      (prf_provFromCode_eqCodeFn_refl (succcT X))
+  have himp : Prf (provFromCode (eqc X Y) ⇒ provFromCode (substfc zero Y Ac)) :=
+    pcc_leibniz_apply_imp Ac X Y hAX
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
+
+/-! ### PASO INDUCTIVO de `+` -/
+
+/-- **Paso inductivo de la evaluación provable de `+`**:
+    `⊢ Prov(⌜ȧ + ḃ = (a+b)˙⌝) ⇒ Prov(⌜ȧ + (σb)˙ = (a+σb)˙⌝)`.
+
+    Cadena: `pcc_congr_succ_code_imp` sobre la HI, luego `pcc_eq_trans_code_imp` con (B)
+    (`pcc_ax5_computed`), y finalmente transporte de códigos con `prf_tc_succ'` y `prf_congr_tcFn`
+    sobre `prf_add_succ_t` (`add a (σb) =eq σ(a+b)`). -/
+theorem pcc_eval_add_succ_imp (a b : Term) :
+    Prf (provFromCode (evalAddCode a b) ⇒ provFromCode (evalAddCode a (succ b))) := by
+  -- invariancias `substtc` (descargadas por (A) + ecuaciones de `funcc`)
+  have hinvAB : ∀ W, Prf (substtc zero W (addcT (tcFn a) (tcFn b)) =eq addcT (tcFn a) (tcFn b)) :=
+    substtc_inv_addcT (substtc_inv_tcFn a) (substtc_inv_tcFn b)
+  have hinvX : ∀ W, Prf (substtc zero W (addcT (tcFn a) (succcT (tcFn b)))
+      =eq addcT (tcFn a) (succcT (tcFn b))) :=
+    substtc_inv_addcT (substtc_inv_tcFn a) (substtc_inv_succcT (substtc_inv_tcFn b))
+  -- HI ⇒ `Prov(⌜σ(ȧ+ḃ) = σ((a+b)˙)⌝)`
+  have hcs : Prf (provFromCode (eqc (addcT (tcFn a) (tcFn b)) (tcFn (add a b)))
+      ⇒ provFromCode (eqc (succcT (addcT (tcFn a) (tcFn b))) (succcT (tcFn (add a b))))) :=
+    pcc_congr_succ_code_imp _ _ hinvAB
+  -- (B) + transitividad
+  have htr : Prf (provFromCode (eqc (succcT (addcT (tcFn a) (tcFn b))) (succcT (tcFn (add a b))))
+      ⇒ provFromCode (eqc (addcT (tcFn a) (succcT (tcFn b))) (succcT (tcFn (add a b))))) :=
+    pcc_eq_trans_code_imp _ _ _ hinvX (pcc_ax5_computed a b)
+  -- transporte final de códigos: `succcT ḃ =eq (σb)˙` y `σ((a+b)˙) =eq (a+σb)˙`
+  have hcode : Prf (eqc (addcT (tcFn a) (succcT (tcFn b))) (succcT (tcFn (add a b)))
+      =eq evalAddCode a (succ b)) :=
+    prf_congr_eqCodeFn
+      (prf_congr_addcT (prf_refl (tcFn a)) (prf_eq_symm (prf_tc_succ' b)))
+      (prf_eq_symm (prf_eq_trans (prf_congr_tcFn (prf_add_succ_t a b)) (prf_tc_succ' (add a b))))
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr hcode) _)
+    (PrfH.mp _ _ _ (prf_to_prfH htr _)
+      (PrfH.mp _ _ _ (prf_to_prfH hcs _) (prfH_hyp_self _)))
+
+/-! ### Inducción object: la evaluación provable de `+`, COMPLETA
+
+`prf_nat_induction` trabaja con `substFormula`/`liftFormula` sobre el predicado. Con
+`substFormula_provFromCode_open` / `liftFormula_provFromCode_open` todo cae **sobre el código**, y
+`evalAddCode` es transparente a `substTerm`/`liftTerm` (sus constantes — `numeral 4`, `strCode +`,
+`cons`, `nil` — son cerradas). Esos dos lemas de transporte hacen la inducción rutinaria. -/
+
+/-- `substTerm` atraviesa `evalAddCode` (las constantes de código son cerradas). -/
+theorem substTerm_evalAddCode (v : Nat) (s X Y : Term) :
+    substTerm v s (evalAddCode X Y)
+      = evalAddCode (substTerm v s X) (substTerm v s Y) := by
+  simp only [evalAddCode, eqCodeFn, addcT, succcT, funcc, tcFn, add, cons, nil, zero, succ,
+    substTerm, substTerms, substTerm_numeral, substTerm_strCode]
+
+/-- `liftTerm` atraviesa `evalAddCode`. -/
+theorem liftTerm_evalAddCode (k : Nat) (X Y : Term) :
+    liftTerm k (evalAddCode X Y) = evalAddCode (liftTerm k X) (liftTerm k Y) := by
+  simp only [evalAddCode, eqCodeFn, addcT, succcT, funcc, tcFn, add, cons, nil, zero, succ,
+    liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
+
+/-- Predicado inductivo `Ψ(b) = Prov(⌜ȧ + ḃ = (a+b)˙⌝)` (`b` = `#0`; `a` liftado). -/
+def evalAddPred (a : Term) : Formula := provFromCode (evalAddCode (liftTerm 0 a) (.var 0))
+
+/-- Instanciar `Ψ` en un término `b` devuelve exactamente `provFromCode (evalAddCode a b)`. -/
+theorem substFormula_evalAddPred (a b : Term) :
+    substFormula 0 b (evalAddPred a) = provFromCode (evalAddCode a b) := by
+  simp only [evalAddPred, substFormula_provFromCode_open, substTerm_evalAddCode, substTerm,
+    reduceIte, FOL.substTerm_liftTerm]
+
+/-- El paso de `prf_nat_induction` sobre `Ψ`: el `liftFormula 1` seguido del `substFormula 0 (σ#0)`
+    devuelve `Ψ` con el argumento `σ#0` (el `a` liftado sobrevive: `↑₁↑₀a` es `↑₀↑₀a` por
+    `liftTerm_comm_zero`, y el `substTerm 0` lo cancela). -/
+theorem step_evalAddPred (a : Term) :
+    substFormula 0 (succ (.var 0)) (liftFormula 1 (provFromCode (evalAddCode (liftTerm 0 a) (.var 0))))
+      = provFromCode (evalAddCode (liftTerm 0 a) (succ (.var 0))) := by
+  rw [liftFormula_provFromCode_open, liftTerm_evalAddCode, substFormula_provFromCode_open,
+    substTerm_evalAddCode, ← FOL.liftTerm_comm_zero a 0, FOL.substTerm_liftTerm]
+  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, if_true]
+
+/-- **EVALUACIÓN PROVABLE DE `+` (∀ object)**: `⊢ ∀b. Prov(⌜ȧ + ḃ = (a+b)˙⌝)`.
+
+    Inducción interna (`prf_nat_induction`): base `pcc_eval_add_zero`, paso `pcc_eval_add_succ_imp`.
+    Es la **primera** evaluación provable completa del proyecto: cierra el hueco que §18 identificó
+    como «la bestia» para el símbolo `+`. -/
+theorem prf_eval_add_all (a : Term) : Prf (Formula.forall (evalAddPred a)) := by
+  refine prf_nat_induction (evalAddPred a) ?base ?step
+  · rw [substFormula_evalAddPred]
+    exact pcc_eval_add_zero a
+  · refine Prf.gen _ ?_
+    show Prf (Formula.impl (provFromCode (evalAddCode (liftTerm 0 a) (.var 0)))
+      (substFormula 0 (succ (.var 0))
+        (liftFormula 1 (provFromCode (evalAddCode (liftTerm 0 a) (.var 0))))))
+    rw [step_evalAddPred]
+    exact pcc_eval_add_succ_imp (liftTerm 0 a) (.var 0)
+
+/-- **EVALUACIÓN PROVABLE DE `+`**: `⊢ Prov(⌜ȧ + ḃ = (a+b)˙⌝)` para `a`, `b` **arbitrarios**.
+    Instancia del `∀` object. -/
+theorem pcc_eval_add (a b : Term) : Prf (provFromCode (evalAddCode a b)) := by
+  have h := prf_spec (prf_eval_add_all a) b
+  rwa [substFormula_evalAddPred] at h
+
+
+/-! ═══ INJERTO ADVERSARIAL B3B (43 decls) ═══ -/
+
+/-! ## §1 · LOS DOS ESCALONES GENERICOS QUE FALTAN — el hueco `prf_liftc_funccN`.
+    Produccion tiene `prf_substtc_funcc1/2/3` pero NINGUN `prf_liftc_funccN`.
+    Copia literal del sondeo (namespace `Paso2`, §0). -/
+
+theorem prf_liftc_funcc2 (c sc x y : Term) :
+    Prf (liftc c (funcc sc (cons x (cons y nil)))
+      =eq funcc sc (cons (liftc c x) (cons (liftc c y) nil))) :=
+  prf_eq_trans (prf_liftc_func c sc (cons x (cons y nil)))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_liftsc_cons c x (cons y nil))
+        (prf_congr_cons_tail
+          (prf_eq_trans (prf_liftsc_cons c y nil)
+            (prf_congr_cons_tail (prf_liftsc_nil c))))))
+
+theorem prf_liftc_funcc3 (c sc x y z : Term) :
+    Prf (liftc c (funcc sc (cons x (cons y (cons z nil))))
+      =eq funcc sc (cons (liftc c x) (cons (liftc c y) (cons (liftc c z) nil)))) :=
+  prf_eq_trans (prf_liftc_func c sc (cons x (cons y (cons z nil))))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_liftsc_cons c x (cons y (cons z nil)))
+        (prf_congr_cons_tail
+          (prf_eq_trans (prf_liftsc_cons c y (cons z nil))
+            (prf_congr_cons_tail
+              (prf_eq_trans (prf_liftsc_cons c z nil)
+                (prf_congr_cons_tail (prf_liftsc_nil c))))))))
+
+/-! ## §2 · FILA `def` — los SEIS constructores.
+    `substfcT` ya esta en `EvalArithPrf`; `liftcT`/`liftscT` estan hoy en `LiftcCodePrf`
+    (version de 1084 lineas) — se copian LITERALES para medir que NO necesitan nada de
+    `LiftcCodePrf`. `substtcT`/`substtscT`/`liftfcT` son las que faltan. -/
+
+def substtcT  (v s t  : Term) : Term := funcc (strCode "substtc")  (cons v (cons s (cons t nil)))
+def substtscT (v s ts : Term) : Term := funcc (strCode "substtsc") (cons v (cons s (cons ts nil)))
+def liftcT    (c t    : Term) : Term := funcc (strCode "liftc")    (cons c (cons t nil))
+def liftfcT   (c f    : Term) : Term := funcc (strCode "liftfc")   (cons c (cons f nil))
+def liftscT   (c ts   : Term) : Term := funcc (strCode "liftsc")   (cons c (cons ts nil))
+
+/-! ## §3 · FILA `_termCode` — los seis puentes, por `rfl`. NO son ecuaciones postuladas. -/
+
+theorem substtcT_termCode (v s t : Term) :
+    substtcT (termCode v) (termCode s) (termCode t) = termCode (substtc v s t) := rfl
+theorem substtscT_termCode (v s ts : Term) :
+    substtscT (termCode v) (termCode s) (termCode ts) = termCode (substtsc v s ts) := rfl
+theorem liftcT_termCode (c t : Term) :
+    liftcT (termCode c) (termCode t) = termCode (liftc c t) := rfl
+theorem liftfcT_termCode (c f : Term) :
+    liftfcT (termCode c) (termCode f) = termCode (liftfc c f) := rfl
+theorem liftscT_termCode (c ts : Term) :
+    liftscT (termCode c) (termCode ts) = termCode (liftsc c ts) := rfl
+
+/-! ## §4 · FILA `prf_congr_` -/
+
+theorem prf_congr_substtcT {v v' s s' t t' : Term}
+    (hv : Prf (v =eq v')) (hs : Prf (s =eq s')) (ht : Prf (t =eq t')) :
+    Prf (substtcT v s t =eq substtcT v' s' t') := prf_congr_funcc3 hv hs ht
+theorem prf_congr_substtscT {v v' s s' t t' : Term}
+    (hv : Prf (v =eq v')) (hs : Prf (s =eq s')) (ht : Prf (t =eq t')) :
+    Prf (substtscT v s t =eq substtscT v' s' t') := prf_congr_funcc3 hv hs ht
+theorem prf_congr_liftcT {c c' t t' : Term} (hc : Prf (c =eq c')) (ht : Prf (t =eq t')) :
+    Prf (liftcT c t =eq liftcT c' t') :=
+  prf_congr_funcc2 (prf_eq_trans (prf_congr_cons_head hc)
+    (prf_congr_cons_tail (prf_congr_cons_head ht)))
+theorem prf_congr_liftfcT {c c' t t' : Term} (hc : Prf (c =eq c')) (ht : Prf (t =eq t')) :
+    Prf (liftfcT c t =eq liftfcT c' t') :=
+  prf_congr_funcc2 (prf_eq_trans (prf_congr_cons_head hc)
+    (prf_congr_cons_tail (prf_congr_cons_head ht)))
+theorem prf_congr_liftscT {c c' t t' : Term} (hc : Prf (c =eq c')) (ht : Prf (t =eq t')) :
+    Prf (liftscT c t =eq liftscT c' t') :=
+  prf_congr_funcc2 (prf_eq_trans (prf_congr_cons_head hc)
+    (prf_congr_cons_tail (prf_congr_cons_head ht)))
+
+/-! ## §5 · FILA `prf_substtc_` — nivel ARBITRARIO -/
+
+theorem prf_substtc_substtcT (v W x y z : Term) :
+    Prf (substtc v W (substtcT x y z)
+      =eq substtcT (substtc v W x) (substtc v W y) (substtc v W z)) :=
+  prf_substtc_funcc3 v W (strCode "substtc") x y z
+theorem prf_substtc_substtscT (v W x y z : Term) :
+    Prf (substtc v W (substtscT x y z)
+      =eq substtscT (substtc v W x) (substtc v W y) (substtc v W z)) :=
+  prf_substtc_funcc3 v W (strCode "substtsc") x y z
+theorem prf_substtc_liftcT (v W x y : Term) :
+    Prf (substtc v W (liftcT x y) =eq liftcT (substtc v W x) (substtc v W y)) :=
+  prf_substtc_funcc2 v W (strCode "liftc") x y
+theorem prf_substtc_liftfcT (v W x y : Term) :
+    Prf (substtc v W (liftfcT x y) =eq liftfcT (substtc v W x) (substtc v W y)) :=
+  prf_substtc_funcc2 v W (strCode "liftfc") x y
+theorem prf_substtc_liftscT (v W x y : Term) :
+    Prf (substtc v W (liftscT x y) =eq liftscT (substtc v W x) (substtc v W y)) :=
+  prf_substtc_funcc2 v W (strCode "liftsc") x y
+
+/-! ## §6 · FILA `prf_liftc_` — LAS SEIS CASILLAS ESTAN VACIAS EN PRODUCCION.
+    Ni siquiera `substfcT`, `liftcT` o `liftscT`, que ya existen, tienen su fila `liftc`. -/
+
+theorem prf_liftc_substfcT (c x y z : Term) :
+    Prf (liftc c (substfcT x y z) =eq substfcT (liftc c x) (liftc c y) (liftc c z)) :=
+  prf_liftc_funcc3 c (strCode "substfc") x y z
+theorem prf_liftc_substtcT (c x y z : Term) :
+    Prf (liftc c (substtcT x y z) =eq substtcT (liftc c x) (liftc c y) (liftc c z)) :=
+  prf_liftc_funcc3 c (strCode "substtc") x y z
+theorem prf_liftc_substtscT (c x y z : Term) :
+    Prf (liftc c (substtscT x y z) =eq substtscT (liftc c x) (liftc c y) (liftc c z)) :=
+  prf_liftc_funcc3 c (strCode "substtsc") x y z
+theorem prf_liftc_liftcT (c x y : Term) :
+    Prf (liftc c (liftcT x y) =eq liftcT (liftc c x) (liftc c y)) :=
+  prf_liftc_funcc2 c (strCode "liftc") x y
+theorem prf_liftc_liftfcT (c x y : Term) :
+    Prf (liftc c (liftfcT x y) =eq liftfcT (liftc c x) (liftc c y)) :=
+  prf_liftc_funcc2 c (strCode "liftfc") x y
+theorem prf_liftc_liftscT (c x y : Term) :
+    Prf (liftc c (liftscT x y) =eq liftscT (liftc c x) (liftc c y)) :=
+  prf_liftc_funcc2 c (strCode "liftsc") x y
+
+/-! ## §7 · FILA `substtc_inv_` — nivel `zero` -/
+
+theorem substtc_inv_substtcT {X Y Z : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))
+    (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :
+    ∀ W, Prf (substtc zero W (substtcT X Y Z) =eq substtcT X Y Z) := fun W =>
+  prf_eq_trans (prf_substtc_substtcT zero W X Y Z) (prf_congr_substtcT (hX W) (hY W) (hZ W))
+theorem substtc_inv_substtscT {X Y Z : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))
+    (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :
+    ∀ W, Prf (substtc zero W (substtscT X Y Z) =eq substtscT X Y Z) := fun W =>
+  prf_eq_trans (prf_substtc_substtscT zero W X Y Z) (prf_congr_substtscT (hX W) (hY W) (hZ W))
+theorem substtc_inv_liftcT {X Y : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
+    ∀ W, Prf (substtc zero W (liftcT X Y) =eq liftcT X Y) := fun W =>
+  prf_eq_trans (prf_substtc_liftcT zero W X Y) (prf_congr_liftcT (hX W) (hY W))
+theorem substtc_inv_liftfcT {X Y : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
+    ∀ W, Prf (substtc zero W (liftfcT X Y) =eq liftfcT X Y) := fun W =>
+  prf_eq_trans (prf_substtc_liftfcT zero W X Y) (prf_congr_liftfcT (hX W) (hY W))
+theorem substtc_inv_liftscT {X Y : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
+    ∀ W, Prf (substtc zero W (liftscT X Y) =eq liftscT X Y) := fun W =>
+  prf_eq_trans (prf_substtc_liftscT zero W X Y) (prf_congr_liftscT (hX W) (hY W))
+
+/-! ## §8 · FILAS `liftTerm_` / `substTerm_` — conmutacion META.
+    Solo `substfcT` las tiene en produccion; las otras CINCO no. -/
+
+theorem liftTerm_substtcT (k : Nat) (v s f : Term) :
+    liftTerm k (substtcT v s f) = substtcT (liftTerm k v) (liftTerm k s) (liftTerm k f) := by
+  simp only [substtcT, funcc, cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+theorem substTerm_substtcT (k : Nat) (u v s f : Term) :
+    substTerm k u (substtcT v s f)
+      = substtcT (substTerm k u v) (substTerm k u s) (substTerm k u f) := by
+  simp only [substtcT, funcc, cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+theorem liftTerm_substtscT (k : Nat) (v s f : Term) :
+    liftTerm k (substtscT v s f) = substtscT (liftTerm k v) (liftTerm k s) (liftTerm k f) := by
+  simp only [substtscT, funcc, cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+theorem substTerm_substtscT (k : Nat) (u v s f : Term) :
+    substTerm k u (substtscT v s f)
+      = substtscT (substTerm k u v) (substTerm k u s) (substTerm k u f) := by
+  simp only [substtscT, funcc, cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+theorem liftTerm_liftcT (k : Nat) (c t : Term) :
+    liftTerm k (liftcT c t) = liftcT (liftTerm k c) (liftTerm k t) := by
+  simp only [liftcT, funcc, cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+theorem substTerm_liftcT (k : Nat) (u c t : Term) :
+    substTerm k u (liftcT c t) = liftcT (substTerm k u c) (substTerm k u t) := by
+  simp only [liftcT, funcc, cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+theorem liftTerm_liftfcT (k : Nat) (c t : Term) :
+    liftTerm k (liftfcT c t) = liftfcT (liftTerm k c) (liftTerm k t) := by
+  simp only [liftfcT, funcc, cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+theorem substTerm_liftfcT (k : Nat) (u c t : Term) :
+    substTerm k u (liftfcT c t) = liftfcT (substTerm k u c) (substTerm k u t) := by
+  simp only [liftfcT, funcc, cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+theorem liftTerm_liftscT (k : Nat) (c t : Term) :
+    liftTerm k (liftscT c t) = liftscT (liftTerm k c) (liftTerm k t) := by
+  simp only [liftscT, funcc, cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+theorem substTerm_liftscT (k : Nat) (u c t : Term) :
+    substTerm k u (liftscT c t) = liftscT (substTerm k u c) (substTerm k u t) := by
+  simp only [liftscT, funcc, cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+
+
+end ROBINSON_PlusPlus.Meta.EvalArithPrf
+
+export ROBINSON_PlusPlus.Meta.EvalArithPrf (
+  addcT addcT_termCode prf_congr_addcT
+  evalAddCode pcc_ax4_computed pcc_eval_add_zero
+  succcT prf_tc_succ' prf_congr_succcT
+  prf_substtc_funcc1 prf_substtc_funcc2 prf_substtc_succcT prf_substtc_addcT prf_substtc_varc0
+  -- KIT TERNARIO, bajado en B3 (2026-09-04). Retira 74 copias a mano repartidas por
+  -- `sondeos/`: `substfcT` estaba en ONCE sondeos y los dos `funcc3` en NUEVE cada uno.
+  prf_substtc_funcc3 prf_congr_funcc3
+  substfcT substfcT_termCode prf_congr_substfcT prf_substtc_substfcT substtc_inv_substfcT
+  liftTerm_substfcT substTerm_substfcT
+  pcc_ax5_computed
+  pcc_leibniz_apply pcc_eq_trans_code pcc_congr_succ_code
+  substtc_inv_tcFn substtc_inv_succcT substtc_inv_addcT
+  pcc_leibniz_apply_imp pcc_eq_trans_code_imp pcc_congr_succ_code_imp
+  substTerm_evalAddCode liftTerm_evalAddCode evalAddPred substFormula_evalAddPred
+  step_evalAddPred pcc_eval_add_succ_imp prf_eval_add_all pcc_eval_add
+)
+
+/-! FOOTPRINT ADVERSARIAL: las 43 inyectadas, una por una -/
+
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_funcc2
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_funcc3
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtcT_termCode
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtscT_termCode
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftcT_termCode
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftfcT_termCode
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftscT_termCode
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_congr_substtcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_congr_substtscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_congr_liftcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_congr_liftfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_congr_liftscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_substtc_substtcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_substtc_substtscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_substtc_liftcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_substtc_liftfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_substtc_liftscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_substfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_substtcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_substtscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_liftcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_liftfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_liftc_liftscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtc_inv_substtcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtc_inv_substtscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtc_inv_liftcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtc_inv_liftfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substtc_inv_liftscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftTerm_substtcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substTerm_substtcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftTerm_substtscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substTerm_substtscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftTerm_liftcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substTerm_liftcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftTerm_liftfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substTerm_liftfcT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.liftTerm_liftscT
+#print axioms ROBINSON_PlusPlus.Meta.EvalArithPrf.substTerm_liftscT

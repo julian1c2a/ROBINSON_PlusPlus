@@ -1,0 +1,3 @@
+import ROBINSON_PlusPlus.Meta.LiftcCodePrf
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_imp
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeBin_imp

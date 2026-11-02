@@ -1,0 +1,2 @@
+import ROBINSON_PlusPlus.Meta
+#print axioms ROBINSON_PlusPlus.Meta.StrongInductionPrf.prf_strong_induction

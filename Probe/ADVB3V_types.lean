@@ -1,0 +1,25 @@
+import ROBINSON_PlusPlus.Meta
+open ROBINSON_PlusPlus.Meta
+set_option pp.fullNames true
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHIbody
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_at
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_use
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_step
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_all
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_imp
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_lista_imp
+#check @ROBINSON_PlusPlus.Meta.StrongInductionPrf.PSI_inst
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_varc
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_funcc
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_nil
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeUn_imp
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_funcc_imp
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeBin_imp
+#check @ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_imp
+#check @ROBINSON_PlusPlus.Meta.EvalPredPrf.pcc_eval_pred
+#check @ROBINSON_PlusPlus.Meta.EvalPredPrf.pcc_eval_pred'
+#check @ROBINSON_PlusPlus.Meta.EvalLiftcPrf.eqc_eq_eqCodeFn_es_symm
+#check @ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.eqCodeFn_eq_eqc
+#check @ROBINSON_PlusPlus.Meta.StrongInductionPrf.psi_lift_form
