@@ -1,0 +1,35 @@
+{
+ "FOL/Theorems/Eq.lean": {
+  "opciones": 2,
+  "unidades_con_avisos": 2,
+  "desactivadas": {},
+  "quitados": [
+   [
+    214,
+    "liftTerm"
+   ],
+   [
+    216,
+    "show k + 1 ≠ v + 1 from by omega"
+   ],
+   [
+    218,
+    "show k + 1 ≠ v + 1 from by omega"
+   ],
+   [
+    294,
+    "show ¬j + 1 = j + 2 from by omega"
+   ],
+   [
+    299,
+    "show j + 2 = j + 2 from rfl"
+   ],
+   [
+    304,
+    "liftTerm"
+   ]
+  ],
+  "raros": [],
+  "atascado": null
+ }
+}

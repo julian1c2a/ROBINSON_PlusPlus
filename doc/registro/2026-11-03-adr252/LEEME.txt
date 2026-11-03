@@ -1,0 +1,8 @@
+ADR-252, 2026-11-03: el thaw de ../FOL/FOL/Theorems/Eq.lean y sus dos opciones de simp, fuera, con la herramienta
+de ADR-249 (doc/registro/2026-11-02-simp/simp_args.py.txt), en un clon compartido de FOL.
+
+  ronda1.json   sin las dos opciones: el linter señala seis argumentos (0 errores, 0 otros avisos)
+  resumen.json  con los seis quitados: el fichero, LIMPIO; las dos unidades aplicadas, ninguna devuelta; los argumentos
+                quitados, con su línea: dos liftTerm y cuatro «show … from»
+Después, lake build de FOL y de RPP enteros, sin avisos; check-warnings.bash (0 avisos, el censo de opciones sin la
+fila de Theorems/Eq.lean) y check-footprints.bash (648, iguales), verdes.

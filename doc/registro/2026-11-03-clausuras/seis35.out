@@ -1,0 +1,14 @@
+  mutante: el valor de Decidable.reflects_decide (el primer thm) es ahora su tipo
+t35b: 52741059 bytes
+  lean exp rc=0 20.16 s 196292 KB :: Lean default kernel accepts the solution 
+  lean mut rc=1 2.51 s 196872 KB :: ble.reflects_decide' has type   Prop but it is expected to have type   ∀ (p : Prop) [self : Decidable p], (Decidable.decide p).Reflects p 
+  paranoid exp rc=0 24.28 s 125720 KB :: Lean default kernel accepts the solution 
+  paranoid mut rc=1 3.46 s 124144 KB :: decide' has type   Prop but it is expected to have type   forall (p : Prop) [self : Decidable p], Bool.Reflects (Decidable.decide p self) p 
+  lean4lean exp rc=0 26.40 s 120620 KB :: checked 6985 declarations 
+  lean4lean mut rc=1 2.20 s 121848 KB :: default` for `IO.Error`). Falling back to raw printer.]   forall (p : Prop) [self : Decidable p], Bool.Reflects (Decidable.decide p self) p 
+  nanoda exp rc=0 4.48 s 137552 KB :: 
+  nanoda mut rc=101 5.27 s 121360 KB :: lay a backtrace  thread 'main' (4982) panicked at src/tc.rs:173:26: A thread in `check_all_declars` panicked while being joined: Any { .. } 
+  con-leche exp rc=0 5.90 s 236460 KB :: con-leche: accepted 6988 declarations (--verified) 
+  con-leche mut rc=1 1.57 s 104340 KB :: e: invalid: type mismatch in theorem Decidable.reflects_decide [at theorem Decidable.reflects_decide, fold position 80] (--verified) t=1.5s 
+  con-ron exp rc=0 3.13 s 659852 KB :: con-ron: accepted 6988 declarations (--verified) 
+  con-ron mut rc=1 1.07 s 198012 KB :: con-ron: rejected: type mismatch in theorem [at theorem Decidable.reflects_decide, fold position 80] (--verified) t=1.060s 

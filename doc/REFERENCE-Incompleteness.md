@@ -5720,10 +5720,13 @@ theorem derives1_to_prfH : Derives₁ Γ f → PrfH Γ f                    -- e
 theorem prf_of_derivesSet (hS : ∀ g, S g → Prf g) (h : DerivesSet₀ S f) : Prf f
 theorem prf_iff_derivesSet : Prf f ↔ DerivesSet₀ (fun g => Prf g) f
 def AxiomasT (φ : Formula) : Prop        -- los 120 de `axioms` y las instancias de `ind` y `listInd`
-theorem prf_completo (h : ∀ D M v, (∀ φ, AxiomasT φ → evalFormula M v φ) → evalFormula M v f) : Prf f
+def ClausurasT (σ : Formula) : Prop     -- ∀ᵏ φ, con φ en AxiomasT y sus variables libres por debajo de k (ADR-253)
+theorem axiomasT_global (h : ∀ σ, ClausurasT σ → evalFormula M v σ) : ∀ φ, AxiomasT φ → ∀ w, evalFormula M w φ
+theorem prf_iff_derivesSet_clausuras : Prf f ↔ DerivesSet₀ ClausurasT f      -- la vuelta, sin Classical.choice
+theorem prf_completo (h : ∀ D M, (∀ φ, AxiomasT φ → ∀ w, evalFormula M w φ) → ∀ w, evalFormula M w f) : Prf f
 theorem goedel_I_fol (hS : ∀ φ, S φ → Prf φ) : ¬ DerivesSet₀ S godelCN    -- y goedel_I_neg_fol, goedel_II_fol (titulares, ADR-210)
-theorem modelo_sin_G : ∃ D M v, (∀ φ, Prf φ → evalFormula M v φ) ∧ ¬ evalFormula M v godelCN
-theorem goedel_I_semantico : (∀ M, Estandar M → ∀ v, evalFormula M v godelCN) ∧ (∃ D M v, …)
+theorem modelo_sin_G : ∃ D M, (∀ φ, Prf φ → ∀ w, evalFormula M w φ) ∧ ∀ w, ¬ evalFormula M w godelCN
+theorem goedel_I_semantico : (∀ M, Estandar M → ∀ v, evalFormula M v godelCN) ∧ (∃ D M, …)
 theorem isSentence_iff_fol : IsSentence φ ↔ FOL.Sentence.IsSentence φ      -- T72, ADR-215
 theorem godelCN_eval_indep : evalFormula M v godelCN ↔ evalFormula M w godelCN
 ```
@@ -5734,4 +5737,8 @@ deducción (`deduction_aux`, cuyo caso `gen` se cierra con `qconf`) y un `gen` q
 ligada (`substFormula_lift_var`), luego `A`, luego `∀A`, contra `¬∀A`. La completitud y el modelo sin `G` salen de la
 existencia de modelo de FOL (`model_existence_lemma₀`) sobre `AxiomasT` (o los teoremas de `Prf`) y `¬f`, consistentes
 por el puente; de ahí su `Classical.choice`. La vuelta, `Prf → DerivesSet₀ AxiomasT`, no está: pide las clausuras
-universales de las instancias con variables libres.
+universales de las instancias con variables libres. ✏️ 2026‑11‑03 (ADR‑253): sobre las CLAUSURAS sí está, y sin
+`Classical.choice`: cada esquema de `Prf`, derivado en `Derives₀` (los lógicos, desde nada; `ind` y `listInd`, de su
+clausura, instanciada con variables en un contexto de sentencias; `gen`, porque ese contexto no cambia al levantarlo).
+Con ellas, `prf_completo` toma la hipótesis de libro (en toda valuación: `axiomasT_global`, de un modelo de las
+clausuras en una valuación a `AxiomasT` en todas) y `modelo_sin_G` da un modelo en el sentido usual.

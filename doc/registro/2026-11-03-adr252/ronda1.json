@@ -1,0 +1,45 @@
+{
+ "FOL/Theorems/Eq.lean": {
+  "rc": 0,
+  "opciones": 2,
+  "avisos": [
+   {
+    "s": 9824,
+    "e": 9832,
+    "nombre": "liftTerm",
+    "texto": "liftTerm"
+   },
+   {
+    "s": 9899,
+    "e": 9931,
+    "nombre": "show k + 1 ≠ v + 1 from by omega",
+    "texto": "show k + 1 ≠ v + 1 from by omega"
+   },
+   {
+    "s": 10058,
+    "e": 10090,
+    "nombre": "show k + 1 ≠ v + 1 from by omega",
+    "texto": "show k + 1 ≠ v + 1 from by omega"
+   },
+   {
+    "s": 14344,
+    "e": 14374,
+    "nombre": "show ¬j + 1 = j + 2 from by omega",
+    "texto": "show ¬ j+1 = j+2 from by omega"
+   },
+   {
+    "s": 14644,
+    "e": 14667,
+    "nombre": "show j + 2 = j + 2 from rfl",
+    "texto": "show j+2 = j+2 from rfl"
+   },
+   {
+    "s": 15020,
+    "e": 15028,
+    "nombre": "liftTerm",
+    "texto": "liftTerm"
+   }
+  ],
+  "otros": []
+ }
+}

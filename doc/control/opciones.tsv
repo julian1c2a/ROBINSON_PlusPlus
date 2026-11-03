@@ -3,7 +3,6 @@
 # check-warnings.bash con igualdad. Sólo con un ADR.
 # fichero	opción	forma	cuenta
 FOL/QFDecide0.lean	maxRecDepth	in	1
-FOL/Theorems/Eq.lean	linter.unusedSimpArgs	in	2
 ROBINSON_PlusPlus/Full/Induction.lean	maxRecDepth	in	4
 ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean	linter.unusedVariables	in	5
 ROBINSON_PlusPlus/Meta/D3InDotPrf.lean	maxRecDepth	in	1

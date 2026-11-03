@@ -58,6 +58,9 @@ de Hilbert propio de RPP, o sobre la verdad en su modelo. **`T_Prf`** es el conj
 toda fórmula de un lenguaje que contiene el de PA; y el cálculo lógico de `Prf` es un Hilbert clásico estándar, y COMPLETO para
 su teoría: lo que vale en todo modelo de `AxiomasT` (los 120 y las instancias de los dos esquemas de inducción), `Prf`
 lo demuestra (`prf_completo`, `Meta/PuenteFOL.lean`; ✏️ 2026‑10‑28, ADR‑195: hasta hoy decía «no está demostrado»).
+✏️ 2026‑11‑03 (ADR‑253): en el sentido de libro —«modelo» es satisfacer `AxiomasT` en TODA valuación—, y con la vuelta:
+`Prf f ↔ DerivesSet₀ ClausurasT f` (`prf_iff_derivesSet_clausuras`, sin `Classical.choice`): **T_Prf es la teoría de
+primer orden de las clausuras universales de `AxiomasT`**, que son sentencias.
 «Todo modelo» es todo modelo con dominio en `Type`: la semántica de FOL no habla de otros, y para la completitud no
 hace falta (lo válido en todo modelo lo es en los de `Type`) (✏️ 2026‑10‑31, T73, ADR‑232). **No es Q, ni «Q++ sin inducción», ni IΣ₁.** Lo que no tiene
 esquema de inducción es la LISTA `axioms`, la que define `Minimal/`, no la teoría de los titulares. (La lista sola ya

@@ -1,0 +1,14 @@
+ADR-253, 2026-11-03: las clausuras de AxiomasT (Meta/PuenteFOL.lean §3bis), la vuelta del puente y los tres
+semánticos en la forma de libro.
+
+  contrato-rojo.txt   el build con los enunciados nuevos y la tabla vieja: #contrato_titulares rompe con exactamente
+                      tres diferencias, las huellas de prf_completo, modelo_sin_G y goedel_I_semantico (el control,
+                      visto fallar); regenerada la tabla, 563 constantes, las mismas
+  modelo.txt          lo que da «#modelo» de sondeos/InduccionTitulares.lean para los tres: (iii)
+  seis35.out          el cierre de los 35 con las pruebas nuevas, por los seis núcleos con su mutante (seis.sh de
+                      doc/registro/2026-11-02-nanoda/, en WSL sobre los .olean de la compilación de Windows): los seis
+                      aceptan (lean4lean, 6985 declaraciones; con-leche y con-ron, 6988; nanoda, 4 hilos, 4,5 s) y
+                      rechazan el mutante
+Los footprints, de la compilación de Meta/PuenteFOL.lean: axiomasT_global y prf_iff_derivesSet_clausuras,
+[propext, Quot.sound]; prf_completo, modelo_sin_G y goedel_I_semantico, [propext, Classical.choice, Quot.sound], los de
+antes. check-footprints.bash, con sus dos filas nuevas: 648, todas iguales.

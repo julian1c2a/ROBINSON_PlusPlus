@@ -250,9 +250,9 @@ def 4089042994593695081 ROBINSON_PlusPlus.Meta.PuenteFOL.AxiomasT
 thm 3856473026 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol
 thm 2674866193 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
 thm 2926819187 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol
-thm 2314678460 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico
-thm 3201601755 ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
-thm 3330633733 ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo
+thm 1433828887 ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico
+thm 3274657883 ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
+thm 2098556209 ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo
 thm 3002450326 ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
 thm 2318897476 ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 thm 3520485007 ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de

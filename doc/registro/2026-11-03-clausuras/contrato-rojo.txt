@@ -1,0 +1,7 @@
+error: ROBINSON_PlusPlus/Meta/PurezaTitulares.lean:85:0: ⛔ T07 · el contrato de los enunciados FALLA (ADR‑165): 3 diferencias con la tabla
+  CAMBIA: thm ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico: la tabla dice thm 2314678460, hoy es 1433828887 (la alcanzan: goedel_I_semantico)
+  CAMBIA: thm ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G: la tabla dice thm 3201601755, hoy es 3274657883 (la alcanzan: modelo_sin_G)
+  CAMBIA: thm ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo: la tabla dice thm 3330633733, hoy es 2098556209 (la alcanzan: prf_completo)
+  Si el cambio es querido: su ADR, y `lake env lean scripts/ContratoGenerar.lean` regenera Meta/ContratoTabla.lean.
+Some required targets logged failures:
+- ROBINSON_PlusPlus.Meta.PurezaTitulares
