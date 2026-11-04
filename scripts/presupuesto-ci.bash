@@ -7,6 +7,10 @@
 # resumen del run y la compara con `doc/control/presupuesto-ci.tsv`: por encima de su presupuesto, rojo. Las cifras de
 # tiempo y memoria sólo estaban en prosa, medidas en condiciones distintas (la auditoría, T41). El presupuesto sólo se
 # sube con un ADR que diga por qué; se baja cuando las medidas lo permitan.
+# ⚠️ ✏️ 2026-11-04 (R3-3-04 de la ronda 3, ADR-256): los MB NO son la memoria del build. «Maximum resident set size» de
+# GNU time es el PICO del proceso más pesado del árbol (un `lean` de un módulo, o leanchecker), no la suma de los que
+# corren a la vez: así se rotula ahora, en el resumen y en la tabla.
+#   bash scripts/presupuesto-ci.bash --autotest   # ✏️ (R3-5-14, ADR-256): con medidas sintéticas; en la CI
 
 set -uo pipefail
 export PATH="/usr/bin:$PATH"
@@ -15,6 +19,30 @@ cd "$(dirname "$0")/.." || exit 2
 TABLA=doc/control/presupuesto-ci.tsv
 RESUMEN="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
 FAIL=0
+
+# ⭐ el AUTOTEST: dentro del presupuesto, verde; por encima en tiempo, en memoria, sin medida o con una ilegible, rojo.
+# «Probado con el fallo puesto» (ADR-202) no tenía artefacto.
+if [ "${1:-}" = "--autotest" ]; then
+  T=$(mktemp -d)
+  trap 'rm -rf "$T"' EXIT
+  medida() { printf '\tElapsed (wall clock) time (h:mm:ss or m:ss): %s\n\tMaximum resident set size (kbytes): %s\n' "$1" "$2" > "$3"; }
+  medida 1:00.00 1048576 "$T/bien"; medida 59:00.00 1048576 "$T/lento"; medida 1:00.00 104857600 "$T/gordo"
+  printf 'nada\n' > "$T/ilegible"
+  AF=0
+  uno() {  # $1 = esperado (0/1), resto = medidas
+    local esp=$1; shift
+    GITHUB_STEP_SUMMARY=/dev/null bash "$0" "$@" > "$T/sal" 2>&1; local rc=$?
+    if [ "$rc" != "$esp" ]; then echo "  ✗ autotest: con $(basename -a "$@" | tr '\n' ' ')salió $rc, y debía $esp"; cat "$T/sal"; AF=1; fi
+  }
+  uno 0 "$T/bien" "$T/bien"
+  uno 1 "$T/lento" "$T/bien"
+  uno 1 "$T/bien" "$T/gordo"
+  uno 1 "$T/bien" "$T/ilegible"
+  uno 1 "$T/bien" "$T/no-existe"
+  uno 1 "$T/bien"
+  if [ "$AF" = 0 ]; then echo "✅ autotest de presupuesto-ci.bash: dentro, verde; lento, gordo, ilegible, ausente o solo, rojo."; exit 0; fi
+  echo "❌ autotest de presupuesto-ci.bash."; exit 1
+fi
 
 # los segundos de «Elapsed (wall clock) time (h:mm:ss or m:ss): 6:12.34»
 segundos() {
@@ -29,7 +57,7 @@ megas() {
 {
   echo "### Tiempo y memoria (T41)"
   echo ""
-  echo "| medida | segundos | presupuesto | MB | presupuesto |"
+  echo "| medida | segundos | presupuesto | MB (pico del proceso más pesado) | presupuesto |"
   echo "|---|---:|---:|---:|---:|"
 } >> "$RESUMEN"
 
@@ -55,7 +83,7 @@ for f in "$@"; do
     echo "❌ $nombre: $S s y $M MB, por encima del presupuesto ($PS s, $PM MB)"
     FAIL=1
   else
-    echo "✓ $nombre: $S s (presupuesto $PS) · $M MB (presupuesto $PM)"
+    echo "✓ $nombre: $S s (presupuesto $PS) · $M MB de pico del proceso más pesado (presupuesto $PM)"
   fi
 done
 [ "$i" -ge 2 ] || { echo "❌ hacen falta las dos medidas (build y leanchecker)"; FAIL=1; }

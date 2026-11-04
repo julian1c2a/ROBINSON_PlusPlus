@@ -27,8 +27,10 @@ but it lacks a general induction principle.
 
 ✏️ **2026‑10‑12 (ADR‑134).** Hoy son 120 axiomas (`axioms`: 34 de `coreAxioms`, 85 de `codingAxioms` y el ancla;
 ✏️ 142 hasta ADR‑192, que retiró los 22 `ax_vpf_*`)
-sobre 33 símbolos (28 de función y 5 de relación; el módulo declara 35, pero `nil_sym` y `le_sym` no los nombra ningún
-axioma: `nil` es `zero`, y `le` una disyunción). «Lacks a general induction principle» es cierto de la LISTA, no
+sobre 32 símbolos (27 de función y 5 de relación: `AXIOMS.md` §0.1; ✏️ 2026‑11‑04, R3‑5‑09 de la ronda 3, ADR‑256:
+decía 33 y 28, la cuenta de antes de retirar `validProofFn` en ADR‑192, y «el módulo declara 35», que no se volvió a
+medir); el módulo declara además `nil_sym` y `le_sym`, que no nombra ningún axioma: `nil` es `zero`, y `le` una
+disyunción. «Lacks a general induction principle» es cierto de la LISTA, no
 de la teoría de los titulares: `Prf` le añade `ind` y `listInd` para TODA fórmula, y contiene a PA (`AXIOMS.md` §0).
 
 🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` (`Derives`) se retiró de RPP: sus postulados eran falsos

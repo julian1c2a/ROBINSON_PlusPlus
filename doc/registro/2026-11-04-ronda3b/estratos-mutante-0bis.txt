@@ -1,0 +1,78 @@
+════ CENSO DE ESTRATOS ════
+  ✓ Derives                                         22 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Inconsistencia.derives_soundness
+      └ completitud en el build: FOL.Estratos0.derives_semantic_complete
+      └ puente en el build: FOL.Inconsistencia.derives_to_derives0
+  ✓ Derives₀                                      21 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Metamath.Soundness0.derives0_soundness
+      └ completitud en el build: FOL.Canonical0.completeness₀
+  ✓ Derives₁                                      20 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Estratos0.derives1_soundness
+      └ completitud en el build: FOL.Estratos0.derives1_complete
+      └ puente en el build: FOL.Derives1.derives1_to_derives0
+  ✓ Derives₂                                      22 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Estratos0.derives2_soundness
+      └ completitud en el build: FOL.Estratos0.derives2_complete
+      └ puente en el build: FOL.Derives2.derives2_to_derives1
+  ✓ LK₀                                           14 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.SequentSound0.lk0_sound
+      └ completitud en el build: FOL.Estratos0.lk0_complete
+      └ puente en el build: FOL.SequentSound0.lk0_to_derives0
+  ✓ LKc                                             15 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.SequentSound0.lkc_sound
+      └ completitud en el build: FOL.Estratos0.lkc_complete
+      └ puente en el build: FOL.Hauptsatz0.cut_elimination₀
+  ✓ FOL.Calculus.Derivesᵢ                         18 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Estratos0.derivesI_soundness
+      └ puente en el build: FOL.Calculus.derivesI_to_derives0
+  ✓ LKh                                             14 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Estratos0.lkh_sound
+      └ completitud en el build: FOL.Estratos0.lkh_complete
+      └ puente en el build: FOL.Hauptsatz0.lkh_to_lk0
+  ✓ FOL.Craig0.LKp                                  13 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Estratos0.lkp_sound
+      └ completitud en el build: FOL.Estratos0.lkp_complete
+      └ puente en el build: FOL.Craig0.lkp_to_lk0
+  ✓ ROBINSON_PlusPlus.Meta.Hilbert.Prf               7 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
+      └ completitud en el build: ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo
+  ✓ ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ           17 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound
+      └ puente en el build: ROBINSON_PlusPlus.Meta.Hilbert.Prf.incl
+  ✓ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH     8 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: ROBINSON_PlusPlus.Meta.SolidezPrf.prfH_sound
+      └ puente en el build: ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
+
+════ ¿§0bis de REFERENCE.md es esta tabla? ════
+  ✗ NO PUDE MEDIR: el autotest del cruce con §0bis da «Calc₀|;Prf|;»
+
+════ ¿algún axioma habita un estrato NO DECLARADO? ════
+  ✓ todos los axiomas habitan estratos declarados
+  ✓ el censo incluye TheoryFramework (215 constantes suyas en el entorno)
+
+════ sorry EN EL ENTORNO (constantes cuyo tipo o valor nombra sorryAx) ════
+  ✓ ninguna usa sorryAx  (de 11606 constantes de RPP, FOL y TheoryFramework)
+
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 5 declarados, y ninguno más: ROBINSON_PlusPlus.Minimal.Axioms.termToString getAllPositions instBEqTermG.beq instReprTermG.repr tryMem 
+
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✓ las 10 marcas del señuelo, exactas: el censo ve axiomas, constructores, partial, sorry, confianza y nativo
+
+════ ESCALERA DE BINDERS ════
+  ✓ forall_            peldaño máximo 4
+  ✓ pcc_thm_inst       peldaño máximo 4
+  ✓ pcc_axiom_inst     peldaño máximo 4
+  ✓ PSI_inst           peldaño máximo 4
+  ✓ psi_lift_form      peldaño máximo 4
+
+❌ EL CENSO DE ESTRATOS NO CUADRA.
+   Si subió el número de axiomas de un estrato, lo PRIMERO es mirar qué se demostró
+   por inducción sobre él: si el axioma nuevo lo contradice, Lean + él ⊢ False.
+   Y si el cambio es correcto, actualizar ESTA tabla Y la de REFERENCE.md §0bis.
+rc=1

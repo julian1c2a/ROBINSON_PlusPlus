@@ -1,0 +1,8 @@
+  ✗ autotest: con lento bien salió 0, y debía 1
+✓ build: 3540 s (presupuesto 900) · 1024 MB de pico del proceso más pesado (presupuesto 9000)
+✓ leanchecker: 60 s (presupuesto 600) · 1024 MB de pico del proceso más pesado (presupuesto 14000)
+  ✗ autotest: con bien gordo salió 0, y debía 1
+✓ build: 60 s (presupuesto 900) · 1024 MB de pico del proceso más pesado (presupuesto 9000)
+✓ leanchecker: 60 s (presupuesto 600) · 102400 MB de pico del proceso más pesado (presupuesto 14000)
+❌ autotest de presupuesto-ci.bash.
+rc=1

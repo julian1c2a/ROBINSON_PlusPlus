@@ -177,7 +177,11 @@ fi
 
 echo | tee -a "$RES"
 if [ "$FALLOS" -eq 0 ]; then
-    echo "✅ $NEW: el par compila y los controles pasan. El bump, si se decide, va por un ADR." | tee -a "$RES"
+    # ✏️ 2026-11-04 (R3-3-08 de la ronda 3, ADR-256): decía «y los controles pasan»; pasan ESTOS, no todos los de la CI
+    # (faltan check-choice, check-indice, check-doc-sync, el segundo núcleo, el presupuesto y los autotest)
+    echo "✅ $NEW: el par compila, y pasan leanchecker, footprints, warnings, estratos, sorry y los sondeos de control" \
+        "(no se prueban aquí check-choice, check-indice, check-doc-sync, el segundo núcleo ni el presupuesto de la CI)." \
+        "El bump, si se decide, va por un ADR y lo comprueba la CI entera." | tee -a "$RES"
 else
     echo "❌ $NEW: $FALLOS paso(s) fallan. Registros en $SALIDA." | tee -a "$RES"
 fi

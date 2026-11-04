@@ -709,6 +709,7 @@ E_BAD=0      # documentos que fallan y NO estaban declarados
 E_SALDADA=0  # documentos declarados que ya están bien ⇒ hay que quitarlos de la tabla
 E_DECL=0     # deuda declarada que sigue vigente (de contenido)
 E_DECL_F=0   # deuda declarada que sigue vigente (de formato)
+E_MANANA=$(date -d tomorrow +%F 2>/dev/null || date -v+1d +%F)
 for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
   [ -e "$d" ] || continue
   GIT_DATE=$(git log -1 --format=%ad --date=short -- "$d" 2>/dev/null)
@@ -738,6 +739,14 @@ for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
 
   ESTADO="ok"
   MOTIVO=""
+  # ✏️ 2026-11-04 (R3-3-11 de la ronda 3, ADR-256): una marca del FUTURO pasaba siempre (sólo se miraba «anterior al
+  # último commit»), y con ella el documento quedaba fresco hasta esa fecha. Ahora es rojo, con un día de margen (la CI
+  # corre en UTC), y ninguna tabla de deuda la absuelve
+  if [ -n "$LU" ] && [ "$LU" \> "$E_MANANA" ]; then
+    echo "  ❌ $d: la marca dice $LU, y hoy es $(date +%F): una marca del futuro no se puede comprobar."
+    E_BAD=$((E_BAD+1))
+    continue
+  fi
   if [ -z "$LU" ]; then
     ESTADO="mal"; MOTIVO="sin marca \`**Last updated:**\`"
   elif [ -z "$GIT_DATE" ]; then

@@ -232,7 +232,10 @@ jobs:
       # ⭐ 2026-10-28 (T41, ADR-202): el tiempo y la memoria del build y de leanchecker, en el resumen y contra un
       # presupuesto versionado (`doc/control/presupuesto-ci.tsv`): por encima, rojo. Las cifras sólo estaban en prosa.
       - name: Presupuesto de tiempo y memoria
-        run: bash scripts/presupuesto-ci.bash "$RUNNER_TEMP/tiempo-build.txt" "$RUNNER_TEMP/tiempo-leanchecker.txt"
+        # ✏️ 2026-11-04 (R3-5-14, ADR-256): antes, su autotest con medidas sintéticas
+        run: |
+          bash scripts/presupuesto-ci.bash --autotest
+          bash scripts/presupuesto-ci.bash "$RUNNER_TEMP/tiempo-build.txt" "$RUNNER_TEMP/tiempo-leanchecker.txt"
 
       # ⛔ 2026-10-04 (ADR-116): BLOQUEANTE. Hasta hoy llevaba `continue-on-error: true` («Warning only»):
       # un `sorry` nuevo dejaba esta CI en VERDE. FOL lo hizo bloqueante el 2026-09-17. Desde ADR-116 el

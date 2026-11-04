@@ -1,0 +1,18 @@
+ADR-256, 2026-11-04: los otros nueve hallazgos de la ronda 3. Las salidas, tal cual (con las rutas locales cambiadas);
+cada mutante, aplicado a una copia del script con sed y borrado después.
+
+  presupuesto-autotest.txt                  scripts/presupuesto-ci.bash --autotest: verde
+  presupuesto-mutante-comparacion.txt       con la comparación con el presupuesto anulada («if false»): rojo (lento y
+                                            gordo salen 0)
+  estratos-mutante-0bis.txt                 check-estratos.bash con el cruce con §0bis leyendo la tercera columna en vez
+                                            de la cuarta: el autotest del cruce lo ve, rojo
+  docsync-mutante-futuro.txt                check-doc-sync.bash con la marca de WORKFLOW.md en 2099-01-01 (en el árbol,
+                                            restaurada después): rojo; y el de FOL con la de su README, rojo
+  adr191-filas-con-choice-en-9435196.txt    las filas de check-footprints.bash con Classical.choice en el commit de
+                                            ADR-191 (9435196): 40, una de RPP (prf_sound), 36 de FOL y 3 de
+                                            TheoryFramework (ADR-191 decía «las 33 filas de FOL»)
+  adr200-crlf-en-800261b-padre.txt          los blobs con algún CR en el padre del commit de FOL que los renormalizó
+                                            (800261b): 46; 45 renormalizados —9 .lean activos, 26 de
+                                            cuarentena/librerias-retiradas/ y 10 más— y una salida .out de la auditoría,
+                                            que no se tocó (ADR-200 decía «treinta de la cuarentena y seis más»)
+Medido en local (Windows); los blobs, con «git cat-file blob | tr -cd '\r' | wc -c» (el grep de msys no ve el CR).

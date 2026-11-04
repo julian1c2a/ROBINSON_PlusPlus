@@ -2,6 +2,9 @@
 # scripts/presupuesto-ci.bash con lo que mide /usr/bin/time -v. Se sube sólo con un ADR que diga por qué.
 # (✏️ 2026-10-28, ADR-203: con las dos primeras medidas de la CI —build 185 s y 5675 MB, en frío; leanchecker 62 s
 # y 11936 y 12094 MB: el master de ADR-202 salió rojo—, los tiempos bajan, y la memoria de leanchecker SUBE a 14000.)
-# medida	segundos	MB
+# (✏️ 2026-11-04, R3-5-13 y R3-3-04 de la ronda 3, ADR-256: el mismo ADR-203 bajó también la memoria del build, de 12000
+# a 9000 MB, sin decirlo aquí; y los MB son el PICO del proceso más pesado —«Maximum resident set size» de GNU time—,
+# no la memoria del build entero.)
+# medida	segundos	MB (pico del proceso más pesado)
 build	900	9000
 leanchecker	600	14000

@@ -1,0 +1,92 @@
+════ VERDAD DEL CÓDIGO ════
+  módulos activos : 119  (Minimal 2 + Meta 116 + Full 1)
+  cuarentena      : 0
+  sondeos         : 48
+  axiom de Lean   : 0
+  sorry           : 0
+
+════ [L] LIBRERÍA = CIERRE DE IMPORTS — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✓ los 121 ficheros del cierre de imports del barril son los del disco y los de git (2 barriles y 119 módulos); el autotest del cierre pasa
+
+════ [EOL] FINALES DE LÍNEA EN EL ÍNDICE — ROJO ════
+  ✓ ningún blob con CRLF en el índice (1214 en LF)
+
+════ [H] PATH HIGIÉNICO EN TODO SCRIPT — ROJO ════
+  ✓ los 29 scripts lo llevan (b-control.bash se carga con source)
+
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  sin medir «jobs»: sus entradas de la tabla no se comparan.
+  techo: la tabla de la base verificada, ccf0a1f (refs/remotes/origin/master)
+  deuda declarada: 28 líneas en 9 entradas; hoy, 3
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  ❌ WORKFLOW.md: la marca dice 2099-01-01, y hoy es 2026-11-04: una marca del futuro no se puede comprobar.
+  deuda declarada: 27 de contenido y 0 de formato · techo: los 27 de la base verificada, ccf0a1f   ·   sin declarar: 1   ·   saldadas sin quitar: 0
+      ⚠️ El titular es una FRASE: [A] no lo ve. Al actualizar la marca, comprobar que lo
+      que el titular AFIRMA sigue siendo cierto, no sólo que sus cifras cuadren.
+
+════ [B] CITAS MUERTAS — ROJO, con trinquete POR CITA (T04, ADR-166) ════
+  ❌ B `validProofFn`: 10 citas muertas en DECISIONS.md, y la tabla dice 9 — una de más:
+      DECISIONS.md:415
+      DECISIONS.md:1229
+      DECISIONS.md:3183
+  ❌ B2 `.claude/settings.json` no existe y se cita sin marcar, en DECISIONS.md (1) — cita muerta NUEVA:
+      DECISIONS.md:4135
+  ❌ B2 `doc/registro/2026-11-04-ronda3b/` no existe y se cita sin marcar, en DECISIONS.md (2) — cita muerta NUEVA:
+      DECISIONS.md:5958
+      DECISIONS.md:5981
+  ❌ B2 `doc/registro/2026-11-04-ronda3b/adr191-filas-con-choice-en-9435196.txt` no existe y se cita sin marcar, en DECISIONS.md (1) — cita muerta NUEVA:
+      DECISIONS.md:3829
+  ❌ B2 `doc/registro/2026-11-04-ronda3b/adr200-crlf-en-800261b-padre.txt` no existe y se cita sin marcar, en DECISIONS.md (1) — cita muerta NUEVA:
+      DECISIONS.md:4137
+  techo: la tabla de la base verificada, ccf0a1f (refs/remotes/origin/master)
+  deuda declarada: 1514 citas muertas en 931 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1520
+
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (121 .lean y los documentos)
+
+════ [N] CITAS POR NÚMERO DE LÍNEA — ROJO (T34, ADR-209) ════
+  ✓ ninguna cita por número de línea en 15 documentos de referencia (autotest: 4 de 4)
+
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+
+════ [D] MARCAS DE TIEMPO ════
+  ✓ todos los docs técnicos llevan marca de tiempo
+
+════ [F] ARTEFACTOS HUÉRFANOS (.olean sin fuente) ════
+  ✓ ningún .olean sin fuente (ni aquí ni en ../FOL; .olean mirados: .:121 ../FOL:72)
+════ [H] CATÁLOGO DE `sondeos/` — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✓ los 48 sondeos del disco y las 48 filas del catálogo CUADRAN
+════ [M] MANDATORIES — la columna «Verificación» nombra cosas que EXISTEN (ROJO) ════
+  ✓ las 37 citas de la columna «Verificación» (13 filas) nombran cosas que existen
+════ [T] TITULARES — cada uno tiene su fila en TEOREMAS-E-HIPOTESIS.md, y cada fila es un titular (ROJO) ════
+  ✓ los 35 titulares de T_UNIVERSO están declarados y tienen UNA fila en TEOREMAS-E-HIPOTESIS.md, y ninguna fila sobra
+  ✓ y son los 35 de TITULARES (ROBINSON_PlusPlus/Meta/ContratoTitulares.lean), los que fija el contrato de los enunciados (T07)
+  ✓ PUROS (T08) son los 12 de la clase (i) del documento
+  ✓ y el build ejecuta T07 y T08: `#contrato_titulares` y `#pureza_titulares`, en el código de ROBINSON_PlusPlus/Meta/PurezaTitulares.lean
+
+════ [G] DEUDAS ENUNCIADAS QUE YA TIENEN TESTIGO — ROJO (T32, ADR-237) ════
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+
+════ [G.2] CENSO DE MARCADORES DE DEUDA — ROJO (T32, ADR-237) ════
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+
+════ [P] FOOTPRINTS EN LA PROSA — ROJO, trinquete (T39, ADR-240) ════
+  ✓ 59 citas con footprint en la prosa (FOL, TheoryFramework y RPP), comparadas con su fila: 57 cuadran, y las 2 que no, declaradas
+
+════ [R] REGISTRO DE HALLAZGOS — ROJO (T37, ADR-241) ════
+  ✓ los 426 IDs de las auditorías tienen su fila y su estado, y son los de sus fuentes (207 hechos, 14 pendientes, 32 descartados, 173 sustituidos)
+
+════ [S] CITAS DE SONDEOS DEL BUILD: EVIDENCIA O PROCEDENCIA — ROJO (T10, ADR-243) ════
+  ✓ 126 citas de sondeos en el build: 26 a sondeos de CONTROL, 78 a archivados con su etiqueta y 22 de procedencia, declaradas (14 filas)
+
+❌ HAY DESINCRONIZACIÓN — corregir ANTES de commitear.
+
+⚠️  Recordatorio: NO basta con arreglar el banner. Comprobar también el CUERPO
+    (tablas resumen, §Próximos pasos, notas de auditoría antiguas).
+rc=1

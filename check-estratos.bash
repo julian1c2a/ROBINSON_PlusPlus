@@ -320,10 +320,22 @@ done <<< "$ESTRATOS"
 # de aquí, el último componente del nombre y sus constructores. Los dos conjuntos, iguales en LOS DOS SENTIDOS.
 echo
 echo "════ ¿§0bis de REFERENCE.md es esta tabla? ════"
-REF_0BIS=$(awk '/^## 0bis/ { en = 1; next } en && /^### / { exit } en && /^\| \*\*`/' REFERENCE.md \
-  | awk -F'|' '{ n = $2; sub(/^[^`]*`/, "", n); sub(/`.*$/, "", n); c = $4; gsub(/[^0-9]/, "", c); print n "|" c }' | LC_ALL=C sort)
+ref_0bis() {   # $1 = el documento → «cálculo|constructores» de cada fila de su §0bis
+  awk '/^## 0bis/ { en = 1; next } en && /^### / { exit } en && /^\| \*\*`/' "$1" \
+    | awk -F'|' '{ n = $2; sub(/^[^`]*`/, "", n); sub(/`.*$/, "", n); c = $4; gsub(/[^0-9]/, "", c); print n "|" c }' | LC_ALL=C sort
+}
+# ✏️ 2026-11-04 (R3-5-14 de la ronda 3, ADR-256): el AUTOTEST del cruce, sobre un §0bis sintético (dos filas, una fuera
+# de la sección y una sin negrita). «Probado con el fallo puesto» no tenía artefacto.
+REF_AUTO=$(mktemp)
+printf '%s\n' '## 0bis · prueba' '| **`Calc₀`** (`M.lean`) | x | 3 ctores |' '| `SinNegrita` | x | 9 |' \
+  '| **`Prf`** y algo | x | 12 |' '### otra' '| **`Fuera`** | x | 5 |' > "$REF_AUTO"
+REF_AUTO_SAL=$(ref_0bis "$REF_AUTO" | tr '\n' ';'); rm -f "$REF_AUTO"
+REF_0BIS=$(ref_0bis REFERENCE.md)
 AQUI_0BIS=$(printf '%s\n' "$ESTRATOS" | awk -F'|' 'NF >= 2 { n = $1; sub(/.*[.]/, "", n); print n "|" $2 }' | LC_ALL=C sort)
-if [ -z "$REF_0BIS" ]; then
+if [ "$REF_AUTO_SAL" != "Calc₀|3;Prf|12;" ]; then
+  echo "  ✗ NO PUDE MEDIR: el autotest del cruce con §0bis da «$REF_AUTO_SAL»"
+  FAIL=1
+elif [ -z "$REF_0BIS" ]; then
   echo "  ✗ no encuentro la tabla de §0bis en REFERENCE.md: el cruce no comprueba nada"
   FAIL=1
 elif [ "$REF_0BIS" = "$AQUI_0BIS" ]; then
