@@ -268,6 +268,14 @@ jobs:
       - name: Check choice
         run: bash check-choice.bash
 
+      # ⭐ AÑADIDO el 2026-11-04 (L5-11 y FOL0912:B-5, ADR-254). El ÍNDICE de las constantes declaradas de RPP (nombre,
+      # clase, módulo y enunciado, del entorno de Lean: `doc/indice.tsv`, para buscar antes de construir) y lo que
+      # NINGUNA constante de RPP, FOL o TheoryFramework usa de FOL (`doc/control/fol-sin-uso.tsv`, etiquetado y sin
+      # borrar): rojo si lo versionado no es lo que se genera. Con calibración, vista fallar con tres mutantes
+      # (doc/registro/2026-11-04-indice/). Medido en local: unos 35 s.
+      - name: El índice de las constantes y lo que nadie usa de FOL
+        run: bash check-indice.bash
+
       # El control de sincronía documentación ↔ código (AI-GUIDE §27). `--quick` omite el
       # `lake build`, que ya se hizo arriba; a cambio el control [A] de jobs no se ejecuta
       # y eso lo dice el propio script (§27.1: un control que no comprueba nada AVISA).

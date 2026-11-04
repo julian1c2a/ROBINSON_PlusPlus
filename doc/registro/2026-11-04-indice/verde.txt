@@ -1,0 +1,13 @@
+════ EL ÍNDICE DE LAS CONSTANTES DE RPP, Y LO QUE NADIE USA DE FOL ════
+  censo: 193 módulos, 29 s
+  ✓ calibración del índice: las ocho declaraciones de prueba (dos constructores), con su enunciado, y nada más
+  ✓ calibración del uso: calibT y CalibI, usadas; calibU, calibP, calibM y calibR (la nombra su _sunfold), no
+  RPP   4169 declaradas ( 3364 generadas, fuera)
+  FOL   1523 declaradas ( 2334 generadas, fuera) ·   56 las usa RPP · 1041 sólo FOL o TF ·  213 nadie
+  TF     113 declaradas (  102 generadas, fuera) ·    0 las usa RPP ·   62 sólo FOL o TF ·   30 nadie
+  1 constantes sin rango de declaración (generadas), fuera: ROBINSON_PlusPlus.Meta.Godel.Sym.ofNat_ctorIdx
+  lo que nadie usa, por etiqueta: — 108 · meta 28 · instancia 5 · simp 1 · vigilada 101
+  ✓ doc/indice.tsv: 4169 líneas, las que se generan
+  ✓ doc/control/fol-sin-uso.tsv: 243 líneas, las que se generan
+✅ EL ÍNDICE Y LO QUE NADIE USA DE FOL, AL DÍA.
+rc=0

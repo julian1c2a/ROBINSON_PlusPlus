@@ -1,7 +1,7 @@
 # Development Workflow
 
 **Author**: Julián Calderón Almendros
-**Last updated:** 2026-11-02 — ADR‑238 (T30): la fila de DEPENDENCIES.md, generado. Antes, 2026-11-01 — [ADR‑235](DECISIONS.md) (T21): los controles, contra el código (el gate es la CI entera; los ganchos versionados de T14; qué mira cada control). Antes, 2026-10-28 — ADR‑212: el orden del bump del toolchain (Parte 4). Antes, 2026-06-05 — Adaptado a flujo IA + opción legacy `git-lock.bash`.
+**Last updated:** 2026-11-04 — ADR‑254: `check-indice.bash` (el índice de las constantes) en «Verificar estado» y en lo que acompaña a un módulo nuevo. Antes, 2026-11-02 — ADR‑238 (T30): la fila de DEPENDENCIES.md, generado. Antes, 2026-11-01 — [ADR‑235](DECISIONS.md) (T21): los controles, contra el código (el gate es la CI entera; los ganchos versionados de T14; qué mira cada control). Antes, 2026-10-28 — ADR‑212: el orden del bump del toolchain (Parte 4). Antes, 2026-06-05 — Adaptado a flujo IA + opción legacy `git-lock.bash`.
 
 Guía operativa para colaborar en este proyecto. Cubre los **dos modos** activos: sesiones con asistente IA (modo principal) y trabajo humano con `git-lock.bash` (legacy, opcional).
 
@@ -164,7 +164,7 @@ cierre de imports del barril o no está en git. En la misma subida, o la CI sale
 catálogo de `REFERENCE.md` §1 ([C]); las cifras de módulos activos, de Meta y de jobs de los documentos autoritativos
 ([A] y [A2]); una fila en la tabla de `check-footprints.bash` por cada `#print axioms` que traiga ([COBERTURA]); y una
 línea en `doc/control/choice.tsv` por cada constante con `Classical.choice`, noncomputable o `String`
-(`check-choice.bash`).
+(`check-choice.bash`); y sus declaraciones, en `doc/indice.tsv` (`bash check-indice.bash --rehacer`, ADR‑254).
 
 ✏️ 2026‑10‑18 (T15, ADR‑163): aquí estaban `gen-root.bash` y `new-module.bash`, retirados. El primero reescribía el
 barril y borraba sus comentarios; el segundo pedía una plantilla, `_template.lean`, que ya no existía.
@@ -178,6 +178,7 @@ bash check-sorry.bash                 # sorry, los agujeros de confianza y las �
 bash check-estratos.bash              # por entorno: los estratos, y ningún sorryAx, axioma de confianza, implemented_by/extern ni partial sin declarar
 bash check-footprints.bash            # el footprint de cada fila de su tabla, y [COBERTURA]
 bash check-choice.bash                # choice, noncomputable y String, contra doc/control/choice.tsv
+bash check-indice.bash                # el índice de las constantes (doc/indice.tsv) y lo que nadie usa de FOL (--rehacer si cambió una declaración)
 bash check-doc-sync.bash              # documentación ↔ código: [A], [A2], [B], [C], [D], [E], [F], [H], [I], [L], [M], [N], [T] y [EOL]
 bash check-warnings.bash              # cero avisos, y las opciones que apagan un linter o suben un límite, contra doc/control/opciones.tsv
 bash check-sondeos.bash --controles   # los sondeos de control (sondeos/CONTROLES.txt)

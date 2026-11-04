@@ -1,0 +1,9 @@
+════ EL ÍNDICE DE LAS CONSTANTES DE FOL Y DE TheoryFramework ════
+  censo: 72 módulos, 19 s
+  ✓ calibración del índice: las ocho declaraciones de prueba (dos constructores), con su enunciado, y nada más
+  FOL   1523 declaradas ( 2334 generadas, fuera)
+  TF     113 declaradas (  102 generadas, fuera)
+  0 constantes sin rango de declaración (generadas), fuera: 
+  ✓ doc/indice.tsv: 1636 líneas, las que se generan
+✅ EL ÍNDICE DE FOL Y DE TheoryFramework, AL DÍA.
+rc=0

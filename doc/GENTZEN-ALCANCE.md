@@ -1,7 +1,9 @@
 # Gentzen: el alcance, medido (T69)
 
-**Last updated:** 2026-11-02 — creado con T69 ([ADR‑244](../DECISIONS.md)): los primeros pasos medibles de la
-auditoría (el censo de la forma de los axiomas y la admisibilidad de `listInd`), y lo que harían falta después.
+**Last updated:** 2026-11-04 — [ADR‑254](../DECISIONS.md): §6, la lección de L5‑02 para el repositorio nuevo (los
+nombres de los símbolos, por índice). Antes, 2026-11-02 — creado con T69 ([ADR‑244](../DECISIONS.md)): los primeros
+pasos medibles de la auditoría (el censo de la forma de los axiomas y la admisibilidad de `listInd`), y lo que harían
+falta después.
 **Autor:** Julián Calderón Almendros
 
 > **Qué es esto.** Gentzen —la consistencia de la teoría por inducción transfinita hasta ε₀— está FUERA de RPP desde
@@ -95,3 +97,13 @@ ellos, ninguna constante nombra `listInd` (ni `p3`), y los dos controles positiv
 En su propio repositorio, cuando empiece (ADR‑140). De RPP necesita: la teoría (`Minimal/Axioms.lean`, `Meta/Hilbert.lean`),
 el censo de §1 y el resultado de §3. El horizonte, en [NEXT-STEPS.md](../NEXT-STEPS.md) («Pendiente además de Rosser»,
 T36).
+
+## 6 · Una lección de RPP para el repositorio nuevo (ADR‑254)
+
+**Los nombres de los símbolos, por índice, no carácter a carácter** (L5‑02 de la auditoría de la base). En RPP, el
+código de un símbolo es la lista de sus caracteres, y cada carácter, el numeral UNARIO de su punto de código (σ son 963
+sucesores anidados): en dos axiomas del verificador, el 98–99 % de los nodos del código son esos nombres
+(`sondeos/RecodCoste.lean`: `ax_tc_zero`, 49 015 nodos, 48 528 de nombres; con un índice, unos 708). Es la razón
+escrita de que el código de los axiomas sea opaco y de que haga falta subir `maxRecDepth` para levantarlos. En RPP no
+se cambia —cambiaría todos los códigos, `G`, el ancla y el modelo, y nada evalúa el ancla (ADR‑117)—; un repositorio
+que empieza puede codificar cada símbolo por su índice en una tabla, o con un código etiquetado, desde el principio.

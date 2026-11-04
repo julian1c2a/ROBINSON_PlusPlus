@@ -1,0 +1,11 @@
+════ EL ÍNDICE DE LAS CONSTANTES DE FOL Y DE TheoryFramework ════
+  censo: 72 módulos, 18 s
+  ✓ calibración del índice: las ocho declaraciones de prueba (dos constructores), con su enunciado, y nada más
+  ❌ calibración: de las de prueba, éstas sólo las quitó la falta de rango, no el filtro de las generadas:
+     IndiceCalib.calibR.match_1 IndiceCalib.calibM.match_1
+  FOL   1523 declaradas ( 2018 generadas, fuera)
+  TF     113 declaradas (   86 generadas, fuera)
+  334 constantes sin rango de declaración (generadas), fuera: IndiceCalib.calibR.match_1 IndiceCalib.calibM.match_1 FOL.Esencialidad0.E7.decU.match_1 FOL.Markov0.vMN.match_1 FOL.Calculus.collapseT.match_1 FOL.Canonical0.pointwiseEqv_refl.match_1_1 FOL.Esencialidad0.E3.decTrue.match_3 FOL.QFDecide0.ext.match_1 FOL.Derives2.eq_substTerms.match_1 FOL.QFDecide0.subT.match_1
+  ✓ doc/indice.tsv: 1636 líneas, las que se generan
+❌ EL ÍNDICE DE FOL Y DE TheoryFramework NO CUADRA (o la calibración falló).
+rc=1

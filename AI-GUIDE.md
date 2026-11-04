@@ -194,6 +194,15 @@ proyecto (ver plantilla de `.gitignore` de este repositorio). Si necesitas
 experimentar, hazlo en uno de esos ficheros y bórralo (o dótalo de nombre definitivo e
 impórtalo) antes de terminar la sesión — nunca lo dejes `git add`eado "por si acaso".
 
+### (16c.) Antes de construir, buscar (L5‑11, ADR‑254)
+
+Antes de escribir un lema, una definición o un sondeo, se busca si ya existe, por nombre y por ENUNCIADO, en los dos
+índices: `grep -i 'patrón' doc/indice.tsv ../FOL/doc/indice.tsv`. Cada línea es una constante declarada (sin las que
+genera Lean): nombre, clase, módulo y enunciado, impreso con los nombres completos y en una línea; buscar el nombre
+completo de una constante da todos los enunciados que la mencionan. Los genera `check-indice.bash` de cada repo, y su
+CI comprueba que están al día. La regla se repetía en seis ADR y vivía sólo en la memoria de las sesiones: si una
+re‑derivación sale idéntica a algo que ya estaba, el trabajo era buscarlo.
+
 ---
 
 ## Arquitectura de Exportaciones y Directorios
@@ -363,6 +372,7 @@ mismo `deltaD`, `ax_axiomsCodeT_def`, el código de `godelBeta'` dentro de `gode
 | `bash check-estratos.bash` | Censo POR ENTORNO: por cada noción de derivabilidad, sus constructores, los `axiom` que la habitan, su solidez, su completitud y su puente (la tabla de `REFERENCE.md` §0bis); ninguna constante con `sorryAx`, un axioma de confianza, implemented_by/extern o de una librería ajena; los `partial`, con igualdad; un señuelo; y la escalera de binders. Rojo; en la CI (el script; a mano, también `make estratos`) |
 | `bash check-footprints.bash` | El `#print axioms` de cada fila de su tabla, con igualdad, y [COBERTURA]: todo titular que el árbol imprime y todo `#print axioms` de la fuente tienen fila. Rojo; en la CI (el script; a mano, también `make footprints`) |
 | `bash check-choice.bash [--rehacer]` | Toda constante de RPP, FOL y TheoryFramework con `Classical.choice`, `noncomputable` o `String`, contra `doc/control/choice.tsv`, en los dos sentidos (con --rehacer la reescribe, sólo con un ADR; T53, ADR‑193). Rojo; en la CI (el script; a mano, también `make choice`) |
+| `bash check-indice.bash [--rehacer]` | El ÍNDICE de las constantes declaradas de RPP (nombre, clase, módulo y enunciado), `doc/indice.tsv`, y lo que ninguna constante de RPP, FOL o TheoryFramework usa de FOL, etiquetado, `doc/control/fol-sin-uso.tsv`, contra lo que se genera del entorno de Lean, con calibración (L5‑11 y B‑5, ADR‑254); el de FOL, su `check-indice.bash`. Con --rehacer las reescribe: en el commit que cambia una declaración. Rojo; en la CI (el script; a mano, también `make indice`) |
 | `bash check-warnings.bash [--generar-opciones]` | Los avisos de los dos builds contra su tabla, VACÍA desde ADR‑227 (todo aviso es rojo), y el censo de los set_option que apagan un linter o suben un límite, de fichero y «… in» (ADR‑229; ninguno de fichero), contra `doc/control/opciones.tsv`, con igualdad. Rojo; en la CI (el script; a mano, también `make warnings`) |
 | `bash check-sondeos.bash [--controles]` | Con --controles, compila los sondeos de `sondeos/CONTROLES.txt`: rojo, y en la CI. Sin él, todos, como informe (sale con 0) |
 | `bash scripts/segundo-nucleo.bash [DIR]` | Exporta el cierre de los titulares (`TITULARES`) y el de la clase (i) (`PUROS`) y los pasa por seis núcleos —el de Lean, su versión paranoica, lean4lean, nanoda, con-leche y con-ron—, contra `doc/control/segundo-nucleo.tsv`, con un mutante (T23, ADR‑222). Los seis aceptan los dos cierres (ADR‑228; con los titulares, nanoda va con un hilo). Rojo; en la CI |
@@ -775,6 +785,8 @@ preservando los bloqueos locales.
    frases que un teorema vivo desmiente, marcas, catálogos—; que el resto de la prosa sea verdad no lo garantiza
    ningún script (§27, la regla de oro).**
    Si el segundo falla, corregir ANTES de commitear — no después.
+   ✏️ 2026‑11‑04 (ADR‑254): si cambió una declaración, `bash check-indice.bash --rehacer` (y el de FOL, si cambió allí),
+   en el mismo commit: la CI compara los índices con lo que se genera.
 2. Desbloquear los ficheros `.lean` en los que se ha trabajado:
    `bash git-lock.bash unlock modulo_1.lean ... modulo_n.lean`
 3. Añadir los cambios al staging area (ficheros concretos, evitar `git add -A`/`*`

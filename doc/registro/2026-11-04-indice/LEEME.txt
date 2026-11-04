@@ -1,0 +1,19 @@
+ADR-254, 2026-11-04: check-indice.bash (el índice de las constantes declaradas, L5-11, y lo que nadie usa de FOL,
+FOL0912:B-5), en verde y visto fallar. Las salidas, tal cual; los mutantes, aplicados a una copia del script con sed y
+borrados después.
+
+  verde.txt              RPP, el árbol del commit: las dos calibraciones, las cifras (4169 declaradas de RPP; de FOL y
+                         TheoryFramework, 56 las usa RPP, 1103 sólo FOL o TF, 243 nadie) y las dos tablas iguales
+  mutante-tablas.txt     una línea de menos en doc/indice.tsv (la de prf_completo) y una etiqueta cambiada en
+                         doc/control/fol-sin-uso.tsv («—» por «simp»): rojo en las dos tablas
+  mutante-filtro.txt     el filtro de las generadas sin la regla de match_N ni isMatcherCore. La PRIMERA vez salió VERDE:
+                         la falta de rango, el segundo filtro, quitaba los match_N igual, y la calibración no lo veía. Se
+                         añadió la comprobación de que las de prueba sin rango las quite el primer filtro: rojo (esta
+                         salida es la de después)
+  mutante-uso.txt        la medida de uso sin el «dueño» (cada constante, el suyo). La primera vez la calibración del uso
+                         salía VERDE (sólo la tabla lo veía: cinco lemas de más); se añadió una función recursiva de
+                         prueba, a la que sólo nombra lo que Lean genera con ella: rojo en la calibración y en la tabla
+  fol-verde.txt          FOL: la calibración, 1636 declaradas (1523 de FOL y 113 de TheoryFramework), la tabla igual
+  fol-mutante-tabla.txt  FOL, una línea de menos en doc/indice.tsv (FOL.Lift0.derives0_lift): rojo
+  fol-mutante-filtro.txt FOL, el filtro sin la regla de match_N: rojo
+Medido en local (Windows, el build de RPP al día): 35-36 s en RPP, 18-19 s en FOL.

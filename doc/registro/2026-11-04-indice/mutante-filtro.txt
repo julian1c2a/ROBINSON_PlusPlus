@@ -1,0 +1,14 @@
+════ EL ÍNDICE DE LAS CONSTANTES DE RPP, Y LO QUE NADIE USA DE FOL ════
+  censo: 193 módulos, 36 s
+  ✓ calibración del índice: las ocho declaraciones de prueba (dos constructores), con su enunciado, y nada más
+  ✓ calibración del uso: calibT y CalibI, usadas; calibU, calibP, calibM y calibR (la nombra su _sunfold), no
+  ❌ calibración: de las de prueba, éstas sólo las quitó la falta de rango, no el filtro de las generadas: IndiceCalib.calibR.match_1 IndiceCalib.calibM.match_1
+  RPP   4169 declaradas ( 3012 generadas, fuera)
+  FOL   1523 declaradas ( 2018 generadas, fuera) ·   56 las usa RPP · 1041 sólo FOL o TF ·  213 nadie
+  TF     113 declaradas (   86 generadas, fuera) ·    0 las usa RPP ·   62 sólo FOL o TF ·   30 nadie
+  687 constantes sin rango de declaración (generadas), fuera: IndiceCalib.calibR.match_1 IndiceCalib.calibM.match_1 ROBINSON_PlusPlus.Meta.Godel.Sym.ofNat_ctorIdx ROBINSON_PlusPlus.Meta.CodeNatInjPrf.codeNatChars_inj.match_1_1 ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatProof.match_3 ROBINSON_PlusPlus.Meta.RosserNegLinea.refT.match_1_1 ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1 FOL.Esencialidad0.E7.decU.match_1 FOL.Markov0.vMN.match_1 FOL.Calculus.collapseT.match_1
+  lo que nadie usa, por etiqueta: — 108 · meta 28 · instancia 5 · simp 1 · vigilada 101
+  ✓ doc/indice.tsv: 4169 líneas, las que se generan
+  ✓ doc/control/fol-sin-uso.tsv: 243 líneas, las que se generan
+❌ EL ÍNDICE O LO QUE NADIE USA DE FOL NO CUADRAN (o la calibración falló).
+rc=1

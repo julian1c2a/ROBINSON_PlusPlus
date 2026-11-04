@@ -1,0 +1,11 @@
+════ EL ÍNDICE DE LAS CONSTANTES DE FOL Y DE TheoryFramework ════
+  censo: 72 módulos, 17 s
+  ✓ calibración del índice: las ocho declaraciones de prueba (dos constructores), con su enunciado, y nada más
+  FOL   1523 declaradas ( 2334 generadas, fuera)
+  TF     113 declaradas (  102 generadas, fuera)
+  0 constantes sin rango de declaración (generadas), fuera: 
+  ❌ doc/indice.tsv NO es lo que se genera (1 de más en lo generado,
+     0 de menos): «bash check-indice.bash --rehacer»
+      + FOL.Lift0.derives0_lift	teorema	FOL.Lift0	∀ {Γ : List Formula} {φ : Formula}, Γ ⊢₀ φ → ∀ (k : Nat), List.map (liftFormula k) Γ ⊢₀ liftFormula k φ
+❌ EL ÍNDICE DE FOL Y DE TheoryFramework NO CUADRA (o la calibración falló).
+rc=1
