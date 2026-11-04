@@ -1,0 +1,25 @@
+ADR-255, 2026-11-04: los nueve controles de la ronda 3 que podían dar verde sin comprobar nada, arreglados y vistos
+fallar. Las salidas, tal cual (con las rutas locales cambiadas por <tmp>, <sesión-tmp> y <home>); cada mutante, aplicado
+a una copia del script con sed y borrado después.
+
+  choice-verde.txt              check-choice.bash con el filtro de check-indice.bash: la calibración exacta y las 200
+                                marcas de siempre (4169 constantes de RPP, 1523 de FOL, 113 de TheoryFramework)
+  choice-mutante-filtro.txt     sin las reglas de Lean (censoGenerada): rojo (la calibración sin rango y 56 filas de más)
+  estratos-verde.txt            check-estratos.bash: el censo de confianza por el cierre y los tres barriles; el señuelo
+                                con sus 10 marcas
+  estratos-mutante-directo.txt  el censo de confianza por lo nombrado (como antes): falta la marca de usaNativo, rojo
+  estratos-mutante-barril.txt   sin «import TheoryFramework»: error del barril, no mide, rojo
+  fol-axioms-verde.txt          ../FOL/check-axioms.bash, lo mismo: 9 marcas del señuelo
+  fol-axioms-mutante-directo.txt, fol-axioms-mutante-barril.txt   los dos mutantes en FOL: rojos
+  guarda-autotest.txt           guarda_y_bloquea.bash --autotest: verde
+  guarda-mutante-indice.txt     sin la comprobación del índice: rojo
+  docsync-mutantes.txt          check-doc-sync.bash con cuatro mutantes a la vez y un TEOREMAS con rosser_ext en (ii):
+                                [EOL] con el recuento a cero, [F] con la ruta del build cambiada, [M] con un motivo
+                                cambiado, [T](7) sin #contrato_titulares y [T](6) con la clase cambiada: los cinco,
+                                rojos
+  fol-docsync-verde.txt         ../FOL/check-doc-sync.bash: verde
+  fol-docsync-mutante-g2.txt    [G.2] de FOL con dos filas sobre un mismo marcador (los recuentos, iguales: antes,
+                                verde): rojo
+  sondeos-verde.txt             check-sondeos.bash --controles: los 11 y el negativo de autoImplicit
+  sondeos-mutante-opciones.txt  el negativo con «lake env lean» (sin las opciones): rojo
+Medido en local (Windows, el build al día).

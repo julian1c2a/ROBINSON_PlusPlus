@@ -1,0 +1,2 @@
+✅ autotest de guarda_y_bloquea.bash: rechaza el congelado, también si ya está en el índice, y commitea el bloqueado.
+rc=0

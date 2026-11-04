@@ -81,8 +81,27 @@ if [ "$MODO" = controles ]; then
   echo "════ SONDEOS DE CONTROL (sondeos/CONTROLES.txt, con \`lake $CMD\`) ════"
   awk -F'\t' 'NR > 1 { printf "  %s %s (%s s)%s\n", ($2 == "0" ? "✓" : "❌"), $1, $3, ($2 == "0" ? "" : "  rc=" $2 "  " $4) }' "$TSV"
   rm -f "$TSV"
-  if [ "$OK" = "$N" ] && [ "$N" -gt 0 ]; then echo "✅ los $N sondeos de control compilan"; exit 0; fi
-  echo "❌ $((N - OK)) de $N sondeos de control NO compilan (o no se pudieron medir)"; exit 1
+  # ⭐ 2026-11-04 (R3-5-06 de la ronda 3, ADR-255): el control NEGATIVO que enunciaba ADR-128 y nunca se cableó. Un
+  # fichero con una variable implícita automática tiene que FALLAR con `lake lean` (los leanOptions del lakefile:
+  # `autoImplicit` apagado) y COMPILAR con `lake env lean` (sin ellos: así el fallo es por la opción, no por otra cosa).
+  # Si `autoImplicit` vuelve a encenderse en el lakefile, o `lake lean` deja de pasar las opciones, rojo.
+  NEG=0
+  NEGD=$(mktemp -d)
+  printf '%s\n' '-- (lo genera check-sondeos.bash: tiene que fallar con autoImplicit apagado)' \
+    'theorem autoImplicitApagado (h : n = n) : True := trivial' > "$NEGD/AutoImplicitDebeFallar.lean"
+  NEGF=$(cygpath -m "$NEGD/AutoImplicitDebeFallar.lean" 2>/dev/null || printf '%s' "$NEGD/AutoImplicitDebeFallar.lean")
+  if lake lean "$NEGF" > "$NEGD/con.out" 2>&1; then
+    echo "  ❌ autoImplicit: un fichero con una variable implícita automática COMPILA con \`lake lean\`"; NEG=1
+  elif ! grep -qiE 'unknown identifier .n.' "$NEGD/con.out"; then
+    echo "  ❌ autoImplicit: \`lake lean\` falla, pero no por la variable: $(grep -m1 error "$NEGD/con.out" | cut -c1-120)"; NEG=1
+  elif ! lake env lean "$NEGF" > "$NEGD/sin.out" 2>&1; then
+    echo "  ❌ autoImplicit: el fichero no compila tampoco sin las opciones (no prueba lo que dice)"; NEG=1
+  else
+    echo "  ✓ autoImplicit apagado: la variable implícita automática falla con \`lake lean\` y compila sin sus opciones"
+  fi
+  rm -rf "$NEGD"
+  if [ "$OK" = "$N" ] && [ "$N" -gt 0 ] && [ "$NEG" = 0 ]; then echo "✅ los $N sondeos de control compilan, y el negativo falla"; exit 0; fi
+  echo "❌ $((N - OK)) de $N sondeos de control NO compilan (o no se pudieron medir), o el negativo no falla"; exit 1
 fi
 
 DEST=sondeos/pasadas/tabla-$(date +%F)$([ "$CMD" = "env lean" ] && echo -env).tsv

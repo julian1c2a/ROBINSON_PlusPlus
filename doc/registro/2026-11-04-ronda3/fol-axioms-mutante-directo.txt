@@ -1,0 +1,33 @@
+════ AXIOMAS DE LEAN, por librería — medidos en el ENTORNO de Lean ════
+✓ guarda-toolchain: FOL y RPP en leanprover/lean4:v4.35.0
+  ✓ FOL                 0 axiom en el entorno
+  ✓ TheoryFramework     0 axiom en el entorno
+      (entorno de Lean: 2446 módulos cargados, core incluido, del build de 2026-11-03 16:55; contraste: grep sobre el código sin comentarios)
+
+════ sorry EN EL ENTORNO (constantes cuyo tipo o valor nombra sorryAx) ════
+  ✓ ninguna usa sorryAx  (de 3857 constantes de FOL y 215 de TheoryFramework)
+
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+
+════ partial (opacos para el núcleo; con igualdad) ════
+  ✓ los 4 declarados, y ninguno más
+
+════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════
+  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice
+      · falta @TRUST SEN Senuelo.usaNativo Senuelo.conNativo._native.native_decide.ax_1_1
+
+════ CUARENTENA (fuera del build, pero con cifra publicada) ════
+  ✓ cuarentena          0 axiom
+  ✓ librerias-retiradas 15 axiom  (librerías muertas: vigilados, no borrados; T57)
+
+════ ¿los cita AXIOMS.md? ════
+  ✓ todos los axiomas del árbol están documentados
+
+════ librerías RETIRADAS: no deben estar en el lakefile ════
+  ✓ ninguna librería retirada está en el build
+
+❌ EL CENSO NO CUADRA — actualizar AXIOMS.md (y sus cifras esperadas en este script).
+rc=1

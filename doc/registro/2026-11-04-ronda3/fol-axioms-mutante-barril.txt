@@ -1,0 +1,6 @@
+════ AXIOMAS DE LEAN, por librería — medidos en el ENTORNO de Lean ════
+✓ guarda-toolchain: FOL y RPP en leanprover/lean4:v4.35.0
+  ❌ NO PUDE MEDIR: 'lake env lean' no llegó al final (código 1). ¿Está construido el árbol?
+      <tmp>/Axiomas.lean:45:0: error: el barril TheoryFramework no está cargado
+      (construir antes: desde ../ROBINSON_PlusPlus, lake build "@FOL/FOL" "@FOL/TheoryFramework")
+rc=1

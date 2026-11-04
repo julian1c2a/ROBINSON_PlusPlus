@@ -1,0 +1,29 @@
+════ CONSTRUCTIVIDAD (choice · noncomputable · String) EN RPP, FOL Y TheoryFramework ════
+  censo: 193 módulos, 15 s
+  ✓ calibración: calibC C, calibN CN, calibS S y CalibJ.mk S, y nada de lo que Lean genera con CalibJ
+  FOL    1523 constantes ·   80 con choice ·  1 noncomputable ·   1 con String
+  RPP    4169 constantes ·   21 con choice · 74 noncomputable ·  16 con String
+  TF      113 constantes ·   14 con choice ·  0 noncomputable ·   0 con String
+  con choice, por módulo:
+        31  FOL.Canonical0
+         8  FOL.Compacity0
+        12  FOL.Estratos0
+         2  FOL.Inconsistencia
+         2  FOL.Lindenbaum0
+         1  FOL.Markov0
+         5  FOL.SequentSound0
+         1  FOL.Skolem0
+         4  FOL.SkolemHerbrand0
+         5  FOL.SkolemN0
+         3  FOL.SkolemNF0
+         5  FOL.Soundness0
+         1  FOL.Tactics
+         7  ROBINSON_PlusPlus.Meta.ContratoTitulares
+         3  ROBINSON_PlusPlus.Meta.PuenteFOL
+         9  ROBINSON_PlusPlus.Meta.PurezaComando
+         2  ROBINSON_PlusPlus.Meta.SolidezPrf
+         3  TheoryFramework.Instances.FOL
+         8  TheoryFramework.Instances.FOLModels
+         3  TheoryFramework.Semantics
+✅ LA TABLA CUADRA: 200 constantes con alguna marca, las mismas en los dos sentidos.
+rc=0

@@ -74,6 +74,9 @@ LEANFILE="$TMP/Estratos.lean"
   echo "import Lean"
   echo "import ROBINSON_PlusPlus"
   echo "import FOL"
+  # ✏️ 2026-11-04 (R3-3-07 de la ronda 3, ADR-255): y el barril `TheoryFramework.lean`, que el build compila desde
+  # T15 (`globs := .andSubmodules`); el `find` de abajo sólo ve el directorio
+  echo "import TheoryFramework"
   for f in $(find ../FOL/TheoryFramework -name '*.lean' ! -path '*/.lake/*' 2>/dev/null | sort); do
     m="${f#../FOL/}"; m="${m%.lean}"; echo "import ${m//\//.}"
   done
@@ -93,6 +96,9 @@ def conSorry : Nat := sorry
 theorem conNativo : (2 + 2 : Nat) = 4 := by native_decide
 -- (✏️ v4.35, T42b: `Lean.ofReduceBool` ya no existe; el axioma AJENO del señuelo es `lcUnreachable`, del core)
 noncomputable unsafe def conAjeno : Nat := lcUnreachable
+-- ✏️ 2026-11-04 (R3-3-06, ADR-255): una que NO nombra el axioma de confianza, sino un teorema que lo usa: el censo
+-- @TRUST la veía sólo si lo nombraba directamente
+theorem usaNativo : (2 + 2 : Nat) = 4 := conNativo
 def implReal (n : Nat) : Nat := n
 @[implemented_by implReal] def conImplementedBy (n : Nat) : Nat := n
 @[extern "senuelo_c"] opaque conExtern : Nat → Nat
@@ -155,11 +161,18 @@ run_cmd do
     -- tipo y valor, también el de un teorema (`getUsedConstantsAsSet` lee con `allowOpaque`)
     let usadas := ci.getUsedConstantsAsSet
     if usadas.contains ``sorryAx then logInfo m!"{p}SORRY {n}"
-    for u in usadas do
-      if esConfianza env estandar u then logInfo m!"{p}TRUST {n} {u}"
+    -- ✏️ 2026-11-04 (R3-3-06, ADR-255): los axiomas de su CIERRE (`collectAxioms`, lo que da `#print axioms`), no sólo
+    -- los que nombra: uno de confianza que usa una constante ajena (del core, de otra librería) no lo nombra la nuestra
+    -- (un axioma no se «usa» a sí mismo: ése lo cuenta HAB)
+    for u in (← Lean.collectAxioms n) do
+      if u != n && esConfianza env estandar u then logInfo m!"{p}TRUST {n} {u}"
     if (Lean.Compiler.getImplementedBy? env n).isSome || Lean.isExtern env n then logInfo m!"{p}NATIVO {n}"
   logInfo m!"@TF {tf}"
   logInfo m!"@NUESTRAS {nuestras}"
+  -- ✏️ 2026-11-04 (R3-3-07, ADR-255): los tres barriles, cargados (el de TheoryFramework no lo importaba nadie aquí);
+  -- si falta uno, error, y el script no puede medir
+  for b in [`ROBINSON_PlusPlus, `FOL, `TheoryFramework] do
+    unless env.header.moduleNames.contains b do logError m!"el barril {b} no está cargado"
   -- ¿alguna librería cargada que ningún censo mira? (una nueva, importada por FOL o por RPP, quedaría fuera)
   for m in env.header.moduleNames do
     if !([`Init, `Std, `Lean, `Lake, `FOL, `TheoryFramework, `ROBINSON_PlusPlus].contains m.getRoot) then
@@ -421,6 +434,7 @@ read -r -d '' SENUELOS <<'EOF'
 @SENUELO SORRY Senuelo.conSorry
 @SENUELO TRUST Senuelo.conNativo Senuelo.conNativo._native.native_decide.ax_1_1
 @SENUELO TRUST Senuelo.conAjeno lcUnreachable
+@SENUELO TRUST Senuelo.usaNativo Senuelo.conNativo._native.native_decide.ax_1_1
 @SENUELO NATIVO Senuelo.conImplementedBy
 @SENUELO NATIVO Senuelo.conExtern
 EOF

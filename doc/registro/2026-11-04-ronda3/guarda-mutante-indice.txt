@@ -1,0 +1,8 @@
+  ✗ commiteó con el congelado C en el índice
+  ✗ no dijo por qué rechazó B con C en el índice
+  ✗ HEAD se movió con un rechazo
+  ✗ no commiteó B, que sí podía:
+⛔ B.txt sigue bloqueado en el árbol: desbloquéalo antes de editarlo (bash git-lock.bash unlock B.txt).
+  ✗ el commit no es sólo B.txt
+❌ autotest de guarda_y_bloquea.bash.
+rc=1

@@ -322,7 +322,13 @@ echo
 echo "════ [EOL] FINALES DE LÍNEA EN EL ÍNDICE — ROJO ════"
 if git rev-parse --git-dir > /dev/null 2>&1; then
   EOL_MAL=$(git ls-files --eol | awk '$1 == "i/crlf" || $1 == "i/mixed" { print $NF }')
-  if [ -n "$EOL_MAL" ]; then
+  # ✏️ 2026-11-04 (R3-3-10 de la ronda 3, ADR-255): sobre un universo vacío aprobaba; con menos de 100 blobs en LF, el
+  # índice no es el de este repositorio (o git no lo lee): no se puede medir
+  EOL_LF=$(git ls-files --eol | grep -c '^i/lf')
+  if [ "$EOL_LF" -lt 100 ]; then
+    echo "  ❌ NO PUDE MEDIR [EOL]: sólo $EOL_LF blobs en LF en el índice."
+    FAIL=1
+  elif [ -n "$EOL_MAL" ]; then
     echo "  ✗ blobs con CRLF en el índice ($(printf '%s\n' "$EOL_MAL" | grep -c .)): renormaliza con «git add --renormalize .»"
     printf '%s\n' "$EOL_MAL" | head -10 | sed 's/^/      /'
     FAIL=1
@@ -1202,9 +1208,18 @@ done
 echo
 echo "════ [F] ARTEFACTOS HUÉRFANOS (.olean sin fuente) ════"
 F_FAIL=0
+# ✏️ 2026-11-04 (R3-3-10 de la ronda 3, ADR-255): sin build («[ -d … ] || continue») aprobaba sin mirar nada. Ahora
+# cuenta los `.olean` que mira en cada raíz, y con menos de 50 en una, no puede medir
+F_VISTOS=""
 for ROOT in "." "../FOL"; do
   LAKEDIR="$ROOT/.lake/build/lib/lean"
-  [ -d "$LAKEDIR" ] || continue
+  F_N=$(find "$LAKEDIR" -name '*.olean' 2>/dev/null | grep -c .)
+  F_VISTOS="$F_VISTOS $ROOT:$F_N"
+  if [ "$F_N" -lt 50 ]; then
+    echo "  ❌ NO PUDE MEDIR [F] en $ROOT: $F_N .olean en $LAKEDIR (¿está construido?)."
+    F_FAIL=1
+    continue
+  fi
   while IFS= read -r O; do
     [ -n "$O" ] || continue
     REL="${O#$LAKEDIR/}"
@@ -1217,7 +1232,7 @@ for ROOT in "." "../FOL"; do
   done <<< "$(find "$LAKEDIR" -name '*.olean' 2>/dev/null)"
 done
 if [ "$F_FAIL" = "0" ]; then
-  echo "  ✓ ningún .olean sin fuente (ni aquí ni en ../FOL)"
+  echo "  ✓ ningún .olean sin fuente (ni aquí ni en ../FOL; .olean mirados:$F_VISTOS)"
 else
   echo "  ⚠️  un .olean sin fuente SIGUE SIENDO IMPORTABLE. Bórralo:"
   echo "      rm -f <ruta>.olean <ruta>.olean.hash <ruta>.ilean <ruta>.ilean.hash <ruta>.trace"
@@ -1382,15 +1397,18 @@ elif [ ! -f "$M_FICH" ]; then
   echo "  ❌ NO PUDE MEDIR [M]: no existe $M_FICH."
   M_FAIL=1
 else
+  # ✏️ 2026-11-04 (R3-3-12 de la ronda 3, ADR-255): el autotest compara la SALIDA, línea a línea; antes contaba 4
+  # fallos, y cuatro fallos cualesquiera (otros motivos, otras citas) le valían
   M_AUTO=$(printf '%s\n' \
     '| **M-0** | prueba | — | `no_existe_jamas_m0`, `ROBINSON_PlusPlus/NoExiste_m0.lean`, `#print axioms muerto_m0_zz`, `goedel_first_prf` y `prf_wfAll_objList` |' \
     '| **M-00** | prueba partida | — | `goedel_first_prf`' \
-    '  y su continuación |' | m_revisa | wc -l | tr -d ' ')
+    '  y su continuación |' | m_revisa | LC_ALL=C sort | tr '\n' ';')
+  M_AUTO_OK='M-00|(la fila)|no ocupa UNA línea con 4 columnas;M-0|#print axioms muerto_m0_zz|no declarado: muerto_m0_zz;M-0|ROBINSON_PlusPlus/NoExiste_m0.lean|ruta inexistente;M-0|no_existe_jamas_m0|no declarado;'
   M_TABLA=$(awk '/^## ⚠️ MANDATORIES/{f=1; next} f && /^## /{exit} f && /^\| \*\*M/{print}' "$M_FICH")
   M_NF=$(printf '%s\n' "$M_TABLA" | grep -c '^| \*\*M' || true)
   M_NT=$(printf '%s\n' "$M_TABLA" | m_tokens | grep -vc '@@FILA$' || true)
-  if [ "$M_AUTO" != "4" ]; then
-    echo "  ❌ NO PUDE MEDIR [M]: el autotest debía dar 4 fallos y da $M_AUTO."
+  if [ "$M_AUTO" != "$M_AUTO_OK" ]; then
+    echo "  ❌ NO PUDE MEDIR [M]: el autotest no da lo esperado ($M_AUTO_OK), da: $M_AUTO"
     M_FAIL=1
   elif [ "$M_NF" -lt 10 ] || [ "$M_NT" -lt 20 ]; then
     echo "  ❌ NO PUDE MEDIR [M]: sólo $M_NF filas y $M_NT citas en la tabla MANDATORIES (¿cambió su cabecera?)."
@@ -1524,6 +1542,56 @@ elif [ "$T_LISTA" != "$T_UNI_ORD" ]; then
 else
   echo "  ✓ y son los $T_NU de TITULARES ($T_LEAN), los que fija el contrato de los enunciados (T07)"
 fi
+# ✏️ 2026-11-04 (R3-2-H4 de la ronda 3, ADR-255): (6) la lista `PUROS` de T08 (`Meta/PurezaTitulares.lean`, hecha a mano)
+# es EXACTAMENTE la de los titulares que el documento da por de la clase (i) —su columna «¿qué usa la prueba?» empieza
+# por **(i)**—; y (7) las dos órdenes que ejecutan T07 y T08, `#pureza_titulares` y `#contrato_titulares`, están en el
+# código de ese módulo, una vez cada una (sin ellas el build no comprueba nada, y nadie lo veía). Con autotest de (6).
+t_clase_i() {   # stdin: el documento → los nombres de las filas de §1 o §3 cuya última columna empieza por **(i)**
+  LC_ALL=C awk '
+    /^## 1 · / { s = 1; next }
+    /^## 3 · / { s = 3; next }
+    /^## /     { s = 0 }
+    s && /^\|/ {
+      n = split($0, c, "|")
+      k = (s == 1) ? 2 : 3
+      if (k > n || n < 3) next
+      if (c[n - 1] !~ /^ *\*\*\(i\)\*\*/) next
+      v = c[k]
+      gsub(/~~[^~]*~~/, "", v)
+      while (match(v, /\*\*`[^`]+`\*\*/)) { print substr(v, RSTART + 3, RLENGTH - 6); v = substr(v, RSTART + RLENGTH) }
+    }' | LC_ALL=C sort -u
+}
+T_PUR_LEAN=ROBINSON_PlusPlus/Meta/PurezaTitulares.lean
+T_PUR_AUTO=$(printf '%s\n' '## 1 · prueba' '| t | h | q | usa |' '|---|---|---|---|' \
+  '| **`uno_t6`**, **`dos_t6`** | — | — | **(i)** |' '| **`tres_t6`** | — | — | **(ii)** |' \
+  '| **`cuatro_t6`** | — | — | **(iii)**: con (i) dentro |' '## 3 · D' '| | t | h | usa |' \
+  '| **D9** | **`cinco_t6`** | — | **(i)**; algo |' '## 4 · fin' '| **`seis_t6`** | — | — | **(i)** |' \
+  | t_clase_i | tr '\n' ';')
+T_PUROS=$(awk '/^def PUROS : List Name := \[/{f=1} f{print} f && /\]$/{exit}' "$T_PUR_LEAN" 2>/dev/null \
+  | grep -oE '``[A-Za-z0-9_.'"'"']+' | sed 's/^``//; s/.*\.//' | LC_ALL=C sort || true)
+T_CLASE_I=$(t_clase_i < "$T_FICH")
+if [ "$T_PUR_AUTO" != "cinco_t6;dos_t6;uno_t6;" ]; then
+  echo "  ❌ NO PUDE MEDIR [T](6): el autotest de la clase (i) da «$T_PUR_AUTO»."
+  T_FAIL=1
+elif [ -z "$T_PUROS" ] || [ -z "$T_CLASE_I" ]; then
+  echo "  ❌ NO PUDE MEDIR [T](6): no encuentro la lista PUROS en $T_PUR_LEAN, o ninguna fila de la clase (i) en $T_FICH."
+  T_FAIL=1
+elif [ "$T_PUROS" != "$T_CLASE_I" ]; then
+  echo "  ✗ PUROS ($T_PUR_LEAN, T08) y los titulares de la clase (i) de $T_FICH no son la misma lista:"
+  diff <(printf '%s\n' "$T_CLASE_I") <(printf '%s\n' "$T_PUROS") | grep '^[<>]' \
+    | sed 's/^< /    sólo en el documento: /; s/^> /    sólo en PUROS: /'
+  T_FAIL=1
+else
+  echo "  ✓ PUROS (T08) son los $(printf '%s\n' "$T_PUROS" | grep -c .) de la clase (i) del documento"
+fi
+T_ORD=$(LC_ALL=C awk -f strip-lean.awk "$T_PUR_LEAN" 2>/dev/null | tr -d '\r' | grep -cxE '#(pureza|contrato)_titulares')
+T_ORD_P=$(LC_ALL=C awk -f strip-lean.awk "$T_PUR_LEAN" 2>/dev/null | tr -d '\r' | grep -cx '#pureza_titulares')
+if [ "$T_ORD" != "2" ] || [ "$T_ORD_P" != "1" ]; then
+  echo "  ✗ $T_PUR_LEAN no ejecuta una vez cada una \`#pureza_titulares\` y \`#contrato_titulares\` ($T_ORD órdenes): T07 o T08 no corren"
+  T_FAIL=1
+else
+  echo "  ✓ y el build ejecuta T07 y T08: \`#contrato_titulares\` y \`#pureza_titulares\`, en el código de $T_PUR_LEAN"
+fi
 rm -f "$T_DECLS" "$T_AUTODOC"
 [ -n "${T_DOC:-}" ] && T_FAIL=1
 [ "$T_FAIL" = "0" ] || FAIL=1
@@ -1653,21 +1721,29 @@ while IFS= read -r g2row; do
     G2_FAIL=1
   fi
 done < "$G2_TAB"
-# (ii) ningún marcador sin declarar, y el recuento CUADRA (cero y cero también es verde: es la meta)
+# (ii) ✏️ 2026-11-04 (R3-3-13 de la ronda 3, ADR-255; lo señaló en FOL, y aquí era igual): la CORRESPONDENCIA, no sólo
+# el recuento: cada marcador lo casa EXACTAMENTE una fila (cero y cero también es verde: es la meta). Antes sólo se
+# miraba si los recuentos cuadraban, y con dos filas sobre un mismo marcador otro quedaba sin declarar, en verde.
+while IFS= read -r g2l; do
+  [ -z "$g2l" ] && continue
+  g2lf=${g2l%%:*}; g2n=0
+  while IFS= read -r g2row; do
+    [ -z "$g2row" ] && continue
+    g2f=$(printf '%s' "$g2row" | awk -F'§' '{print $1}')
+    [ "$g2f" = "$g2lf" ] || continue
+    g2a=$(printf '%s' "$g2row" | awk -F'§' '{print $2}')
+    case "$g2l" in *"$g2a"*) g2n=$((g2n + 1)) ;; esac
+  done < "$G2_TAB"
+  if [ "$g2n" = "0" ]; then
+    echo "  ❌ SIN DECLARAR → $(printf '%s' "$g2l" | cut -c1-118)"
+    G2_FAIL=1
+  elif [ "$g2n" != "1" ]; then
+    echo "  ❌ $g2n filas casan con el MISMO marcador → $(printf '%s' "$g2l" | cut -c1-110)"
+    G2_FAIL=1
+  fi
+done < "$G2_CUR"
 if [ "$G2_N" != "$G2_D" ]; then
   echo "  ❌ marcadores en el árbol: $G2_N · filas declaradas: $G2_D"
-  while IFS= read -r g2l; do
-    [ -z "$g2l" ] && continue
-    g2lf=${g2l%%:*}; g2found=0
-    while IFS= read -r g2row; do
-      [ -z "$g2row" ] && continue
-      g2f=$(printf '%s' "$g2row" | awk -F'§' '{print $1}')
-      [ "$g2f" = "$g2lf" ] || continue
-      g2a=$(printf '%s' "$g2row" | awk -F'§' '{print $2}')
-      case "$g2l" in *"$g2a"*) g2found=1; break ;; esac
-    done < "$G2_TAB"
-    [ "$g2found" = "0" ] && echo "        SIN DECLARAR → $(printf '%s' "$g2l" | cut -c1-118)"
-  done < "$G2_CUR"
   G2_FAIL=1
 fi
 G2_AB=$(awk -F'§' '$3 == "ABIERTA"' "$G2_TAB" | grep -c .); G2_AB=${G2_AB:-0}

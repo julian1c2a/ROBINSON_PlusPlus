@@ -1,0 +1,49 @@
+════ VERDAD DEL CÓDIGO ════
+  módulos activos : 70  (FOL/ 49 + FOL/Calculus/ 7 + FOL/Theorems/ 5 + TheoryFramework/ 9)
+  cuarentena      : 0
+  axiom de Lean   : 0
+  sorry           : 0
+  build jobs      : no se mide aquí (la mide RPP, que construye los dos objetivos de FOL)
+
+════ [L] LIBRERÍA = CIERRE DE IMPORTS — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✓ los 72 ficheros del cierre de imports de las raíces son los del disco y los de git (2 barriles y 70 módulos); el autotest del cierre pasa
+
+════ [EOL] FINALES DE LÍNEA EN EL ÍNDICE — ROJO ════
+  ✓ ningún blob con CRLF en el índice (285 en LF)
+
+════ [H] PATH HIGIÉNICO EN TODO SCRIPT — ROJO ════
+  ✓ los 12 scripts lo llevan (b-control.bash se carga con source)
+
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+
+════ [A2] CIFRAS EN EL CUERPO — ROJO (T04b, ADR-169 de RPP) ════
+  ✓ el cuerpo tampoco tiene cifras obsoletas
+
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  24 documentos · deuda declarada: 9 de contenido y 0 de formato · techo: los 9 de la base verificada, dbae8d6   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+
+════ [B] CITAS MUERTAS — ROJO, con trinquete POR CITA (T04 y ADR-166 de RPP) ════
+  ℹ️  la base verificada es HEAD: el techo es la tabla de HEAD, y aquí no compara nada nuevo.
+  techo: la tabla de la base verificada, dbae8d6 (refs/remotes/origin/master)
+  deuda declarada: 693 citas muertas en 349 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 693
+  ✓ ninguna cita muerta nueva, y la deuda por cita cuadra con la tabla
+
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+
+════ [D] MARCAS DE TIEMPO ════
+  ✓ todos los docs técnicos llevan marca de tiempo
+
+════ [F] ARTEFACTOS HUÉRFANOS (.olean sin fuente) ════
+  ✓ ningún .olean sin fuente (mirados: 72)
+
+════ [G] DEUDAS ENUNCIADAS QUE YA TIENEN TESTIGO — ROJO ════
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional
+
+════ [G.2] CENSO DE MARCADORES DE DEUDA — ROJO ════
+  ✓ los 13 marcadores de deuda están TODOS clasificados
+
+✅ DOCUMENTACIÓN SINCRONIZADA.
+rc=0

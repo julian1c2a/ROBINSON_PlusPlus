@@ -1,0 +1,4 @@
+════ CENSO DE ESTRATOS ════
+  ❌ NO PUDE MEDIR: 'lake env lean' sobre el fichero del censo dio error (código 1). ¿Está construido el árbol?
+      <tmp>/Estratos.lean:68:0: error: el barril TheoryFramework no está cargado
+rc=1

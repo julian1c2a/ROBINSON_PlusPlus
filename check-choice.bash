@@ -7,9 +7,12 @@
 # vigila los TITULARES (lo que el árbol imprime); esto vigila TODAS las constantes de las tres librerías.
 #
 # QUÉ MIDE. Para cada constante de los módulos `ROBINSON_PlusPlus*`, `FOL*` y `TheoryFramework*` (todos: el fichero
-# Lean que genera importa cada módulo de las tres librerías, no sólo los barriles), sin las generadas (detalles
-# internos —`match_N`, `proof_N`, `eq_N`, `_…`—, recursores auxiliares y `noConfusion`; una privada, con su nombre de
-# usuario), tres marcas:
+# Lean que genera importa cada módulo de las tres librerías, no sólo los barriles), sin las generadas, tres marcas.
+# ✏️ 2026-11-04 (R3-3-05 de la ronda 3, ADR-255): «generada» es lo que dice `check-indice.bash` (ADR-254): sin rango de
+# declaración, o generada según las reglas de `Lean.isAutoDeclOrPrivate_Internal` (Lean/AutoDecl.lean), con una privada
+# por su nombre de usuario. Antes se descartaba POR NOMBRE (`inj`, `injEq`, `noConfusionType`, `sizeOf_spec`, los
+# detalles internos y los recursores auxiliares): dejaba pasar `eq_def`, `below`, `brecOn`, `ctorIdx` o los
+# `match_N.splitter`, y quitaba una constante de usuario que se llamara así (`Formula.ex.inj`). Las marcas:
 #   C  su cierre lleva `Classical.choice` (`collectAxioms`, lo mismo que `#print axioms`);
 #   N  es `noncomputable`;
 #   S  su tipo o su valor nombra DIRECTAMENTE `String` o una constante `String.*` (el «cierre de String» de D7, ahora
@@ -60,15 +63,19 @@ if [ "$NMODS" -lt 100 ]; then
   exit 1
 fi
 {
+  echo "import Lean"
   sed 's/^/import /' "$MODS"
   cat <<'EOF'
 open Lean
 
 namespace CensoChoiceCalib
--- la calibración: el censo tiene que ver estas tres con su marca exacta
+-- la calibración: el censo tiene que ver estas cuatro con su marca exacta, y NINGUNA otra de aquí: lo que Lean genera
+-- con `CalibJ` (su recursor, `casesOn`, `noConfusion`, `mk.injEq`…) nombra `String` y no tiene que salir (ADR-255)
 theorem calibC : ∀ p : Prop, p ∨ ¬p := Classical.em
 noncomputable def calibN : Nat := Classical.choice ⟨0⟩
 def calibS : String := "a"
+inductive CalibJ where
+  | mk (s : String)
 end CensoChoiceCalib
 
 def censoRaiz (m : Name) : Option String :=
@@ -76,11 +83,32 @@ def censoRaiz (m : Name) : Option String :=
   if r == "ROBINSON_PlusPlus" then some "RPP" else if r == "FOL" then some "FOL"
   else if r == "TheoryFramework" then some "TF" else none
 
+/-- ¿la genera Lean? Las reglas de `Lean.isAutoDeclOrPrivate_Internal` (Lean/AutoDecl.lean), salvo que una privada
+    cuenta por su nombre de usuario: aquélla las da todas por generadas. La misma que la de `check-indice.bash`. -/
+partial def censoGenerada (env : Environment) (d : Name) : Bool :=
+  let u := (privateToUserName? d).getD d
+  if isPrivateName d && u.isAnonymous then false
+  else if d.hasMacroScopes || u.isInternal || isReservedName env d then true
+  else match d with
+    | .str n s =>
+      censoGenerada env n || s.startsWith "proof_" || s.startsWith "match_" || s.startsWith "unsafe_"
+        || s.startsWith "grind_"
+        || (env.isConstructor n && ["injEq", "inj", "sizeOf_spec", "elim", "noConfusion"].contains s)
+        || (match env.find? n with
+            | some (.inductInfo _) =>
+              s.startsWith "brecOn_" || s.startsWith "below_"
+                || ["casesOn", "recOn", "brecOn", "below", "ndrec", "ndrecOn", "noConfusionType", "noConfusion",
+                    "ofNat", "toCtorIdx", "ctorIdx", "ctorElim", "ctorElimType"].contains s
+                || (isSubobjectField? env n (.mkSimple s)).isSome
+            | _ => false)
+    | _ => false
+
 #eval show CoreM Unit from do
   let env ← getEnv
   let mut filas : Array String := #[]
   let mut tot : Std.HashMap String (Nat × Nat × Nat × Nat) := {}
   let mut sinValor := 0
+  let mut calibSinRango : Array Name := #[]
   for (c, ci) in env.constants.toList do
     let info : Option (String × String) := match env.getModuleIdxFor? c with
       | some i =>
@@ -89,10 +117,13 @@ def censoRaiz (m : Name) : Option String :=
       | none => if (`CensoChoiceCalib).isPrefixOf c then some ("_calibracion", "CALIB") else none
     let some (modulo, repo) := info | continue
     let u := (privateToUserName? c).getD c
-    if u.isInternalDetail || isAuxRecursor env c || isNoConfusion env c || isRecCore env c then continue
-    -- (y los lemas que Lean genera con cada constructor)
-    if let .str _ s := u then
-      if ["noConfusionType", "inj", "injEq", "sizeOf_spec"].contains s then continue
+    -- (sin las generadas: las dos reglas de `check-indice.bash`; una de la calibración sin rango tiene que quitarla la
+    -- primera, o no se la ve fallar)
+    if (match ci with | .recInfo _ | .quotInfo _ => true | _ => false) || isAuxRecursor env c || isNoConfusion env c
+        || isRecCore env c || Meta.isMatcherCore env c || censoGenerada env c then continue
+    if (← findDeclarationRanges? c).isNone then
+      if repo == "CALIB" then calibSinRango := calibSinRango.push c
+      continue
     let axs ← collectAxioms c
     let tC := axs.contains ``Classical.choice
     let tN := isNoncomputable env c
@@ -109,6 +140,7 @@ def censoRaiz (m : Name) : Option String :=
   for (r, (n0, n1, n2, n3)) in tot.toList do
     IO.println s!"TOTAL\t{r}\t{n0}\t{n1}\t{n2}\t{n3}"
   IO.println s!"SINVALOR\t{sinValor}"
+  IO.println s!"SINRANGOCALIB\t{calibSinRango.size}\t{" ".intercalate (calibSinRango.toList.map toString)}"
   IO.println "FIN"
 EOF
 } > "$LEANFILE"
@@ -126,15 +158,22 @@ if [ "$RC" != "0" ] || ! grep -qx 'FIN' <<< "$SALIDA"; then
 fi
 echo "  censo: $NMODS módulos, $((T1 - T0)) s"
 
-# la calibración
-for esp in "CensoChoiceCalib.calibC	C" "CensoChoiceCalib.calibN	CN" "CensoChoiceCalib.calibS	S"; do
-  if grep -qxF "FILA	_calibracion	$esp" <<< "$SALIDA"; then
-    echo "  ✓ calibración: $(printf '%s' "$esp" | tr '\t' ' ')"
-  else
-    echo "  ❌ calibración: el censo no ve «$(printf '%s' "$esp" | tr '\t' ' ')» — no comprueba lo que dice."
-    FAIL=1
-  fi
-done
+# la calibración: EXACTAMENTE estas cuatro filas (✏️ 2026-11-04, ADR-255: antes, que estuvieran las tres primeras; una
+# generada con `String` de más no la veía)
+CAL=$(printf '%s\n' "$SALIDA" | awk -F'\t' '$1 == "FILA" && $2 == "_calibracion" { print $3 "\t" $4 }' | LC_ALL=C sort)
+ESP=$(printf 'CensoChoiceCalib.CalibJ.mk\tS\nCensoChoiceCalib.calibC\tC\nCensoChoiceCalib.calibN\tCN\nCensoChoiceCalib.calibS\tS\n' | LC_ALL=C sort)
+if [ "$CAL" = "$ESP" ]; then
+  echo "  ✓ calibración: calibC C, calibN CN, calibS S y CalibJ.mk S, y nada de lo que Lean genera con CalibJ"
+else
+  echo "  ❌ calibración: el censo no da exactamente las cuatro filas de prueba —no comprueba lo que dice—:"
+  diff <(printf '%s\n' "$ESP") <(printf '%s\n' "$CAL") | sed 's/^/      /'
+  FAIL=1
+fi
+SRCAL=$(printf '%s\n' "$SALIDA" | awk -F'\t' '$1 == "SINRANGOCALIB" { print $2 "\t" $3 }')
+if [ "${SRCAL%%	*}" != "0" ]; then
+  echo "  ❌ calibración: de las de prueba, éstas sólo las quitó la falta de rango, no el filtro de las generadas: ${SRCAL#*	}"
+  FAIL=1
+fi
 SINV=$(printf '%s\n' "$SALIDA" | awk -F'\t' '$1 == "SINVALOR" { print $2 }')
 if [ "${SINV:-x}" != "0" ]; then
   echo "  ❌ $SINV teoremas o definiciones sin valor accesible: la marca S no los ve."

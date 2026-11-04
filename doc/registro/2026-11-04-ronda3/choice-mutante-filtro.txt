@@ -1,0 +1,63 @@
+════ CONSTRUCTIVIDAD (choice · noncomputable · String) EN RPP, FOL Y TheoryFramework ════
+  censo: 193 módulos, 15 s
+  ✓ calibración: calibC C, calibN CN, calibS S y CalibJ.mk S, y nada de lo que Lean genera con CalibJ
+  ❌ calibración: de las de prueba, éstas sólo las quitó la falta de rango, no el filtro de las generadas: CensoChoiceCalib.CalibJ.mk.sizeOf_spec CensoChoiceCalib.CalibJ._sizeOf_inst CensoChoiceCalib.CalibJ.ctorIdx CensoChoiceCalib.CalibJ.noConfusionType CensoChoiceCalib.CalibJ.mk.inj CensoChoiceCalib.CalibJ.mk.injEq CensoChoiceCalib.CalibJ._sizeOf_1 CensoChoiceCalib.calibN._proof_1
+  FOL    1573 constantes ·   82 con choice ·  1 noncomputable ·  28 con String
+  RPP    4203 constantes ·   23 con choice · 74 noncomputable ·  43 con String
+  TF      113 constantes ·   14 con choice ·  0 noncomputable ·   0 con String
+  con choice, por módulo:
+        31  FOL.Canonical0
+         8  FOL.Compacity0
+        12  FOL.Estratos0
+         2  FOL.Inconsistencia
+         2  FOL.Lindenbaum0
+         1  FOL.Markov0
+         5  FOL.SequentSound0
+         1  FOL.Skolem0
+         4  FOL.SkolemHerbrand0
+         5  FOL.SkolemN0
+         3  FOL.SkolemNF0
+         5  FOL.Soundness0
+         1  FOL.SymLit
+         2  FOL.Tactics
+         7  ROBINSON_PlusPlus.Meta.ContratoTitulares
+         3  ROBINSON_PlusPlus.Meta.PuenteFOL
+         9  ROBINSON_PlusPlus.Meta.PurezaComando
+         2  ROBINSON_PlusPlus.Meta.PurezaTitulares
+         2  ROBINSON_PlusPlus.Meta.SolidezPrf
+         3  TheoryFramework.Instances.FOL
+         8  TheoryFramework.Instances.FOLModels
+         3  TheoryFramework.Semantics
+  ❌ medidas y NO declaradas (56):
+      + FOL.Calculus.DerivesI	FOL.Calculus.«_aux_FOL_Calculus_DerivesI___macroRules_FOL_Calculus_term_⊢ᵢ__1»	S
+      + FOL.Canonical0	FOL.Canonical0.«_aux_FOL_Canonical0___macroRules__private_FOL_Canonical0_0_FOL_Canonical0_term_⊢₀*__1»	S
+      + FOL.Canonical0	FOL.Canonical0.«_aux_FOL_Canonical0___macroRules__private_FOL_Canonical0_0_FOL_Canonical0_term_⊨__1»	S
+      + FOL.Derives0	«_aux_FOL_Derives0___macroRules_term_⊢₀__1»	S
+      + FOL.Derives1	«_aux_FOL_Derives1___macroRules_term_⊢₁__1»	S
+      + FOL.Derives2	«_aux_FOL_Derives2___macroRules_term_⊢₂__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term#__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term_⇒__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term_⇔__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term_∧__1_1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term_∨__1_1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term_≐__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term_⊢__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term¬__1_1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term∀.__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term∃.__1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term⊤_1»	S
+      + FOL.FOL	«_aux_FOL_FOL___macroRules_term⊥_1»	S
+      + FOL.Fresh0	FOL.Fresh0.«_aux_FOL_Fresh0___macroRules__private_FOL_Fresh0_0_FOL_Fresh0_term_⊢₀*__1»	S
+      + FOL.Henkin0	FOL.Henkin0.«_aux_FOL_Henkin0___macroRules__private_FOL_Henkin0_0_FOL_Henkin0_term_⊢₀*__1»	S
+      + FOL.HenkinLimit0	FOL.HenkinLimit0.«_aux_FOL_HenkinLimit0___macroRules__private_FOL_HenkinLimit0_0_FOL_HenkinLimit0_term_⊢₀*__1»	S
+      + FOL.Lindenbaum0	FOL.Lindenbaum0.«_aux_FOL_Lindenbaum0___macroRules__private_FOL_Lindenbaum0_0_FOL_Lindenbaum0_term_⊢₀*__1»	S
+      + FOL.Soundness0	FOL.Metamath.Soundness0.«_aux_FOL_Soundness0___macroRules__private_FOL_Soundness0_0_FOL_Metamath_Soundness0_term_⊨__1»	S
+      + FOL.SymLit	FOL.SymLit._aux_FOL_SymLit___macroRules_FOL_SymLit_symLit_1	CS
+      + FOL.Tactics	_aux_FOL_Tactics___elabRules_tacticDerive_hyp_1	CS
+      + FOL.Tactics	_aux_FOL_Tactics___macroRules_tacticDerive_rewrite_At__1	S
+      + FOL.Tactics	_aux_FOL_Tactics___macroRules_tacticDerive_weaken__1	S
+      + ROBINSON_PlusPlus.Meta.Godel	ROBINSON_PlusPlus.Meta.Godel.«_aux_ROBINSON_PlusPlus_Meta_Godel___macroRules_ROBINSON_PlusPlus_Meta_Godel_term⌜_⌝_1»	S
+      + ROBINSON_PlusPlus.Meta.Hilbert	ROBINSON_PlusPlus.Meta.Hilbert.«_aux_ROBINSON_PlusPlus_Meta_Hilbert___macroRules_ROBINSON_PlusPlus_Meta_Hilbert_term⊢ᴴ__1»	S
+      + ROBINSON_PlusPlus.Meta.ModeloCodificacion	ROBINSON_PlusPlus.Meta.ModeloCodificacion._aux_ROBINSON_PlusPlus_Meta_ModeloCodificacion___macroRules__private_ROBINSON_PlusPlus_Meta_ModeloCodificacion_0_ROBINSON_PlusPlus_Meta_ModeloCodificacion_tacticLwf_1	S
+❌ LA CONSTRUCTIVIDAD NO CUADRA CON doc/control/choice.tsv.
+rc=1

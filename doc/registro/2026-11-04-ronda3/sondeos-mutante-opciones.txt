@@ -1,0 +1,15 @@
+════ SONDEOS DE CONTROL (sondeos/CONTROLES.txt, con `lake lean`) ════
+  ✓ AnclaEqInconsistente.lean (7 s)
+  ✓ AnclaSoundness.lean (5 s)
+  ✓ CraigEqVacuo.lean (5 s)
+  ✓ D3ReduccionesNoVacuas.lean (5 s)
+  ✓ IteSimboloNucleo.lean (12 s)
+  ✓ ListInductionAxiomRefutable.lean (5 s)
+  ✓ MetaReglasRefutables.lean (3 s)
+  ✓ OmegaConsistentRefutable.lean (5 s)
+  ✓ PrfBotCodificacionVieja.lean (5 s)
+  ✓ RosserBasura.lean (5 s)
+  ✓ RosserReflexion.lean (6 s)
+  ❌ autoImplicit: un fichero con una variable implícita automática COMPILA con `lake lean`
+❌ 0 de 11 sondeos de control NO compilan (o no se pudieron medir), o el negativo no falla
+rc=1

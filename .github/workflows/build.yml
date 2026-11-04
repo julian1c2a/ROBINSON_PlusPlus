@@ -276,6 +276,12 @@ jobs:
       - name: El índice de las constantes y lo que nadie usa de FOL
         run: bash check-indice.bash
 
+      # ⭐ AÑADIDO el 2026-11-04 (R3-5-14 y R3-3-09 de la ronda 3, ADR-255). `guarda_y_bloquea.bash` se «probó con el fallo
+      # puesto» sin artefacto: su autotest, en un repositorio de prueba, tiene que rechazar un congelado (también uno que
+      # ya está en el índice) y commitear un bloqueado. Unos segundos.
+      - name: Autotest de guarda_y_bloquea.bash
+        run: bash guarda_y_bloquea.bash --autotest
+
       # El control de sincronía documentación ↔ código (AI-GUIDE §27). `--quick` omite el
       # `lake build`, que ya se hizo arriba; a cambio el control [A] de jobs no se ejecuta
       # y eso lo dice el propio script (§27.1: un control que no comprueba nada AVISA).

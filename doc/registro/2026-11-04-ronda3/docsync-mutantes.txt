@@ -1,0 +1,83 @@
+════ VERDAD DEL CÓDIGO ════
+  módulos activos : 119  (Minimal 2 + Meta 116 + Full 1)
+  cuarentena      : 0
+  sondeos         : 48
+  axiom de Lean   : 0
+  sorry           : 0
+
+════ [L] LIBRERÍA = CIERRE DE IMPORTS — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✓ los 121 ficheros del cierre de imports del barril son los del disco y los de git (2 barriles y 119 módulos); el autotest del cierre pasa
+
+════ [EOL] FINALES DE LÍNEA EN EL ÍNDICE — ROJO ════
+  ❌ NO PUDE MEDIR [EOL]: sólo 0 blobs en LF en el índice.
+
+════ [H] PATH HIGIÉNICO EN TODO SCRIPT — ROJO ════
+  ✓ los 29 scripts lo llevan (b-control.bash se carga con source)
+
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  sin medir «jobs»: sus entradas de la tabla no se comparan.
+  techo: la tabla de la base verificada, 1c71c8e (refs/remotes/origin/master)
+  deuda declarada: 28 líneas en 9 entradas; hoy, 3
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 27 de contenido y 0 de formato · techo: los 27 de la base verificada, 1c71c8e   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+
+════ [B] CITAS MUERTAS — ROJO, con trinquete POR CITA (T04, ADR-166) ════
+  techo: la tabla de la base verificada, 1c71c8e (refs/remotes/origin/master)
+  deuda declarada: 1514 citas muertas en 931 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1514
+  ✓ ninguna cita muerta nueva, y la deuda por cita cuadra con la tabla
+
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (121 .lean y los documentos)
+
+════ [N] CITAS POR NÚMERO DE LÍNEA — ROJO (T34, ADR-209) ════
+  ✓ ninguna cita por número de línea en 15 documentos de referencia (autotest: 4 de 4)
+
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+
+════ [D] MARCAS DE TIEMPO ════
+  ✓ todos los docs técnicos llevan marca de tiempo
+
+════ [F] ARTEFACTOS HUÉRFANOS (.olean sin fuente) ════
+  ❌ NO PUDE MEDIR [F] en .: 0 .olean en ./.lake/build/lib/leanX (¿está construido?).
+  ❌ NO PUDE MEDIR [F] en ../FOL: 0 .olean en ../FOL/.lake/build/lib/leanX (¿está construido?).
+  ⚠️  un .olean sin fuente SIGUE SIENDO IMPORTABLE. Bórralo:
+      rm -f <ruta>.olean <ruta>.olean.hash <ruta>.ilean <ruta>.ilean.hash <ruta>.trace
+════ [H] CATÁLOGO DE `sondeos/` — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✓ los 48 sondeos del disco y las 48 filas del catálogo CUADRAN
+════ [M] MANDATORIES — la columna «Verificación» nombra cosas que EXISTEN (ROJO) ════
+  ❌ NO PUDE MEDIR [M]: el autotest no da lo esperado (M-00|(la fila)|no ocupa UNA línea con 4 columnas;M-0|#print axioms muerto_m0_zz|no declarado: muerto_m0_zz;M-0|ROBINSON_PlusPlus/NoExiste_m0.lean|ruta inexistente;M-0|no_existe_jamas_m0|no declarado;), da: M-00|(la fila)|no ocupa UNA línea con 4 columnas;M-0|#print axioms muerto_m0_zz|no declarado: muerto_m0_zz;M-0|ROBINSON_PlusPlus/NoExiste_m0.lean|no declarado;M-0|no_existe_jamas_m0|no declarado;
+════ [T] TITULARES — cada uno tiene su fila en TEOREMAS-E-HIPOTESIS.md, y cada fila es un titular (ROJO) ════
+  ⚠️ MODO DE PRUEBA: el documento se lee de <sesión-tmp>/TEOREMAS-mut.md (en este modo [T] nunca da verde)
+  ✓ los 35 titulares de T_UNIVERSO están declarados y tienen UNA fila en <sesión-tmp>/TEOREMAS-mut.md, y ninguna fila sobra
+  ✓ y son los 35 de TITULARES (ROBINSON_PlusPlus/Meta/ContratoTitulares.lean), los que fija el contrato de los enunciados (T07)
+  ✗ PUROS (<sesión-tmp>/PurezaMut.lean, T08) y los titulares de la clase (i) de <sesión-tmp>/TEOREMAS-mut.md no son la misma lista:
+    sólo en PUROS: rosser_ext
+  ✗ <sesión-tmp>/PurezaMut.lean no ejecuta una vez cada una `#pureza_titulares` y `#contrato_titulares` (1 órdenes): T07 o T08 no corren
+
+════ [G] DEUDAS ENUNCIADAS QUE YA TIENEN TESTIGO — ROJO (T32, ADR-237) ════
+  ✓ ninguna deuda enunciada tiene ya testigo incondicional (13 enunciados sin binders; 1 con su cabecera de deuda)
+
+════ [G.2] CENSO DE MARCADORES DE DEUDA — ROJO (T32, ADR-237) ════
+  ✓ los 23 marcadores de deuda están TODOS clasificados (0 abiertos)
+
+════ [P] FOOTPRINTS EN LA PROSA — ROJO, trinquete (T39, ADR-240) ════
+  ✓ 59 citas con footprint en la prosa (FOL, TheoryFramework y RPP), comparadas con su fila: 57 cuadran, y las 2 que no, declaradas
+
+════ [R] REGISTRO DE HALLAZGOS — ROJO (T37, ADR-241) ════
+  ✓ los 426 IDs de las auditorías tienen su fila y su estado, y son los de sus fuentes (189 hechos, 32 pendientes, 32 descartados, 173 sustituidos)
+
+════ [S] CITAS DE SONDEOS DEL BUILD: EVIDENCIA O PROCEDENCIA — ROJO (T10, ADR-243) ════
+  ✓ 126 citas de sondeos en el build: 26 a sondeos de CONTROL, 78 a archivados con su etiqueta y 22 de procedencia, declaradas (14 filas)
+
+❌ HAY DESINCRONIZACIÓN — corregir ANTES de commitear.
+
+⚠️  Recordatorio: NO basta con arreglar el banner. Comprobar también el CUERPO
+    (tablas resumen, §Próximos pasos, notas de auditoría antiguas).
+rc=1
