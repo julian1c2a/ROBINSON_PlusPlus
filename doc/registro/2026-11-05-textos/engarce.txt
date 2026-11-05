@@ -1,0 +1,38 @@
+# FOL0912:M-3 — el engarce que hay, medido el 2026-11-05 (RPP 9bb3336, FOL e2a07cc)
+# require en el lakefile de RPP:
+16:require FOL from "../FOL"
+# los import de FOL y TheoryFramework en el árbol de RPP (módulos que lo importan):
+     20 import FOL.FOL
+     17 import FOL.Theorems.Eq
+     10 import FOL.Theorems.Quantifiers
+      2 import FOL.Semantics
+      1 import FOL.SymLit
+      1 import FOL.Sentence
+      1 import FOL.Lift0
+      1 import FOL.Derives1
+      1 import FOL.Canonical0
+# lo que el documento describía, en los .lean de los dos repos (ficheros, grep -w):
+encodeList: 0
+encodeList_bijective: 0
+IsList: 0
+code_nil: 0
+code_cons: 0
+lema β: 0
+beta_lemma: 0
+betaLemma: 0
+WType: 0
+W-Type: 0
+W‑Type: 0
+# lo que sí existe (doc/indice.tsv, nombre · clase · módulo):
+ROBINSON_PlusPlus.Meta.CodeNatInjPrf.codeNat_inj	teorema	ROBINSON_PlusPlus.Meta.CodeNatInjPrf
+ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj	teorema	ROBINSON_PlusPlus.Meta.CodeNatInjPrf
+ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd	constructor	ROBINSON_PlusPlus.Meta.Hilbert
+ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd	constructor	ROBINSON_PlusPlus.Meta.HilbertDeduction
+ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.listInd	constructor	ROBINSON_PlusPlus.Meta.HilbertSeq
+ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol	teorema	ROBINSON_PlusPlus.Meta.PuenteFOL
+ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol	teorema	ROBINSON_PlusPlus.Meta.PuenteFOL
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_iff_derivesSet_clausuras	teorema	ROBINSON_PlusPlus.Meta.PuenteFOL
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_of_derivesSet	teorema	ROBINSON_PlusPlus.Meta.PuenteFOL
+ROBINSON_PlusPlus.Minimal.Axioms.codeNat	def	ROBINSON_PlusPlus.Minimal.Axioms
+ROBINSON_PlusPlus.Minimal.Axioms.consN	def	ROBINSON_PlusPlus.Minimal.Axioms
+# lo que RPP nombra de FOL y TheoryFramework: ver doc/control/fol-sin-uso.tsv y la salida de check-indice.bash (56 las usa RPP de 1402)

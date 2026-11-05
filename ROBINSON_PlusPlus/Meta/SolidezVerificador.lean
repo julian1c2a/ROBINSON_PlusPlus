@@ -46,7 +46,12 @@ open ROBINSON_PlusPlus.Meta.ModeloCodigo ROBINSON_PlusPlus.Meta.CodeNatInjPrf
 
 namespace ROBINSON_PlusPlus.Meta.SolidezVerificador
 
-/-! ## §1 · El DECODIFICADOR total: todo número es el código de un término o de una fórmula
+/-! ## §1 · El DECODIFICADOR total: todo número se DECODIFICA a un término y a una fórmula
+
+✏️ 2026‑11‑05 (A121:W2 y A121:G5 de la auditoría de ADR‑120/121, ADR‑257): el título decía «todo número es el código
+de un término o de una fórmula», falso al pie de la letra: hay números que no son el código de nada. Lo demostrado es
+que todo número se decodifica (las ramas por defecto lo hacen total), y que sobre los códigos de verdad la
+decodificación es el inverso (§2).
 
 Espeja EXACTAMENTE el análisis de casos de `substtcN`/`substfcN`: la etiqueta `nthN c 0` decide, y la forma que no
 es de nadie va a una constante cerrada (`dflt`) o a `⊥`. Así la sustitución CONMUTA con la decodificación para TODO

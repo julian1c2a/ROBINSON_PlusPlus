@@ -1,0 +1,18 @@
+# FOL0912:R-9 — =eq y ≐ en el CÓDIGO (sin comentarios ni cadenas: strip-lean.awk), medido el 2026-11-05 sobre RPP 9bb3336 y FOL e2a07cc
+RPP, =eq: 2965
+RPP, ≐: 6
+FOL, =eq: 0
+FOL, ≐: 0
+# los ≐ de RPP, uno por línea:
+ROBINSON_PlusPlus/Meta/Hilbert.lean:100:  | eqrefl (t : Term) : Prfᵢ (t ≐ t)
+ROBINSON_PlusPlus/Meta/Hilbert.lean:102:      Prfᵢ ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
+ROBINSON_PlusPlus/Meta/HilbertSeq.lean:128:  | .eqrefl t => some (t ≐ t)
+ROBINSON_PlusPlus/Meta/HilbertSeq.lean:129:  | .leibniz A t₁ t₂ => some ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
+ROBINSON_PlusPlus/Meta/Representability2Prf.lean:354:                have hf : f = (t ≐ t) := by
+ROBINSON_PlusPlus/Meta/Representability2Prf.lean:360:                have hf : f = ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A)) := by
+# módulos de RPP con las dos:
+ROBINSON_PlusPlus/Meta/Representability2Prf.lean
+# las definiciones:
+../FOL/FOL/FOL.lean:123:infix:50 " ≐ " => Formula.eq
+ROBINSON_PlusPlus/Minimal/Axioms.lean:15:scoped notation:50 t₁ " =eq " t₂ => Formula.eq t₁ t₂
+# en doc/indice.tsv (sin open): líneas con ≐ 1011, con =eq 1 (la de la propia notación)

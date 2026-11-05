@@ -141,7 +141,10 @@ end ModeloDiscriminador
 open Classical
 
 /-- ⇒ `carc` EXISTE: la inversa, **clásicamente**. La interpretación de un modelo no tiene que
-    ser computable — `ModelG.func` es una función de Lean cualquiera. -/
+    ser computable — `ModelG.func` es una función de Lean cualquiera.
+    ✏️ 2026‑11‑05 (L3‑5 de la auditoría de la base, ADR‑257): esta `carcN` es la de la codificación ANTERIOR a ADR‑113
+    (`cons a b = pair a (σ b)`, de ahí el `y + 1`); con la de hoy, `cons a b = σ (pair a b)`. Es la medida de su día:
+    el modelo del build (ADR‑120) trata el `cons` de hoy. -/
 noncomputable def carcN (c : Nat) : Nat :=
   if h : ∃ x y, ModeloDiscriminador.pairN x (y + 1) = c then h.choose else 0
 

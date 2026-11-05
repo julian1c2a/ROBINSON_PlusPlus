@@ -1637,7 +1637,9 @@ def axioms : List Formula := [
   -- REPARACION (rama reparacion/c-godel-i-consistente): `ax_tc_cons` RETIRADO.
   -- Es la ecuacion que hacia INCONSISTENTE la teoria: `tcFn` no puede recurrir a la vez
   -- sobre estructura NUMERAL (ax_tc_succ) y sobre estructura de CODIGO (ax_tc_cons),
-  -- porque en N el mismo valor es ambas cosas (`cons 0 nil = 2 = sigma sigma 0`).
+  -- porque en N el mismo valor es ambas cosas (con la codificación de entonces, `cons 0 nil = 2 = sigma sigma 0`;
+  -- ✏️ 2026‑11‑05, L3‑5 de la auditoría de la base, ADR‑257: con la de hoy, ADR‑113, `cons a b = sigma (pair a b)` y
+  -- `cons 0 nil = sigma 0 = 1`: otro número, la misma colisión).
   -- El lema diagonal se reconstruyó sin ella con la lectura NUMERAL (`godelCN`, en
   -- `Meta/DiagonalNumeral.lean`); sobre `Prf` es `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`).
   -- El de `⊢` (`godelCN_fixedpoint`) quedó retirado (ADR‑115).

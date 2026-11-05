@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ADR‑001 a ADR‑130 (histórico)
 
-**Last updated:** 2026-10-16 — trasladado TAL CUAL desde `DECISIONS.md` ([ADR‑142](../../DECISIONS.md), paso 2 de ADR‑139). Es REGISTRO: lo que dice es de su fecha. Lo vigente, en `DECISIONS.md` (el índice de estos ADR y ADR‑131 en adelante).
+**Last updated:** 2026-11-05 — una nota fechada en ADR‑113 §5 (L2‑6, [ADR‑257](../../DECISIONS.md)); el resto, como se trasladó. Antes, 2026-10-16 — trasladado TAL CUAL desde `DECISIONS.md` ([ADR‑142](../../DECISIONS.md), paso 2 de ADR‑139). Es REGISTRO: lo que dice es de su fecha. Lo vigente, en `DECISIONS.md` (el índice de estos ADR y ADR‑131 en adelante).
 
 ---
 
@@ -8286,7 +8286,9 @@ su propia copia `consOldN` y conserva la medición histórica. `ModeloNat`, `Can
 
 A2, la capa de listas de `ModeloNat` (los 9: `ax_L0`–`ax_L3`, `ax_C1`–`ax_C3`, `prodp`); A3, los 107
 `codingAxioms`; A4, la solidez de `Prf`; A5, `ConsistentH` como teorema. ⚠️ Y `AnclaEq` sigue sin instancia
-(`AXIOMS.md`): el modelo tendrá que darla o el resultado lo arrastrará en la firma.
+(`AXIOMS.md`): el modelo tendrá que darla o el resultado lo arrastrará en la firma. ✏️ *(2026‑11‑05, L2‑6, ADR‑257:
+un modelo no podía darla: `AnclaEq` postulaba `Prf (ancla)`, una DERIVACIÓN, y un modelo da verdad. La dio el cálculo:
+`prf_ancla`, teorema desde ADR‑117; la clase se retiró en ADR‑118.)*
 PeanoRF puede fijar ya `consNat` con la codificación nueva.
 
 **Véase también:** ADR-088, ADR-090, ADR-092, ADR-093; `sondeos/CantorSobreyectivo.lean`.

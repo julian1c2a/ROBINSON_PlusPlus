@@ -199,6 +199,10 @@ que RPP ya no importa— (cuáles, en la nota ADR‑115 de `Meta/Hilbert.lean`).
 
 🔑 **El fondo**: postular `Prf (ancla)` afirma que el ancla **tiene una derivación finita de
 Hilbert**. Lo que queremos es que sea **VERDADERA**. La hipótesis dice eso y nada más.
+✏️ 2026‑11‑05 (L2‑6 de la auditoría de la base, ADR‑257): la última frase decía lo CONTRARIO del tipo. La clase
+`AnclaEq` postulaba `Prf (ancla)` —que el ancla tiene una derivación—, no que sea verdadera: eso lo diría un modelo, y
+la hipótesis no hablaba de modelos. Desde ADR‑117 no se postula nada: `prf_ancla` es un TEOREMA, una derivación en
+`Prf`, y la clase se retiró en ADR‑118.
 
 ## Por qué una CLASE y no un argumento explícito
 

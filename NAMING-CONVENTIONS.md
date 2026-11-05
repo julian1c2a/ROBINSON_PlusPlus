@@ -367,6 +367,23 @@ prefijos `prf_`), medido el 2026-09-26. **Decisión del propietario (2026-09-26)
 subíndice** (ADR-104). ⚠️ Los registros HISTÓRICOS (`DECISIONS.md`,
 `CHANGELOG.md`, `doc/AUDITORIA-*`, `doc/book/`) conservan `Prf₀` tal como se escribió.
 
+### `=eq` y `≐`: dos notaciones del MISMO `Formula.eq` (escrita el 2026‑11‑05, FOL0912:R‑9, ADR‑257)
+
+* `≐` es la de FOL: `infix:50 " ≐ " => Formula.eq`, global (`../FOL/FOL/FOL.lean`). `=eq` es la de RPP:
+  `scoped notation:50 t₁ " =eq " t₂ => Formula.eq t₁ t₂`, en el espacio `ROBINSON_PlusPlus.Minimal.Axioms`
+  (`Minimal/Axioms.lean`), y sólo vale donde ese espacio está abierto. Las dos elaboran al mismo término: no hay
+  colisión de análisis, y un lema escrito con una se aplica a lo escrito con la otra.
+* **La regla.** En RPP, `=eq` para las ecuaciones entre términos objeto (los axiomas, la aritmética, los códigos); `≐`
+  sólo donde se escribe una regla LÓGICA de la igualdad, que es de FOL: `Prfᵢ.eqrefl` y `Prfᵢ.leibniz`
+  (`Meta/Hilbert.lean`), sus espejos en `Meta/HilbertSeq.lean` y su análisis de casos en
+  `Meta/Representability2Prf.lean`. En FOL, `≐` o `Formula.eq`: allí `=eq` no existe.
+* **Medido el 2026‑11‑05**, en el código (sin comentarios ni cadenas, con `strip-lean.awk`): en RPP, 2965 `=eq` y 6
+  `≐`, en esos tres módulos, y sólo `Meta/Representability2Prf.lean` usa las dos; en FOL, ninguna de las dos fuera de
+  su definición. La auditoría de FOL del 2026‑09‑12 contaba 4410 y 201, con los comentarios y sobre otro árbol, y «20+
+  módulos de `Meta/`» que las mezclaban.
+* Lean imprime `≐`, la global, salvo con el espacio abierto: el índice de las constantes (`doc/indice.tsv`, que no
+  abre nada) la da en 1011 enunciados.
+
 ---
 
 ## 10. Nota de Migración

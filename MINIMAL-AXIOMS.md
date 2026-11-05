@@ -276,6 +276,12 @@ Son declaraciones Lean `axiom name : Type` que el sistema **no demuestra** pero 
 
 Estos **no son axiomas matemáticos**: son **reglas del cálculo deductivo** en **formulación meta-función / ω-regla**. **Refactor 2026-06-12**: extraídos de `Minimal/Axioms.lean` (donde eran lógica pura conviviendo con los axiomas aritméticos) a `FOL/MetaRules.lean` (namespace `FOL.MetaRules`); `Minimal.Axioms` los **re-exporta** para compatibilidad. No son derivables de los constructores de `Derives` (la hipótesis meta-función no se reduce a hipótesis-en-contexto). Junto con `gen` (ω-regla) axiomatizan "demostrabilidad = verdad en el modelo estándar ℕ": el sistema es **sólido y completo relativo a ℕ** (ω-lógica, estrictamente más fuerte que FOL= finitaria). Los constructores finitarios y sólidos para *todo* modelo son `Derives.intro_impl`/`elim_or`/`elim_ex`/`intro_forall`. Documentado en ADR-008.
 
+> ✏️ **2026‑11‑05 · FOL0912:R‑6 de la auditoría de FOL ([ADR‑257](DECISIONS.md)).** «El sistema es **sólido y completo
+> relativo a ℕ**» era falso en sus dos mitades. La SOLIDEZ es justo lo que no se tenía: con estas meta‑reglas
+> (`raa` toma una función de Lean) `⊢` derivaba `False`, y ADR‑115 borró `FOL/MetaRules.lean` y la capa `⊢` de RPP.
+> Y lo que no se derivaba se refutaba por otra razón —una premisa‑función decide—, de modo que `⊢` no era r.e. y no
+> podía ser sujeto de un teorema de incompletitud. Los titulares van hoy sobre `Prf`, un cálculo finitario.
+
 **Axioma matemático meta-codificado** (1, en `Block8.lean`):
 
 | Meta-axioma | Tipo | Rol |

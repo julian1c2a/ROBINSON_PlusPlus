@@ -1,0 +1,10 @@
+ADR-257, 2026-11-05: las dos medidas de los textos, sobre RPP 9bb3336 y FOL e2a07cc (los comentarios editados ese
+día no cambian lo que se cuenta: el código se mide sin comentarios).
+
+  engarce.txt    FOL0912:M-3: el «require» del lakefile de RPP, los import de FOL en el árbol de RPP (nueve módulos),
+                 lo que ENGARCE-ROBINSON-FOL.md describía (encodeList, IsList, code_nil, el lema β, los W-types: cero
+                 ficheros .lean en los dos repos) y lo que sí existe, del índice de las constantes (doc/indice.tsv)
+  alias-eq.txt   FOL0912:R-9: =eq y ≐ en el código de los dos repos, sin comentarios ni cadenas (strip-lean.awk): RPP
+                 2965 y 6 (los seis, uno por línea), un solo módulo con las dos; FOL, 0 y 0 (la definición de ≐ está en
+                 una cadena, que el despojador vacía); las dos definiciones; y cuántos enunciados del índice imprimen
+                 cada una

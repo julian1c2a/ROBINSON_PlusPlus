@@ -26,7 +26,8 @@ meta-reglas de `FOL/MetaRules.lean`), incluye la **ω-regla** `gen`:
 gen : (∀ n : Term, Γ ⊢ A[n]) → Γ ⊢ ∀A      -- premisas INFINITAS
 ```
 
-El propio módulo lo declara: el sistema es *"sólido y completo relativo a ℕ"* —
+El propio módulo lo declara: el sistema es *"sólido y completo relativo a ℕ"* (✏️ 2026‑11‑05, R‑6, ADR‑257: la
+cita era del docstring de entonces, y su mitad «sólido» era falsa: ADR‑115 borró las meta‑reglas porque daban `False`) —
 es **ω-lógica**. Consecuencias que **bloquean** D1–D3 como teoremas sobre `⊢`:
 
 1. **`⊢` no es r.e.** Captura la verdad en ℕ. Una demostración con la ω-regla
