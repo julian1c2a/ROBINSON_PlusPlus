@@ -1,0 +1,85 @@
+"""ADR-261: las 19 congruencias internas `pcc_congr_*_code` del build, como corolarios del genérico
+`pcc_congr_hole_code` (que sube de `sondeos/CongruenciaHueco.lean` a `Meta/EvalArithPrf.lean`).
+
+Para cada copia (salvo las dos de EvalArithPrf, que van a mano): comprueba que la FIRMA del build es, carácter a
+carácter salvo espacios, la del corolario del sondeo (que el sondeo ya comparó por `rfl`); cambia el `:= by` final de
+la firma por `:=` y el cuerpo (hasta la línea en blanco) por el del corolario; y añade al docstring una línea que lo
+dice. Uso: py -3.15 dedup.py RAIZ_RPP [--seco]"""
+import io, re, sys
+
+RAIZ = sys.argv[1]
+SECO = '--seco' in sys.argv
+SONDEO = RAIZ + '/sondeos/CongruenciaHueco.lean'
+NOTA = 'Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261).'
+
+def lee(p):
+    t = io.open(p, encoding='utf-8', newline='').read()
+    nl = '\r\n' if '\r\n' in t else '\n'
+    return t, nl, t.split(nl)
+
+def bloque(L, i):
+    """Desde la línea del `theorem` (i): (fin de la firma j, fin del cuerpo k exclusivo)."""
+    j = i
+    while not (L[j].rstrip().endswith(':=') or L[j].rstrip().endswith(':= by')):
+        j += 1
+    k = j + 1
+    while k < len(L) and L[k].strip() != '':
+        k += 1
+    return j, k
+
+def norm(s):
+    return re.sub(r'\s+', ' ', s).strip()
+
+# El sondeo: firma y cuerpo de cada corolario.
+_, _, S = lee(SONDEO)
+cor = {}
+for i, l in enumerate(S):
+    m = re.match(r'^theorem C_(pcc_congr_\w+)', l)
+    if m:
+        j, k = bloque(S, i)
+        firma = '\n'.join(S[i:j + 1]).replace('theorem C_', 'theorem ', 1)
+        cor[m.group(1)] = (firma, S[j + 1:k])
+assert len(cor) == 19, len(cor)
+
+hechos = []
+for f in ['CodeCtorKit', 'EvalCarcNthcPrf', 'EvalLiftfcPrf', 'EvalMulPrf', 'EvalPredPrf', 'EvalSubstfcPrf',
+          'EvalSubsttcPrf', 'LiftcCodePrf', 'LineWFTrackedPrf', 'SubstfcCodePrf', 'TrackedAtomsPrf']:
+    p = RAIZ + '/ROBINSON_PlusPlus/Meta/' + f + '.lean'
+    t, nl, L = lee(p)
+    out, i = [], 0
+    while i < len(L):
+        m = re.match(r'^theorem (pcc_congr_\w+)', L[i])
+        if not m:
+            out.append(L[i]); i += 1; continue
+        n = m.group(1)
+        firma_s, cuerpo_s = cor[n]
+        j, k = bloque(L, i)
+        firma_b = '\n'.join(L[i:j + 1])
+        fb = norm(re.sub(r':= by\s*$', ':=', firma_b))
+        assert fb == norm(firma_s), (f, n, fb, norm(firma_s))
+        # el docstring de justo encima: la nota antes de su `-/`
+        d = len(out) - 1
+        sangria = '    '
+        if out[d].strip() == '':
+            out.append('/-- ' + NOTA + ' -/')
+        else:
+            assert out[d].rstrip().endswith('-/'), (f, n, out[d])
+            e = d
+            while '/--' not in out[e] and '/-!' not in out[e]:
+                e -= 1
+            assert '/--' in out[e], (f, n, out[e])
+            out[d] = out[d].rstrip()[:-2].rstrip() + nl.join(['', sangria + NOTA + ' -/'])
+        out.extend(L[i:j])
+        out.append(re.sub(r':= by\s*$', ':=', L[j].rstrip()))
+        out.extend(cuerpo_s)
+        hechos.append((f, n, k - j - 1, len(cuerpo_s)))
+        i = k
+    t2 = nl.join(out)
+    # el docstring partido por la nota ya va con el salto del fichero
+    if not SECO and t2 != t:
+        io.open(p, 'w', encoding='utf-8', newline='').write(t2)
+
+for h in hechos:
+    print('%-18s %-34s cuerpo %3d → %2d líneas' % h)
+print('copias sustituidas:', len(hechos), '· líneas de cuerpo:', sum(h[2] for h in hechos), '→',
+      sum(h[3] for h in hechos))

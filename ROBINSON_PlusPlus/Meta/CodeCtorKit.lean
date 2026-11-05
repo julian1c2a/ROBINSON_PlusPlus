@@ -330,79 +330,48 @@ theorem pcc_dot_bin_symm (m : Nat) (a b : Term) :
 
 Cambiar un argumento del árbol de código **bajo `Prov`**, con la igualdad interna en la mano. Va
 por Leibniz interno sobre un contexto de código de un solo hueco. Generaliza el
-`pcc_congr_eqcT_diag_code_imp` que `eqrefl` construyó a mano (que era su caso diagonal). -/
+`pcc_congr_eqcT_diag_code_imp` que `eqrefl` construyó a mano (que era su caso diagonal).
+✏️ 2026‑11‑05 (ADR‑261): las tres, como las otras dieciséis del build, son corolarios del genérico
+`pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`); antes, cada una copiaba su prueba. -/
 
 /-- **Congruencia interna de `binT` en el 2º argumento**: de `Prov(⌜X = Y⌝)` sale
-    `Prov(⌜binT m A X = binT m A Y⌝)`. -/
+    `Prov(⌜binT m A X = binT m A Y⌝)`.
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_binT_2_code (m : Nat) (A X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m A X) (binT m A Y))) := by
-  let Ac : Term := eqc (binT m A X) (binT m A (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (binT m A X) (binT m A w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (binT m A X) (binT m A (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_binT m w A X) (prf_congr_binT (hA w) (hX w))
-    · exact prf_eq_trans (prf_substtc_binT m w A (varc (numeral 0)))
-        (prf_congr_binT (hA w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (binT m A X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (binT m A X) (binT m A (varc (numeral 0)))
-        (prf_hasWit_binT m hwA hwX)
-        (prf_hasWit_binT m hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m A X) (binT m A Y))) :=
+  pcc_congr_hole_code (fun s => binT m A s) X Y
+    (fun W => prf_eq_trans (prf_substtc_binT m W A X) (prf_congr_binT (hA W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_binT m w A (varc (numeral 0)))
+      (prf_congr_binT (hA w) (prf_substtc_varc0 w)))
+    (prf_hasWit_binT m hwA hwX) (prf_hasWit_binT m hwA (prf_hasWit_varc (numeral 0))) hwX hwY
 
-/-- **Congruencia interna de `binT` en el 1er argumento**. -/
+/-- **Congruencia interna de `binT` en el 1er argumento**.
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_binT_1_code (m : Nat) (B X Y : Term)
     (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwB : Prf (hasWit B) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m X B) (binT m Y B))) := by
-  let Ac : Term := eqc (binT m X B) (binT m (varc (numeral 0)) B)
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (binT m X B) (binT m w B)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (binT m X B) (binT m (varc (numeral 0)) B)) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_binT m w X B) (prf_congr_binT (hX w) (hB w))
-    · exact prf_eq_trans (prf_substtc_binT m w (varc (numeral 0)) B)
-        (prf_congr_binT (prf_substtc_varc0 w) (hB w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (binT m X B))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (binT m X B) (binT m (varc (numeral 0)) B)
-        (prf_hasWit_binT m hwX hwB)
-        (prf_hasWit_binT m (prf_hasWit_varc (numeral 0)) hwB)) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m X B) (binT m Y B))) :=
+  pcc_congr_hole_code (fun s => binT m s B) X Y
+    (fun W => prf_eq_trans (prf_substtc_binT m W X B) (prf_congr_binT (hX W) (hB W)))
+    (fun w => prf_eq_trans (prf_substtc_binT m w (varc (numeral 0)) B)
+      (prf_congr_binT (prf_substtc_varc0 w) (hB w)))
+    (prf_hasWit_binT m hwX hwB) (prf_hasWit_binT m (prf_hasWit_varc (numeral 0)) hwB) hwX hwY
 
-/-- **Congruencia interna de `unT`**. -/
+/-- **Congruencia interna de `unT`**.
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_unT_code (m : Nat) (X Y : Term)
     (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (unT m X) (unT m Y))) := by
-  let Ac : Term := eqc (unT m X) (unT m (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (unT m X) (unT m w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (unT m X) (unT m (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_unT m w X) (prf_congr_unT (hX w))
-    · exact prf_eq_trans (prf_substtc_unT m w (varc (numeral 0)))
-        (prf_congr_unT (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (unT m X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (unT m X) (unT m (varc (numeral 0)))
-        (prf_hasWit_unT m hwX)
-        (prf_hasWit_unT m (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (unT m X) (unT m Y))) :=
+  pcc_congr_hole_code (fun s => unT m s) X Y
+    (fun W => prf_eq_trans (prf_substtc_unT m W X) (prf_congr_unT (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_unT m w (varc (numeral 0)))
+      (prf_congr_unT (prf_substtc_varc0 w)))
+    (prf_hasWit_unT m hwX) (prf_hasWit_unT m (prf_hasWit_varc (numeral 0))) hwX hwY
 
 end ROBINSON_PlusPlus.Meta.CodeCtorKit
 

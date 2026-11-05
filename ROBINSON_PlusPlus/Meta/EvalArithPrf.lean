@@ -334,31 +334,6 @@ theorem pcc_eq_trans_code (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq 
       (prf_hasWitF_eq2 X (varc (numeral 0)) hwX (prf_hasWit_varc (numeral 0))) hwY hwZ h2 hY
   exact prf_mp (prf_provCode_congr (hcomp Z)) hZ
 
-/-- **Congruencia interna de `σ`** sobre códigos: `Prov(⌜X=Y⌝) → Prov(⌜σX = σY⌝)`.
-    Leibniz con el contexto `Ac := (σX = σv₀)`; la base `Ac[X]` es la **reflexividad codificada**
-    (`prf_provFromCode_eqCodeFn_refl`, libre de muro). -/
-theorem pcc_congr_succ_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
-    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y))
-    (heq : Prf (provFromCode (eqc X Y))) :
-    Prf (provFromCode (eqc (succcT X) (succcT Y))) := by
-  let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
-  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (succcT X) (succcT t)) := by
-    intro t
-    refine prf_eq_trans (prf_substfc_eq zero t (succcT X) (succcT (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_succcT zero t X) (prf_congr_succcT (hX t))
-    · exact prf_eq_trans (prf_substtc_succcT zero t (varc (numeral 0)))
-        (prf_congr_succcT (prf_substtc_varc0 t))
-  have hrefl : Prf (provFromCode (eqc (succcT X) (succcT X))) :=
-    prf_provFromCode_eqCodeFn_refl (succcT X)
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X))) hrefl
-  have hAY : Prf (provFromCode (substfc zero Y Ac)) :=
-    pcc_leibniz_apply Ac X Y
-      (prf_hasWitF_eq2 (succcT X) (succcT (varc (numeral 0))) (prf_hasWit_succcT hwX)
-        (prf_hasWit_succcT (prf_hasWit_varc (numeral 0)))) hwX hwY heq hAX
-  exact prf_mp (prf_provCode_congr (hcomp Y)) hAY
-
 /-! #### Invariancias `substtc` de los códigos que usamos (descargan `hX`) -/
 
 /-- `tcFn a` es `substtc`‑invariante (es (A), `prf_substtc_tcFn`). -/
@@ -415,28 +390,54 @@ theorem pcc_eq_trans_code_imp (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X 
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Z)) _)
     (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
 
-/-- **Congruencia interna de `σ`**, en forma implicación. -/
-theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+/-- **Congruencia interna de un contexto de UN hueco**, el genérico: de `Prov(⌜X = Y⌝)` sale
+    `Prov(⌜F X = F Y⌝)`. Leibniz interno con el contexto `Ac := (F X = F v₀)`; la base `Ac[X]` es la
+    **reflexividad codificada** (`prf_provFromCode_eqCodeFn_refl`, libre de muro). El contexto entra como
+    `F : Term → Term`: `hinv` y `hhole` son las dos obligaciones de estructura (que el contexto con `X` es
+    `substtc`‑invariante, y que sustituir en el hueco da `F w`), y las cuatro de testigo, las que pide Leibniz
+    desde la guarda (ADR‑020). Las 19 congruencias internas `pcc_congr_*_code` del build (doce módulos) son sus
+    corolarios: antes eran copias de esta prueba, cada una con su contexto escrito a mano (ADR‑261; el genérico
+    se escribió en 2026‑09 y se adaptó a la guarda en `sondeos/CongruenciaHueco.lean`, ADR‑247). -/
+theorem pcc_congr_hole_code (F : Term → Term) (X Y : Term)
+    (hinv : ∀ W, Prf (substtc zero W (F X) =eq F X))
+    (hhole : ∀ w, Prf (substtc zero w (F (varc (numeral 0))) =eq F w))
+    (hwFX : Prf (hasWit (F X))) (hwF0 : Prf (hasWit (F (varc (numeral 0)))))
     (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (succcT X) (succcT Y))) := by
-  let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
-  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (succcT X) (succcT t)) := by
-    intro t
-    refine prf_eq_trans (prf_substfc_eq zero t (succcT X) (succcT (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_succcT zero t X) (prf_congr_succcT (hX t))
-    · exact prf_eq_trans (prf_substtc_succcT zero t (varc (numeral 0)))
-        (prf_congr_succcT (prf_substtc_varc0 t))
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (F X) (F Y))) := by
+  let Ac : Term := eqc (F X) (F (varc (numeral 0)))
+  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (F X) (F w)) := by
+    intro w
+    refine prf_eq_trans (prf_substfc_eq zero w (F X) (F (varc (numeral 0)))) ?_
+    exact prf_congr_eqCodeFn (hinv w) (hhole w)
   have hAX : Prf (provFromCode (substfc zero X Ac)) :=
     prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (succcT X))
+      (prf_provFromCode_eqCodeFn_refl (F X))
   have himp : Prf (provFromCode (eqc X Y) ⇒ provFromCode (substfc zero Y Ac)) :=
     pcc_leibniz_apply_imp Ac X Y
-      (prf_hasWitF_eq2 (succcT X) (succcT (varc (numeral 0))) (prf_hasWit_succcT hwX)
-        (prf_hasWit_succcT (prf_hasWit_varc (numeral 0)))) hwX hwY hAX
+      (prf_hasWitF_eq2 (F X) (F (varc (numeral 0))) hwFX hwF0) hwX hwY hAX
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
     (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
+
+/-- **Congruencia interna de `σ`**, en forma implicación: `Prov(⌜X=Y⌝) ⇒ Prov(⌜σX = σY⌝)`.
+    Corolario del genérico `pcc_congr_hole_code` (ADR‑261). -/
+theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (succcT X) (succcT Y))) :=
+  pcc_congr_hole_code succcT X Y
+    (fun W => prf_eq_trans (prf_substtc_succcT zero W X) (prf_congr_succcT (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_succcT zero w (varc (numeral 0)))
+      (prf_congr_succcT (prf_substtc_varc0 w)))
+    (prf_hasWit_succcT hwX) (prf_hasWit_succcT (prf_hasWit_varc (numeral 0))) hwX hwY
+
+/-- **Congruencia interna de `σ`** sobre códigos, en forma de REGLA: de `Prov(⌜X=Y⌝)` sale
+    `Prov(⌜σX = σY⌝)`. Corolario del genérico `pcc_congr_hole_code` (ADR‑261; antes estaba encima de
+    `pcc_leibniz_apply_imp`, con su propia prueba). -/
+theorem pcc_congr_succ_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y))
+    (heq : Prf (provFromCode (eqc X Y))) :
+    Prf (provFromCode (eqc (succcT X) (succcT Y))) :=
+  prf_mp (pcc_congr_succ_code_imp X Y hX hwX hwY) heq
 
 /-! ### PASO INDUCTIVO de `+` -/
 
@@ -558,6 +559,8 @@ export ROBINSON_PlusPlus.Meta.EvalArithPrf (
   pcc_leibniz_apply pcc_eq_trans_code pcc_congr_succ_code
   substtc_inv_tcFn substtc_inv_succcT substtc_inv_addcT
   pcc_leibniz_apply_imp pcc_eq_trans_code_imp pcc_congr_succ_code_imp
+  -- ADR-261: el genérico de las 19 congruencias internas `pcc_congr_*_code`
+  pcc_congr_hole_code
   substTerm_evalAddCode liftTerm_evalAddCode evalAddPred substFormula_evalAddPred
   step_evalAddPred pcc_eval_add_succ_imp prf_eval_add_all pcc_eval_add
   -- ADR-020: la guarda de los constructores dotados (escalera de aridad, §28)

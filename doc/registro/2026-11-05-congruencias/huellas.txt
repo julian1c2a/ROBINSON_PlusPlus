@@ -1,0 +1,26 @@
+# ADR-261: las huellas (huellas.bash.txt de doc/registro/2026-11-05-pendientes/) ANTES (el build de ADR-260, de62e8e)
+# y DESPUÉS (las 19 congruencias, corolarios del genérico): el hash del tipo y del valor de cada constante.
+antes: 11523 · después: 11524 constantes
+sólo antes: 0 · sólo después: 1 · cambia el TIPO: 0 · cambia sólo el VALOR: 19
+### sólo después (el genérico):
+ROBINSON_PlusPlus.Meta.EvalArithPrf.pcc_congr_hole_code
+### cambia sólo el valor (las 19, con el mismo enunciado):
+ROBINSON_PlusPlus.Meta.CodeCtorKit.pcc_congr_binT_1_code
+ROBINSON_PlusPlus.Meta.CodeCtorKit.pcc_congr_binT_2_code
+ROBINSON_PlusPlus.Meta.CodeCtorKit.pcc_congr_unT_code
+ROBINSON_PlusPlus.Meta.EvalArithPrf.pcc_congr_succ_code
+ROBINSON_PlusPlus.Meta.EvalArithPrf.pcc_congr_succ_code_imp
+ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf.pcc_congr_carcT_code_imp
+ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_congr_liftfcT_arg2_code
+ROBINSON_PlusPlus.Meta.EvalMulPrf.pcc_congr_addcT1_code_imp
+ROBINSON_PlusPlus.Meta.EvalPredPrf.pcc_congr_predcT_code
+ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.pcc_congr_substfcT_arg2_code
+ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.pcc_congr_substtcT_arg3_code
+ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.pcc_congr_substtscT_arg3_code
+ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_congr_consT_arg1_code
+ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_congr_consT_arg2_code
+ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_congr_liftcT_arg2_code
+ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_congr_liftscT_arg2_code
+ROBINSON_PlusPlus.Meta.LineWFTrackedPrf.pcc_congr_eqcT_diag_code_imp
+ROBINSON_PlusPlus.Meta.SubstfcCodePrf.pcc_congr_substfcT_arg3_code
+ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.pcc_congr_nthcT_arg1_code

@@ -352,30 +352,18 @@ theorem pcc_dot_eqc_symm (a b : Term) :
 /-- **Congruencia DIAGONAL de `eqcT` DENTRO de `Prov`**: de `Prov(⌜X = Y⌝)` sale
     `Prov(⌜eqc(X,X) = eqc(Y,Y)⌝)`. Mismo patrón que `pcc_congr_carcT_code_imp`, con el contexto
     de código llevando **dos huecos** `⌜v₀⌝` — ambos reciben el mismo testigo al sustituir, que es
-    justo lo que pide `eqrefl` (`t ≐ t`, el mismo término a los dos lados). -/
+    justo lo que pide `eqrefl` (`t ≐ t`, el mismo término a los dos lados).
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_eqcT_diag_code_imp (X Y : Term)
     (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (eqcT X X) (eqcT Y Y))) := by
-  let Ac : Term := eqc (eqcT X X) (eqcT (varc (numeral 0)) (varc (numeral 0)))
-  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (eqcT X X) (eqcT t t)) := by
-    intro t
-    refine prf_eq_trans (prf_substfc_eq zero t (eqcT X X)
-      (eqcT (varc (numeral 0)) (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_eqcT t X X) (prf_congr_eqcT (hX t) (hX t))
-    · exact prf_eq_trans (prf_substtc_eqcT t (varc (numeral 0)) (varc (numeral 0)))
-        (prf_congr_eqcT (prf_substtc_varc0 t) (prf_substtc_varc0 t))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (eqcT X X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (eqcT X X) (eqcT (varc (numeral 0)) (varc (numeral 0)))
-        (prf_hasWit_eqcT hwX hwX)
-        (prf_hasWit_eqcT (prf_hasWit_varc (numeral 0)) (prf_hasWit_varc (numeral 0))))
-      hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (eqcT X X) (eqcT Y Y))) :=
+  pcc_congr_hole_code (fun s => eqcT s s) X Y
+    (fun W => prf_eq_trans (prf_substtc_eqcT W X X) (prf_congr_eqcT (hX W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_eqcT w (varc (numeral 0)) (varc (numeral 0)))
+      (prf_congr_eqcT (prf_substtc_varc0 w) (prf_substtc_varc0 w)))
+    (prf_hasWit_eqcT hwX hwX)
+    (prf_hasWit_eqcT (prf_hasWit_varc (numeral 0)) (prf_hasWit_varc (numeral 0))) hwX hwY
 
 /-- **`Prov(TAG_dot t)`**: bajo la cota `1 < lenc t`, la igualdad de etiqueta `nthc t 1 = 12̇`
     produce el código punteado del antecedente de tag, DENTRO de `Prov`. -/

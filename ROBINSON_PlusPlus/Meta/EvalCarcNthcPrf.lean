@@ -78,25 +78,16 @@ theorem PrfH_eq_trans_code {Γ : List Formula} (X Y Z : Term)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Z)) _) hZ
 
 /-- **Congruencia interna de `carcT`** (forma implicación): `Prov(⌜X=Y⌝) ⇒ Prov(⌜carcT X = carcT Y⌝)`.
-    Leibniz con contexto `Ac := (carcT X = carcT v₀)`; base = reflexividad codificada. -/
+    Leibniz con contexto `Ac := (carcT X = carcT v₀)`; base = reflexividad codificada.
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_carcT_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (carcT X) (carcT Y))) := by
-  let Ac : Term := eqc (carcT X) (carcT (varc (numeral 0)))
-  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (carcT X) (carcT t)) := by
-    intro t
-    refine prf_eq_trans (prf_substfc_eq zero t (carcT X) (carcT (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_carcT zero t X) (prf_congr_carcT (hX t))
-    · exact prf_eq_trans (prf_substtc_carcT zero t (varc (numeral 0)))
-        (prf_congr_carcT (prf_substtc_varc0 t))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X))) (prf_provFromCode_eqCodeFn_refl (carcT X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (carcT X) (carcT (varc (numeral 0))) (prf_hasWit_carcT hwX)
-        (prf_hasWit_carcT (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (carcT X) (carcT Y))) :=
+  pcc_congr_hole_code carcT X Y
+    (fun W => prf_eq_trans (prf_substtc_carcT zero W X) (prf_congr_carcT (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_carcT zero w (varc (numeral 0)))
+      (prf_congr_carcT (prf_substtc_varc0 w)))
+    (prf_hasWit_carcT hwX) (prf_hasWit_carcT (prf_hasWit_varc (numeral 0))) hwX hwY
 
 /-- Congruencia de `carcT` en `PrfH`. -/
 theorem PrfH_congr_carcT {Γ : List Formula} {x y : Term} (h : PrfH Γ (x =eq y)) :

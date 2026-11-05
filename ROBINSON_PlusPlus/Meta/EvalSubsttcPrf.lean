@@ -647,54 +647,37 @@ example (v s X : Term) : True := by
     exact (rfl : substtcT (tcFn v) (tcFn s) (tcFn X) = tcFn (substtc v s X))
   trivial
 
+/-- Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_substtcT_arg3_code (A B X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hB : ∀ W, Prf (substtc zero W B =eq B))
     (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwB : Prf (hasWit B) := by hw_auto)
     (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substtcT A B X) (substtcT A B Y))) := by
-  let Ac : Term := eqc (substtcT A B X) (substtcT A B (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (substtcT A B X) (substtcT A B w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (substtcT A B X)
-      (substtcT A B (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_substtcT zero w A B X)
-        (prf_congr_substtcT (hA w) (hB w) (hX w))
-    · exact prf_eq_trans (prf_substtc_substtcT zero w A B (varc (numeral 0)))
-        (prf_congr_substtcT (hA w) (hB w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (substtcT A B X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (by hw_auto) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substtcT A B X) (substtcT A B Y))) :=
+  pcc_congr_hole_code (fun s => substtcT A B s) X Y
+    (fun W => prf_eq_trans (prf_substtc_substtcT zero W A B X)
+      (prf_congr_substtcT (hA W) (hB W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_substtcT zero w A B (varc (numeral 0)))
+      (prf_congr_substtcT (hA w) (hB w) (prf_substtc_varc0 w)))
+    (prf_hasWit_funcc3 (strCode sym!"substtc") A B X hwA hwB hwX)
+    (prf_hasWit_funcc3 (strCode sym!"substtc") A B (varc (numeral 0)) hwA hwB
+      (prf_hasWit_varc (numeral 0))) hwX hwY
 
+/-- Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_substtscT_arg3_code (A B X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hB : ∀ W, Prf (substtc zero W B =eq B))
     (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwB : Prf (hasWit B) := by hw_auto)
     (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substtscT A B X) (substtscT A B Y))) := by
-  let Ac : Term := eqc (substtscT A B X) (substtscT A B (varc (numeral 0)))
-  have hcomp : ∀ w : Term,
-      Prf (substfc zero w Ac =eq eqc (substtscT A B X) (substtscT A B w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (substtscT A B X)
-      (substtscT A B (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_substtscT zero w A B X)
-        (prf_congr_substtscT (hA w) (hB w) (hX w))
-    · exact prf_eq_trans (prf_substtc_substtscT zero w A B (varc (numeral 0)))
-        (prf_congr_substtscT (hA w) (hB w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (substtscT A B X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (by hw_auto) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substtscT A B X) (substtscT A B Y))) :=
+  pcc_congr_hole_code (fun s => substtscT A B s) X Y
+    (fun W => prf_eq_trans (prf_substtc_substtscT zero W A B X)
+      (prf_congr_substtscT (hA W) (hB W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_substtscT zero w A B (varc (numeral 0)))
+      (prf_congr_substtscT (hA w) (hB w) (prf_substtc_varc0 w)))
+    (prf_hasWit_funcc3 (strCode sym!"substtsc") A B X hwA hwB hwX)
+    (prf_hasWit_funcc3 (strCode sym!"substtsc") A B (varc (numeral 0)) hwA hwB
+      (prf_hasWit_varc (numeral 0))) hwX hwY
 
 /-! ############################################################################
     ## §6 · LAS CLAUSULAS ESTRUCTURALES (`funcc`, `nil`, `cons`) — CERRADAS

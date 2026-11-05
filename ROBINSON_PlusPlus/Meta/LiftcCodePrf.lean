@@ -661,96 +661,55 @@ theorem pcc_liftsc0_cons_code (h t : Term) :
      el KIT solo tiene las de `unT`/`binT`, y el paso `cons` de la lista las pide sobre `consT`
      con tag `cons_sym`, que NO es un `binT`. -/
 
+/-- Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_liftcT_arg2_code (A X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftcT A X) (liftcT A Y))) := by
-  let Ac : Term := eqc (liftcT A X) (liftcT A (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (liftcT A X) (liftcT A w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (liftcT A X) (liftcT A (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_liftcT zero w A X) (prf_congr_liftcT (hA w) (hX w))
-    · exact prf_eq_trans (prf_substtc_liftcT zero w A (varc (numeral 0)))
-        (prf_congr_liftcT (hA w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (liftcT A X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (liftcT A X) (liftcT A (varc (numeral 0)))
-        (prf_hasWit_liftcT hwA hwX) (prf_hasWit_liftcT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftcT A X) (liftcT A Y))) :=
+  pcc_congr_hole_code (fun s => liftcT A s) X Y
+    (fun W => prf_eq_trans (prf_substtc_liftcT zero W A X) (prf_congr_liftcT (hA W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_liftcT zero w A (varc (numeral 0)))
+      (prf_congr_liftcT (hA w) (prf_substtc_varc0 w)))
+    (prf_hasWit_liftcT hwA hwX) (prf_hasWit_liftcT hwA (prf_hasWit_varc (numeral 0))) hwX hwY
 
+/-- Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_liftscT_arg2_code (A X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftscT A X) (liftscT A Y))) := by
-  let Ac : Term := eqc (liftscT A X) (liftscT A (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (liftscT A X) (liftscT A w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (liftscT A X) (liftscT A (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_liftscT zero w A X) (prf_congr_liftscT (hA w) (hX w))
-    · exact prf_eq_trans (prf_substtc_liftscT zero w A (varc (numeral 0)))
-        (prf_congr_liftscT (hA w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (liftscT A X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (liftscT A X) (liftscT A (varc (numeral 0)))
-        (prf_hasWit_liftscT hwA hwX) (prf_hasWit_liftscT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftscT A X) (liftscT A Y))) :=
+  pcc_congr_hole_code (fun s => liftscT A s) X Y
+    (fun W => prf_eq_trans (prf_substtc_liftscT zero W A X) (prf_congr_liftscT (hA W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_liftscT zero w A (varc (numeral 0)))
+      (prf_congr_liftscT (hA w) (prf_substtc_varc0 w)))
+    (prf_hasWit_liftscT hwA hwX) (prf_hasWit_liftscT hwA (prf_hasWit_varc (numeral 0))) hwX hwY
 
-/-- Congruencia interna en la COLA de `consT` (para el paso `cons` de la lista). -/
+/-- Congruencia interna en la COLA de `consT` (para el paso `cons` de la lista).
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_consT_arg2_code (A X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT A X) (consT A Y))) := by
-  let Ac : Term := eqc (consT A X) (consT A (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (consT A X) (consT A w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (consT A X) (consT A (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_consT zero w A X) (prf_congr_consT (hA w) (hX w))
-    · exact prf_eq_trans (prf_substtc_consT zero w A (varc (numeral 0)))
-        (prf_congr_consT (hA w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (consT A X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (consT A X) (consT A (varc (numeral 0)))
-        (prf_hasWit_consT hwA hwX) (prf_hasWit_consT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT A X) (consT A Y))) :=
+  pcc_congr_hole_code (fun s => consT A s) X Y
+    (fun W => prf_eq_trans (prf_substtc_consT zero W A X) (prf_congr_consT (hA W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_consT zero w A (varc (numeral 0)))
+      (prf_congr_consT (hA w) (prf_substtc_varc0 w)))
+    (prf_hasWit_consT hwA hwX) (prf_hasWit_consT hwA (prf_hasWit_varc (numeral 0))) hwX hwY
 
-/-- Congruencia interna en la CABEZA de `consT`. -/
+/-- Congruencia interna en la CABEZA de `consT`.
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_consT_arg1_code (B X Y : Term)
     (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwB : Prf (hasWit B) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT X B) (consT Y B))) := by
-  let Ac : Term := eqc (consT X B) (consT (varc (numeral 0)) B)
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (consT X B) (consT w B)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (consT X B) (consT (varc (numeral 0)) B)) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_consT zero w X B) (prf_congr_consT (hX w) (hB w))
-    · exact prf_eq_trans (prf_substtc_consT zero w (varc (numeral 0)) B)
-        (prf_congr_consT (prf_substtc_varc0 w) (hB w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (consT X B))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (consT X B) (consT (varc (numeral 0)) B)
-        (prf_hasWit_consT hwX hwB)
-        (prf_hasWit_consT (prf_hasWit_varc (numeral 0)) hwB)) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT X B) (consT Y B))) :=
+  pcc_congr_hole_code (fun s => consT s B) X Y
+    (fun W => prf_eq_trans (prf_substtc_consT zero W X B) (prf_congr_consT (hX W) (hB W)))
+    (fun w => prf_eq_trans (prf_substtc_consT zero w (varc (numeral 0)) B)
+      (prf_congr_consT (prf_substtc_varc0 w) (hB w)))
+    (prf_hasWit_consT hwX hwB) (prf_hasWit_consT (prf_hasWit_varc (numeral 0)) hwB) hwX hwY
 
 /-! ## §7 · LAS CUATRO CLAUSULAS DE LA RECURSION — el esqueleto entero de `hLift`
 

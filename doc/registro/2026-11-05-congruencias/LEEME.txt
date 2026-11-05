@@ -1,0 +1,15 @@
+ADR-261, 2026-11-05: las 19 congruencias internas `pcc_congr_*_code`, corolarios del genérico `pcc_congr_hole_code`
+(Meta/EvalArithPrf.lean). El script va como .txt; se lanzó con py -3.15 en la máquina del propietario.
+
+  huellas.txt          el hash del tipo y del valor de cada constante (huellas.bash.txt de ../2026-11-05-pendientes/)
+                       ANTES (el build de ADR-260, de62e8e) y DESPUÉS: 11 523 → 11 524 constantes; la nueva, el
+                       genérico; ningún TIPO cambia; cambian sólo los valores de las 19
+  dedup.py.txt         sustituyó las 17 copias de fuera de EvalArithPrf: comprueba que la firma del build es la del
+                       corolario de sondeos/CongruenciaHueco.lean (la versión de T48, f67a8f7), salvo espacios; pone su
+                       prueba y una línea en el docstring. Las dos de EvalArithPrf, a mano
+  medida-sondeo.txt    la salida de sondeos/CongruenciaHueco.lean (la medida que queda): las 19, por el genérico y sin
+                       Leibniz propio; los dos controles; rc=0
+  medida-mutante.txt   el mismo sondeo con pcc_eq_trans_code_imp de más en la lista (una prueba con su propia Leibniz):
+                       §1 lo ve y sale rojo, rc=1
+Y además: el build (150 jobs, sin avisos); check-footprints (652), check-choice (200), check-estratos (12),
+check-sorry y check-warnings, verdes; el índice rehecho (doc/indice.tsv: una fila más, el genérico).

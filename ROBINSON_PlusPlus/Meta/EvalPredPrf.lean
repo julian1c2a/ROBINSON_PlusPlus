@@ -198,29 +198,18 @@ theorem pcc_eval_pred' (n : Term) :
     Prf (provFromCode (eqc (predcT (tcFn n)) (tcFn (pred n)))) := pcc_eval_pred n
 
 /-! ## §5 · CONGRUENCIA INTERNA de `predcT` (dentro de `Prov`) — la pieza que consume el
-consumidor aguas abajo, molde `pcc_congr_succ_code` (`Meta/EvalArithPrf.lean:253`). -/
+consumidor aguas abajo, molde `pcc_congr_succ_code` (`Meta/EvalArithPrf.lean`). -/
 
+/-- Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_predcT_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y))
     (heq : Prf (provFromCode (eqc X Y))) :
-    Prf (provFromCode (eqc (predcT X) (predcT Y))) := by
-  let Ac : Term := eqc (predcT X) (predcT (varc (numeral 0)))
-  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (predcT X) (predcT t)) := by
-    intro t
-    refine prf_eq_trans (prf_substfc_eq zero t (predcT X) (predcT (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_predcT zero t X) (prf_congr_predcT (hX t))
-    · exact prf_eq_trans (prf_substtc_predcT zero t (varc (numeral 0)))
-        (prf_congr_predcT (prf_substtc_varc0 t))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (predcT X))
-  have hAY : Prf (provFromCode (substfc zero Y Ac)) :=
-    pcc_leibniz_apply Ac X Y
-      (prf_hasWitF_eq2 (predcT X) (predcT (varc (numeral 0)))
-        (prf_hasWit_predcT hwX) (prf_hasWit_predcT (prf_hasWit_varc (numeral 0)))) hwX hwY
-      heq hAX
-  exact prf_mp (prf_provCode_congr (hcomp Y)) hAY
+    Prf (provFromCode (eqc (predcT X) (predcT Y))) :=
+  prf_mp (pcc_congr_hole_code predcT X Y
+    (fun W => prf_eq_trans (prf_substtc_predcT zero W X) (prf_congr_predcT (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_predcT zero w (varc (numeral 0)))
+      (prf_congr_predcT (prf_substtc_varc0 w)))
+    (prf_hasWit_predcT hwX) (prf_hasWit_predcT (prf_hasWit_varc (numeral 0))) hwX hwY) heq
 
 /-! ## §5b · PAYOFF: el LADO DERECHO de `ax_substtc_var_gt` dotado, YA PLEGADO.
 

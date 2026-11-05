@@ -1344,6 +1344,7 @@ de razonamiento ecuacional dentro de `Prov`:
 | congruencia interna de `σ` | `theorem pcc_congr_succ_code (X Y : Term) …` |
 | invariancias `substtc` | `substtc_inv_tcFn`, `substtc_inv_succcT`, `substtc_inv_addcT` |
 | formas IMPLICACIÓN (para `prf_nat_induction`) | `pcc_leibniz_apply_imp`, `pcc_eq_trans_code_imp`, `pcc_congr_succ_code_imp` |
+| congruencia interna de un contexto de UN hueco, el genérico (✏️ 2026‑11‑05, [ADR‑261](../DECISIONS.md): las 19 pcc_congr_*_code del build, en doce módulos, son sus corolarios) | `theorem pcc_congr_hole_code (F : Term → Term) (X Y : Term) (hinv : ∀ W, Prf (substtc zero W (F X) =eq F X)) (hhole : ∀ w, Prf (substtc zero w (F (varc (numeral 0))) =eq F w)) (hwFX …) (hwF0 …) (hwX …) (hwY …) : Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (F X) (F Y)))` |
 
 La restricción real del toolkit: al sustituir en el código‑contexto `Ac`, el `substtc` alcanza también
 los subtérminos ya presentes ⇒ los lemas piden que el código fijo sea **`substtc`‑invariante**

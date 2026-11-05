@@ -2012,6 +2012,7 @@ S_TAB=$(mktemp); S_HOY=$(mktemp)
 cat > "$S_TAB" <<'SEOF'
 ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean§AcotarEsLaMismaObligacion§1§los consumidores de la firma que quedan en el sondeo
 ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§A3IsFCBTracked§2§lo que aplicó y lo que no necesitó en su día (nota ✏️ de ADR‑134; REGISTRO: compila otra vez desde ADR‑248)
+ROBINSON_PlusPlus/Meta/EvalArithPrf.lean§CongruenciaHueco§1§de dónde se adaptó el genérico (ADR‑247) antes de subir (ADR‑261); en el sondeo queda la medida de que las 19 son sus corolarios
 ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean§A3IsFCBTracked§3§lo que reflejó, su §2 citada y cómo define su PsiF (REGISTRO desde ADR‑248)
 ROBINSON_PlusPlus/Meta/HilbertDeduction.lean§PrfHMono§2§el rescate de la deuda B6b (2026‑09‑11) y su copia; PrfH_w1 está en el build
 ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean§SegundoMuro§1§una de las copias de la pieza antes de entrar en el build

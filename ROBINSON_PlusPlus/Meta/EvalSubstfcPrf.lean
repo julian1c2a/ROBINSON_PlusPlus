@@ -97,32 +97,21 @@ namespace ROBINSON_PlusPlus.Meta.EvalSubstfcPrf
     `mem6`/`mem9`. Las otras 73 eran duplicados o exploración sin consumidor.
     ############################################################################ -/
 
+/-- Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_substfcT_arg2_code (A C X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hC : ∀ W, Prf (substtc zero W C =eq C))
     (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwC : Prf (hasWit C) := by hw_auto)
     (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substfcT A X C) (substfcT A Y C))) := by
-  let Ac : Term := eqc (substfcT A X C) (substfcT A (varc (numeral 0)) C)
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (substfcT A X C) (substfcT A w C)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (substfcT A X C)
-      (substfcT A (varc (numeral 0)) C)) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_substfcT zero w A X C)
-        (prf_congr_substfcT (hA w) (hX w) (hC w))
-    · exact prf_eq_trans (prf_substtc_substfcT zero w A (varc (numeral 0)) C)
-        (prf_congr_substfcT (hA w) (prf_substtc_varc0 w) (hC w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (substfcT A X C))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (substfcT A X C) (substfcT A (varc (numeral 0)) C)
-        (prf_hasWit_funcc3 (strCode sym!"substfc") A X C hwA hwX hwC)
-        (prf_hasWit_funcc3 (strCode sym!"substfc") A (varc (numeral 0)) C hwA
-          (prf_hasWit_varc (numeral 0)) hwC)) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substfcT A X C) (substfcT A Y C))) :=
+  pcc_congr_hole_code (fun s => substfcT A s C) X Y
+    (fun W => prf_eq_trans (prf_substtc_substfcT zero W A X C)
+      (prf_congr_substfcT (hA W) (hX W) (hC W)))
+    (fun w => prf_eq_trans (prf_substtc_substfcT zero w A (varc (numeral 0)) C)
+      (prf_congr_substfcT (hA w) (prf_substtc_varc0 w) (hC w)))
+    (prf_hasWit_funcc3 (strCode sym!"substfc") A X C hwA hwX hwC)
+    (prf_hasWit_funcc3 (strCode sym!"substfc") A (varc (numeral 0)) C hwA
+      (prf_hasWit_varc (numeral 0)) hwC) hwX hwY
 
 /-- Constructor UNARIO de codigo de FORMULA, parametrizado por el tag. -/
 def unc (m : Nat) (a : Term) : Term := cons (numeralM m) (cons a nil)

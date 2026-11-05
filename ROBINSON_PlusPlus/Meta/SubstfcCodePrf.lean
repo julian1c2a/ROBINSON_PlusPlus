@@ -82,32 +82,21 @@ namespace ROBINSON_PlusPlus.Meta.SubstfcCodePrf
 
 /-! ## §3 · Congruencia INTERNA de `substfcT` en el 3er argumento (patrón §4 de `Paso2CasoForall`) -/
 
+/-- Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_substfcT_arg3_code (A B X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hB : ∀ W, Prf (substtc zero W B =eq B))
     (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwB : Prf (hasWit B) := by hw_auto)
     (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substfcT A B X) (substfcT A B Y))) := by
-  let Ac : Term := eqc (substfcT A B X) (substfcT A B (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (substfcT A B X) (substfcT A B w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (substfcT A B X)
-      (substfcT A B (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_substfcT zero w A B X)
-        (prf_congr_substfcT (hA w) (hB w) (hX w))
-    · exact prf_eq_trans (prf_substtc_substfcT zero w A B (varc (numeral 0)))
-        (prf_congr_substfcT (hA w) (hB w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (substfcT A B X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (substfcT A B X) (substfcT A B (varc (numeral 0)))
-        (prf_hasWit_funcc3 (strCode sym!"substfc") A B X hwA hwB hwX)
-        (prf_hasWit_funcc3 (strCode sym!"substfc") A B (varc (numeral 0)) hwA hwB
-          (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substfcT A B X) (substfcT A B Y))) :=
+  pcc_congr_hole_code (fun s => substfcT A B s) X Y
+    (fun W => prf_eq_trans (prf_substtc_substfcT zero W A B X)
+      (prf_congr_substfcT (hA W) (hB W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_substfcT zero w A B (varc (numeral 0)))
+      (prf_congr_substfcT (hA w) (hB w) (prf_substtc_varc0 w)))
+    (prf_hasWit_funcc3 (strCode sym!"substfc") A B X hwA hwB hwX)
+    (prf_hasWit_funcc3 (strCode sym!"substfc") A B (varc (numeral 0)) hwA hwB
+      (prf_hasWit_varc (numeral 0))) hwX hwY
 
 /-! ## §4 · El código de la ecuación interna (idéntico a `Paso2CasoForall` §6) -/
 

@@ -98,29 +98,19 @@ theorem prf_congr_bdAllCode {B B' P P' : Term} (hB : Prf (B =eq B')) (hP : Prf (
   unfold bdAllCode
   exact prf_congr_forallc (prf_congr_implc (prf_congr_atom2CodeFn (prf_refl _) hB) hP)
 
-/-- Congruencia INTERNA de `nthcT` en su PRIMER argumento (molde `pcc_congr_consT_arg1_code`). -/
+/-- Congruencia INTERNA de `nthcT` en su PRIMER argumento (molde `pcc_congr_consT_arg1_code`).
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_nthcT_arg1_code (B X Y : Term)
     (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwB : Prf (hasWit B) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (nthcT X B) (nthcT Y B))) := by
-  let Ac : Term := eqc (nthcT X B) (nthcT (varc (numeral 0)) B)
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (nthcT X B) (nthcT w B)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (nthcT X B) (nthcT (varc (numeral 0)) B)) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_nthcT zero w X B) (prf_congr_nthcT (hX w) (hB w))
-    · exact prf_eq_trans (prf_substtc_nthcT zero w (varc (numeral 0)) B)
-        (prf_congr_nthcT (prf_substtc_varc0 w) (hB w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (nthcT X B))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (nthcT X B) (nthcT (varc (numeral 0)) B)
-        (prf_hasWit_funcc2 _ X B hwX hwB)
-        (prf_hasWit_funcc2 _ (varc (numeral 0)) B (prf_hasWit_varc (numeral 0)) hwB)) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (nthcT X B) (nthcT Y B))) :=
+  pcc_congr_hole_code (fun s => nthcT s B) X Y
+    (fun W => prf_eq_trans (prf_substtc_nthcT zero W X B) (prf_congr_nthcT (hX W) (hB W)))
+    (fun w => prf_eq_trans (prf_substtc_nthcT zero w (varc (numeral 0)) B)
+      (prf_congr_nthcT (prf_substtc_varc0 w) (hB w)))
+    (prf_hasWit_funcc2 _ X B hwX hwB)
+    (prf_hasWit_funcc2 _ (varc (numeral 0)) B (prf_hasWit_varc (numeral 0)) hwB) hwX hwY
 
 /-- Introducción del `∨` a nivel de código, bajo contexto (versión `PrfH` de la mitad
     izquierda de `pcc_reflect_or`). -/

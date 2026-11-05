@@ -154,30 +154,17 @@ theorem pcc_ax9_computed (a b : Term) :
 /-! ### Las dos congruencias nuevas dentro de `Prov` -/
 
 /-- **Congruencia de `addcT` en el PRIMER argumento**, en forma implicación.
-    Espejo de `pcc_congr_succ_code_imp` con contexto `Ac := (X+A = v₀+A)`. -/
+    Espejo de `pcc_congr_succ_code_imp` con contexto `Ac := (X+A = v₀+A)`.
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_addcT1_code_imp (X Y A : Term)
     (hX : ∀ W, Prf (substtc zero W X =eq X)) (hA : ∀ W, Prf (substtc zero W A =eq A))
     (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) (hwA : Prf (hasWit A)) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (addcT X A) (addcT Y A))) := by
-  let Ac : Term := eqc (addcT X A) (addcT (varc (numeral 0)) A)
-  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (addcT X A) (addcT t A)) := by
-    intro t
-    refine prf_eq_trans (prf_substfc_eq zero t (addcT X A) (addcT (varc (numeral 0)) A)) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_addcT zero t X A) (prf_congr_addcT (hX t) (hA t))
-    · exact prf_eq_trans (prf_substtc_addcT zero t (varc (numeral 0)) A)
-        (prf_congr_addcT (prf_substtc_varc0 t) (hA t))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (addcT X A))
-  have himp : Prf (provFromCode (eqc X Y) ⇒ provFromCode (substfc zero Y Ac)) :=
-    pcc_leibniz_apply_imp Ac X Y
-      (prf_hasWitF_eq2 (addcT X A) (addcT (varc (numeral 0)) A)
-        (prf_hasWit_addcT hwX hwA)
-        (prf_hasWit_addcT (prf_hasWit_varc (numeral 0)) hwA)) hwX hwY hAX
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (addcT X A) (addcT Y A))) :=
+  pcc_congr_hole_code (fun s => addcT s A) X Y
+    (fun W => prf_eq_trans (prf_substtc_addcT zero W X A) (prf_congr_addcT (hX W) (hA W)))
+    (fun w => prf_eq_trans (prf_substtc_addcT zero w (varc (numeral 0)) A)
+      (prf_congr_addcT (prf_substtc_varc0 w) (hA w)))
+    (prf_hasWit_addcT hwX hwA) (prf_hasWit_addcT (prf_hasWit_varc (numeral 0)) hwA) hwX hwY
 
 /-- **Sustitución en el SEGUNDO argumento de `=`**, con la igualdad CERRADA:
     de `Prov(⌜Z=W⌝)` sale `Prov(⌜X=Z⌝) ⇒ Prov(⌜X=W⌝)`. Es lo que permite encadenar con

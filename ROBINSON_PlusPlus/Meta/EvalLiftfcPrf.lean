@@ -692,28 +692,18 @@ ecuación META correspondiente (`prf_liftfc_*`, `Meta/ArithPrf.lean`), y el tran
 Leibniz desde la forma ecuacional de la guarda. -/
 
 /-- La congruencia interna de `liftfcT` en su argumento CÓDIGO — espejo de
-    `pcc_congr_liftcT_arg2_code`. Es lo único de fontanería que faltaba. -/
+    `pcc_congr_liftcT_arg2_code`. Es lo único de fontanería que faltaba.
+    Corolario del genérico `pcc_congr_hole_code` (`Meta/EvalArithPrf.lean`, ADR‑261). -/
 theorem pcc_congr_liftfcT_arg2_code (A X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
     (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
     (hwY : Prf (hasWit Y) := by hw_auto) :
-    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftfcT A X) (liftfcT A Y))) := by
-  let Ac : Term := eqc (liftfcT A X) (liftfcT A (varc (numeral 0)))
-  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (liftfcT A X) (liftfcT A w)) := by
-    intro w
-    refine prf_eq_trans (prf_substfc_eq zero w (liftfcT A X) (liftfcT A (varc (numeral 0)))) ?_
-    refine prf_congr_eqCodeFn ?_ ?_
-    · exact prf_eq_trans (prf_substtc_liftfcT zero w A X) (prf_congr_liftfcT (hA w) (hX w))
-    · exact prf_eq_trans (prf_substtc_liftfcT zero w A (varc (numeral 0)))
-        (prf_congr_liftfcT (hA w) (prf_substtc_varc0 w))
-  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
-    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
-      (prf_provFromCode_eqCodeFn_refl (liftfcT A X))
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
-      (prf_hasWitF_eq2 (liftfcT A X) (liftfcT A (varc (numeral 0)))
-        (prf_hasWit_liftfcT hwA hwX) (prf_hasWit_liftfcT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftfcT A X) (liftfcT A Y))) :=
+  pcc_congr_hole_code (fun s => liftfcT A s) X Y
+    (fun W => prf_eq_trans (prf_substtc_liftfcT zero W A X) (prf_congr_liftfcT (hA W) (hX W)))
+    (fun w => prf_eq_trans (prf_substtc_liftfcT zero w A (varc (numeral 0)))
+      (prf_congr_liftfcT (hA w) (prf_substtc_varc0 w)))
+    (prf_hasWit_liftfcT hwA hwX) (prf_hasWit_liftfcT hwA (prf_hasWit_varc (numeral 0))) hwX hwY
 
 /-- El transporte de Leibniz del objetivo (espeja `PrfH_congr_targetSubstfc`). -/
 theorem substF_targetLiftfc_hole (c t : Term) :
