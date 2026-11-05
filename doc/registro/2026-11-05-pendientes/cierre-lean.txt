@@ -1,0 +1,12 @@
+# R2-4-5: qué módulos de RPP tienen Lean en su cierre de imports (cierre_lean.py.txt), sobre RPP 2e78871 y FOL 1dc0180
+## antes
+módulos de RPP: 121 · con Lean en el cierre: 118
+importan Lean directamente: 0: 
+   111  por ROBINSON_PlusPlus.Meta.Godel → FOL.Theorems.Quantifiers
+     7  por ROBINSON_PlusPlus.Full.Induction → FOL.Theorems.Quantifiers
+Minimal.Axioms: 
+## después (el árbol de ADR-258)
+módulos de RPP: 121 · con Lean en el cierre: 19
+importan Lean directamente: 1: ROBINSON_PlusPlus.Meta.PurezaComando
+    19  por ROBINSON_PlusPlus.Meta.PurezaComando → Lean
+Minimal.Axioms: 

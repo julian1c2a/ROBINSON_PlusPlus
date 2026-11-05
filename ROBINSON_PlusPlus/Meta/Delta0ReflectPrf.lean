@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.EvalBoundedPrf
+open scoped FOL  -- ¬ ∧ ∨ de las fórmulas de FOL (L5-08, ADR-258)
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel

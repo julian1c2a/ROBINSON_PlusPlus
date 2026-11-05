@@ -9,6 +9,7 @@ import ROBINSON_PlusPlus.Full.Induction
 import FOL.FOL
 import FOL.Theorems.Quantifiers
 import FOL.Theorems.Eq
+open scoped FOL  -- ¬ ∧ ∨ de las fórmulas de FOL (L5-08, ADR-258)
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 

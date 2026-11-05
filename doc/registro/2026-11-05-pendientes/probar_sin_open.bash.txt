@@ -1,0 +1,22 @@
+#!/bin/bash
+# L5-08: ¿qué módulos de RPP necesitan `open scoped FOL`? Por cada módulo que la lleva, compila una COPIA sin esa línea
+# (contra los .olean del build hecho con ella en todos) y apunta si compila. Uso: bash probar_sin_open.bash SALIDA.tsv
+set -uo pipefail
+export PATH="/c/Users/julia/.elan/bin:/usr/bin:$PATH"
+cd /e/dropbox/github/lean4/ROBINSON_PlusPlus || exit 2
+OUT="$1"
+TMP=$(mktemp -d)
+LINEA='open scoped FOL  -- ¬ ∧ ∨ de las fórmulas de FOL (L5-08, ADR-258)'
+uno() {
+  f="$1"; b=$(echo "$f" | tr '/' '_')
+  grep -vxF "$LINEA" "$f" > "$TMP/$b"
+  t0=$(date +%s)
+  if lake env lean "$(cygpath -m "$TMP/$b")" > "$TMP/$b.out" 2>&1; then r=0; else r=1; fi
+  e=$(grep -m1 -E 'error' "$TMP/$b.out" | sed -E 's#^.*\.lean:##' | cut -c1-140 | tr '\t' ' ')
+  printf '%s\t%s\t%s\t%s\n' "$f" "$r" "$(( $(date +%s) - t0 ))" "$e"
+}
+export -f uno; export TMP LINEA
+git ls-files 'ROBINSON_PlusPlus/*.lean' | while read -r f; do grep -qxF "$LINEA" "$f" && echo "$f"; done \
+  | xargs -P 4 -I{} bash -c 'uno "$@"' _ {} > "$OUT"
+rm -rf "$TMP"
+echo "hecho: $(wc -l < "$OUT") módulos; compilan sin la línea: $(awk -F'\t' '$2==0' "$OUT" | wc -l)"

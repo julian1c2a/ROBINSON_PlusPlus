@@ -1,6 +1,6 @@
 # Diagrama de Dependencias — ROBINSON_PlusPlus
 
-**Last updated:** 2026-11-02 — GENERADO por `python3 gen-dependencies.py` desde las líneas `import`; no se edita a mano.
+**Last updated:** 2026-11-05 — GENERADO por `python3 gen-dependencies.py` desde las líneas `import`; no se edita a mano.
 **Autor**: Julián Calderón Almendros
 
 > ⚠️ Este fichero se **calcula** (T30, ADR‑238). Para actualizarlo: `python3 gen-dependencies.py`; para comprobar
@@ -14,7 +14,7 @@
 * 1 `lean_lib`, `ROBINSON_PlusPlus`, con `globs := #[.andSubmodules …]`: el build compila el barril
   y TODO su directorio (T15, ADR‑163). Que todo módulo esté además en el cierre de imports del barril lo comprueba [L]
   de `check-doc-sync.bash`, y la cifra de módulos activos de arriba la compara [A] con la suya.
-* Imports externos de FOL, el único `require`: `FOL.Canonical0` (1), `FOL.Derives1` (1), `FOL.FOL` (18), `FOL.Lift0` (1), `FOL.Semantics` (2), `FOL.Sentence` (1), `FOL.SymLit` (1), `FOL.Theorems.Eq` (15), `FOL.Theorems.Quantifiers` (8) —entre paréntesis, cuántos módulos lo importan directamente; los barriles, aparte—. De fuera de FOL: ninguno.
+* Imports externos de FOL, el único `require`: `FOL.Canonical0` (1), `FOL.DecEq` (1), `FOL.Derives1` (1), `FOL.FOL` (18), `FOL.Lift0` (1), `FOL.Semantics` (2), `FOL.Sentence` (1), `FOL.SymLit` (1), `FOL.Theorems.Eq` (15), `FOL.Theorems.Quantifiers` (8) —entre paréntesis, cuántos módulos lo importan directamente; los barriles, aparte—. De fuera de FOL: `Lean` (1).
 
 ## Por niveles (camino de imports más largo hasta una raíz)
 
@@ -488,7 +488,7 @@ graph BT
 | `Meta.Hilbert` | 3 | `Full.Induction`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.CodeWitnessPrf`, `Meta.Diagonal`, `Meta.EvalLiftcPrf`, `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.ReprPrf`, `Meta.Representability`, `Meta.SolidezPrf`, `Meta.SubstfcCodePrf` |
 | `Meta.Provability` | 3 | `Meta.Godel`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Quantifiers` | `Meta.EvalLiftcPrf`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.LineWFCases`, `Meta.SubstArith`, `Meta.SubstfcCodePrf` |
 | `Meta.HilbertDeduction` | 4 | `Meta.Hilbert` | `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.LiftcCodePrf`, `Meta.PuenteFOL`, `Meta.SolidezPrf`, `Meta.SubstfcCodePrf` |
-| `Meta.HilbertSeq` | 4 | `Meta.Godel`, `Meta.Hilbert`, `Meta.Provability` · externo: `FOL.FOL` | `Meta.Representability` |
+| `Meta.HilbertSeq` | 4 | `Meta.Godel`, `Meta.Hilbert`, `Meta.Provability` · externo: `FOL.DecEq`, `FOL.FOL` | `Meta.Representability` |
 | `Meta.SubstArith` | 4 | `Meta.Provability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ArithPrf`, `Meta.CheckArith`, `Meta.Representability`, `Meta.SubstfcWitnessPrf` |
 | `Meta.CheckArith` | 5 | `Meta.SubstArith` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ProofChain`, `Meta.Representability` |
 | `Meta.ProofChain` | 6 | `Full.Induction`, `Meta.CheckArith`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwo`, `Meta.ReprPrf`, `Meta.Representability`, `Meta.Representability2` |
@@ -580,7 +580,7 @@ graph BT
 | `Meta.GodelTwo` | 48 | `Meta.PremsBdAllPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf` |
 | `Meta.GodelTwoPrf` | 49 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.DerivCondPrf`, `Meta.DiagonalNumeral`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.LineWFCases`, `Meta.PremsBdAllPrf`, `Meta.ReprPrf`, `Meta.Representability2Prf`, `Meta.TcArithPrf` | `Meta.Consistencia`, `Meta.TarskiPrf` |
 | `Meta.Consistencia` | 50 | `Meta.GodelTwoPrf`, `Meta.ModeloCodificacion`, `Meta.SolidezDobleNegacion`, `Meta.SolidezPrf` | `Meta.ContratoTitulares`, `Meta.PurezaComando`, `Meta.PurezaTitulares`, `Meta.RosserGuardNeg`, `Meta.SolidezVerificador`, `Meta.TarskiPrf` |
-| `Meta.PurezaComando` | 51 | `Meta.Consistencia` | `Meta.ContratoTitulares`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaTitulares`, `Meta.RosserNumerales`, `Meta.RosserPosNum`, `Meta.RosserW1` |
+| `Meta.PurezaComando` | 51 | `Meta.Consistencia` · externo: `Lean` | `Meta.ContratoTitulares`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaTitulares`, `Meta.RosserNumerales`, `Meta.RosserPosNum`, `Meta.RosserW1` |
 | `Meta.SolidezVerificador` | 51 | `Meta.Consistencia`, `Meta.Representability` | `Meta.GodelCorolarios`, `Meta.RigidezEstandar`, `Meta.RosserPosNum`, `Meta.RosserW1` |
 | `Meta.TarskiPrf` | 51 | `Meta.Consistencia`, `Meta.GodelTwoPrf` · externo: `FOL.Lift0` | `Meta.ContratoTitulares`, `Meta.Lob`, `Meta.PuenteFOL`, `Meta.PurezaTitulares`, `Meta.Rosser` |
 | `Meta.GodelCorolarios` | 52 | `Meta.PurezaComando`, `Meta.SolidezVerificador` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares` |

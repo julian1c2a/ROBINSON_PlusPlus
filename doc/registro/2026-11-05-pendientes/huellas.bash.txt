@@ -1,0 +1,34 @@
+#!/bin/bash
+# La HUELLA de cada constante de RPP, FOL y TheoryFramework: el hash de su tipo y el de su valor (Expr.hash, que
+# depende de la estructura y de los nombres, no de la notación). Para comparar dos árboles: lo que cambie aquí cambió
+# de verdad; lo que sólo cambia de notación, no. Uso, desde la raíz de RPP del árbol que se mide:
+#   bash huellas.bash SALIDA.tsv
+set -uo pipefail
+export PATH="/c/Users/julia/.elan/bin:/usr/bin:$PATH"
+OUT="$1"
+TMP=$(mktemp -d)
+{
+  echo "import Lean"
+  { ( find ROBINSON_PlusPlus -name '*.lean' ; echo ROBINSON_PlusPlus.lean )
+    ( cd ../FOL && find FOL TheoryFramework -name '*.lean' ; echo FOL.lean ; echo TheoryFramework.lean ) ; } \
+    | sed -e 's/\.lean$//' -e 's|/|.|g' | LC_ALL=C sort -u | sed 's/^/import /'
+  cat <<'EOF'
+open Lean
+#eval show CoreM Unit from do
+  let env ← getEnv
+  let some ruta ← IO.getEnv "HUELLAS" | throwError "falta HUELLAS"
+  let mut out : Array String := #[]
+  for (c, ci) in env.constants.toList do
+    let some i := env.getModuleIdxFor? c | continue
+    let m := env.header.moduleNames[i.toNat]!
+    let r := m.getRoot
+    unless r == `ROBINSON_PlusPlus || r == `FOL || r == `TheoryFramework do continue
+    let v := (ci.value? (allowOpaque := true)).map (·.hash) |>.getD 0
+    out := out.push s!"{c}\t{m}\t{ci.type.hash}\t{v}"
+  IO.FS.writeFile ruta ("\n".intercalate out.toList ++ "\n")
+EOF
+} > "$TMP/Huellas.lean"
+HUELLAS="$(cygpath -m "$TMP/h.tsv")" lake env lean "$(cygpath -m "$TMP/Huellas.lean")" || { echo "falló"; exit 1; }
+LC_ALL=C sort "$TMP/h.tsv" > "$OUT"
+rm -rf "$TMP"
+echo "$(wc -l < "$OUT") constantes"

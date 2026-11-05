@@ -4,6 +4,10 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Consistencia
+-- ✏️ 2026‑11‑05 (R2‑4‑5, ADR‑258): `Lean` a la vista. Llegaba sin pedirlo, por `FOL.Tactics`, a casi todo RPP; desde que
+-- `FOL.Theorems.Impl` ya no lo importa, sólo lo cargan los módulos que lo usan: éste (sus órdenes, `#pureza`) y lo que
+-- lo importa (`Meta/ContratoTitulares.lean` y `Meta/PurezaTitulares.lean`).
+import Lean
 
 /-!
 # `Meta/PurezaComando.lean` — T08: el RECORRIDO del cierre y el comando `#pureza` (ADR‑143, ADR‑149, ADR‑157)

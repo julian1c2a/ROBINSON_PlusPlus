@@ -1,0 +1,10 @@
+# R2-4-9: el cierre de imports de los congelados de FOL y lo que en él no estaba congelado (cierre_congelados.py.txt), sobre FOL 1dc0180
+congelados: 39 · su cierre: 39 módulos · en el cierre y NO congelados: 8
+  FOL/Enumeration.lean                          bloqueado  lo importan (transitivamente) 10 congelados, p. ej. FOL.Canonical0, FOL.Compacity0, FOL.HenkinLimit0
+  FOL/Semantics.lean                            bloqueado  lo importan (transitivamente) 10 congelados, p. ej. FOL.Canonical0, FOL.Compacity0, FOL.Inconsistencia
+  FOL/SymClasses.lean                           bloqueado  lo importan (transitivamente) 12 congelados, p. ej. FOL.Canonical0, FOL.Compacity0, FOL.Fresh0
+  TheoryFramework/Logic.lean                    bloqueado  lo importan (transitivamente) 1 congelados, p. ej. TheoryFramework.Instances.FOL
+  TheoryFramework/MetaTheorems.lean             bloqueado  lo importan (transitivamente) 1 congelados, p. ej. TheoryFramework.Instances.FOL
+  TheoryFramework/Properties.lean               LIBRE      lo importan (transitivamente) 1 congelados, p. ej. TheoryFramework.Instances.FOL
+  TheoryFramework/Relations.lean                LIBRE      lo importan (transitivamente) 1 congelados, p. ej. TheoryFramework.Instances.FOL
+  TheoryFramework/Theory.lean                   LIBRE      lo importan (transitivamente) 1 congelados, p. ej. TheoryFramework.Instances.FOL

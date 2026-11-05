@@ -1,0 +1,42 @@
+"""R2-4-9: el cierre de imports de los congelados de FOL, y lo que en él no está ni congelado ni bloqueado.
+
+Uso: py -3.15 cierre_congelados.py RAIZ_FOL"""
+import os, re, sys
+
+fol = sys.argv[1]
+def lista(n):
+    return [l.strip() for l in open(os.path.join(fol, n), encoding='utf-8') if l.strip() and not l.startswith('#')]
+frozen, locked = set(lista('frozen_files.txt')), set(lista('locked_files.txt'))
+
+mods = {}
+for top in ('FOL', 'TheoryFramework'):
+    for d, _, fs in os.walk(os.path.join(fol, top)):
+        for f in fs:
+            if f.endswith('.lean'):
+                p = os.path.relpath(os.path.join(d, f), fol).replace(os.sep, '/')
+                mods[p[:-5].replace('/', '.')] = p
+for b in ('FOL', 'TheoryFramework'):
+    mods[b] = b + '.lean'
+imp = {m: re.findall(r'^import\s+(\S+)', open(os.path.join(fol, p), encoding='utf-8').read(), re.M) for m, p in mods.items()}
+
+def cierre(m, acc):
+    for x in imp.get(m, []):
+        if x in mods and x not in acc:
+            acc.add(x)
+            cierre(x, acc)
+    return acc
+
+fichero = {m: p for m, p in mods.items()}
+congelados = [m for m, p in mods.items() if p in frozen]
+todo = set()
+quien = {}
+for c in congelados:
+    for x in cierre(c, set()):
+        todo.add(x)
+        quien.setdefault(x, set()).add(c)
+sin = sorted(x for x in todo if fichero[x] not in frozen)
+print(f'congelados: {len(congelados)} · su cierre: {len(todo)} módulos · en el cierre y NO congelados: {len(sin)}')
+for x in sin:
+    estado = 'bloqueado' if fichero[x] in locked else 'LIBRE'
+    ej = sorted(quien[x])[:3]
+    print(f'  {fichero[x]:45s} {estado:10s} lo importan (transitivamente) {len(quien[x])} congelados, p. ej. {", ".join(ej)}')

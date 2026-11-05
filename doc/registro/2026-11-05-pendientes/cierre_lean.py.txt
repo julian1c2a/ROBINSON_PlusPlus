@@ -1,0 +1,73 @@
+"""¿Qué módulos de RPP tienen `Lean` en su cierre de imports, y por dónde? (R2-4-5)
+
+Uso: py -3.15 cierre_lean.py RAIZ_RPP RAIZ_FOL [--sin MOD:IMPORT ...]
+--sin quita una arista (para simular el cambio antes de hacerlo)."""
+import os, re, sys
+
+rpp, fol = sys.argv[1], sys.argv[2]
+quitar = set()
+args = sys.argv[3:]
+while args:
+    if args[0] == '--sin':
+        quitar.add(tuple(args[1].split(':', 1)))
+        args = args[2:]
+    else:
+        args = args[1:]
+
+def modulos(raiz, tops):
+    out = {}
+    for top in tops:
+        base = os.path.join(raiz, top)
+        if os.path.isfile(base + '.lean'):
+            out[top] = base + '.lean'
+        for d, _, fs in os.walk(base):
+            for f in fs:
+                if f.endswith('.lean'):
+                    p = os.path.join(d, f)
+                    m = os.path.relpath(p, raiz)[:-5].replace(os.sep, '.')
+                    out[m] = p
+    return out
+
+mods = {}
+mods.update(modulos(rpp, ['ROBINSON_PlusPlus']))
+mods.update(modulos(fol, ['FOL', 'TheoryFramework']))
+imp = {}
+for m, p in mods.items():
+    src = open(p, encoding='utf-8').read()
+    imp[m] = [x for x in re.findall(r'^import\s+(\S+)', src, re.M) if (m, x) not in quitar]
+
+memo = {}
+def camino(m, vis=()):
+    """un camino de m hasta `Lean` (o None)"""
+    if m in memo:
+        return memo[m]
+    if m == 'Lean' or m.startswith('Lean.'):
+        return [m]
+    if m not in imp or m in vis:
+        return None
+    res = None
+    for x in imp[m]:
+        c = camino(x, vis + (m,))
+        if c is not None:
+            res = [m] + c
+            break
+    memo[m] = res
+    return res
+
+rppm = sorted(m for m in mods if m.startswith('ROBINSON_PlusPlus'))
+con = [m for m in rppm if camino(m)]
+print(f'módulos de RPP: {len(rppm)} · con Lean en el cierre: {len(con)}')
+directo = [m for m in rppm if any(x == 'Lean' or x.startswith('Lean.') for x in imp[m])]
+print(f'importan Lean directamente: {len(directo)}: {" ".join(directo)}')
+puertas = {}
+for m in con:
+    c = camino(m)
+    # la primera arista que sale de RPP
+    for a, b in zip(c, c[1:]):
+        if not b.startswith('ROBINSON_PlusPlus'):
+            puertas[(a, b)] = puertas.get((a, b), 0) + 1
+            break
+for (a, b), n in sorted(puertas.items(), key=lambda x: -x[1])[:12]:
+    print(f'  {n:4d}  por {a} → {b}')
+ejemplo = camino('ROBINSON_PlusPlus.Minimal.Axioms') or []
+print('Minimal.Axioms:', ' → '.join(ejemplo))

@@ -7,6 +7,7 @@ License: MIT
 import FOL.FOL        -- Term, Formula, Derives (⊢), notaciones ≐ ∧ ∨ ¬ ⇒ ⇔ ∀. ∃. ⊥ ⊤ #
 import ROBINSON_PlusPlus.Minimal.SymLit  -- `sym!"…"`: los literales de símbolo, `List Char` (D7)
 import FOL.Theorems.Eq -- derive_eq_symm, derive_eq_trans, substTerm_liftTerm
+open scoped FOL  -- ¬ ∧ ∨ de las fórmulas de FOL (L5-08, ADR-258)
 
 namespace ROBINSON_PlusPlus.Minimal.Axioms
 

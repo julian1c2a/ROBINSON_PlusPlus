@@ -8,6 +8,8 @@ import ROBINSON_PlusPlus.Meta.Godel
 import ROBINSON_PlusPlus.Meta.Provability
 
 import FOL.FOL
+import FOL.DecEq
+open scoped FOL  -- ¬ ∧ ∨ de las fórmulas de FOL (L5-08, ADR-258)
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -43,38 +45,11 @@ Resultados de la fase:
   `prf_iff_derivation`.)
 -/
 
-/- Igualdad decidible para términos y fórmulas (necesaria para el verificador:
-   el paso MP compara fórmulas). `Term` es inductivo **anidado** (`func` lleva
-   `List Term`), así que el handler automático de `DecidableEq` no aplica: lo
-   damos a mano por recursión estructural mutua. `Formula` ya se deriva una vez
-   `Term` tiene la instancia. -/
-mutual
-def decEqTerm {S : Type} [DecidableEq S] : (a b : TermG S) → Decidable (a = b)
-  | .var n, .var m => if h : n = m then isTrue (by rw [h]) else isFalse (by simp_all)
-  | .var _, .func _ _ => isFalse (by simp_all)
-  | .func _ _, .var _ => isFalse (by simp_all)
-  | .func f ts, .func g us =>
-      if hf : f = g then
-        match decEqTerms ts us with
-        | isTrue h => isTrue (by rw [hf, h])
-        | isFalse h => isFalse (by simp_all)
-      else isFalse (by simp_all)
-def decEqTerms {S : Type} [DecidableEq S] : (as bs : List (TermG S)) → Decidable (as = bs)
-  | [], [] => isTrue rfl
-  | [], _ :: _ => isFalse (by simp_all)
-  | _ :: _, [] => isFalse (by simp_all)
-  | a :: as, b :: bs =>
-      match decEqTerm a b with
-      | isTrue h =>
-          match decEqTerms as bs with
-          | isTrue h2 => isTrue (by rw [h, h2])
-          | isFalse h2 => isFalse (by simp_all)
-      | isFalse h => isFalse (by simp_all)
-end
-
-instance instDecEqTermG {S : Type} [DecidableEq S] : DecidableEq (TermG S) := decEqTerm
-
-deriving instance DecidableEq for FormulaG
+/- Igualdad decidible para términos y fórmulas (necesaria para el verificador: el paso MP compara fórmulas): la de
+   FOL, `FOL.DecEq` (importado arriba), por recursión estructural mutua sobre `Term`/`List Term`, y `Formula` derivada.
+   ✏️ 2026‑11‑05 (L5‑10 de la auditoría de la base, ADR‑258): aquí había una COPIA propia (`decEqTerm`, `decEqTerms`,
+   `instDecEqTermG` y otra `deriving instance DecidableEq for FormulaG`), la tercera implementación del árbol; la de
+   `ChainDecode` salió con ADR‑160. -/
 
 /-- **Regla de demostración**: justificación de una línea. Los esquemas de
     axiomas llevan sus parámetros (fórmulas/términos); `thy k` es el `k`-ésimo

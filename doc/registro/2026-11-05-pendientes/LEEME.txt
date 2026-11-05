@@ -1,0 +1,16 @@
+ADR-258, 2026-11-05: las medidas de los seis pendientes. Los scripts van como .txt (para que nadie los tome por
+código del árbol); se lanzaron con py -3.15 y Git Bash en la máquina del propietario.
+
+  huellas.txt            el hash del tipo y del valor (Expr.hash) de cada constante de RPP, FOL y TheoryFramework,
+                         ANTES (RPP 2e78871 y FOL 1dc0180, construidos de cero en dos worktrees de la sesión) y
+                         DESPUÉS (el árbol de ADR-258): qué sale, qué entra y qué cambia, y por qué. Lo hizo
+                         huellas.bash.txt
+  sin-open.tsv           L5-08: cada módulo de RPP, compilado SIN «open scoped FOL» contra el build que la llevaba en
+                         todos (probar_sin_open.bash.txt): módulo · 0 si compila · segundos · primer error. 113 compilan;
+                         los 6 que no, la conservan. La línea la pone y la quita abrir.py.txt
+  cierre-lean.txt        R2-4-5: los módulos de RPP con Lean en su cierre de imports, antes (118) y después (19), y por
+                         dónde entraba (cierre_lean.py.txt)
+  cierre-congelados.txt  R2-4-9: el cierre de imports de los congelados de FOL antes de ADR-258 y los 8 módulos de ese
+                         cierre que no estaban congelados (cierre_congelados.py.txt)
+Y además, sin fichero propio: los 48 sondeos y los 11 de control compilan con las notaciones scoped (check-sondeos.bash);
+los controles de los dos repos, verdes (con las tablas del índice y de lo que nadie usa de FOL, rehechas).

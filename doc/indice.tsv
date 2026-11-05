@@ -1542,14 +1542,9 @@ ROBINSON_PlusPlus.Meta.HilbertSeq.checkAux_shift	teorema	ROBINSON_PlusPlus.Meta.
 ROBINSON_PlusPlus.Meta.HilbertSeq.checkProof	def	ROBINSON_PlusPlus.Meta.HilbertSeq	List ROBINSON_PlusPlus.Meta.HilbertSeq.Rule → Option (List Formula)
 ROBINSON_PlusPlus.Meta.HilbertSeq.combine_gen	teorema	ROBINSON_PlusPlus.Meta.HilbertSeq	∀ {rs1 : List ROBINSON_PlusPlus.Meta.HilbertSeq.Rule} {A : Formula}, ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation rs1 A → ∃ rs, ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation rs (∀. A)
 ROBINSON_PlusPlus.Meta.HilbertSeq.combine_mp	teorema	ROBINSON_PlusPlus.Meta.HilbertSeq	∀ {rs1 rs2 : List ROBINSON_PlusPlus.Meta.HilbertSeq.Rule} {A B : Formula}, ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation rs1 (A ⇒ B) → ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation rs2 A → ∃ rs, ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation rs B
-ROBINSON_PlusPlus.Meta.HilbertSeq.decEqTerm	def	ROBINSON_PlusPlus.Meta.HilbertSeq	{S : Type} → [DecidableEq S] → (a b : TermG S) → Decidable (a = b)
-ROBINSON_PlusPlus.Meta.HilbertSeq.decEqTerms	def	ROBINSON_PlusPlus.Meta.HilbertSeq	{S : Type} → [DecidableEq S] → (as bs : List (TermG S)) → Decidable (as = bs)
 ROBINSON_PlusPlus.Meta.HilbertSeq.dem_tracks	teorema	ROBINSON_PlusPlus.Meta.HilbertSeq	∀ (φ : Formula), ROBINSON_PlusPlus.Meta.HilbertSeq.ProvableH (ROBINSON_PlusPlus.Meta.Provability.formCode φ) ↔ ROBINSON_PlusPlus.Meta.Hilbert.Prf φ
 ROBINSON_PlusPlus.Meta.HilbertSeq.derivation_single	teorema	ROBINSON_PlusPlus.Meta.HilbertSeq	∀ {r : ROBINSON_PlusPlus.Meta.HilbertSeq.Rule} {φ : Formula}, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl [] r = Option.some φ → ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation [r] φ
 ROBINSON_PlusPlus.Meta.HilbertSeq.derivation_to_prf	teorema	ROBINSON_PlusPlus.Meta.HilbertSeq	∀ {rs : List ROBINSON_PlusPlus.Meta.HilbertSeq.Rule} {φ : Formula}, ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation rs φ → ROBINSON_PlusPlus.Meta.Hilbert.Prf φ
-ROBINSON_PlusPlus.Meta.HilbertSeq.instDecEqTermG	instancia	ROBINSON_PlusPlus.Meta.HilbertSeq	{S : Type} → [DecidableEq S] → DecidableEq (TermG S)
-ROBINSON_PlusPlus.Meta.HilbertSeq.instDecidableEqFormulaG_rOBINSON_PlusPlus	instancia	ROBINSON_PlusPlus.Meta.HilbertSeq	{S : Type} → [DecidableEq S] → DecidableEq (FormulaG S)
-ROBINSON_PlusPlus.Meta.HilbertSeq.instDecidableEqFormulaG_rOBINSON_PlusPlus.decEq	def	ROBINSON_PlusPlus.Meta.HilbertSeq	{S : Type} → [DecidableEq S] → (x x_1 : FormulaG S) → Decidable (x = x_1)
 ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl	def	ROBINSON_PlusPlus.Meta.HilbertSeq	Formula → Formula → Option Formula
 ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl_eq	teorema	ROBINSON_PlusPlus.Meta.HilbertSeq	∀ {fi fj f : Formula}, ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl fi fj = Option.some f → fi = fj ⇒ f
 ROBINSON_PlusPlus.Meta.HilbertSeq.prfI_to_derivation	teorema	ROBINSON_PlusPlus.Meta.HilbertSeq	∀ {φ : Formula}, ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ φ → ∃ rs, ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation rs φ

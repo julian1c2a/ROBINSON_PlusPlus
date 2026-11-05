@@ -10,6 +10,7 @@ import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 import FOL.FOL
 import FOL.Theorems.Eq
+open scoped FOL  -- ¬ ∧ ∨ de las fórmulas de FOL (L5-08, ADR-258)
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo

@@ -1,0 +1,50 @@
+"""L5-08: pone (o quita) la línea que abre las notaciones de fórmulas de FOL en un módulo.
+
+Uso: py -3.15 abrir.py poner|quitar|tiene FICHERO...
+La línea va justo después del último `import` del principio del fichero. Conserva el fin de línea del fichero."""
+import io, sys
+
+LINEA = 'open scoped FOL  -- ¬ ∧ ∨ de las fórmulas de FOL (L5-08, ADR-258)'
+
+def leer(p):
+    t = io.open(p, encoding='utf-8', newline='').read()
+    nl = '\r\n' if '\r\n' in t else '\n'
+    return t, nl
+
+modo, ficheros = sys.argv[1], sys.argv[2:]
+for p in ficheros:
+    t, nl = leer(p)
+    L = t.split(nl)
+    if modo == 'tiene':
+        print(('1 ' if LINEA in L else '0 ') + p)
+        continue
+    if modo == 'quitar':
+        if LINEA in L:
+            L.remove(LINEA)
+            io.open(p, 'w', encoding='utf-8', newline='').write(nl.join(L))
+        continue
+    if LINEA in L:
+        continue
+    # el último import de la cabecera (antes de la primera línea de código que no sea import, comentario o blanco)
+    ult = -1
+    en_com = 0
+    for i, l in enumerate(L):
+        s = l.strip()
+        if en_com:
+            if '-/' in s:
+                en_com = 0
+            continue
+        if s.startswith('/-') and '-/' not in s[2:]:
+            en_com = 1
+            continue
+        if s.startswith('import '):
+            ult = i
+            continue
+        if s == '' or s.startswith('--') or (s.startswith('/-') and s.endswith('-/')):
+            continue
+        break
+    if ult < 0:
+        print('SIN IMPORT: ' + p)
+        continue
+    L.insert(ult + 1, LINEA)
+    io.open(p, 'w', encoding='utf-8', newline='').write(nl.join(L))

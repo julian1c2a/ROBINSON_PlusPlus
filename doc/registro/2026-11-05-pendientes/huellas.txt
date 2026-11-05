@@ -1,0 +1,39 @@
+# Las HUELLAS (hash del tipo y del valor, Expr.hash) de cada constante de RPP, FOL y TheoryFramework: antes (RPP 2e78871,
+# FOL 1dc0180, construidos de cero en worktrees) y después (el árbol de ADR-258). Medido el 2026-11-05 con huellas.bash.txt.
+antes: 11606 constantes · después: 11495
+## sólo antes (120): la copia de DecidableEq de HilbertSeq (L5-10), con lo que Lean generaba con ella; los tres ejemplos de FOL/FOL.lean (M-5); y las notaciones ¬ ∧ ∨ globales (L5-08)
+_aux_FOL_FOL___unexpand_FormulaG_and_1
+_aux_FOL_FOL___unexpand_FormulaG_or_1
+_aux_FOL_FOL___unexpand_neg_1
+formula_ejemplo
+formula_simplificada
+posicion_Q
+«_aux_FOL_FOL___macroRules_term_∧__1_1»
+«_aux_FOL_FOL___macroRules_term_∨__1_1»
+«_aux_FOL_FOL___macroRules_term¬__1_1»
+«term_∧__1»
+«term_∨__1»
+«term¬__1»
+  … y 108 de ROBINSON_PlusPlus.Meta.HilbertSeq (decEqTerm, decEqTerms, instDecEqTermG, la instancia derivada de FormulaG y sus auxiliares)
+## sólo después (9): las mismas notaciones, ahora en el espacio FOL (scoped)
+FOL._aux_FOL_FOL___unexpand_FormulaG_and_1
+FOL._aux_FOL_FOL___unexpand_FormulaG_or_1
+FOL._aux_FOL_FOL___unexpand_neg_1
+FOL.«_aux_FOL_FOL___macroRules_FOL_term_∧__1»
+FOL.«_aux_FOL_FOL___macroRules_FOL_term_∨__1»
+FOL.«_aux_FOL_FOL___macroRules_FOL_term¬__1»
+FOL.«term_∧_»
+FOL.«term_∨_»
+FOL.«term¬_»
+## las que están en los dos y cambian de tipo o de valor (7): todas, por la instancia de DecidableEq (L5-10)
+ROBINSON_PlusPlus.Meta.CodeNatInjPrf.codeNatTerm_inj._f	VALOR
+ROBINSON_PlusPlus.Meta.HilbertSeq.combine_mp	VALOR
+ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl	VALOR
+ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl.eq_1	TIPO 
+ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl.eq_2	VALOR
+ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl_eq	VALOR
+ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeT_closed._f	VALOR
+## las dos auxiliares (._f) que cambian: la instancia de Term que nombra su valor
+antes:   codeNatTerm_inj._f y substCodeT_closed._f nombran ROBINSON_PlusPlus.Meta.HilbertSeq.instDecEqTermG
+después: los dos nombran FOL.DecEq.instDecidableEqTermG
+## ⇒ L5-08 (las notaciones) y R2-4-5 (sin Lean en el cierre) no cambian NINGUNA constante; id_impl, reescrita sin derive_hyp, tampoco

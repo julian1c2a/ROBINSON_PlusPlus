@@ -384,6 +384,17 @@ subíndice** (ADR-104). ⚠️ Los registros HISTÓRICOS (`DECISIONS.md`,
 * Lean imprime `≐`, la global, salvo con el espacio abierto: el índice de las constantes (`doc/indice.tsv`, que no
   abre nada) la da en 1011 enunciados.
 
+### `¬ ∧ ∨` de las fórmulas: `open scoped FOL`, sólo donde se escriben (2026‑11‑05, L5‑08, ADR‑258)
+
+Las notaciones `¬`, ` ∧ ` y ` ∨ ` de las fórmulas de FOL son `scoped` en `FOL` (antes eran globales y sombreaban los
+conectivos de Lean en todo módulo: `k = 5 ∨ k = 7` no se leía, y un `∧` en el tipo de un `have` era `Formula.and`). Un
+módulo de RPP que escribe fórmulas con ellas pone `open scoped FOL` tras sus `import`; los demás no, y en ellos `∧`,
+`∨` y `¬` son los de Lean. MEDIDO: hoy la llevan 6 de los 119 módulos (`Minimal/Axioms.lean`, `Meta/Hilbert.lean`,
+`Meta/HilbertSeq.lean`, `Meta/Representability2Prf.lean`, `Meta/ReprPrf.lean` y `Meta/Delta0ReflectPrf.lean`); en ellos
+la trampa sigue, y allí los conectivos de Lean se escriben por nombre (`And`, `Or`). `⇒ ⇔ ≐ ∀. ∃. ⊥ ⊤ #` siguen
+globales: no chocan con ninguna notación de Lean. (`≤` y `∈`, los objeto de RPP, siguen `scoped` en
+`ROBINSON_PlusPlus.Minimal.Axioms`, que casi todo módulo abre por sus nombres: ahí la trampa sigue.)
+
 ---
 
 ## 10. Nota de Migración
