@@ -56,6 +56,8 @@ Public API:
   · ✏️ 2026‑10‑20 (ADR‑175, T75): `tarski_semantico_de` (Tarski en todo modelo estándar, `Meta/TarskiPrf.lean`);
     `control_ancla` (sin el ancla, `Prov` puede mentir: `MNV V⊥` cree demostrable `⊥`, `Meta/RigidezEstandar.lean`);
     y `Meta/SegundoModelo.lean`, un segundo modelo estándar, distinto de `MNV V₀` (`segundo_modelo`).
+  · ✏️ 2026‑11‑05 (ADR‑259): `Meta/ListIndAdmisible.lean`, `listInd_admisible`: la inducción de listas sale de `ind`, sin
+    el constructor `Prf.listInd` (la prueba, del sondeo de T69, ADR‑244).
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -183,6 +185,8 @@ import ROBINSON_PlusPlus.Meta.ProvFiel
 import ROBINSON_PlusPlus.Meta.SegundoModelo
 import ROBINSON_PlusPlus.Meta.PuenteFOL
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
+-- (✏️ 2026‑11‑05, ADR‑259: `listInd` es ADMISIBLE en `Prf` —sale de `ind`—; la prueba, del sondeo de T69 al build.)
+import ROBINSON_PlusPlus.Meta.ListIndAdmisible
 -- (✏️ 2026‑10‑19, ADR‑170, T74: `FOL.Deduction`, `FOL.Theorems.Derived`, `Impl` y `Neg`, sin nada en el cono, fuera.)
 import FOL.FOL
 import FOL.Theorems.Eq

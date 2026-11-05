@@ -443,6 +443,10 @@ ROBINSON_PlusPlus.Meta.Lob.prf_lob_fix|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Lob.lob|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Lob.lob_iff|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Lob.goedel_second_de_lob|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ListIndAdmisible.listInd_admisible|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ListIndAdmisible.prf_strong_ind_formula|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ListIndAdmisible.prf_nil_or_consOk|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ListIndAdmisible.prf_list_induction_sin|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_imp_con|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado|Quot.sound,propext

@@ -2015,6 +2015,7 @@ ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean§A3IsFCBTracked§2§lo que aplicó y l
 ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean§A3IsFCBTracked§3§lo que reflejó, su §2 citada y cómo define su PsiF (REGISTRO desde ADR‑248)
 ROBINSON_PlusPlus/Meta/HilbertDeduction.lean§PrfHMono§2§el rescate de la deuda B6b (2026‑09‑11) y su copia; PrfH_w1 está en el build
 ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean§SegundoMuro§1§una de las copias de la pieza antes de entrar en el build
+ROBINSON_PlusPlus/Meta/ListIndAdmisible.lean§ListIndAdmisible§1§de dónde se promovió la prueba (ADR‑259); en el sondeo queda la medida de las reglas que construye
 ROBINSON_PlusPlus/Meta/ModeloCodigo.lean§ModeloNat§1§de dónde se promovió el modelo (ADR‑119)
 ROBINSON_PlusPlus/Meta/Rosser.lean§ExtensionPorReduccion§2§de dónde se promovió su §1 (ADR‑144)
 ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean§RosserHasWitF§1§el esquema de su §4, hecho general aquí

@@ -201,7 +201,6 @@ FOL.Theorems.Eq	FOL.derive_eq_func_congr	teorema	vigilada
 FOL.Theorems.Eq	FOL.derive_eq_symm	teorema	—
 FOL.Theorems.Eq	FOL.derive_eq_trans	teorema	—
 FOL.Theorems.Eq	FOL.substFormula_lift_comm	teorema	—
-FOL.Theorems.Eq	FOL.subst_subst_comm_succ	teorema	—
 FOL.Theorems.Impl	FOL.Theorems.Impl.id_impl	teorema	—
 FOL.Theorems.Impl	FOL.Theorems.Impl.k_impl	teorema	—
 FOL.Theorems.Impl	FOL.Theorems.Impl.s_impl	teorema	—

@@ -1,6 +1,6 @@
 # Gentzen: el alcance, medido (T69)
 
-**Last updated:** 2026-11-04 — [ADR‑254](../DECISIONS.md): §6, la lección de L5‑02 para el repositorio nuevo (los
+**Last updated:** 2026-11-05 — [ADR‑259](../DECISIONS.md): §3, la prueba de `listInd`, en el build. Antes, 2026-11-04 — [ADR‑254](../DECISIONS.md): §6, la lección de L5‑02 para el repositorio nuevo (los
 nombres de los símbolos, por índice). Antes, 2026-11-02 — creado con T69 ([ADR‑244](../DECISIONS.md)): los primeros
 pasos medibles de la auditoría (el censo de la forma de los axiomas y la admisibilidad de `listInd`), y lo que harían
 falta después.
@@ -56,7 +56,8 @@ pide más que Π₂.
 
 ## 3 · ¿Es `listInd` admisible desde `ind`? — MEDIDO
 
-**Sí.** `sondeos/ListIndAdmisible.lean` (REGISTRO; ≈ 6 s, 727 líneas, la prueba 437) demuestra
+**Sí.** (✏️ 2026‑11‑05, [ADR‑259](../DECISIONS.md): la prueba está ya en el BUILD, `Meta/ListIndAdmisible.lean`, con sus
+footprints vigilados; el sondeo guarda la medida.) `sondeos/ListIndAdmisible.lean` (REGISTRO; ≈ 6 s, 727 líneas, la prueba 437) demuestra
 
     theorem listInd_admisible (A : Formula) : Prf (listInductionFormula A)
 

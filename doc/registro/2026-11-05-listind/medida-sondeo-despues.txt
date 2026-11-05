@@ -1,0 +1,76 @@
+ListIndAdmisible.listInd_admisible: cierre de 2213 constantes
+  ind: 4 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ListIndAdmisible.prf_strong_ind_formula, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  listInd: 2 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  p3: 2 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  qconf: 2 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+ListIndAdmisible.listInd_admisible: cierre cortado de 2176 constantes · recorridos alcanzados [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono] · `prf_list_induction` en el cierre COMPLETO: false
+  ind: constructores en el cierre cortado [ROBINSON_PlusPlus.Meta.Hilbert.Prf.ind, ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.ind] · frontera fuera de los recorridos [ListIndAdmisible.prf_strong_ind_formula, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction]
+  listInd: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  p3: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+ListIndAdmisible.listInd_admisible ⟶ ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd: 3 aristas de valor
+  ListIndAdmisible.listInd_admisible
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_deduction
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
+  ⟶ ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd
+ListIndAdmisible.listInd_admisible ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd: 2 aristas de valor
+  ListIndAdmisible.listInd_admisible
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd
+usuarios de ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction en el cierre de ListIndAdmisible.listInd_admisible: 6
+  ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_le_self_mul_self_all
+  ListIndAdmisible.prf_consOk_succ_all
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_succ_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_succ
+  ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_le_mono_right
+usuarios de ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.ind en el cierre de ListIndAdmisible.listInd_admisible: 4
+  ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono
+  ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux
+  ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH
+  ListIndAdmisible.prf_strong_ind_formula
+ListIndAdmisible.listInd_admisible ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_lt_trichotomy: 3 aristas de valor
+  ListIndAdmisible.listInd_admisible
+  ⟶ ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_cantor_mono_right
+  ⟶ ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_lt_succ_div2
+  ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_lt_trichotomy
+ListIndAdmisible.prf_nil_or_consOk: cierre cortado de 1963 constantes · recorridos alcanzados [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono] · `prf_list_induction` en el cierre COMPLETO: false
+  ind: constructores en el cierre cortado [ROBINSON_PlusPlus.Meta.Hilbert.Prf.ind] · frontera fuera de los recorridos [ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction]
+  listInd: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  p3: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+ListIndAdmisible.prf_strong_ind_formula: cierre cortado de 2021 constantes · recorridos alcanzados [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · `prf_list_induction` en el cierre COMPLETO: false
+  ind: constructores en el cierre cortado [ROBINSON_PlusPlus.Meta.Hilbert.Prf.ind, ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.ind] · frontera fuera de los recorridos [ListIndAdmisible.prf_strong_ind_formula, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction]
+  listInd: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  p3: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+ListIndAdmisible.prf_list_induction_sin: cierre cortado de 2177 constantes · recorridos alcanzados [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono] · `prf_list_induction` en el cierre COMPLETO: false
+  ind: constructores en el cierre cortado [ROBINSON_PlusPlus.Meta.Hilbert.Prf.ind, ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.ind] · frontera fuera de los recorridos [ListIndAdmisible.prf_strong_ind_formula, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction]
+  listInd: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  p3: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+ListIndAdmisible.control_con_listInd: cierre de 272 constantes
+  ind: 0 fuera de las traducciones [] · traducciones: []
+  listInd: 1 fuera de las traducciones [ListIndAdmisible.control_con_listInd] · traducciones: []
+  p3: 0 fuera de las traducciones [] · traducciones: []
+  qconf: 0 fuera de las traducciones [] · traducciones: []
+ListIndAdmisible.control_con_listInd: cierre cortado de 272 constantes · recorridos alcanzados [] · `prf_list_induction` en el cierre COMPLETO: false
+  ind: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  listInd: constructores en el cierre cortado [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd] · frontera fuera de los recorridos [ListIndAdmisible.control_con_listInd]
+  p3: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons: cierre de 1805 constantes
+  ind: 0 fuera de las traducciones [] · traducciones: []
+  listInd: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction] · traducciones: []
+  p3: 0 fuera de las traducciones [] · traducciones: []
+  qconf: 0 fuera de las traducciones [] · traducciones: []
+ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons: cierre cortado de 1805 constantes · recorridos alcanzados [] · `prf_list_induction` en el cierre COMPLETO: true
+  ind: constructores en el cierre cortado [] · frontera fuera de los recorridos []
+  listInd: constructores en el cierre cortado [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd] · frontera fuera de los recorridos [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction]
+  p3: constructores en el cierre cortado [] · frontera fuera de los recorridos []
