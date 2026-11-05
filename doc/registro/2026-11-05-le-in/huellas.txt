@@ -1,0 +1,19 @@
+# ADR-260: las huellas (huellas.bash.txt de doc/registro/2026-11-05-pendientes/) antes (RPP 9cdc808, el build de ADR-259),
+# con la apertura puesta donde Minimal.Axioms se abría (la BASE: abrir3.py.txt), y después (sin ninguna).
+antes: 11523 · base: 11523 · después: 11523 constantes
+## antes → después: sólo antes 6, sólo después 6, cambian 0
+### sólo antes (las dos notaciones, en ROBINSON_PlusPlus.Minimal.Axioms):
+ROBINSON_PlusPlus.Minimal.Axioms._aux_ROBINSON_PlusPlus_Minimal_Axioms___unexpand_ROBINSON_PlusPlus_Minimal_Axioms_In_1
+ROBINSON_PlusPlus.Minimal.Axioms._aux_ROBINSON_PlusPlus_Minimal_Axioms___unexpand_ROBINSON_PlusPlus_Minimal_Axioms_le_1
+ROBINSON_PlusPlus.Minimal.Axioms.«_aux_ROBINSON_PlusPlus_Minimal_Axioms___macroRules_ROBINSON_PlusPlus_Minimal_Axioms_term_∈__1»
+ROBINSON_PlusPlus.Minimal.Axioms.«_aux_ROBINSON_PlusPlus_Minimal_Axioms___macroRules_ROBINSON_PlusPlus_Minimal_Axioms_term_≤__1»
+ROBINSON_PlusPlus.Minimal.Axioms.«term_∈_»
+ROBINSON_PlusPlus.Minimal.Axioms.«term_≤_»
+### sólo después (las mismas, en ROBINSON_PlusPlus.Minimal.Axioms.Objeto):
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto._aux_ROBINSON_PlusPlus_Minimal_Axioms___unexpand_ROBINSON_PlusPlus_Minimal_Axioms_In_1
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto._aux_ROBINSON_PlusPlus_Minimal_Axioms___unexpand_ROBINSON_PlusPlus_Minimal_Axioms_le_1
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto.«_aux_ROBINSON_PlusPlus_Minimal_Axioms___macroRules_ROBINSON_PlusPlus_Minimal_Axioms_Objeto_term_∈__1»
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto.«_aux_ROBINSON_PlusPlus_Minimal_Axioms___macroRules_ROBINSON_PlusPlus_Minimal_Axioms_Objeto_term_≤__1»
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto.«term_∈_»
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto.«term_≤_»
+## antes → base: la misma diferencia, y ninguna constante cambia (0)

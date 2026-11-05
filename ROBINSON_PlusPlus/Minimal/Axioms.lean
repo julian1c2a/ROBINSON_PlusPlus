@@ -160,11 +160,18 @@ instance : ToString Term := ⟨termToString⟩
 -- Helper function to build atomic formulas
 def lt (t₁ t₂ : Term) : Formula := .atom lt_sym [t₁, t₂]
 def le (t₁ t₂ : Term) : Formula := (lt t₁ t₂) ∨ (t₁ =eq t₂)
--- Alias de ≤ aritmético para Terms → Formula (sombrea ≤ de Prop dentro del namespace)
-scoped notation:50 t₁ " ≤ " t₂ => le t₁ t₂
 
 def In (x l : Term) : Formula := .atom in_sym [x, l]
+
+-- `≤` y `∈` de las fórmulas: `le` e `In`. ✏️ 2026‑11‑05 (L5‑08, la otra mitad, ADR‑260): en su propio espacio,
+-- `ROBINSON_PlusPlus.Minimal.Axioms.Objeto`. Eran `scoped` en `ROBINSON_PlusPlus.Minimal.Axioms`, que casi todo módulo
+-- abre por sus NOMBRES, y en todos ellos sombreaban el `≤` y el `∈` de Lean (la trampa: «type expected, got (n : Nat)»).
+-- Hoy los abre, con `open scoped ROBINSON_PlusPlus.Minimal.Axioms.Objeto`, sólo el módulo que escribe fórmulas con ellos.
+namespace Objeto
+scoped notation:50 t₁ " ≤ " t₂ => le t₁ t₂
 scoped notation:50 x " ∈ " l => In x l
+end Objeto
+open scoped Objeto
 
 -- Helper for universal quantification over 1, 2, or 3 variables
 def forall_ (f : Formula) : Formula := .forall f

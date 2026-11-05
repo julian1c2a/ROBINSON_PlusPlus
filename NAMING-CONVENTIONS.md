@@ -392,8 +392,11 @@ módulo de RPP que escribe fórmulas con ellas pone `open scoped FOL` tras sus `
 `∨` y `¬` son los de Lean. MEDIDO: hoy la llevan 6 de los 119 módulos (`Minimal/Axioms.lean`, `Meta/Hilbert.lean`,
 `Meta/HilbertSeq.lean`, `Meta/Representability2Prf.lean`, `Meta/ReprPrf.lean` y `Meta/Delta0ReflectPrf.lean`); en ellos
 la trampa sigue, y allí los conectivos de Lean se escriben por nombre (`And`, `Or`). `⇒ ⇔ ≐ ∀. ∃. ⊥ ⊤ #` siguen
-globales: no chocan con ninguna notación de Lean. (`≤` y `∈`, los objeto de RPP, siguen `scoped` en
-`ROBINSON_PlusPlus.Minimal.Axioms`, que casi todo módulo abre por sus nombres: ahí la trampa sigue.)
+globales: no chocan con ninguna notación de Lean. ✏️ ADR‑260: `≤` y `∈`, los objeto de RPP (`le` e `In`), están en su
+propio espacio, `ROBINSON_PlusPlus.Minimal.Axioms.Objeto`, y no en `ROBINSON_PlusPlus.Minimal.Axioms`, que casi todo
+módulo abre por sus nombres; MEDIDO: no los necesita ningún módulo salvo `Minimal/Axioms.lean`, que escribe los axiomas
+con ellos. Fuera de él, `≤` y `∈` son los de Lean; un módulo nuevo que quiera escribirlos sobre términos pone
+`open scoped ROBINSON_PlusPlus.Minimal.Axioms.Objeto`.
 
 ---
 

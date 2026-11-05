@@ -3896,6 +3896,8 @@ ROBINSON_PlusPlus.Meta.TrackedCorePrf.prf_congr_atom2CodeFn	teorema	ROBINSON_Plu
 ROBINSON_PlusPlus.Meta.TrackedCorePrf.prf_provFromCode_atom2_congr	teorema	ROBINSON_PlusPlus.Meta.TrackedCorePrf	∀ {s : List Char} {a a' b b' : _root_.Term}, ROBINSON_PlusPlus.Meta.Hilbert.Prf (a ≐ a') → ROBINSON_PlusPlus.Meta.Hilbert.Prf (b ≐ b') → ROBINSON_PlusPlus.Meta.Hilbert.Prf (ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode (ROBINSON_PlusPlus.Meta.TrackedCorePrf.atom2CodeFn s a b) ⇒ ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode (ROBINSON_PlusPlus.Meta.TrackedCorePrf.atom2CodeFn s a' b'))
 ROBINSON_PlusPlus.Meta.TrackedCorePrf.substFormula_provFromCode_open	teorema	ROBINSON_PlusPlus.Meta.TrackedCorePrf	∀ (v : Nat) (s c : _root_.Term), substFormula v s (ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode c) = ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode (substTerm v s c)
 ROBINSON_PlusPlus.Minimal.Axioms.In	def	ROBINSON_PlusPlus.Minimal.Axioms	_root_.Term → _root_.Term → Formula
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto.«term_∈_»	meta	ROBINSON_PlusPlus.Minimal.Axioms	Lean.TrailingParserDescr
+ROBINSON_PlusPlus.Minimal.Axioms.Objeto.«term_≤_»	meta	ROBINSON_PlusPlus.Minimal.Axioms	Lean.TrailingParserDescr
 ROBINSON_PlusPlus.Minimal.Axioms.add	def	ROBINSON_PlusPlus.Minimal.Axioms	_root_.Term → _root_.Term → _root_.Term
 ROBINSON_PlusPlus.Minimal.Axioms.add_sym	def	ROBINSON_PlusPlus.Minimal.Axioms	List Char
 ROBINSON_PlusPlus.Minimal.Axioms.allIn	def	ROBINSON_PlusPlus.Minimal.Axioms	_root_.Term → _root_.Term → Formula
@@ -4192,7 +4194,5 @@ ROBINSON_PlusPlus.Minimal.Axioms.wfAllFBody	def	ROBINSON_PlusPlus.Minimal.Axioms
 ROBINSON_PlusPlus.Minimal.Axioms.zero	def	ROBINSON_PlusPlus.Minimal.Axioms	_root_.Term
 ROBINSON_PlusPlus.Minimal.Axioms.zero_sym	def	ROBINSON_PlusPlus.Minimal.Axioms	List Char
 ROBINSON_PlusPlus.Minimal.Axioms.«term_=eq_»	meta	ROBINSON_PlusPlus.Minimal.Axioms	Lean.TrailingParserDescr
-ROBINSON_PlusPlus.Minimal.Axioms.«term_∈_»	meta	ROBINSON_PlusPlus.Minimal.Axioms	Lean.TrailingParserDescr
-ROBINSON_PlusPlus.Minimal.Axioms.«term_≤_»	meta	ROBINSON_PlusPlus.Minimal.Axioms	Lean.TrailingParserDescr
 ROBINSON_PlusPlus.Minimal.SymLit.symMatchProbe	def	ROBINSON_PlusPlus.Minimal.SymLit	List Char → List Nat → Nat
 ROBINSON_PlusPlus.Minimal.SymLit.symProbe	def	ROBINSON_PlusPlus.Minimal.SymLit	List Char

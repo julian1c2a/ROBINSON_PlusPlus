@@ -1,0 +1,16 @@
+ADR-260, 2026-11-05: L5-08, la otra mitad — `≤` y `∈` de RPP (`le`, `In`), fuera del espacio que casi todo módulo abre.
+Los scripts van como .txt; se lanzaron con py -3.15 y Git Bash en la máquina del propietario.
+
+  sin-objeto.tsv           cada módulo de RPP en el que `≤` y `∈` objeto estaban activos (los que abrían el espacio
+                           ROBINSON_PlusPlus.Minimal.Axioms entero o estaban dentro de él), compilado SIN la apertura de
+                           ROBINSON_PlusPlus.Minimal.Axioms.Objeto contra el build que la llevaba en todos
+                           (probar_sin_objeto.bash.txt): módulo · 0 si compila · segundos · primer error. Los 112
+                           compilan: ninguno los necesita. La apertura la pone y la quita abrir3.py.txt (justo después
+                           de cada `open` del espacio entero —no los selectivos ni los `… in`— y de cada `namespace`)
+  huellas.txt              el hash del tipo y del valor de cada constante (huellas.bash.txt de ../2026-11-05-pendientes/)
+                           ANTES (RPP 9cdc808), en la BASE (la apertura puesta en los 112) y DESPUÉS (sin ninguna):
+                           11 523 constantes en los tres; sólo se renombran las 6 declaraciones de las dos notaciones;
+                           ninguna constante cambia
+Y además: el build sin ninguna apertura (150 jobs) y los 48 sondeos y los 11 de control, compilados (check-sondeos.bash;
+la pasada reescribió ficheros de registro de otras fechas y la tabla de sondeos/pasadas/, que se restauraron); el índice
+rehecho (doc/indice.tsv: sólo las dos filas de las notaciones, con su espacio nuevo).

@@ -1,0 +1,39 @@
+"""L5-08, la otra mitad (ADR-260): pone `open scoped ROBINSON_PlusPlus.Minimal.Axioms.Objeto` JUSTO DESPUÉS de cada
+`open … ROBINSON_PlusPlus.Minimal.Axioms …` que abría el espacio entero (no los selectivos `(…)` ni los `… in`) y de
+cada `namespace ROBINSON_PlusPlus.Minimal.Axioms`, con la misma sangría: así `≤` y `∈` quedan activos exactamente donde
+lo estaban. Uso: py -3.15 abrir3.py poner|quitar|cuantas FICHERO..."""
+import io, re, sys
+
+MARCA = 'open scoped ROBINSON_PlusPlus.Minimal.Axioms.Objeto  -- ≤ ∈ de las fórmulas (L5-08, ADR-260)'
+RE_OPEN = re.compile(r'^(\s*)open\s+(.*)$')
+RE_NS = re.compile(r'^(\s*)namespace\s+ROBINSON_PlusPlus\.Minimal\.Axioms\s*$')
+
+def abre_entero(resto):
+    if resto.rstrip().endswith(' in') or '(' in resto:
+        return False
+    return any(t == 'ROBINSON_PlusPlus.Minimal.Axioms' for t in resto.split())
+
+modo, fs = sys.argv[1], sys.argv[2:]
+for p in fs:
+    t = io.open(p, encoding='utf-8', newline='').read()
+    nl = '\r\n' if '\r\n' in t else '\n'
+    L = t.split(nl)
+    if modo == 'cuantas':
+        print(sum(1 for l in L if l.strip() == MARCA), p)
+        continue
+    if modo == 'quitar':
+        L2 = [l for l in L if l.strip() != MARCA]
+    else:
+        L2 = []
+        for i, l in enumerate(L):
+            L2.append(l)
+            m = RE_OPEN.match(l)
+            if m and abre_entero(m.group(2)):
+                if not (i + 1 < len(L) and L[i + 1].strip() == MARCA):
+                    L2.append(m.group(1) + MARCA)
+                continue
+            m = RE_NS.match(l)
+            if m and not (i + 1 < len(L) and L[i + 1].strip() == MARCA):
+                L2.append(m.group(1) + MARCA)
+    if L2 != L:
+        io.open(p, 'w', encoding='utf-8', newline='').write(nl.join(L2))
