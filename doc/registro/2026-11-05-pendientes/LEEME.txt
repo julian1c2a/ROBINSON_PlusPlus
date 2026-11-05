@@ -12,5 +12,6 @@ código del árbol); se lanzaron con py -3.15 y Git Bash en la máquina del prop
                          dónde entraba (cierre_lean.py.txt)
   cierre-congelados.txt  R2-4-9: el cierre de imports de los congelados de FOL antes de ADR-258 y los 8 módulos de ese
                          cierre que no estaban congelados (cierre_congelados.py.txt)
-Y además, sin fichero propio: los 48 sondeos y los 11 de control compilan con las notaciones scoped (check-sondeos.bash);
+Y además: los 48 sondeos y los 11 de control compilan con las notaciones scoped (check-sondeos.bash; la pasada entera,
+en sondeos/pasadas/tabla-2026-11-05.tsv; la pasada reescribió 14 ficheros de registro de octubre, que se restauraron);
 los controles de los dos repos, verdes (con las tablas del índice y de lo que nadie usa de FOL, rehechas).
