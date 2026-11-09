@@ -1,6 +1,6 @@
 # Auditoría de la base · 2026‑10‑02 — las MEDICIONES, versionadas
 
-**Last updated:** 2026-10-02 · Lean v4.31.0 — creado para que las cifras de ADR‑114/ADR‑115 no vivan sólo en
+**Last updated:** 2026-11-09 — estado al día ([ADR‑263](../DECISIONS.md)): las tres rondas de la auditoría de la base, cerradas en `doc/control/hallazgos.tsv` —la 1 (36: 31 hechos, 4 descartados, 1 sustituido), la 2 (43: 37, 4 y 2) y la 3, del 2026‑10‑28 (39, todos hechos; lanzada con ADR‑211 y terminada con ADR‑256)—; el índice de todas las auditorías, en `doc/AUDITORIAS.md`. El cuerpo es registro de su fecha. Antes, 2026-10-02 · Lean v4.31.0 — creado para que las cifras de ADR‑114/ADR‑115 no vivan sólo en
 un scratchpad (lección: *una medición cuyo artefacto vive en un scratchpad se evapora*).
 
 Este documento no razona: **guarda lo medido**. El razonamiento y las decisiones están en

@@ -1,6 +1,6 @@
 # Auditoría 2026-09-18 — el encargo A1-A5 y los cuatro planes de capa
 
-**Last updated:** 2026-09-18
+**Last updated:** 2026-11-09 — estado al día ([ADR‑263](../DECISIONS.md)): sus nueve hallazgos, cerrados en `doc/control/hallazgos.tsv` —A1–A5 hechos (ADR‑072, ADR‑073 y, A5, ADR‑258), G0–G3, los cuatro planes de capa, descartados (ADR‑069)—; el índice de todas las auditorías, en `doc/AUDITORIAS.md`. El cuerpo es registro de su fecha. Antes, 2026-09-18
 **Autor**: panel adversarial de 18 agentes (9 informes + 9 refutadores), orquestado en sesión.
 
 > ⚠️ **CÓMO SE LEE ESTE DOCUMENTO.** Cada bloque trae el informe **y su refutación**. Cuando el
