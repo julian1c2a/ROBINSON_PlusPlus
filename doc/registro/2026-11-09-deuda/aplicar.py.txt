@@ -1,0 +1,35 @@
+"""aplicar.py DOC CAMBIOS.json — aplica a DOC una lista de reemplazos EXACTOS, todos o ninguno.
+
+CAMBIOS.json: una lista de objetos {"viejo": "...", "nuevo": "...", "veces": N}; «veces» es cuántas veces tiene que
+aparecer «viejo» en el documento (por omisión 1) y se reemplazan TODAS esas. Si una sola falla (aparece otro número de
+veces, o «viejo» está vacío o es igual a «nuevo»), no se escribe NADA y se dice cuál.
+Conserva los finales de línea del documento (CRLF o LF): los «\n» de «viejo» y «nuevo» se leen como el final del
+documento. Los reemplazos se aplican en orden, cada uno sobre el resultado del anterior.
+Escribe el JSON con la herramienta Write (no con un heredoc: las barras invertidas llegan cambiadas).
+Uso: py -3.15 aplicar.py RUTA_DEL_DOC RUTA_DEL_JSON [--seco]"""
+import io, json, sys
+
+doc, cambios = sys.argv[1], sys.argv[2]
+seco = '--seco' in sys.argv
+t = io.open(doc, encoding='utf-8', newline='').read()
+nl = '\r\n' if '\r\n' in t else '\n'
+lista = json.load(io.open(cambios, encoding='utf-8'))
+mal = []
+for i, c in enumerate(lista):
+    v = c.get('viejo', '').replace('\r\n', '\n').replace('\n', nl)
+    n = c.get('nuevo', '').replace('\r\n', '\n').replace('\n', nl)
+    k = int(c.get('veces', 1))
+    if not v or v == n:
+        mal.append('#%d: «viejo» vacío o igual a «nuevo»' % i); continue
+    hay = t.count(v)
+    if hay != k:
+        mal.append('#%d: «%s» aparece %d veces, y se pedían %d' % (i, v[:80].replace(nl, '⏎'), hay, k)); continue
+    t = t.replace(v, n)
+if mal:
+    print('❌ NO SE ESCRIBE NADA (%d de %d fallan):' % (len(mal), len(lista)))
+    for m in mal:
+        print('   ' + m)
+    sys.exit(1)
+if not seco:
+    io.open(doc, 'w', encoding='utf-8', newline='').write(t)
+print('✅ %d reemplazos %s en %s' % (len(lista), 'comprobados (en seco)' if seco else 'aplicados', doc))

@@ -1,0 +1,35 @@
+ADR-262, 2026-11-09: la deuda de documentación de [E], [B] y [A2], pagada en lote (RPP y FOL). Los scripts van como .txt
+(se lanzaron con py -3.15 y Git Bash en la máquina del propietario, desde el scratchpad de la sesión; las rutas que nombran
+son las de entonces).
+
+  citas-antes-RPP.txt / -FOL.txt   todas las citas muertas que veía [B] antes (1514 en RPP, 693 en FOL): la salida entera de
+                                   b-citas.awk, volcada con un gancho TEMPORAL en b-control.bash (volcar-citas.bash.txt),
+                                   deshecho con git checkout tras cada pasada (comprobado: 0 cambios)
+  citas-despues-RPP.txt / -FOL.txt las que quedan (10 en RPP, 29 en FOL), con b-uno.bash; abajo, la razón de cada una
+  a2-antes.txt                     las 28 líneas de [A2] de doc/REFERENCE-Incompleteness.md (a2-uno.py.txt, réplica exacta)
+  hechos.tsv                       por cada clave muerta, su HECHO: de la historia de git de los dos repos (HEAD y etiquetas),
+                                   si se declaró alguna vez, cuándo, y el commit en que desapareció (con su asunto, que nombra
+                                   el ADR); si fue un módulo o un directorio; qué sondeo la declara; nombres vivos parecidos
+                                   (pistas, no hechos). hechos.py.txt; trabajo.py.txt hizo una hoja por documento
+  b-uno.bash.txt                   el medidor por documento: el MISMO núcleo (b-citas.awk) con las entradas volcadas; da, en
+                                   3 s, las cifras de la tabla (comprobado en los 21 documentos con deuda)
+  aplicar.py.txt                   reemplazos exactos en lote, todos o ninguno, conservando CRLF/LF
+  REGLAS.txt / REVISION.txt        lo que se pidió a los once editores y a los once revisores adversariales
+  origen.py.txt                    rehace las 47 líneas de doc/control/hallazgos.tsv que citaban las dos auditorías del
+                                   2026-09-11/12, por CONTENIDO (cada una tiene que nombrar su ID): los avisos de cabecera las
+                                   habían desplazado
+  edeuda.py.txt                    saca de E_DEUDA (RPP y FOL) los 26 + 8 documentos saldados
+  plan-libro-propuesta.diff.txt    la cabecera que un editor escribió para PLAN-LIBRO.md, DESHECHA: ADR-136 §3 dice que no se
+                                   toca mientras el libro esté en espera. Para el propietario.
+
+Las citas que quedan, y por qué no se arreglan (falsos positivos de [B]):
+  RPP  ci/** (DECISIONS): el patrón de ramas de build.yml, no un fichero; Sugerencias.md (×2) y sondeos/pasadas/salida/:
+       existen fuera de git a propósito (.gitignore); #censoFrontera y #noExiste: órdenes elab de sondeos vivos; if_neg y
+       exact? (×2): un lema y una táctica de Lean dentro de una orden; decodeTerm.eq_1: un lema que genera Lean.
+  FOL  derive_hyp/derive_rewrite/derive_weaken (8): las tácticas de FOL/Tactics.lean ([B] no indexa tácticas);
+       of_decide_eq_false, not_eq_of_beq_eq_false, not_not_em: lemas del núcleo de Lean en snake_case (sólo absuelve
+       un nombre del proyecto, o lo tapa un homónimo retirado); _of_: un infijo; DautoImplicit: de la orden
+       -DautoImplicit=false; los 14 de PeanoRF: otro repositorio (Peano-from-ROB-n-FOL), que [B] no indexa.
+Y dos cosas del núcleo de [B] vistas por el camino, PROPUESTAS (un cambio de b-citas.awk va solo, ADR-167): «se RETIRÓ»
+no casa como marcador (tolower en locale C no baja «Ó») y «**BORRARON**» tampoco (la negrita rompe la palabra); y [B]
+podría aprender las tácticas del proyecto como aprende las órdenes «#».

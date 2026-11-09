@@ -1,0 +1,28 @@
+691 · jobs · dice 91 (hoy 150) · §19–§38. **Estado 2026‑07‑12 (HEAD `05fe7c3`, 91 jobs, 0 sorrys).**
+1641 · jobs · dice 118 (hoy 150) · cero `sorry`**, recompilado a mano (`EXIT=0`, build 118 jobs). Commits `2f27a29` y `c8f100f`.
+1818 · jobs · dice 118 (hoy 150) · build de producción intacto en 118 jobs. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
+1938 · jobs · dice 118 (hoy 150) · desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
+1938 · sondeos · dice 57 (hoy 48) · desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
+2249 · jobs · dice 124 (hoy 150) · Build **124 jobs**, 0 errores, 0 sorrys.
+2765 · conteo de Meta · dice 90 (hoy 117) · `[propext, Classical.choice, Quot.sound]`. El árbol pasa a **112 módulos** (Meta 90).
+2847 · axiom de Lean · dice 7 (hoy 0) · 112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
+3783 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+3869 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+3945 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
+4026 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
+4108 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (nuevo).
+4178 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/LiftcCodePrf.lean` (§7bis, §9bis),
+4306 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)` — reconstrucción completa aguas abajo.
+4345 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. 22 ficheros. Footprint sin cambios.
+4395 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (1 307 l.).
+4461 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean`.
+4503 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` (720 l.),
+4642 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §10 (888 l.),
+4752 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §5,
+4848 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §12.
+4924 · jobs · dice 135 (hoy 150) · > `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §6,
+5034 · jobs · dice 139 (hoy 150) · > `Build completed successfully (139 jobs)`. `Meta/LiftfcWitnessPrf.lean` (nuevo, 657 l.).
+5080 · jobs · dice 139 (hoy 150) · > `Build completed successfully (139 jobs)`. `Meta/SubstTreeReflect.lean` §10bis + §11ter.
+5167 · jobs · dice 139 (hoy 150) · > `Build completed successfully (139 jobs)`. `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean`
+5238 · jobs · dice 141 (hoy 150) · > `Build completed successfully (141 jobs)`. `Meta/PremsOfDotPrf.lean` (nuevo, 1 059 l.).
+5372 · jobs · dice 141 (hoy 150) · > `Build completed successfully (141 jobs)`. `Meta/PremsBdAllPrf.lean` §9bis–§10 +

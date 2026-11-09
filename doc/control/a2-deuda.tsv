@@ -4,12 +4,3 @@
 # Se arregla en el DOCUMENTO: la cifra, o un marcador de historia («histórico», «previo», «entonces»…) en su línea.
 # La tabla tiene que existir siempre: sin deuda, sólo con esta cabecera.
 # etiqueta	documento	cifra	líneas
-axiom de Lean	doc/REFERENCE-Incompleteness.md	7	1
-conteo de Meta	doc/REFERENCE-Incompleteness.md	90	1
-jobs	doc/REFERENCE-Incompleteness.md	118	3
-jobs	doc/REFERENCE-Incompleteness.md	124	1
-jobs	doc/REFERENCE-Incompleteness.md	135	15
-jobs	doc/REFERENCE-Incompleteness.md	139	3
-jobs	doc/REFERENCE-Incompleteness.md	141	2
-jobs	doc/REFERENCE-Incompleteness.md	91	1
-sondeos	doc/REFERENCE-Incompleteness.md	57	1

@@ -1,11 +1,14 @@
 # PLAN — `NegVerifier` (cerrar `⊬¬G`)
 
-**Last updated:** 2026-09-10 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-09-10 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
 
 > 🗄️ **HISTÓRICO** (✏️ 2026‑10‑28, [ADR‑196](DECISIONS.md), T55): el plan de septiembre para cerrar `⊬¬G` con un
 > verificador negativo sobre la capa `⊢`. Esa capa se retiró con ADR‑115 (y el módulo `VerifierSound` con ADR‑160),
 > y `⊬¬G` se cerró por otro camino: `goedel_I_neg` (ADR‑121), por la solidez en el modelo estándar y W1. Lo de abajo
 > es registro; lo vigente, [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §2.
+> ✏️ 2026‑11‑09 ([ADR‑262](DECISIONS.md)), medido en git: con ADR‑160 (2026‑10‑18) salieron del build cinco módulos: cuatro que el plan da por hechos o por hacer,
+> `CodeDecode`, `ChainDecode`, `OmegaReflect` y `VerifierSound`, y `ChainNegPrf`, la realización posterior de su módulo D (retirados, en `archivo/t66-2026-10-18`); `LineWFCases` sigue en el build,
+> y `LineWFNeg` y `NegVerifierPrf` (inexistentes) no se escribieron nunca. `decodeStr` y `decodeChars`, de la nota de D7 (§4), viven sólo en `sondeos/IteSimboloNucleo.lean`.
 
 > # 🔬 VEREDICTO DEL SONDEO OBLIGATORIO DEL MÓDULO E (2026‑09‑10h)
 >

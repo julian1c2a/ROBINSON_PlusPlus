@@ -1,0 +1,44 @@
+"""ADR-262: los avisos de cabecera de las dos auditorías desplazaron las líneas que cita doc/control/hallazgos.tsv
+(columna «origen»: «…AUDITORIA-2026-09-11.md):NN» y «doc/AUDITORIA-FOL-2026-09-12.md:NN»). Para cada cita: el texto de
+la línea NN en HEAD; su posición en el árbol (tiene que aparecer UNA sola vez); y la cita, rehecha. Comprueba además que
+la línea de HEAD contiene el ID de la fila (el encabezado del hallazgo). Uso: py -3.15 origen.py [--seco]"""
+import io, re, subprocess, sys
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+T = R + 'doc/control/hallazgos.tsv'
+seco = '--seco' in sys.argv
+DOCS = {'doc/AUDITORIA-2026-09-11.md': r'(doc/AUDITORIA-2026-09-11\.md\)?):(\d+)',
+        'doc/AUDITORIA-FOL-2026-09-12.md': r'(doc/AUDITORIA-FOL-2026-09-12\.md):(\d+)'}
+head = {d: subprocess.run(['git', '-C', R, 'show', 'HEAD:' + d], capture_output=True).stdout.decode('utf-8').replace('\r', '').split('\n') for d in DOCS}
+hoy = {d: io.open(R + d, encoding='utf-8').read().replace('\r', '').split('\n') for d in DOCS}
+t = io.open(T, encoding='utf-8', newline='').read()
+nl = '\r\n' if '\r\n' in t else '\n'
+filas = t.split(nl)
+cambios, malos = 0, []
+for i, f in enumerate(filas):
+    c = f.split('\t')
+    if len(c) < 2:
+        continue
+    for d, pat in DOCS.items():
+        m = re.search(pat, c[1])
+        if not m:
+            continue
+        n = int(m.group(2))
+        txt = head[d][n - 1]
+        ide = c[0].split(':')[-1]
+        if ide.replace('-', '') not in txt.replace('‑', '-').replace('-', ''):
+            malos.append('%s: la línea %d de HEAD no nombra el ID: %s' % (c[0], n, txt[:80]))
+            continue
+        pos = [k + 1 for k, l in enumerate(hoy[d]) if l == txt]
+        if len(pos) != 1:
+            malos.append('%s: la línea de HEAD aparece %d veces hoy' % (c[0], len(pos)))
+            continue
+        if pos[0] != n:
+            c[1] = c[1][:m.start(2)] + str(pos[0]) + c[1][m.end(2):]
+            cambios += 1
+            print('%-14s %s:%d → %d' % (c[0], d.split('/')[-1], n, pos[0]))
+        filas[i] = '\t'.join(c)
+for x in malos:
+    print('❌', x)
+print('cambios:', cambios, '· malos:', len(malos))
+if not seco and not malos:
+    io.open(T, 'w', encoding='utf-8', newline='').write(nl.join(filas))

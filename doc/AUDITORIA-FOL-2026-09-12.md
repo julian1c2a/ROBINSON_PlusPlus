@@ -1,6 +1,16 @@
 # AUDITORÍA UNIFICADA DE FOL — y su engarce con ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-12 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](../DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-09-12 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
+> 🗄️ **HISTÓRICO** (✏️ 2026‑11‑09, [ADR‑262](../DECISIONS.md)): la auditoría unificada de FOL del 2026‑09‑12, sobre
+> FOL `ef54c6f` y RPP `47d7348`, con las cifras de ese día (28 `axiom` en las cinco `lean_lib` de FOL). Sus 36
+> hallazgos (A, M, B, R y D) están, con su estado de hoy, en `doc/control/hallazgos.tsv` (prefijo FOL0912; T37,
+> ADR‑241): 32 «hecho», 2 «sustituido» (B‑4 y R‑7) y 2 «descartado» (R‑8 y R‑10). Medido en la historia de FOL: ese
+> mismo día salieron las librerías `FOLPure`, `PropLogic` y `FOL_poli` (retiradas a `cuarentena/librerias-retiradas/`,
+> FOL b97ee6d) y FOL pasó de 13 a 4 axiomas (ADR‑028, FOL 3c9fc5d); `FOL/Completeness.lean` pasó a la cuarentena y se borró
+> el 2026‑09‑23 (FOL 62dc2d5: lo supera `Canonical0.completeness₀`); `FOL/MetaRules.lean` se retiró el 2026‑10‑02
+> (ADR‑115, FOL 3b355d7); y hoy el build de FOL y el de RPP tienen 0 `axiom` de Lean. Lo de abajo es registro; lo vigente,
+> `FOL/AXIOMS.md`, el `CURRENT-STATUS-PROJECT.md` de cada repo y `doc/control/hallazgos.tsv`.
 
 **Fecha:** 2026‑09‑12 · **Autor:** auditoría automatizada, síntesis · **Alcance:** los dos repos hermanos
 `E:/dropbox/github/lean4/FOL` (HEAD `ef54c6f`, árbol limpio) y `E:/dropbox/github/lean4/ROBINSON_PlusPlus`
@@ -404,7 +414,9 @@ la vez**.
 
 **M‑2 · `formula_enum`/`formula_enum_surj` son derivables — COMPILADO en 94 líneas** *(AX‑5)*.
 🏁 **RESUELTO el 2026‑09‑13** — [ADR‑030](../DECISIONS.md): `FOL/Enumeration.lean`, dentro del
-build, cero axiomas; `cuarentena/Completeness.lean` pasa de **5 a 3**.
+build, cero axiomas; `cuarentena/Completeness.lean` pasa de **5 a 3**. ✏️ *2026‑11‑09 ([ADR‑262](../DECISIONS.md)): se borró
+el 2026‑09‑23 (FOL 62dc2d5); antes, ese mismo 13 de septiembre, quedó en uno (ADR‑031, FOL 5d77fca). Medido en la
+historia de FOL.*
 ⚠️⚠️ **Y este hallazgo cobró su propia factura**: *«Fichero ya compilado en
 `…/scratchpad/ProbeEnum.lean`»* — un directorio **de sesión**. Al día siguiente se buscó en los dos
 repos, no apareció, y **se construyó otra vez** (~330 líneas donde había 102). 🔑 *Una medición cuyo

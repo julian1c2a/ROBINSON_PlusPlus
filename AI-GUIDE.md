@@ -1,6 +1,6 @@
 # Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-**Last updated:** 2026-09-09 (§27.1, «un control que no comprueba nada»; banner de MANDATORIES) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): lo que ADR‑235 no midió y lo que cambió después (nanoda con cuatro hilos, ADR‑251; el veredicto de `update-toolchain.bash`, ADR‑256; el `CHANGELOG.md` congelado, ADR‑142; la cita partida de §27.1; los nombres de la plantilla, por los de RPP), y notas fechadas, medidas, donde la regla no describe RPP (el `.gitignore`, los barriles, las listas de bloqueo, el recordatorio de §11, la cabecera de copyright, la hora de §22). Antes, 2026-09-09 (§27.1, «un control que no comprueba nada»; banner de MANDATORIES) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor:** Julián Calderón Almendros
 
 > Este documento define lo **universal**: aplica a cualquier proyecto Lean 4 que nazca
@@ -42,18 +42,18 @@ nombres bien elegidos.
 un único fichero monolítico.** Es el índice raíz de un árbol de documentos
 interconectados:
 
-- **Índice raíz** (`PROJECT_ROOT/REFERENCE.md`): catálogo general (tabla §1 con todos
+- **Índice raíz** (`REFERENCE.md`, en la raíz del repositorio): catálogo general (tabla §1 con todos
   los módulos, una fila por fichero `.lean`) y mapa de navegación hacia los nodos
   temáticos. No contiene el detalle exhaustivo de cada definición/teorema — eso vive
   en los nodos.
-- **Nodos temáticos** (`PROJECT_ROOT/doc/REFERENCE-{campo-temático}.md`): un fichero
-  por rama matemática o subsistema (p. ej. `REFERENCE-Arithmetic.md`,
-  `REFERENCE-GroupTheory.md`, `REFERENCE-Rationals.md`). Ahí van las firmas Lean 4,
+- **Nodos temáticos** (`doc/REFERENCE-{campo-temático}.md`): un fichero
+  por rama matemática o subsistema (aquí, cinco: `REFERENCE-Kernel.md`, `REFERENCE-Arithmetic.md`,
+  `REFERENCE-Godelization.md`, `REFERENCE-Full.md` y `REFERENCE-Incompleteness.md`). Ahí van las firmas Lean 4,
   la notación matemática, las dependencias y el detalle de cada símbolo exportado.
 - **Navegación fuerte obligatoria** — cada nodo temático **DEBE**:
   - enlazar de vuelta al índice raíz (`[REFERENCE.md](../REFERENCE.md)`);
   - enlazar de forma cruzada a otros nodos temáticos relacionados (no dejar nodos
-    aislados — si `REFERENCE-Rationals.md` depende de `REFERENCE-Arithmetic.md`, debe
+    aislados — si `REFERENCE-Rationals.md` (hipotético) depende de `REFERENCE-Arithmetic.md`, debe
     decirlo y enlazarlo explícitamente, y viceversa);
   - enlazar a los ficheros `.lean` concretos que documenta.
 - La fila de cada módulo en la tabla §1 del índice raíz **debe enlazar** a su nodo
@@ -135,6 +135,8 @@ módulos o pruebas **sin cargar el resto del proyecto**.
 
 Al leer un fichero `.lean`, añadir o verificar su comentario de cabecera que recuerda
 proyectarlo a REFERENCE.md.
+✏️ 2026‑11‑09 (ADR‑262), medido: ningún módulo de RPP lo lleva (en FOL, 44 de 70: «-- REFERENCE.md: project this
+file after every modification.»), y ningún control lo mira.
 
 ### (12.) Qué significa "proyectar"
 
@@ -183,9 +185,10 @@ theorem subset_refl (A : Type) : A ⊆ A := fun _ h => h
 
 **NUNCA** crear módulos de trabajo (ficheros `.lean` con teoremas, definiciones, etc.)
 en el directorio raíz del repositorio (donde está `lakefile.lean`). Todo módulo de
-trabajo vive dentro del directorio del proyecto (p. ej. `ProjectName/`) o en
+trabajo vive dentro del directorio del proyecto (aquí, `ROBINSON_PlusPlus/`) o en
 subdirectorios temáticos dentro de él. El único `.lean` permitido en la raíz es el
-barril raíz (`ProjectName.lean`), curado a mano, y el ejecutable (`Main.lean`) si existe.
+barril raíz (aquí, `ROBINSON_PlusPlus.lean`), curado a mano, y el ejecutable si existe (RPP no tiene).
+(✏️ 2026‑11‑09, ADR‑262: decía los nombres de la plantilla, ProjectName/, ProjectName.lean y Main.lean.)
 (✏️ 2026‑10‑18, T15 y ADR‑163 de RPP: decía «autogenerado, vía `gen-root.bash`»; el script se retiró.)
 
 **Ficheros scratch/temporales de sesión (`scratch*.lean`, `temp_*.lean`, `fix_*.py`,
@@ -193,6 +196,9 @@ barril raíz (`ProjectName.lean`), curado a mano, y el ejecutable (`Main.lean`) 
 proyecto (ver plantilla de `.gitignore` de este repositorio). Si necesitas
 experimentar, hazlo en uno de esos ficheros y bórralo (o dótalo de nombre definitivo e
 impórtalo) antes de terminar la sesión — nunca lo dejes `git add`eado "por si acaso".
+(✏️ 2026‑11‑09, ADR‑262: medido, el `.gitignore` de RPP no los lista, ni los ha listado nunca
+—`git log --all -S scratch -- .gitignore`, vacío—, y tampoco el de FOL ni el de la plantilla lean4-project-template:
+no los aparta git, sino quien no los commitea; hoy no hay ninguno versionado.)
 
 ### (16c.) Antes de construir, buscar (L5‑11, ADR‑254)
 
@@ -247,20 +253,23 @@ añadir una que se ofrece, también (y, por (14), proyectarla a REFERENCE.md).
 ### (18.) Archivos "barrel" (paraguas)
 
 Cualquier subdirectorio con 2+ módulos **DEBE** tener un fichero barrel al mismo nivel
-que el directorio (p. ej. `Algebra.lean` para `Algebra/`) que importe todos sus
+que el directorio (p. ej. `ROBINSON_PlusPlus/Meta.lean` para `ROBINSON_PlusPlus/Meta/`) que importe todos sus
 submódulos. Los barrels **no contienen código**, solo `import` (y opcionalmente un
 comentario catalogando la API pública del directorio). El barrel raíz del proyecto
-(`ProjectName.lean`) prefiere importar barrels de subdirectorio en vez de listar cada
+(aquí, `ROBINSON_PlusPlus.lean`) prefiere importar barrels de subdirectorio en vez de listar cada
 submódulo suelto. Los barrels se curan a mano (✏️ 2026‑10‑18, T15 y ADR‑163 de RPP: `gen-root.bash`, que los
 regeneraba y borraba sus comentarios, se retiró). Los `globs` del lakefile compilan todo el directorio, y `[L]` de
 `check-doc-sync.bash` exige que cada fichero esté en el cierre de imports de las raíces (`cierre-imports.bash`).
+✏️ 2026‑11‑09 (ADR‑262), medido: `Minimal/` (dos módulos, `Axioms.lean` y `SymLit.lean`) no tiene barril —el raíz
+importa `ROBINSON_PlusPlus.Minimal.Axioms`, y éste, `SymLit`—, y ningún control lo mira: lo que se exige es `[L]`.
 
 ### (19.) Organización por subdirectorios temáticos
 
 A medida que el proyecto crece, organizar los módulos en subdirectorios temáticos
 (`UpperCamelCase`, reflejando el sub-namespace). Cada subdirectorio puede tener su
-propio `Basic.lean` fundacional. El módulo `Nat/Add` es `ProjectName/Nat/Add.lean`, con namespace
-`ProjectName.Nat.Add`, y se importa desde su barril. (✏️ 2026‑10‑18, T15 y ADR‑163 de RPP: lo creaba
+propio `Basic.lean` fundacional (en RPP, ninguno). El módulo `Meta/Hilbert` es `ROBINSON_PlusPlus/Meta/Hilbert.lean`,
+con namespace `ROBINSON_PlusPlus.Meta.Hilbert`, y se importa desde su barril, `ROBINSON_PlusPlus/Meta.lean` (✏️ 2026‑11‑09,
+ADR‑262: el ejemplo era el de la plantilla, Nat/Add en ProjectName/). (✏️ 2026‑10‑18, T15 y ADR‑163 de RPP: lo creaba
 `new-module.bash` desde una plantilla, `_template.lean`, que ya no existía; el script se retiró.)
 
 ---
@@ -271,6 +280,9 @@ propio `Basic.lean` fundacional. El módulo `Nat/Add` es `ProjectName/Nat/Add.le
 existe para ser usado de verdad, no para quedar documentado y vacío** — si
 `locked_files.txt`/`frozen_files.txt` llevan vacíos varias sesiones seguidas pese a
 haber módulos "✅ Completos", el protocolo no se está siguiendo.
+✏️ 2026‑11‑09 (ADR‑262), medido: en RPP las dos listas están vacías (`locked_files.txt` es un fin de línea, y
+`frozen_files.txt`, vacío) y el catálogo de `REFERENCE.md` §1 tiene módulos «✅ Complete»; en FOL hay 47 congelados y
+54 bloqueados.
 
 | Nivel | Comando | Reversible | Propósito |
 |---|---|---|---|
@@ -347,7 +359,8 @@ Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
 
 El ancla de ADR‑117 lleva `nD L := numeralM (codeNat (psiD L))`, un numeral astronómico plegado tras un nombre (y lo
 mismo `deltaD`, `ax_axiomsCodeT_def`, el código de `godelBeta'` dentro de `godelCN`). Con ellos:
-* se prueba por `rw` con lemas que valen ∀ n (`occT_numeralM`, `evB_concat`…), un nivel por vez, de dentro afuera,
+* se prueba por `rw` con lemas que valen ∀ n (`occT_numeralM`, del sondeo `sondeos/AnclaEqInconsistente.lean`;
+  `evB_concat`…), un nivel por vez, de dentro afuera,
   y un `rfl` final sólo cuando ya no queda el término en el objetivo;
 * NUNCA `simp`/`simp only [f]` sobre funciones recursivas que lo alcancen, ni un `show` que escriba su evaluación, ni
   un `rfl`/`decide` que lo toque: el núcleo comprueba por reducción lo que eso deja como igualdad definicional, y no
@@ -376,11 +389,11 @@ mismo `deltaD`, `ax_axiomsCodeT_def`, el código de `godelBeta'` dentro de `gode
 | `bash check-warnings.bash [--generar-opciones]` | Los avisos de los dos builds contra su tabla, VACÍA desde ADR‑227 (todo aviso es rojo), y el censo de los set_option que apagan un linter o suben un límite, de fichero y «… in» (ADR‑229; ninguno de fichero), contra `doc/control/opciones.tsv`, con igualdad. Rojo; en la CI (el script; a mano, también `make warnings`) |
 | `bash check-sondeos.bash [--controles]` | Con --controles, compila los sondeos de `sondeos/CONTROLES.txt` y el control NEGATIVO de `autoImplicit` (ADR‑255: una variable implícita automática tiene que fallar con `lake lean`): rojo, y en la CI. Sin él, todos, como informe (sale con 0) |
 | `bash guarda_y_bloquea.bash <fichero> "<mensaje>"` | Commitea un fichero BLOQUEADO sin tocar la lista y lo vuelve a bloquear (T52, ADR‑201); rechaza un congelado, también si ya está en el índice (ADR‑255). `--autotest`, en un repositorio de prueba: en la CI de los dos repos |
-| `bash scripts/segundo-nucleo.bash [DIR]` | Exporta el cierre de los titulares (`TITULARES`) y el de la clase (i) (`PUROS`) y los pasa por seis núcleos —el de Lean, su versión paranoica, lean4lean, nanoda, con-leche y con-ron—, contra `doc/control/segundo-nucleo.tsv`, con un mutante (T23, ADR‑222). Los seis aceptan los dos cierres (ADR‑228; con los titulares, nanoda va con un hilo). Rojo; en la CI |
+| `bash scripts/segundo-nucleo.bash [DIR]` | Exporta el cierre de los titulares (`TITULARES`) y el de la clase (i) (`PUROS`) y los pasa por seis núcleos —el de Lean, su versión paranoica, lean4lean, nanoda, con-leche y con-ron—, contra `doc/control/segundo-nucleo.tsv`, con un mutante (T23, ADR‑222). Los seis aceptan los dos cierres (ADR‑228); nanoda va con cuatro hilos, también con los titulares, desde ADR‑251 (✏️ 2026‑11‑09, ADR‑262: decía «con los titulares, nanoda va con un hilo»). Rojo; en la CI |
 | `scripts/presupuesto-ci.bash`, `scripts/leanchecker-cobertura.bash` | En la CI: el tiempo y la memoria —el pico del proceso más pesado— del build y de leanchecker contra `doc/control/presupuesto-ci.tsv` (T41, ADR‑202; `--autotest`, con medidas sintéticas, ADR‑256), y que leanchecker replaye los módulos de las fuentes y de los .olean (T23, ADR‑222). Rojos |
 | `bash scripts/thaws-fol.bash [../FOL]` | En la CI («Los thaws de FOL, autorizados»): cada thaw de FOL se apoya en un ADR de RPP que existe y recoge una decisión (lo mira por la palabra «propietario», o «usuario» en los antiguos) —el que cita su mensaje, «ADR-NNN de RPP», o, para los de antes de la regla, `doc/control/thaws-fol.tsv`—; el alcance que declara esa tabla (prosa o código), re-medido con `scripts/prosa.py`; y `git-lock.bash` y `.githooks/`, los mismos en RPP y en FOL (T14, ADR‑234). Rojo |
 | **`PLAN-PRUEBAS.md`** | 🆕 **qué garantiza cada control y qué NO garantiza ninguno** (auditoría F‑4). Léelo antes de fiarte de un verde |
-| `bash update-toolchain.bash [vX.Y.Z]` | PRUEBA el par (RPP, FOL) con otra versión de Lean —por defecto, la última estable— en worktrees aparte, SIN commit: los builds (`lake build "@FOL/FOL" "@FOL/TheoryFramework"` y el de RPP), leanchecker y cinco controles —`check-footprints.bash`, `check-warnings.bash`, `check-estratos.bash`, `check-sorry.bash` y `check-sondeos.bash --controles`; no `check-choice.bash`, `check-doc-sync.bash` ni el segundo núcleo—, con la versión que corre comprobada (T42, ADR‑176). `--check`, sólo si hay otra; `--en-sitio`, en la CI. La vigilancia semanal, `.github/workflows/toolchain.yml` contra `doc/control/toolchain-vigilado.txt`. El bump, si se decide, por un ADR y a mano |
+| `bash update-toolchain.bash [vX.Y.Z]` | PRUEBA el par (RPP, FOL) con otra versión de Lean —por defecto, la última estable— en worktrees aparte, SIN commit: los builds (`lake build "@FOL/FOL" "@FOL/TheoryFramework"` y el de RPP), leanchecker y cinco controles —`check-footprints.bash`, `check-warnings.bash`, `check-estratos.bash`, `check-sorry.bash` y `check-sondeos.bash --controles`; no `check-choice.bash`, `check-indice.bash`, `check-doc-sync.bash`, el segundo núcleo, el presupuesto de la CI ni los autotest (✏️ 2026‑11‑09, ADR‑262: `check-indice.bash`, el presupuesto y los autotest faltaban aquí; desde ADR‑256 el veredicto del script nombra `check-choice`, `check-indice`, `check-doc-sync`, el segundo núcleo y el presupuesto, y su comentario añade los autotest)—, con la versión que corre comprobada (T42, ADR‑176). `--check`, sólo si hay otra; `--en-sitio`, en la CI. La vigilancia semanal, `.github/workflows/toolchain.yml` contra `doc/control/toolchain-vigilado.txt`. El bump, si se decide, por un ADR y a mano |
 | `make probar-controles [PYTHON=python3] [AWK=awk]` | Prueba las herramientas que VALIDAN los controles (T47, ADR‑180): `strip-lean.awk` frente al oráculo léxico (`scripts/pruebas/validar_strip.py`, sobre todo `.lean` versionado de RPP y FOL y 182 fixtures), `lineWFT` frente a su generador (`scripts/lineWFT_generar.py`) y los mutantes de `strip-lean.awk` frente al humo de `check-sorry` (`scripts/pruebas/mutantes_strip.py`, unos minutos). Las dos primeras corren también en la CI |
 | `make help` | Lista los targets del Makefile |
 
@@ -551,8 +564,8 @@ dos puntos seguidos de espacio dentro de un escalar sin comillas: YAML lo lee co
 con «mapping values are not allowed here» **antes de ejecutar nada** (0 s, «workflow file issue»).
 Se pasa a escalar de bloque. `.gitattributes` fuerza además `*.bash`, `*.yml` y `*.py` a **LF**:
 con `core.autocrlf` activo en Windows, un re-clone los convierte a CRLF y fallan en el runner con
-«$'
-': command not found».
+«`$'\r': command not found`» (✏️ 2026‑11‑09, ADR‑262: en el commit que lo escribió, `60b845f`, entre `$'` y `'`
+había un retorno de carro de verdad, y hoy era un salto de línea que partía la cita).
 
 ### (22.) Marcas de tiempo
 
@@ -561,6 +574,10 @@ Todos los ficheros de documentación técnica (`REFERENCE.md` y sus nodos, `CHAN
 incluir una marca de tiempo bajo el título en formato `YYYY-MM-DD HH:MM` (ISO 8601
 abreviado) — **no solo `YYYY-MM-DD`**: la hora permite detectar desincronización
 incluso dentro de una misma sesión de trabajo.
+✏️ 2026‑11‑09 (ADR‑262), medido: de los documentos que nombra (`REFERENCE.md` y sus cinco nodos, `CHANGELOG.md`,
+`DEPENDENCIES.md` y `CURRENT-STATUS-PROJECT.md`), ninguno lleva la hora justo detrás de su sello
+(`**Last updated:** AAAA-MM-DD — …`); [D] mira sólo la etiqueta, y [E], sólo la fecha (§27): la hora no la pide
+ningún control.
 
 ### (23.) Autoría y licencia
 
@@ -579,6 +596,9 @@ Author: [Nombre del Autor]
 License: MIT
 -/
 ```
+
+✏️ 2026‑11‑09 (ADR‑262), medido (la línea «Copyright» antes del primer `import`): no la llevan 43 de los 175 `.lean`
+versionados de RPP —15 módulos de `Meta/`, 27 sondeos y `lakefile.lean`—. Ningún control lo mira.
 
 ### (24.) Anotaciones de módulo para REFERENCE.md
 
@@ -614,7 +634,7 @@ la IA a priorizar qué cargar.
 | `THOUGHTS.md` | Diario de diálogo diseño usuario↔IA — nunca normativo, nunca sustituye una regla de esta guía |
 | `WORKFLOW.md` | Metodología operativa de Git, IA y Lean |
 | `CURRENT-STATUS-PROJECT.md` | Snapshot en vivo del build, jobs y estado de módulos |
-| `CHANGELOG.md` | Historial de cambios |
+| `CHANGELOG.md` | Historial de cambios, 🗄️ CONGELADO desde el 2026‑10‑16 (ADR‑142, T54): se detiene en ADR‑113, y el registro de cambios es `DECISIONS.md` (y `git log`) (✏️ 2026‑11‑09, ADR‑262) |
 
 > ✏️ **2026‑10‑28 ([ADR‑209](DECISIONS.md), T34): se cita por SÍMBOLO, nunca por número de línea.** En los documentos
 > de referencia (los autoritativos de §27, salvo `DECISIONS.md` y `NEXT-STEPS.md`, que son registro fechado), una cita
@@ -659,6 +679,13 @@ vivos con el estado real del código tras una sesión de desarrollo.
    Comprobar el CUERPO de cada documento, no sólo su banner.
 10. Reportar en el chat un resumen breve: `sorry` cerrados, declaraciones nuevas,
     ficheros tocados, `sorry` restantes y su ubicación.
+
+✏️ 2026‑11‑09 (ADR‑262), medido en RPP: `CHANGELOG.md`, el que nombran los pasos 2, 4 y 9, está CONGELADO desde
+ADR‑142 (su cabecera: «este registro se detiene en ADR‑113. El registro de cambios es DECISIONS.md (y git log)»);
+`NEXT-STEPS.md` no tiene tabla de `sorry` (hay cero:
+`check-sorry.bash`), ni `CURRENT-STATUS-PROJECT.md` tabla de módulos (el estado de cada uno, en el catálogo de
+`REFERENCE.md` §1); y esta guía no tiene árbol de directorios —su §22 es «Marcas de tiempo», y el paso 7 viene así de
+la plantilla—: el grafo de los módulos es `DEPENDENCIES.md`, generado (`python3 gen-dependencies.py`).
 
 ### `actualiza_documentacion`
 
@@ -707,7 +734,8 @@ normativo — nunca invalida una regla de esta guía.
 
 **Propósito:** comprobación exhaustiva con registro verboso.
 
-**Ficheros afectados:** `build_report.txt` (se sobrescribe en cada llamada).
+**Ficheros afectados:** `build_report.txt` (se sobrescribe en cada llamada; ✏️ 2026‑11‑09, ADR‑262: el `.gitignore` de
+RPP no lo aparta, y el de FOL, sí).
 
 **Pasos:** ejecutar `lake build` completo → capturar toda la salida → volcarla en
 `build_report.txt` → informar en el chat del resultado global (éxito/fallo, nº de
@@ -721,6 +749,9 @@ errores) invitando a revisar el fichero para más detalle.
 errores, warnings) → leer la tabla de `sorry` vigentes de `NEXT-STEPS.md` → leer la
 tabla de estado de módulos de `CURRENT-STATUS-PROJECT.md` → leer la última entrada de
 `CHANGELOG.md`.
+✏️ 2026‑11‑09 (ADR‑262): en RPP, el último cambio documentado es el último ADR de `DECISIONS.md` (`CHANGELOG.md`,
+congelado desde ADR‑142), el estado de los módulos está en el catálogo de `REFERENCE.md` §1 y no hay tabla de `sorry`
+(hay cero).
 
 **Formato de salida (siempre en este orden):**
 

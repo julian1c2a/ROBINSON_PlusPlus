@@ -21,11 +21,16 @@ Hilbert‑Bernays, las tres DEMOSTRADAS —D1 (`repr_pos'_prf`), D2 (`d2_prf`) y
 su hipótesis (`goedel_first_prf`, `goedel_second_prf`) y, por el modelo y la solidez, sin ella (`goedel_I`,
 `goedel_II`); la mitad `⊬¬G` (`goedel_I_neg`), Tarski, y W1 y E10 en todo modelo estándar. **Cómo leerlo:** §3.15–§3.23
 son anteriores a la reparación (registro); §3.24–§3.68, la construcción —la reparación, la escalera, la repatriación,
-el frente `substfc`, D3 y su ensamblaje—, cada una con su fecha; §3.69–§3.77, el lado semántico (ADR‑120 en
-adelante). Rosser, Löb y los corolarios de Gödel II, en las cabeceras de sus módulos y en TEOREMAS §1.
+el frente `substfc`, D3 y su ensamblaje—, cada una con su fecha; §3.69–§3.80, el lado semántico (ADR‑120 en
+adelante; §3.80, el puente de FOL, ADR‑195). Rosser, Löb y los corolarios de Gödel II, en las cabeceras de sus módulos y en TEOREMAS §1.
 
-**Last updated:** 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean v4.31.0. ✏️ 2026‑10‑05,
-D7 ejecutada (ADR‑129 de RPP): las cifras del ESTADO REAL de abajo, §3.22 (`decodeStr` da `Option (List Char)`) y
+**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): las 484 citas muertas de [B], a cero
+(cada nombre retirado o archivado, con su rótulo y la decisión que lo retiró; las notaciones, en texto plano; las
+abreviaturas, con el nombre entero), las 28 cifras viejas de [A2], marcadas como de su fecha, los módulos retirados de
+§3.15–§3.26 rotulados y los bloques de código de los vivos con una nota de lo que cambió, y §3.69–§3.80, contrastados con
+el código y con `doc/indice.tsv`. Antes, 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean
+v4.31.0. ✏️ 2026‑10‑05,
+D7 ejecutada (ADR‑129 de RPP): las cifras del ESTADO REAL de abajo, §3.22 (`decodeStr` (retirado con su módulo, ADR‑160) da `Option (List Char)`) y
 los literales de símbolo, hoy `sym!"…"`.
 
 
@@ -33,12 +38,19 @@ los literales de símbolo, hoy `sym!"…"`.
 
 ## Descripción de módulos
 
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): §3.15–§3.26 describen los módulos como se escribieron (junio–agosto de
+> 2026), y se han revisado contra el árbol: los módulos que ya no existen llevan su rótulo, con la decisión que los retiró (F7a, la
+> capa ⊢ de ADR‑115, T66 de ADR‑160, el cono de ADR‑161 o ADR‑190), y los bloques de código de los que siguen, una
+> nota con lo que cambió. Los `#print axioms` de los bloques son medidas de su fecha: los footprints de hoy son las filas
+> de `check-footprints.bash`, y sin `axiom` en el build ninguno lleva un axioma del proyecto. Los nombres y enunciados de
+> hoy, en `doc/indice.tsv`.
+
 ### 3.15 `Meta/Incompleteness.lean` — Incompletitud Nivel D (Fase 19) — 🗑️ **MÓDULO ELIMINADO**
 
 > ⚠️ **Registro histórico, no código vigente.** El fichero se **borró en F7a** (2026‑07‑09, commit
 > `f03eacf`) junto con sus 7 postulados legacy. Ninguna de las declaraciones que siguen existe hoy.
 > Se conserva la sección porque el libro (`PLAN-LIBRO.md` Parte IV) la cita como registro del
-> episodio: `provFormula_repr` era **falso en general**, y de ahí venía la mitad `⊬¬G` de Gödel I
+> episodio: `provFormula_repr` (retirado en F7a) era **falso en general**, y de ahí venía la mitad `⊬¬G` de Gödel I
 > que hubo que retirar. **No revertir F7a** — fue un arreglo de solidez.
 
 **Namespace**: `ROBINSON_PlusPlus.Meta.Incompleteness` *(inexistente)*
@@ -47,7 +59,7 @@ los literales de símbolo, hoy `sym!"…"`.
 **Last updated**: 2026-06-12
 **Dependencias**: `Axioms`, `Meta/Godel`, `Meta/Provability`, `FOL.*`.
 
-Deriva los teoremas de incompletitud a partir de las condiciones de demostrabilidad del Nivel C (D1 vía `provFormula_repr`; diagonalización vía `goedelSentence_fixedpoint`) + D2/D3 postuladas.
+Deriva los teoremas de incompletitud a partir de las condiciones de demostrabilidad del Nivel C (D1 vía `provFormula_repr`, retirado; diagonalización vía `goedelSentence_fixedpoint`, retirado: los dos, en F7a) + D2/D3 postuladas.
 
 ```lean
 noncomputable def provCode (φ) : Formula := substFormula 0 (formCode φ) provFormula   -- Prov(⌜φ⌝)
@@ -64,18 +76,21 @@ theorem con_imp_goedelSentence : axioms ⊢ (consistencyFormula ⇒ goedelSenten
 theorem goedel_second (hcon : Consistent) : ¬ (axioms ⊢ consistencyFormula)       -- ⊬ Con
 ```
 
-**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp`, **sin DNE object-level**.
+**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp` (el primero, retirado con las meta‑reglas de FOL, ADR‑115), **sin DNE object-level**.
 
 > ⚠️ **Corrección de auditoría (2026-07-13).** Aquí se afirmaba que la otra mitad de Gödel I (`⊬ ¬G`)
-> quedó cerrada el 2026-06-13 vía `dne` clásica (`goedel_first_unrefutable`/`goedel_first_undecidable`).
+> quedó cerrada el 2026-06-13 vía `dne` clásica (`goedel_first_unrefutable`/`goedel_first_undecidable`, retirados en F7a).
 > **Eso era cierto sólo en la capa LEGACY** (`Meta/Incompleteness.lean`, que postulaba D2/D3), y esa capa
 > se **RETIRÓ en F7a** (`f03eacf`): **esos dos teoremas ya no existen en el código**. La cadena real
 > establece **sólo `⊬G`**. La **indecidibilidad de `G` está PENDIENTE** de re‑derivar sobre la cadena
 > real (tarea abierta, independiente de D3).
 >
-> ↻ **Actualización 2026‑08‑23:** el `goedel_first_real'` que esta nota citaba como «la cadena real»
-> **tampoco existe ya** — cayó con la reparación (ADR‑012). Hoy `⊬G` es **`goedel_first_numeral`**
-> (§3.24.5). El diagnóstico de la nota sigue siendo válido palabra por palabra: falta `NegVerifier`.
+> ↻ **Actualización 2026‑08‑23:** el `goedel_first_real'` que esta nota citaba como «la cadena real» **tampoco existe ya**
+> — cayó con la reparación (ADR‑012). Hoy `⊬G` es **`goedel_first_numeral`** (retirado después con la capa ⊢, ADR‑115)
+> (§3.24.5). El diagnóstico de la nota sigue siendo válido palabra por palabra: falta `NegVerifier` (retirado después, ADR‑115).
+>
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): registro. Hoy `⊬G` es `goedel_first_prf` (con `ConsistentH`) y `goedel_I`
+> (sin hipótesis), y `⊬¬G` es `goedel_I_neg` (ADR‑121, §3.75).
 
 ---
 
@@ -94,6 +109,9 @@ theorem prfI_to_derives : Prfᵢ φ → axioms ⊢ φ   -- SOLO constructores de
 theorem prf_to_derives  : Prf φ → axioms ⊢ φ    -- + dne en un único punto (esquema p3)
 theorem consistentH_of_omega : ¬(axioms ⊢ ⊥) → ¬ Prf ⊥
 -- #print axioms: prf0 sin dne; prf con FOL.MetaRules.dne (diferencia exacta = {dne})
+-- ✏️ 2026‑11‑09 (ADR‑262): prfI_to_derives y prf_to_derives —los puentes a ⊢— y consistentH_of_omega, sobre ⊢, se
+--   retiraron con esa capa (ADR‑115; lo cuenta la cabecera del módulo), y FOL.MetaRules con ella: Prf ya no tiene puente
+--   a ⊢. Su solidez es prf_sound (Meta/SolidezPrf.lean, ADR‑120).
 ```
 
 **`Meta/HilbertSeq.lean`** (Fase 1) — namespace `…Meta.HilbertSeq`:
@@ -137,9 +155,12 @@ theorem substTerms_arith ...   -- mutuo; cómputo object de la sustitución (niv
 theorem liftTerm_arith / liftFormula_arith ; theorem substFormula_arith   -- nivel fórmula (con binders)
 -- lemas de lift: substTerm_liftLiftLift (3-lift), substTerm_liftLiftLiftLift (4-lift)
 -- #print axioms substFormula_arith = solo axiomas estándar de Lean (0 postulados nuevos)
+-- ✏️ 2026‑11‑09 (ADR‑262): lo de arriba sobre ⊢ se retiró con esa capa (ADR‑115; lo cuenta la cabecera del módulo).
+--   Hoy el módulo sólo declara las cancelaciones substTerm_liftLiftLift, substTerm_liftLiftLiftLift y sus substTerms_*;
+--   la versión Prf de los lemas de cómputo está en Meta/ArithPrf.lean (prf_substTerm_arith, prf_substFormula_arith…).
 ```
 
-**`Meta/StepArith.lean`** (Fase 2.3) — `…Meta.StepArith`:
+**`Meta/StepArith.lean`** (Fase 2.3) — 🗑️ retirado con la capa ⊢ el 2026‑10‑02 (ADR‑115; está en la etiqueta `pre-adr115`), y con él el namespace `…Meta.StepArith` (retirado). Lo de abajo es registro:
 
 ```lean
 theorem q1_concl_code / q2_concl_code / leibniz_concl_code   -- el código de la conclusión de
@@ -156,6 +177,9 @@ theorem vpf_nil/p1/p2/c1/c2/c3/j1/j2/j3/efq/q1/q2/q3/eqrefl/leibniz/p3   -- inco
 theorem vpf_mp (… h1 h2) / vpf_gen (… h1)   -- condicionales por pertenencia In
 -- (provFormulaC, la demostrabilidad Σ₁ sobre validProofFn: retirada con el verificador antiguo, ADR‑192)
 noncomputable def provCodeC (φ) := substFormula 0 (formCode φ) provFormulaC
+-- ✏️ 2026‑11‑09 (ADR‑262): carc_cons, cdrc_cons y los vpf_* se retiraron con la capa ⊢ (ADR‑115), y provCodeC con el
+--   verificador antiguo (ADR‑192): hoy el módulo sólo declara numeralM_eq. En Prf, prf_carc_cons (Meta/ReprPrf.lean) y
+--   prf_cdrc_cons (Meta/CodeWitnessPrf.lean).
 ```
 
 ---
@@ -163,7 +187,7 @@ noncomputable def provCodeC (φ) := substFormula 0 (formCode φ) provFormulaC
 ### 3.17 Gödel II finitario en `Prf` — cadena HBL sobre `provCodeC'` (Fases 3–5)
 
 Re-nivelación de la cadena Hilbert-Bernays-Löb al cálculo finitario `Prf` (Gödel II es
-`¬ Prf Con'`; `provCodeC'` rastrea `Prf`, no ω). Predicado estructural fiel
+`¬ Prf consistencyFormula'`; `provCodeC'` rastrea `Prf`, no ω). Predicado estructural fiel
 `provCodeC' φ := ∃p, chainOk nil p ∧ In ⌜φ⌝ (runFn nil p)` (`Meta/ProofChain.lean`).
 
 **`Meta/HilbertDeduction.lean`** — namespace `…Meta.HilbertDeduction`:
@@ -191,6 +215,7 @@ theorem repr_pos'_prf {φ} (h : Prf φ) : Prf (provCodeC' φ)   -- D1 finitaria 
 -- ReprPrf: prf_runFn_nil/cons, prf_congr_runFn_1/2, prf_chainOk_nil/cons/subst1, prf_allIn_nil/cons,
 --   prf_in_cons_head/tail, prf_eq_trans/symm, prf_concat_nil_eq/cons_eq, prf_carc_cons, 32 lineWF/premsOf
 -- #print axioms repr_pos'_prf = [propext, Classical.choice, Quot.sound, prf_inAxC]
+-- ✏️ 2026‑11‑09 (ADR‑262): medido entonces; hoy su fila de check-footprints.bash es [propext, Quot.sound].
 ```
 
 **`Meta/ChainPrf.lean`** (Fase 4, paso 8) — namespace `…Meta.ChainPrf`: **10 lemas de cadena en `Prf`**
@@ -227,7 +252,7 @@ theorem d2_prf (A B) : Prf (provCodeC' (A ⇒ B) ⇒ (provCodeC' A ⇒ provCodeC
 -- #print axioms d2_prf = [propext, Classical.choice, Quot.sound]   (sin postulados, ni prf_inAxC)
 ```
 
-**`Meta/ReflectionPrf.lean`** (Fase 5, D3 reducida) — namespace `…Meta.ReflectionPrf`:
+**`Meta/ReflectionPrf.lean`** (Fase 5, D3 reducida) — 🗑️ fuera del build el 2026‑10‑18 ([ADR‑161](../DECISIONS.md); está en `archivo/fuera-del-cono-2026-10-18`), y con él el namespace `…Meta.ReflectionPrf` (retirado). Lo de abajo es registro:
 
 ```lean
 theorem PrfH_pcc_mp {Γ A B} (h1 : PrfH Γ (provCodeC' (A ⇒ B))) (h2 : PrfH Γ (provCodeC' A))
@@ -273,10 +298,11 @@ theorem pcc_allIn_cons (c x t) : Prf (provCodeC' (In x c) ⇒
 -- NOTA (núcleo duro pendiente): la reflexión de igualdad universal `∀x y` es indemostrable
 --   (obstrucción Tarski: `termCode` es meta, no object; solo vale para términos-código vía tcFn).
 --   La Σ₁-completitud real (`hC`/`hI`) debe reformularse al nivel del código object (tcFn/substfc).
+-- ✏️ 2026‑11‑09 (ADR‑262): registro de julio; D3 se probó el 2026‑09‑10 por la vía punteada (d3_prf_real, §3.67).
 ```
 
 **`Meta/TcArithPrf.lean`** (Fase 5, cimiento código object) — namespace `…Meta.TcArithPrf`: porte
-finitario de la cadena `tc_arith` de `Diagonal.lean` (ω) → `Prf`. `tcFn` (función object,
+finitario de la cadena tc_arith de `Diagonal.lean` (ω) → `Prf`. `tcFn` (función object,
 `Minimal/Axioms.lean`) computa `termCode`.
 
 ```lean
@@ -292,6 +318,9 @@ theorem prf_congr_tcFn {t₁ t₂} (h : Prf (t₁ =eq t₂)) : Prf (tcFn t₁ =e
 -- #print axioms = [propext, Classical.choice, Quot.sound]
 -- Cimiento del enfoque de código object: `tcFn` es función object con congruencia Leibniz
 -- (a diferencia de la `termCode` meta que causa la obstrucción Tarski).
+-- ✏️ 2026‑11‑09 (ADR‑262): prf_tc_cons, prf_tc_of_cons, prf_tc_chars/str/term/terms y prf_tc_form se retiraron el
+--   2026‑08‑18 con ax_tc_cons (la reparación, ADR‑012, §3.24). Hoy el módulo declara prf_tc_zero, prf_tc_succ,
+--   prf_tc_numeral, prf_congr_tcFn y prf_congr_tc2; el sustituto de prf_tc_form es prf_tc_form_numeral (Meta/D3InDotPrf.lean).
 ```
 
 **`Meta/Sigma1CorePrf.lean`** (Fase 5, capa de código object para `In`) — namespace `…Meta.Sigma1CorePrf`:
@@ -333,6 +362,9 @@ theorem prf_provCodeC'_of_tracked_witness (A p) (hp : Prf (tcFn p =eq termCode p
 -- #print axioms = [propext, Classical.choice, Quot.sound]  (pcc_* añaden prf_inAxC, ancla de coding benigna)
 theorem prf_lineOk_q2 (c Ac w) : Prf (lineOk c (cons (implc (substfc zero w Ac) (exc Ac))
   (cons (numeralM 10) (cons Ac (cons w nil)))))   -- línea-axioma Q2 válida en cualquier contexto (A‑F3 base)
+-- ✏️ 2026‑11‑09 (ADR‑262): prf_tc_objList se retiró el 2026‑08‑19 (la refundación, §3.24.7: su sustituto es
+--   prf_objList_numeral), y prf_tc_objList_formCode y prf_provCodeC'_In_formCode_of_tracked cambiaron de enunciado
+--   (ídem); objList se define hoy en Minimal/Axioms.lean.
 ```
 
 **`Meta/ExIntroCodePrf.lean`** (A‑F3/A‑F4) — namespace `…Meta.ExIntroCodePrf`: ∃‑intro de la
@@ -348,7 +380,7 @@ theorem pcc_exIntro_code (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac) (hw : ∀ c, l
   -- (tipo d2_prf). #print axioms = [propext, Classical.choice, Quot.sound] (sin postulados)
 ```
 
-**`Meta/Sigma1TrackedPrf.lean`** (verificación RIESGO‑1) — namespace `…Meta.Sigma1TrackedPrf`:
+**`Meta/Sigma1TrackedPrf.lean`** (verificación RIESGO‑1) — 🗑️ fuera del build el 2026‑10‑18 ([ADR‑161](../DECISIONS.md); está en `archivo/fuera-del-cono-2026-10-18`), y con él el namespace `…Meta.Sigma1TrackedPrf` (retirado):
 el ∃‑intro rastreado (`pcc_exIntro_code`, L1) cierra hasta `provCodeC'(∃A)` para testigo CERRADO.
 
 ```lean
@@ -406,7 +438,7 @@ pretensión, nunca probada: [AXIOMS.md](../AXIOMS.md) §0—, capa numérica
 de listas para D3, §12‑A): `lenc l := func sym!"lenc" [l]`, `nthc l i := func sym!"nthc" [l, i]`; axiomas
 `ax_lenc_nil` (`lenc nil = 0`), `ax_lenc_cons` (`lenc (cons h t) = σ (lenc t)`), `ax_nthc_zero`
 (`nthc (cons h t) 0 = h`), `ax_nthc_succ` (`nthc (cons h t) (σ i) = nthc t i`). Añadidos a `axioms`
-y `codingAxioms` (`axioms_eq` rfl preservado; verificador/`prf_iff_derivation`/D1 intactos).
+y `codingAxioms` (`axioms_eq` (retirado después: ver abajo) rfl preservado; verificador/`prf_iff_derivation`/D1 intactos).
 (`axioms_eq` se retiró con ADR‑117, 2026‑10‑04: hoy `axioms_split : axioms = axiomsBase ++ [ax_axiomsCodeT_def]`.)
 
 ---
@@ -429,7 +461,7 @@ Fases y estado:
 | 2 | forma Δ₀ del verificador: `In · (runFn nil p)` y `chainOk c p` | ✅ |
 | 3 | `num` (numeral‑de) + evaluación provable | ⏳ |
 | 4 | Δ₀‑completitud atómica (aquí entran las ecuaciones de variable de `substfc`) | ⏳ |
-| 5 | inducción estructural `⊢ ∀p (δ → Prov ⌜δ(ṗ)⌝)` → `d3_prf` → `goedel_second_prf` | ⏳ *(✏️ 2026‑10‑14, ADR‑134: registro; D3 se probó el 2026‑09‑10 por la vía punteada, `d3_prf_real`, y no por esta tabla)* |
+| 5 | inducción estructural `⊢ ∀p (δ → Prov ⌜δ(ṗ)⌝)` → `d3_prf` (inexistente: el nombre del plan) → `goedel_second_prf` | ⏳ *(✏️ 2026‑10‑14, ADR‑134: registro; D3 se probó el 2026‑09‑10 por la vía punteada, `d3_prf_real`, y no por esta tabla)* |
 
 **`Meta/NumListPrf.lean`** — ver §3.17 (ecuaciones `Prf` de `lenc`/`nthc`).
 
@@ -478,6 +510,7 @@ theorem liftFormula_boundedIn / liftFormula_boundedIn_gen / substFormula_bounded
   -- NO son defeq: bajo el ∃, `liftFormula 1` da `liftTerm 1 (liftTerm 0 ·)` y `boundedIn ↑x ↑L`
   -- da `liftTerm 0 (liftTerm 0 ·)`; los iguala `FOL.liftTerm_comm_zero` (teorema)
 theorem prf_lt_subst2 / PrfH_lt_subst2 / PrfH_lt_subst1 / PrfH_eq_congr_nthc2   -- congruencias de lt/nthc
+-- ✏️ 2026‑11‑09 (ADR‑262): PrfH_lt_subst1 y PrfH_lt_subst2 viven hoy en Meta/ChainPrf.lean (la deduplicación de §3.52).
 theorem prf_boundedIn_head (x hd t) : Prf ((x =eq hd) ⇒ boundedIn x (cons hd t))   -- testigo i = 0
 theorem prf_boundedIn_tail (x hd t) : Prf (boundedIn x t ⇒ boundedIn x (cons hd t)) -- testigo i = σj
 theorem prf_boundedIn_nil  (x)      : Prf (boundedIn x nil ⇒ ⊥)
@@ -611,7 +644,7 @@ línea anterior*. La demostración generaliza el acumulador como `∀c` **intern
 Con la fase 2 completa (§3.18), la Σ₁‑completitud provable (`hI`/`hC` de `d3_prf_of_sigma1` (retirado en ADR‑161)) se
 ataca sobre la forma **Δ₀ acotada** y por reflexión de sus **átomos**.
 
-**`Meta/Sigma1BoundedPrf.lean`** (fase 3, puente) — namespace `…Meta.Sigma1BoundedPrf`. Como la
+**`Meta/Sigma1BoundedPrf.lean`** (fase 3, puente) — 🗑️ fuera del build el 2026‑10‑18 ([ADR‑161](../DECISIONS.md); está en `archivo/fuera-del-cono-2026-10-18`), y con él el namespace `…Meta.Sigma1BoundedPrf` (retirado). Como la
 fase 1/2 dio los `⇔` y `pcc_imp` sube implicaciones object a `provCodeC'` (D2+D1), `hI`/`hC` se
 reducen a reflejar la forma acotada `boundedIn`/`chainOkB`.
 
@@ -678,7 +711,7 @@ Hilbert‑Bernays.
 **Estado de fase 3‑5** (plan en `GODEL-D3-TRACKED-DESIGN.md` §15.5): ✅ puente + átomo `=eq` cerrado
 libre de muro; ⏳ átomos `<`/`lineWF` (`atom1CodeFn`; `<` se reduce a `=eq` + `∃` acotado), reflexión
 de cuantificadores acotados (∀/∃), e inducción estructural sobre `boundedIn`/`chainOkB` → `hbI`/`hbC`
-→ `d3_prf` *(nombre del plan, que nunca existió con ese nombre: no existe; D3 se probó el 2026‑09‑10 como `d3_prf_real`)* → `goedel_second_prf`.
+→ `d3_prf` *(inexistente: nombre del plan, que nunca existió con ese nombre; D3 se probó el 2026‑09‑10 como `d3_prf_real`)* → `goedel_second_prf`.
 
 ---
 
@@ -688,7 +721,7 @@ Tras el arranque de fase 3 (§3.19), la Σ₁‑completitud provable se ataca co
 prueba interno a nivel de código** y la **evaluación provable** de las funciones del verificador,
 reformulando el target sobre la **notación‑punto de Feferman** (`num = tcFn`, "ruta B") — la
 formulación canónica para fórmulas con variables libres. Plan en `GODEL-D3-TRACKED-DESIGN.md`
-§19–§38. **Estado 2026‑07‑12 (HEAD `05fe7c3`, 91 jobs, 0 sorrys).**
+§19–§38. **Estado 2026‑07‑12 (entonces: HEAD `05fe7c3`, 91 jobs, 0 sorrys).**
 
 #### 3.20.1 Sistema de prueba interno a nivel de código (§19, §25, §26)
 
@@ -793,11 +826,11 @@ theorem d3_prf_of_chainOkDot (φ) (hC : Prf (chainOk nil #0 ⇒ provFromCode cha
    computación de `substCodeF` no cambia. Con `liftFormula_provFromCode_open` + `liftTerm_bddCarcDotAt`
    la meta lifteada es *la misma con `↑p`*.
 2. La **COTA exigió SIMETRÍA INTERNA** (que no existía): `pcc_lt_tracked` da la cota con `tcFn (lenc ↑p)`,
-   pero el código dotado pide `lencT (liftc 0 ↑ṗ)` — y **sólo son iguales DENTRO de `Prov`** (es la
+   pero el código dotado pide `lencT (liftc 0 ↑ṗ)` — y **sólo son iguales DENTRO de Prov** (es la
    evaluación provable `pcc_eval_lenc`), en la dirección contraria a la que transporta Leibniz. De ahí
    `PrfH_eq_symm_code` + `prf_substfc_ltCodeFn_snd` (hueco `⌜v₀⌝` en 2ª posición).
 3. El **CUERPO NO necesita simetría**: la hipótesis del `∃` es una igualdad **objeto**, así que basta
-   congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form` —retirado el 2026‑08‑18 con ADR‑012— + `prf_liftc_tcFn`) + `PrfH_provCode_congr`
+   congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form` (retirado el 2026‑08‑18 con ADR‑012) + `prf_liftc_tcFn`) + `PrfH_provCode_congr`
    sobre `pcc_eval_carc_nthc` — que consume `chainOk`, y por eso `hI` debe recibirlo (`hbody_of_atoms`
    reestructurado).
 
@@ -831,7 +864,7 @@ theorem pcc_or_elim_code (Ac Bc Cc) (hor h1 h2) : Prf (provFromCode Cc)
 ```
 
 **Consecuencia:** junto con lo ya existente (MP, `∀`‑elim, `∃`‑intro, gen, Leibniz, `∧`, `∨`‑intro),
-**`Prov` dispone YA de lógica completa**. `pcc_ind_code` es el desbloqueo de `hC_dot`.
+**Prov dispone YA de lógica completa**. `pcc_ind_code` es el desbloqueo de `hC_dot`.
 
 #### 3.20.7 INTRODUCCIÓN del `∀` acotado (§40) — keystone de `hC_dot`
 
@@ -867,12 +900,12 @@ theorem PrfH_weaken_code / PrfH_imp_trans_code / PrfH_or_elim_imp_code
 3. `pcc_gen_code` toma el body **abierto** ⇒ se induce sobre el **CUERPO ABIERTO** y se aplica `gen`
    **una sola vez al final** (evita el *round‑trip* `∀`‑elim).
 4. **Obstrucción `hPsiId`**: `substfc` **DECREMENTA** las variables superiores (`prf_substtc_var_gt`),
-   luego `substfc 0 ⌜v₀⌝ Psi` **sólo es la identidad** si la única code‑var de `Psi` es `⌜v₀⌝`. Se pasa
+   luego `substfc 0 ⌜v₀⌝ Psi` **sólo es la identidad** si la única code‑var de Psi es `⌜v₀⌝`. Se pasa
    como hipótesis y se descarga estructuralmente. (Por lo mismo, el split se **voltea en el objeto**:
    la simetría interna exige el 1er arg `substtc`‑invariante, y `⌜v₀⌝` no lo es.)
 5. **Obstrucción De Bruijn del ensamblaje**: el binder de la inducción **desplaza** las variables
    libres ⇒ dentro del `gen` hace falta `hbody` en **`↑p`**, no en `p`. Resuelto **parametrizando
-   sobre `p`** (`CF`/`bndF`/`PsiF` como funciones + conmutación de `liftTerm`/`substTerm`) — mismo
+   sobre `p`** (CF/bndF/PsiF como funciones + conmutación de `liftTerm`/`substTerm`) — mismo
    patrón que resolvió el `∃`‑elim de `hI_dot`.
 
 #### 3.20.8 Lo que FALTA para cerrar D3
@@ -896,10 +929,11 @@ boundedPremsIn c p i L = ∀j<lenc L. ( In (nthc L j) c  ∨  ∃k<i. carc (nthc
 * Faltan además las **evaluaciones de `premsOf`** (y `lenc`/`nthc` sobre él) y los **cómputos
   `substCodeF`** de `chainOkB`/`lineOkB`/`boundedPremsIn` (patrón `substCodeT_closed`).
 
-Luego `d3_prf := d3_prf_of_chainOkDot φ hC_dot` → `goedel_second_prf` → **F7b retira `axiom d3` (7→6)**.
+Luego `d3_prf := d3_prf_of_chainOkDot φ hC_dot` (inexistente: era el nombre del plan) → `goedel_second_prf` → **F7b retira `axiom d3` (7→6)**.
 *(✏️ 2026‑10‑14, [ADR‑134](../DECISIONS.md): registro. Se hizo el 2026‑09‑10: D3 es `d3_prf_real`
 (`Meta/PremsBdAllPrf.lean`) y el `axiom d3` se retiró.)*
-Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
+Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable` *(✏️ 2026‑11‑09, ADR‑262: entonces; el
+`NEXT-STEPS.md` de esa fecha es hoy `doc/historia/NEXT-STEPS-hasta-2026-10-14.md`)*.
 
 ---
 
@@ -907,9 +941,14 @@ Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
 
 Paralelo a D3 (independiente de él): **la otra mitad de Gödel I**, la indecidibilidad de `G`.
 
-#### 3.21.1 `Meta/OmegaReflect.lean` (§41) — `G` INDECIDIBLE, sin postulados gödelianos
+> 🗑️ ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): registro; los dos módulos de esta sección, retirados: `Meta/OmegaReflect.lean`
+> con T66 ([ADR‑160](../DECISIONS.md); en `archivo/t66-2026-10-18`) y `Meta/AxiomListCode.lean` (retirado con la capa ⊢,
+> ADR‑115; en `pre-adr115`). Hoy `⊬¬G` es `goedel_I_neg` (`Meta/SolidezVerificador.lean`, ADR‑121,
+> §3.75), sin hipótesis.
 
-La cadena real daba **sólo `⊬G`** (`goedel_first_real'`); la mitad `⊬¬G` vivía en la capa legacy
+#### 3.21.1 `Meta/OmegaReflect.lean` (retirado, ADR‑160) (§41) — `G` INDECIDIBLE, sin postulados gödelianos
+
+La cadena real daba **sólo `⊬G`** (`goedel_first_real'`, retirado el 2026‑08‑18 con ADR‑012); la mitad `⊬¬G` vivía en la capa legacy
 (sobre el postulado **falso** `provFormula_repr`) y se retiró en F7a. Se reconstruye **con la reflexión
 como hipótesis META explícita** (no escondida en un postulado):
 
@@ -924,18 +963,20 @@ theorem reflects_of_omega (hω : OmegaConsistent) (hneg : NegVerifier) (φ) : Re
 theorem goedel_first_undecidable_omega (hcon) (hω) (hneg) : ¬ Prf godelC' ∧ ¬ Prf (neg godelC')
 ```
 
-`#print axioms goedel_first_undecidable_real'` = `[propext, choice, Quot.sound, MetaRules.{dne,gen,
-imp_intro}, ax_induction, ax_list_induction, ax_axiomsCodeT_eq]` — **ni un postulado gödeliano**.
+`#print axioms goedel_first_undecidable_real'` (retirado el 2026‑08‑18, ADR‑012) = `[propext, choice, Quot.sound, MetaRules.{dne,gen,
+imp_intro}, ax_induction, ax_list_induction, ax_axiomsCodeT_eq]` (todos salvo los tres de Lean, retirados con la capa ⊢,
+ADR‑115) — **ni un postulado gödeliano**.
 
-> ⛔ **`repr_neg` NO se sigue de la consistencia (cerrado por Gödel).** `⊢ ¬provCodeC' φ` para `φ`
+> ⛔ **repr_neg NO se sigue de la consistencia (cerrado por Gödel).** `⊢ ¬provCodeC' φ` para `φ`
 > indemostrable es, con `φ = ⊥`, **`Con(T)`** — indemostrable por Gödel II. Por eso la reflexión es
-> **hipótesis META** (la ω‑consistencia clásica), no un teorema interno. Descargarla (`NegVerifier`)
+> **hipótesis META** (la ω‑consistencia clásica), no un teorema interno. Descargarla (`NegVerifier`, retirado con la capa ⊢, ADR‑115)
 > es un enunciado **Δ₀** sobre testigos concretos — plan en `PLAN-NEGVERIFIER.md`.
 
-#### 3.21.2 `Meta/AxiomListCode.lean` + anclaje (§42) — `axiomsCodeT` concretado
+#### 3.21.2 `Meta/AxiomListCode.lean` (retirado, ADR‑115) + anclaje (§42) — `axiomsCodeT` concretado
 
 El sondeo de solidez (`PLAN-NEGVERIFIER.md` §🔬) halló que **`axiomsCodeT` era opaco** (sólo dirección
-positiva `ax_inAxC`), lo que impedía refutar `In v0 axiomsCodeT` y **bloqueaba `NegVerifier`**. Opción 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+positiva `ax_inAxC`, retirado con la capa ⊢, ADR‑115), lo que impedía refutar `In v0 axiomsCodeT` y **bloqueaba
+`NegVerifier`** (retirado, ADR‑115). Opción 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 1: concretar el anclaje, **net‑0 axiomas de Lean**.
 
 ```lean
@@ -949,17 +990,21 @@ theorem neg_In_axiomsCodeT (φ) (hnp : ¬ Prf φ) : axioms ⊢ neg (In (formCode
 
 **Clave de rendimiento:** el término gigante `listFormCodeM axioms` (que costaba ~40 s materializado y
 motivó retirar el `axiomsCodeT` concreto en `7ae7b7b`) **no se expande** — la pertenencia se decide por
-**recursión estructural sobre la lista abstracta** (`ax_L1`/`ax_L2` + `formCode_ne`); y `φ ∉ axioms` se
-obtiene de `¬Prf φ` vía `prf_ax`, **sin comparación sintáctica** (medido: 4 s). `neg_In_axiomsCodeT` es
-la pieza que **desbloquea el módulo D de `NegVerifier`**.
+**recursión estructural sobre la lista abstracta** (`ax_L1_in_nil`/`ax_L2_in_cons` + `formCode_ne`, retirado con la capa ⊢, ADR‑115); y `φ ∉ axioms` se
+obtiene de `¬Prf φ` vía `prf_ax`, **sin comparación sintáctica** (medido: 4 s). `neg_In_axiomsCodeT` (retirado, ADR‑115) es
+la pieza que **desbloquea el módulo D de `NegVerifier`** (retirado, ADR‑115).
 
-### 3.22 `Meta/CodeDecode.lean` + `Meta/ChainDecode.lean` (§43) — el DECODIFICADOR (módulo A de `NegVerifier`)
+### 3.22 `Meta/CodeDecode.lean` + `Meta/ChainDecode.lean` (retirados, ADR‑160) (§43) — el DECODIFICADOR (módulo A de `NegVerifier`, retirado, ADR‑115)
 
 Inversos **computables** de los codificadores de Gödel y de prueba. Es el puente **objeto → meta** que
-`VerifierSound` (módulo E) necesita: de un testigo aceptado se recupera —de forma verificada— la
+`VerifierSound` (módulo E; retirado, ADR‑160) necesita: de un testigo aceptado se recupera —de forma verificada— la
 derivación real. Plan: `PLAN-NEGVERIFIER.md` §4.
 
-#### 3.22.1 `Meta/CodeDecode.lean` (§43·A.1) — `decodeForm` es una BIYECCIÓN
+> 🗑️ ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): registro. Los dos módulos salieron del build con T66 (ADR‑160; están en
+> `archivo/t66-2026-10-18`). El decodificador de hoy es otro, sobre los códigos `Nat`: `dec`/`decT`/`decTs` de
+> `Meta/SolidezVerificador.lean` (§3.75).
+
+#### 3.22.1 `Meta/CodeDecode.lean` (retirado, ADR‑160) (§43·A.1) — `decodeForm` (retirado con él) es una BIYECCIÓN
 
 Recursión estructural directa sobre `Term` (terminación inferida). Cada decodificador tiene su
 **round‑trip** (`decode ∘ code = some`) y su **inyectividad** (`decode c = some v → c = code v`); juntas
@@ -982,22 +1027,22 @@ theorem decodeTerm_inj {c t} : decodeTerm c = some t → c = termCodeM t   -- mu
 theorem decodeForm_inj {c φ} : decodeForm c = some φ → c = formCodeM φ    -- ★ la «dirección crítica»
 ```
 
-> **No hizo falta la hipótesis `IsCodeShaped c`** que el plan anticipaba: los decodificadores son
+> **No hizo falta la hipótesis `IsCodeShaped c`** (retirada después, ADR‑160) que el plan anticipaba: los decodificadores son
 > estructuralmente rígidos ⟹ la inyectividad vale para **todo** `c : Term`.
 >
 > ⚠️ **Dos trampas reales** (ver [[feedback-lean-kernel-ite-string]]):
 > 1. **Kernel + `DecidableEq String`** (medido con símbolos `String`; ✏️ 2026‑10‑05: desde D7 son `List Char`, y no
->    se ha vuelto a medir). `split`/`rw`/`simp only [decodeX]` **manuales** sobre `if s == sym`
->    fabrican un cast `congrFun'` que **el núcleo RECHAZA**. Se sortea con **inducción funcional**
->    (`fun_induction`; para las mutuas `decodeTerm.induct` con `motive_2` explícito) + `unfold … at h`.
+>    se ha vuelto a medir). `split`/`rw`/`simp only [decodeX]` (decodeX: un decodificador, retirado con el módulo)
+>    **manuales** sobre `if s == sym` fabrican un cast `congrFun'` que **el núcleo RECHAZA**. Se sortea con **inducción funcional**
+>    (fun_induction; para las mutuas `decodeTerm.induct` (retirado con su módulo, ADR‑160) con motive_2 explícito) + `unfold … at h`.
 >    ✏️ *(2026‑10‑05, ADR‑130)* La causa no era ésa. MEDIDO en `sondeos/IteSimboloNucleo.lean`: el `if` sobre un símbolo pasa el núcleo con `String` y con `List Char`, con `==` y con `=`; lo que el núcleo rechaza es desplegar **por defeq** (`dsimp only`/`simp only [f] at h`) una recursión estructural MUTUA cuya llamada recursiva va a un subtérmino que sólo sale tras un `match` interior —`decodeTerm`, y réplicas sin ningún `if`—. El remedio sigue siendo el de aquí: `unfold` y la inducción funcional.
-> 2. **`Char.ofNat` CLAMPA** ⟹ `decodeChars` no es inyectiva sin el guard `(Char.ofNat code).toNat == code`
+> 2. **`Char.ofNat` CLAMPA** ⟹ `decodeChars` (retirado con su módulo, ADR‑160) no es inyectiva sin el guard `(Char.ofNat code).toNat == code`
 >    (el round‑trip lo cumple gratis por `Char.ofNat_toNat`).
 
-#### 3.22.2 `Meta/ChainDecode.lean` (§43·A.2) — decodificador de CADENAS + solidez
+#### 3.22.2 `Meta/ChainDecode.lean` (retirado, ADR‑160) (§43·A.2) — decodificador de CADENAS + solidez
 
 Invierte `lineJustif`/`lineCode'`/`proofCode'` (`Representability2.lean`). El justif se **pela** a
-`List Term` (`peelArgs`) para matchear `(tag : Nat, args)` — un `match` sobre las 21 formas anidadas de
+`List Term` (`peelArgs`, retirado con el módulo) para matchear `(tag : Nat, args)` — un `match` sobre las 21 formas anidadas de
 `Term` reventaría el `whnf` (`String.decEq`; medido con símbolos `String`. ✏️ 2026‑10‑05: desde D7 son `List Char`, y no se ha vuelto a medir).
 
 ```lean
@@ -1029,21 +1074,21 @@ theorem decodeChain_prf         : decodeChain t = some rs →
 
 > ⚠️ **HALLAZGO que corrige el plan.** `lineJustif` es **LOSSY** para `thy`/`mp`/`gen` (descarta los
 > índices: `thy k ↦ cons 15̇ nil`; `mp`/`gen` guardan la premisa resuelta, no el índice). Por tanto el
-> round‑trip `decodeChain (proofCode' rs) = some rs` (**retract**) es **FALSO**. Lo que el módulo E
-> necesita **no** es el retract sintáctico `proofCode' rs = t` (que `peelArgs` no da para códigos con
-> «cola basura»), sino la **SOLIDEZ**: una cadena que `decodeChain` acepta es una **derivación válida**,
+> round‑trip `decodeChain (proofCode' rs) = some rs` (**retract**; decodeChain, retirado con su módulo) es **FALSO**. Lo que el módulo E
+> necesita **no** es el retract sintáctico `proofCode' rs = t` (que `peelArgs`, retirado, no da para códigos con
+> «cola basura»), sino la **SOLIDEZ**: una cadena que `decodeChain` (retirado) acepta es una **derivación válida**,
 > y de ahí `Prf` de cada conclusión vía `derivation_to_prf` (solidez meta ya existente). La pieza que lo
-> hace cierto es que `decodeLine` **verifica** `stepConcl acc r = some f` (con `DecidableEq Formula`).
+> hace cierto es que `decodeLine` (retirado) **verifica** `stepConcl acc r = some f` (con `DecidableEq Formula`).
 
-**Dependencias:** `CodeDecode` ⇐ `Minimal.Axioms`. `ChainDecode` ⇐ `CodeDecode` + `Representability2`
+**Dependencias** (de entonces; los dos, retirados: ADR‑160): `CodeDecode` ⇐ `Minimal.Axioms`. `ChainDecode` (retirado) ⇐ `CodeDecode` (retirado) + `Representability2`
 (`Rule`/`stepConcl`/`checkProof`/`Derivation`/`derivation_to_prf`, `lineJustif`/`proofCode'`) + los
 puentes `formCodeM_eq`/`termCodeM_eq` (`Representability`). Todo `[propext, choice, Quot.sound]`.
 
-### 3.23 `Meta/LineWFCases.lean` + `Meta/LineWFDerives.lean` (§44) — los 21 TAGS (módulo B de `NegVerifier`)
+### 3.23 `Meta/LineWFCases.lean` + `Meta/LineWFDerives.lean` (éste, retirado con la capa ⊢, ADR‑115) (§44) — los 21 TAGS (módulo B de `NegVerifier`, retirado, ADR‑115)
 
 Módulo B del plan: la tabla **ejecutable** de los 21 esquemas de línea, indexada por la etiqueta `k`.
 Es la pieza de **mayor apalancamiento** porque está **COMPARTIDA** por los dos frentes, en direcciones
-opuestas: **D3/`hC_dot`** (positiva: `lineWF X ⇒ Prov ⌜lineWF Ẋ⌝`) y **`NegVerifier`/módulo C**
+opuestas: **D3/`hC_dot`** (positiva: `lineWF X ⇒ Prov ⌜lineWF Ẋ⌝`) y **`NegVerifier`/módulo C** (retirados con la capa ⊢, ADR‑115)
 (negativa: `¬lineWF X ⇒ ⊢ ¬lineWF X`).
 
 > 🔎 **La revisión previa evitó rehacer trabajo**: los 21 `prf_lineWF_<tag>`/`prf_premsOf_<tag>` **ya
@@ -1069,6 +1114,9 @@ theorem derives_lineWF_neg_of_tag (h : tagConcl k args = some e)
     (hne : axioms ⊢ neg (concl =eq e)) : axioms ⊢ neg (lineWF ⟨concl,k,args⟩)
 theorem derives_lineWF_neg_thy_of_not_prf (φ) (hnp : ¬ Prf φ) :   -- ★ compone con `neg_In_axiomsCodeT`
     axioms ⊢ neg (lineWF (cons (formCode φ) (cons (numeralM 15) nil)))
+-- ✏️ 2026‑11‑09 (ADR‑262): prf_lineWF_tag es hoy prf_lineWF_tag_imp (sólo la implicación; desde el 2026‑09‑05, vía C,
+--   ADR‑020), y la mitad sobre ⊢ (derives_imp_trans, derives_lineWF_neg_of_tag, derives_lineWF_neg_thy_of_not_prf) se
+--   retiró con esa capa (ADR‑115): queda prf_lineWF_neg_of_tag, en Prf. Lo cuenta la cabecera del módulo.
 ```
 
 > ⚠️ **Los 21 esquemas NO son uniformes — `tagConcl` cubre 19, no 21.**
@@ -1083,12 +1131,12 @@ theorem derives_lineWF_neg_thy_of_not_prf (φ) (hnp : ¬ Prf φ) :   -- ★ comp
 > SIEMPRE demostrable). Refutar una línea `mp` mala **tiene que ir por `premsOf`/`boundedPremsIn`**.
 > Condiciona el árbol de casos del módulo C.
 
-#### 3.23.2 `Meta/LineWFDerives.lean` — des-duplicación del nivel `⊢`
+#### 3.23.2 `Meta/LineWFDerives.lean` (retirado con la capa ⊢, ADR‑115) — des-duplicación del nivel `⊢`
 
-Los 42 enunciados (21 `lineWF_*` + 21 `premsOf_*`) vivían en `Meta/ProofChain.lean` **probados por
+Los 42 enunciados (21 `lineWF_*` + 21 `premsOf_*`, retirados con la capa ⊢, ADR‑115) vivían en `Meta/ProofChain.lean` **probados por
 segunda vez desde los mismos axiomas** que sus gemelos `prf_*`. Aquí son lo que siempre fueron: el
-transporte por **`prf_to_derives : Prf φ → axioms ⊢ φ`**. Enunciados **idénticos**; namespace
-`ProofChain` conservado ⟹ los consumidores (`Representability2` = D1, `DerivCond` = D2) sólo cambian un
+transporte por **`prf_to_derives : Prf φ → axioms ⊢ φ`** (retirado con la capa ⊢, ADR‑115). Enunciados **idénticos**; namespace
+`ProofChain` conservado ⟹ los consumidores (`Representability2` = D1, `DerivCond` (retirado, ADR‑115) = D2) sólo cambian un
 `import`. `ProofChain`: 870 → 540 líneas. `repr_pos'_prf`/`d2_prf` conservan sus axiomas exactos.
 
 #### 3.23.3 Paso 3 — los esquemas a ACCESORES (`ax_lineWF_<tag>` **B.3b HECHO**) → `pcc_lineWF_tracked` (B.3c)
@@ -1129,7 +1177,7 @@ su enunciado (`[propext, choice, Quot.sound]`); D1/D2 con axiomas intactos. Gene
 Toolkit en `ReprPrf`: `prf_lineWF_iff_transport` (vale para los 21 — `lineWF L` es un **átomo sin
 binders** ⟹ el cancel lift/subst va por `substTerm_liftTerm`; ⚠️ **el cancel general a nivel fórmula es
 FALSO**, `FOL/Theorems/Quantifiers.lean`), `prf_congr_bin1/bin2/un/bin` (des‑duplicadas de `ArithPrf`),
-copias privadas `prf_congr_substfc_a2/a3_loc`/`prf_congr_liftfc_a2_loc`/`prf_nthc_zero/succ_loc`.
+copias privadas `prf_congr_substfc_a2_loc`/`prf_congr_substfc_a3_loc`/`prf_congr_liftfc_a2_loc`/`prf_nthc_zero_loc`/`prf_nthc_succ_loc`.
 Escollos: `ind`/`listInd` (términos gigantes) exigieron `have hy` explícito + `maxRecDepth 16000`.
 
 **B.3c EN CURSO — `pcc_lineWF_tracked`** (el átomo `lineWF` punteado que `hC_dot` consume). Desbloqueado
@@ -1137,7 +1185,7 @@ por B.3b. Enunciado (refinado al arrancar — la **forma dotada** `substfc zero 
 análoga exacta a `inDot`, NO `lineWFCodeFn (tcFn t)`):
 `Prf (lineWF t ⇒ provFromCode (substfc zero (tcFn t) (formCode (lineWF #0))))`. Plan (diseño §16),
 21 casos: (1) `prf_lineWF_inv t` da `⋁_{k} (lineTag t =eq k̇)` → `PrfH_or_elim`; (2) en la rama `k`, el
-bicondicional‑accesor reduce `lineWF t` a `carc t =eq expr_k`; (3) reflejar ese `=eq`; (4) **transportar
+bicondicional‑accesor reduce `lineWF t` a carc t =eq expr_k; (3) reflejar ese `=eq`; (4) **transportar
 de vuelta** por el bicondicional codificado (el corazón denso, «subproyecto de 21 casos»).
 
 **Arranque de `eqrefl` (tag 12), progreso:**
@@ -1145,13 +1193,16 @@ de vuelta** por el bicondicional codificado (el corazón denso, «subproyecto de
 * **PASO 4 — columna vertebral CONSTRUIDA y compilando** (`[propext, choice, Quot.sound, prf_inAxC]`),
   confirmando la plantilla `pcc_bddDot_imp_inDot`: **`hbwd`** = `∀.(tag ⇒ (=eq ⇒ lineWF))` (dirección ⇐
   currificada bajo el tag: `Prf.gen` + `prf_deduction`×2 + `iff.mpr` interno vía `Prfᵢ.c3`); y
-  **`paso6_backbone`** = `Prov(⌜implc TAG_dot (implc EQ_dot LWF_dot)⌝)` (reflejar `hbwd` con
+  **`paso6_backbone`** = Prov(⌜implc TAG_dot (implc EQ_dot LWF_dot)⌝) (reflejar `hbwd` con
   `pcc_thm_inst` testigo `tcFn t` → distribuir `substfc` con `prf_substfc_impl`×2 → `prf_provCode_congr`).
-  Código exacto en `NEXT-STEPS.md`.
+  Código exacto en el `NEXT-STEPS.md` de entonces (hoy, `doc/historia/NEXT-STEPS-hasta-2026-10-14.md`).
 * **FALTA (capa densa restante):** reflejar `TAG_dot`/`EQ_dot` (= `Prov(⌜nthc t 1 =eq 12⌝)` y
   `Prov(⌜carc t =eq …⌝)`) vía **evaluación provable** (`pcc_eval_nthc`/`pcc_eval_carc_nthc`, DENTRO de
-  `Prov` bajo cota `i<lenc` — NO `pcc_eq_tracked` directo, que sería **Tarski**); dos `pcc_mp_code_open`;
+  Prov bajo cota `i<lenc` — NO `pcc_eq_tracked` directo, que sería **Tarski**); dos `pcc_mp_code_open`;
   y envolver con la inversión (`PrfH_or_elim`×21). Es un bloque denso en sí (como `bddCarcDot`).
+
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): registro. `pcc_lineWF_tracked` se cerró el 2026‑09‑10, incondicional (§3.62),
+> y vive en `Meta/SubstTreeReflect.lean`.
 
 ---
 
@@ -1187,12 +1238,17 @@ La pieza clave del diseño: `consN` se define con **números triangulares**, de 
 | `triN n = 0+1+…+n` | `def triN : Nat → Nat` |
 | `2·triN n = n(n+1)` | `theorem two_mul_triN : ∀ n : Nat, 2 * triN n = n * (n + 1)` |
 | `consN a b = triN(a+b+1) + (b+1)` | `def consN (a b : Nat) : Nat := triN (a + (b + 1)) + (b + 1)` |
-| `2·consN a b = (a+b+1)(a+b+2) + 2(b+1)` | `theorem two_mul_consN (a b : Nat) : …` |
+| `2·consN a b = (a+b+1)(a+b+2) + 2(b+1)` | `theorem two_mul_consN (a b : Nat) : …` (renombrado en ADR‑113: hoy `two_mul_pairN`; ver la nota) |
 | `⊢ ā + b̄ = (a+b)‾` | `theorem prf_numeral_add (a b : Nat) : Prf (add (numeral a) (numeral b) =eq numeral (a+b))` (en `Meta/ArithPrf.lean`; hasta ADR‑190, su espejo «prf_gnum_add» vivía aquí) |
 | `⊢ cons(ā, b̄) = consN a b‾` | `theorem prf_cons_eval (a b : Nat) : Prf (cons (numeral a) (numeral b) =eq numeral (consN a b))` |
 | ídem, con premisas | `theorem prf_cons_eval_of {A B : Term} {a b : Nat} (ha …) (hb …) : Prf (cons A B =eq numeral (consN a b))` |
 | `codeNat φ ∈ ℕ` (espejo meta de `formCode`) | `def codeNat : Formula → Nat` |
 | **`⊢ formCode φ = codeNat φ‾`** | **`theorem prf_formCode_numeral : ∀ φ : Formula, Prf (formCode φ =eq numeral (codeNat φ))`** |
+
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): desde ADR‑113 (`cons a b = σ (pair a b)`, 2026‑09‑28) las dos filas de
+> `consN` son registro: hoy `consN a b := triN (a + b) + b + 1` (en `Minimal/Axioms.lean`), y la identidad de Cantor es
+> la de `pairN` (`pairN a b := triN (a + b) + b`): `two_mul_pairN : 2 * pairN a b = (a + b) * ((a + b) + 1) + 2 * b`.
+> El cuadre de arriba, `2·consN a b = cpOf ā b̄`, es hoy `2·pairN a b = cpOf ā b̄` (`prf_cpOf_eval`).
 
 `codeNat` va acompañado de `codeNatChars`/`codeNatStr`/`codeNatTerm`/`codeNatTerms`, y cada uno de su
 lema de evaluación (`prf_charsCode_numeral`, `prf_strCode_numeral`, `prf_termCode_numeral`,
@@ -1243,7 +1299,7 @@ cálculo finitario `Prf` y construyen encima.
 
 * **`NatOrderPrf`** — orden `≤`: `prf_le_of_lt`, `prf_le_of_eq`, `prf_le_refl`, la cadena de
   transitividades (`prf_lt_trans`, `prf_lt_le_trans`, `prf_le_lt_trans`, `prf_le_trans`),
-  sustitución bajo `≤`/`<` (`prf_le_subst1/2`, `PrfH_lt_subst1/2`) y `prf_add_assoc`/`prf_add_comm`.
+  sustitución bajo `≤`/`<` (`prf_le_subst1`/`prf_le_subst2`, y `PrfH_lt_subst1`/`PrfH_lt_subst2`, hoy en `ChainPrf`: §3.52) y `prf_add_assoc`/`prf_add_comm`.
 * **`NatMulPrf`** — producto: `prf_mul_zero`, `prf_mul_succ`, `prf_mul_comm`, `prf_zero_mul`,
   `prf_mul_one`; monotonía aditiva y multiplicativa (`prf_add_le_mono_*`, `prf_mul_le_mono_right`);
   **cancelación** `prf_lt_of_mul_lt_mul_right`; tricotomía `prf_lt_trichotomy` e irreflexividad
@@ -1257,32 +1313,40 @@ cálculo finitario `Prf` y construyen encima.
 #### 3.24.5 `Meta/DiagonalNumeral.lean` — el lema diagonal rehecho, y **Gödel I**
 
 **Namespace**: `ROBINSON_PlusPlus.Meta.DiagonalNumeral` · **@importance**: `foundational`
-**Dependencias**: `CodeNumeralPrf`, `Diagonal`, `DiagonalTwo`, `OmegaReflect`.
+**Dependencias**: `CodeNumeralPrf`, `DiagonalTwo` (✏️ 2026‑11‑09, ADR‑262: sus `import` de hoy; la lista decía también
+`Diagonal`, que llega por `DiagonalTwo`, y `OmegaReflect`, retirado con T66, ADR‑160).
 
 | Notación matemática | Firma Lean 4 |
 |---|---|
-| `⊢ codeNat φ‾ = formCode φ` | `theorem hFN (φ : Formula) : axioms ⊢ (numeral (codeNat φ) =eq formCode φ)` |
+| `⊢ codeNat φ‾ = formCode φ` | `theorem hFN (φ : Formula) : axioms ⊢ (numeral (codeNat φ) =eq formCode φ)` (retirado, ADR‑115) |
 | `ψ[⌈ψ⌉]` con el código NUMERAL | `noncomputable def selfAppN (ψ : Formula) : Formula` |
-| `Prov` sobre el código numeral | `noncomputable def provCodeN (φ : Formula) : Formula` |
+| Prov sobre el código numeral | `noncomputable def provCodeN (φ : Formula) : Formula` |
 | la sentencia de Gödel numeral | `noncomputable def godelCN : Formula` |
-| diagonalización | `theorem diag_arith_num (ψ : Formula) : …` |
-| **punto fijo** | **`theorem godelCN_fixedpoint : axioms ⊢ (godelCN ⇔ neg (provCodeC' godelCN))`** |
-| puente entre representaciones | `theorem provCode_transfer (φ : Formula) : axioms ⊢ (provCodeN φ ⇔ provCodeC' φ)` |
-| **Gödel I — `⊬G`** | **`theorem goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN`** |
-| Gödel I — indecidibilidad | `theorem goedel_first_undecidable_numeral (hcon : ConsistentOmega) (hrefl : Reflects godelCN) : (¬ Prf godelCN) ∧ (¬ Prf (neg godelCN))` |
+| diagonalización | `theorem diag_arith_num (ψ : Formula) : …` (retirado, ADR‑115) |
+| **punto fijo** | **`theorem godelCN_fixedpoint : axioms ⊢ (godelCN ⇔ neg (provCodeC' godelCN))`** (retirado, ADR‑115) |
+| puente entre representaciones | `theorem provCode_transfer (φ : Formula) : axioms ⊢ (provCodeN φ ⇔ provCodeC' φ)` (retirado, ADR‑115) |
+| **Gödel I — `⊬G`** | **`theorem goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN`** (retirado, ADR‑115) |
+| Gödel I — indecidibilidad | `theorem goedel_first_undecidable_numeral (hcon : ConsistentOmega) (hrefl : Reflects godelCN) : (¬ Prf godelCN) ∧ (¬ Prf (neg godelCN))` (retirado, ADR‑115) |
 
-**Por qué la refundación fue barata (~30 líneas):** `substFormula_arith (v) (s) (f)` toma **`s`
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): de esta tabla, el módulo de hoy sólo define `selfAppN`, `provCodeN` y
+> `godelCN`; lo demás, sobre ⊢, se retiró con esa capa (ADR‑115; lo dice la cabecera del módulo). La reconstrucción sobre
+> `Prf` está en `Meta/GodelTwoPrf.lean` §2 (`prf_hFN`, `prf_diag_arith_num`, `prf_godelCN_fixedpoint`,
+> `prf_provCode_transfer`), y Gödel I es `goedel_first_prf` (con `ConsistentH`) y `goedel_I`/`goedel_I_neg` (sin
+> hipótesis, §3.74–§3.75).
+
+**Por qué la refundación fue barata (~30 líneas):** `substFormula_arith (v) (s) (f)` (retirado con la capa ⊢, ADR‑115) toma **`s`
 arbitrario**, luego traga un numeral sin más; y «godelPred», «godelBeta», `diagTerm` y «godel_comp»
-**no cambian** (✏️ los tres entre comillas, retirados con ADR‑192) — ninguno menciona la representación. Y **`provCode_transfer` es literalmente
-`subst_eq_iff provFormulaC' (hFN φ)`** ⇒ D1 y la cadena existente se transfieren **componiendo con
+**no cambian** (✏️ los tres entre comillas, retirados con ADR‑192) — ninguno menciona la representación. Y **`provCode_transfer` (retirado, ADR‑115) es literalmente
+`subst_eq_iff provFormulaC' (hFN φ)`** (los dos, retirados con ⊢, ADR‑115) ⇒ D1 y la cadena existente se transfieren **componiendo con
 ese bicondicional, sin re‑demostrarse**.
 
-**Footprint de `goedel_first_numeral`** (verificado con `#print axioms`): 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+**Footprint de `goedel_first_numeral`** (retirado, ADR‑115; verificado con `#print axioms`): 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `[propext, Classical.choice, Quot.sound, dne, gen, imp_intro, ax_induction, ax_list_induction,
-ax_axiomsCodeT_eq]` — la base sancionada de siempre, **menos `tc_cons`**.
+ax_axiomsCodeT_eq]` (todos salvo los tres de Lean, retirados con la capa ⊢, ADR‑115) — la base sancionada de siempre,
+**menos `tc_cons`** (retirado el 2026‑08‑18).
 
-⚠️ `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**. La reducción 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-a ω‑consistencia (`reflects_of_omega`, §3.21) sigue vigente, pero **`NegVerifier` sigue abierto**:
+⚠️ `goedel_first_undecidable_numeral` (retirado, ADR‑115) toma `Reflects` (retirada con él) como **hipótesis META explícita**. La reducción 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+a ω‑consistencia (`reflects_of_omega`, retirado, ADR‑115; §3.21) sigue vigente, pero **`NegVerifier` (retirado, ADR‑115) sigue abierto**:
 `⊬¬G` **no** está cerrado en la cadena real. Ver `PLAN-NEGVERIFIER.md`. *(✏️ 2026‑10‑19, ADR‑169: así estaba entonces; desde ADR‑121 la demuestra `goedel_I_neg`. Lo cazó `[I]`.)*
 
 #### 3.24.6 `Meta/StrongInductionPrf.lean` — inducción fuerte en `Prf`
@@ -1294,8 +1358,8 @@ a ω‑consistencia (`reflects_of_omega`, §3.21) sigue vigente, pero **`NegVeri
 
 con `PSI Φ` = el `∀m<n. Φ[m]` acotado, `prf_le_of_lt_succ (m n) : Prf (lt m (succ n) ⇒ le m n)`
 (sin análisis de casos) y el andamiaje De Bruijn (`liftTerm_swap`, `psi_lift_eq_subst`, …).
-⚠️ Distinto de `Full/StrongInduction.lean`, que está sobre `Derives` (capa ω) y **no es importable**
-desde aquí — es un guion, no un módulo reutilizable.
+⚠️ Distinto de `Full/StrongInduction.lean` (retirado con la capa ⊢, ADR‑115), que estaba sobre `Derives` (capa ω) y **no
+era importable** desde aquí — era un guion, no un módulo reutilizable.
 
 #### 3.24.7 Refundación de `Meta/Sigma1CorePrf.lean` (el keystone de (a.1))
 
@@ -1304,7 +1368,7 @@ Tres declaraciones cambiaron de **enunciado**, no sólo de prueba:
 | antes | ahora |
 |---|---|
 | `prf_provCodeC'_In_formCode_of_tracked` vía `prf_tc_form` (retirado el 2026‑08‑18, ADR‑012) | vía `prf_tc_numeral`; ⚠️ concluye sobre `In (numeral (codeNat φ)) L` |
-| `prf_tc_objList` (retirado en esta refundación, el 2026‑08‑19) vía `prf_tc_of_cons` | `prf_objList_numeral` vía `prf_cons_eval_of` |
+| `prf_tc_objList` (retirado en esta refundación, el 2026‑08‑19) vía `prf_tc_of_cons` (retirado el 2026‑08‑18) | `prf_objList_numeral` vía `prf_cons_eval_of` |
 | `prf_tc_objList_formCode` | `prf_objList_formCode_numeral`, con `termCode (numeral N)` a la derecha |
 
 Refundar el keystone **devolvió 10 módulos** de la cuarentena de golpe (31 → 21), entre ellos
@@ -1317,12 +1381,12 @@ Refundar el keystone **devolvió 10 módulos** de la cuarentena de golpe (31 →
 
 **Last updated**: 2026-08-22 23:55 · **@importance**: `foundational`
 **Módulos**: `Meta/EvalArithPrf.lean` (`+`), `Meta/EvalMulPrf.lean` (`·`), `Meta/DotConsPrf.lean`
-(`cons`). Todos con footprint `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` — la
-base sancionada, **sin `tc_cons`**.
+(`cons`). Todos con footprint `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` (el último, retirado después con ADR‑026) — la
+base sancionada, **sin `tc_cons`** (retirado el 2026‑08‑18).
 
-**Qué es.** Los cuatro peldaños que llevan la evaluación aritmética **dentro de `Prov`**, para
+**Qué es.** Los cuatro peldaños que llevan la evaluación aritmética **dentro de Prov**, para
 argumentos **ABSTRACTOS** (no `numeral a` concretos). Es lo que devuelve la cuarentena: el viejo
-`pcc_eval_carc` cerraba con `prf_tc_cons'`, el puente que la reparación mató, y `pcc_dot_cons` es su
+`pcc_eval_carc` cerraba con `prf_tc_cons'` (retirado), el puente que la reparación mató, y `pcc_dot_cons` es su
 sustituto — verificado en `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean`.
 
 | peldaño | teorema | dónde |
@@ -1335,7 +1399,7 @@ sustituto — verificado en `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean`.
 #### 3.25.1 `Meta/EvalArithPrf.lean` — la suma, y la lógica ecuacional INTERNA
 
 **@importance**: `foundational`. Además del peldaño `+`, este módulo aporta el **toolkit reutilizable**
-de razonamiento ecuacional dentro de `Prov`:
+de razonamiento ecuacional dentro de Prov:
 
 | Notación | Firma Lean 4 |
 |---|---|
@@ -1383,7 +1447,7 @@ como `σ (div2 (cantor_poly h t))` (ADR-113), o sea `σ`, `+`, `·` y `div2`, to
 | fase | qué | pieza |
 |---|---|---|
 | **A** | la instancia codificada de `ax_L0_cons_def` **computa por `rfl`** (igual que `ax5`/`ax9`) | `prf_axL0_body_computes`, `pcc_axL0_computed` |
-| **B** | el polinomio de Cantor se evalúa dentro de `Prov` en **cinco** pasos, bajo el `σ` | `pcc_rw`, `pcc_rw_sdiv2` |
+| **B** | el polinomio de Cantor se evalúa dentro de Prov en **cinco** pasos, bajo el `σ` | `pcc_rw`, `pcc_rw_sdiv2` |
 | **C** | el `div2` se cancela contra `prf_div2_double`; puente `prf_pair_double`; el `σ` se pliega a nivel de código | `pcc_div2_pair` |
 
 **API pública:**
@@ -1401,12 +1465,12 @@ como `σ (div2 (cantor_poly h t))` (ADR-113), o sea `σ`, `+`, `·` y `div2`, to
 | `⌜2⌝ = 2˙` | `theorem prf_tc_two : Prf (tcFn two =eq termCode two)` |
 | congruencias / `substtc` | `prf_congr_consT`, `prf_congr_div2cT`, `prf_congr_cpOfT`, `prf_congr_cpOfT2`, `prf_substtc_consT`, `prf_substtc_div2cT`, `prf_substtc_cpOfT`, `prf_substtc_two`, `substtc_inv_consT`, `substtc_inv_div2cT` |
 
-##### 🔑 Las dos técnicas — reutilizables para cualquier evaluación dentro de `Prov`
+##### 🔑 Las dos técnicas — reutilizables para cualquier evaluación dentro de Prov
 
 1. **Todo teorema OBJETO se «dota» GRATIS.** `tcFn` es un símbolo de función, luego `prf_congr_tcFn`
-   transporta cualquier `Prf (a =eq b)` a `Prf (ȧ =eq ḃ)` **a nivel de código, sin entrar en `Prov`**.
+   transporta cualquier `Prf (a =eq b)` a `Prf (ȧ =eq ḃ)` **a nivel de código, sin entrar en Prov**.
    Por eso `prf_pair_double` sirve de puente sin coste y los pasos `σ(ẋ) ⟶ (σx)˙` son libres
-   (`prf_tc_succ'`). **Antes de razonar dentro de `Prov`, comprobar si el paso es objeto.**
+   (`prf_tc_succ'`). **Antes de razonar dentro de Prov, comprobar si el paso es objeto.**
 2. **`substfc` sustituye TODAS las ocurrencias del hueco.** El polinomio `(x+y)·σ(x+y)+2y` menciona
    `x+y` **dos veces**; reescribir por posiciones exigiría congruencias a cada profundidad. Con el
    contexto `Ac := C[v₀]` un **único** `pcc_leibniz_apply` cierra las dos. De ahí que la fase B sean
@@ -1415,10 +1479,10 @@ como `σ (div2 (cantor_poly h t))` (ADR-113), o sea `σ`, `+`, `·` y `div2`, to
 ##### El rédito, verificado
 
 `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean` reconstruye **`pcc_eval_carc`** con el mismo enunciado y el mismo footprint.
-El viejo (`cuarentena/EvalListPrf.lean`) cerraba con `prf_tc_cons'`; la sustitución es **un único
+El viejo (`cuarentena/EvalListPrf.lean`, borrado al volver al build el 2026‑08‑23) cerraba con `prf_tc_cons'` (retirado); la sustitución es **un único
 `pcc_rw` con `pcc_dot_cons`**, y los pasos 1‑3 (instancia de `ax_carc` + los dos `substfc` computados)
 quedan **intactos**. ⇒ el keystone `EvalListPrf` es repatriable, y el patrón de arreglo es mecánico.
-⚠️ El transporte pasa de ser **de código** (fuera de `Prov`) a ser **interno** (dentro), así que hay
+⚠️ El transporte pasa de ser **de código** (fuera de Prov) a ser **interno** (dentro), así que hay
 que dar el contexto `G` y su ecuación de `substfc`.
 
 ---
@@ -1437,9 +1501,9 @@ Todos han vuelto, **con el footprint sancionado** y **sin cambiar ningún enunci
 
 | familia | por qué murió | sustituto |
 |---|---|---|
-| `prf_tc_cons'` | consecuencia directa de `ax_tc_cons`; **falsa** para argumentos abstractos bajo la lectura numeral | **`pcc_dot_cons`** (§3.25.3) — la misma ecuación, **dentro de `Prov`** |
-| `prf_tc_form` | meta‑recursión con paso `prf_tc_of_cons` (muerto) | `prf_tc_form_numeral` + **conversión en la FRONTERA** |
-| KIT `prf_tc_nul`/`_un`/`_bin` | composición pura de `prf_tc_cons'` | `pcc_dot_nul`/`_un`/`_bin`, **por composición de `pcc_dot_cons`** |
+| `prf_tc_cons'` (retirado) | consecuencia directa de `ax_tc_cons`; **falsa** para argumentos abstractos bajo la lectura numeral | **`pcc_dot_cons`** (§3.25.3) — la misma ecuación, **dentro de Prov** |
+| `prf_tc_form` (retirado) | meta‑recursión con paso `prf_tc_of_cons` (muerto) | `prf_tc_form_numeral` + **conversión en la FRONTERA** |
+| KIT `prf_tc_nul`/`_un`/`_bin` (retirados) | composición pura de `prf_tc_cons'` (retirado) | `pcc_dot_nul`/`pcc_dot_un`/`pcc_dot_bin`, **por composición de `pcc_dot_cons`** |
 
 #### 3.26.2 Las herramientas nuevas
 
@@ -1450,7 +1514,7 @@ Todos han vuelto, **con el footprint sancionado** y **sin cambiar ningún enunci
 | molde binario (`PrfH`) | `theorem pcc_rw_dot_cons_nthc {Γ} (h t IDX RHS : Term) (hI …) (hR …) (hbase …) : PrfH Γ (provFromCode (eqCodeFn (nthcT (tcFn (cons h t)) IDX) RHS))` | `EvalNthcPrf` |
 | sustituto de `prf_tc_form` (retirado el 2026‑08‑18) | `theorem prf_tc_form_numeral (φ : Formula) : Prf (tcFn (formCode φ) =eq termCode (numeral (codeNat φ)))` | `D3InDotPrf` |
 | **convertidor de frontera** | `theorem pcc_to_formCode_imp (φ : Formula) (G : Term → Term) (hG …) : Prf (provFromCode (G (termCode (numeral (codeNat φ)))) ⇒ provFromCode (G (termCode (formCode φ))))` | `D3InDotPrf` |
-| KIT internalizado | `pcc_dot_nul (m)` · `pcc_dot_un (m a)` · `pcc_dot_bin (m a b)` (+ `_symm`) | `CodeCtorKit` |
+| KIT internalizado | `pcc_dot_nul (m)` · `pcc_dot_un (m a)` · `pcc_dot_bin (m a b)` (+ `pcc_dot_nul_symm`/`pcc_dot_un_symm`/`pcc_dot_bin_symm`) | `CodeCtorKit` |
 | ecuación `tc` del árbol `eqc` | `theorem pcc_dot_eqc (a b : Term) : Prf (provFromCode (eqCodeFn (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b))))` | `LineWFTrackedPrf` |
 | código del código del árbol | `theorem pcc_tc_objAt (t : Term) : ∀ T : CTree, Prf (provFromCode (eqc (tcFn (T.objAt t)) (T.dotV t)))` | `CodeTreeReflect` |
 | los dos códigos de `formCode f` | `theorem pcc_tc_formCode_internal (f : Formula) : Prf (provFromCode (eqCodeFn (tcFn (formCode f)) (termCode (formCode f))))` | `InAxiomsCodePrf` |
@@ -1464,25 +1528,25 @@ de `provCodeC'`. Cambiarlo no sería refundar un enunciado, sería **cambiar el 
 
 La salida: los dos códigos son los de dos términos objeto **provablemente iguales**
 (`prf_formCode_numeral`), y **D1 dota cualquier teorema `Prf`**. El puente sale gratis dentro de
-`Prov`: `repr_pos'_prf (prf_eq_symm (prf_formCode_numeral φ))` es exactamente el `heq` que `pcc_rw`
+Prov: `repr_pos'_prf (prf_eq_symm (prf_formCode_numeral φ))` es exactamente el `heq` que `pcc_rw`
 pide. ⇒ **probar por dentro en forma numeral y convertir en la frontera**, dejando los enunciados
 públicos intactos.
 
 #### 3.26.4 El trabajo voluminoso: `pcc_tc_objAt`
 
-`prf_tc_objAt` era **recursión estructural sobre `CTree`** produciendo una igualdad **de código**.
-Con sustitutos internos, la recursión entera se muda **dentro de `Prov`**. La conversión resultó
+`prf_tc_objAt` (retirado el 2026‑08‑23) era **recursión estructural sobre `CTree`** produciendo una igualdad **de código**.
+Con sustitutos internos, la recursión entera se muda **dentro de Prov**. La conversión resultó
 **literal, pieza por pieza**, y todas las piezas existían:
 
 | antes | ahora |
 |---|---|
 | `prf_eq_trans` | `pcc_eq_trans_code` (`EvalArithPrf`) |
-| `prf_congr_unT` / `prf_congr_binT` | `pcc_congr_unT_code` / `pcc_congr_binT_1_code` / `_2_code` (`CodeCtorKit`) — **sobrevivieron intactas** y ya venían en forma implicación |
+| `prf_congr_unT` / `prf_congr_binT` | `pcc_congr_unT_code` / `pcc_congr_binT_1_code` / `pcc_congr_binT_2_code` (`CodeCtorKit`) — **sobrevivieron intactas** y ya venían en forma implicación |
 | `prf_refl` | `prf_provFromCode_eqCodeFn_refl` |
-| ecuaciones `tc` del kit | `pcc_dot_nul_symm` / `_un_symm` / `_bin_symm` |
+| ecuaciones `tc` del kit | `pcc_dot_nul_symm` / `pcc_dot_un_symm` / `pcc_dot_bin_symm` |
 
 ⚠️ Único cambio de forma: en el caso binario hacen falta **dos** congruencias encadenadas donde
-antes bastaba una simultánea — **dentro de `Prov` los argumentos se reescriben de uno en uno**.
+antes bastaba una simultánea — **dentro de Prov los argumentos se reescriben de uno en uno**.
 
 #### 3.26.5 Estado tras la repatriación
 
@@ -1501,13 +1565,17 @@ necesitan `pcc_eval_substfc`, que **no existe**. Requiere sancionar un predicado
 (`isFormCode`, <12 axiomas) — **decisión pendiente**, con objeciones de conservatividad sin resolver.
 **La repatriación devuelve el proyecto a donde estaba antes de la inconsistencia; no lo lleva más lejos.**
 
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): registro del 2026‑08‑23. `pcc_eval_substfc` se probó el 2026‑08‑31 (§3.30)
+> y entró en producción el 2026‑09‑08 (§3.42, `Meta/EvalSubstfcPrf.lean`); los 7 reflectores, el 2026‑09‑10 (§3.62), y D3,
+> el mismo día (§3.67).
+
 
 ---
 
 ## §3.27 · EL FRENTE `substfc` POR LA VÍA DE **CERO AXIOMAS** (2026‑08‑24 → 08‑29)
 
 > ⚠️ **Supersede el cierre de §3.26.** Aquélla terminaba diciendo que los 7 tags «requieren
-> sancionar un predicado de buena‑formación (`isFormCode`, <12 axiomas) — decisión pendiente».
+> sancionar un predicado de buena‑formación (isFormCode, <12 axiomas) — decisión pendiente».
 > **La decisión se tomó, y fue la contraria**: la buena‑formación se define en vocabulario objeto
 > **EXISTENTE**, con **cero axiomas nuevos**. Todo lo de abajo está compilado y vive en `sondeos/`.
 
@@ -1521,7 +1589,7 @@ necesitan `pcc_eval_substfc`, que **no existe**. Requiere sancionar un predicado
 > opacos** que `provFormulaC'` menciona sólo por su nombre.
 >
 > Lo que sí es cierto y se conserva: cambiar `axioms` **cambia la teoría de la que G habla** — la
-> fórmula es la misma, lo que cambia es **qué demuestra `Prov`**. Eso puede seguir siendo motivo
+> fórmula es la misma, lo que cambia es **qué demuestra Prov**. Eso puede seguir siendo motivo
 > para no hacerlo, pero **es un argumento distinto** del que se escribió aquí, y mucho más débil
 > como razón de coste. Se conserva el texto como registro del razonamiento del 08‑26.
 
@@ -1537,14 +1605,14 @@ conservatividad** — la prueba NO vacua que `ax_lineWF_inv` sólo afirma de pal
 
 | predicado | disyuntos | ecuaciones de su sustitución |
 |---|--:|---|
-| `isFormCode` | **8** | `substfc`: **8** (las «ax_substfc_*» de `Minimal/Axioms.lean`) |
-| `isTermCode` | **2** | `substtc`: **2** |
-| `isTermsCode` | **2** | `substtsc`: **2** |
+| isFormCode | **8** | `substfc`: **8** (las «ax_substfc_*» de `Minimal/Axioms.lean`) |
+| isTermCode | **2** | `substtc`: **2** |
+| isTermsCode | **2** | `substtsc`: **2** |
 
 🔑 `pcc_eval_substfc` se atasca **porque 12 ≠ 8**. Partido, cada mitad encaja. El total **no crece**
 (12 = 8+2+2): es **partición**, no recubrimiento. ⇒ **partir no repara un defecto: es la CONDICIÓN
 para que la inducción exista.**
-Y **discrimina**: `crit_isFC_junk_REFUTED` es net‑0 — el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ` que el predicado
+Y **discrimina**: `crit_isFC_junk_REFUTED` (archivado con su sondeo, ADR‑141) es net‑0 — el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ` que el predicado
 **fusionado** aceptaba, el partido lo **refuta**. (`archivo/sondeos-2026-10:sondeos/ParticionTresPredicados.lean`,
 `archivo/sondeos-2026-10:sondeos/ParticionDiscrimina.lean`.)
 
@@ -1587,12 +1655,12 @@ CRIT_hasWit_lift (c : Term) : Prf (hasWit c ⇒ hasWit (liftc 0 c))
 
 ### 3.27.4 · Las cuatro ideas reutilizables
 
-1. **Dotar un átomo COMO ÁTOMO** en vez de desplegarlo (`inFormCodeFn`, y luego `allInFn`): el
+1. **Dotar un átomo COMO ÁTOMO** en vez de desplegarlo (`inFormCodeFn`, y luego `allInFn`, archivado con su sondeo, ADR‑141): el
    cuerpo queda **sin binder** y el problema De Bruijn **se disuelve**. Pagó dos veces —en A3 y en
-   el reflector del predicado sin‑`wTs`.
+   el reflector del predicado sin‑wTs.
 2. **Probar contra la lista COMPLETA** (generalizar sobre un superconjunto) en vez de usar
    monotonía: ahorra un or‑elim de 12 casos por composición.
-3. **Llevar el lift en vez de quitarlo**: `wfAllT` ya lo lleva en su definición;
+3. **Llevar el lift en vez de quitarlo**: `wfAllT` (lo declara hoy `sondeos/AcotarEsLaMismaObligacion.lean`) ya lo lleva en su definición;
    `FOL.substTerm_liftTerm` hace el trabajo **para cualquier `p`**, cerrado o no.
 4. **Poner el lift en el OBJETIVO, no en la hipótesis**: no existe lema de lifting de
    **derivaciones**, así que el testigo va **dentro del objetivo** del `∃`‑elim, donde el
@@ -1618,7 +1686,7 @@ de `Φ`**.
 * **El puente a forma ECUACIONAL de la imagen punteada.** El reflector entrega `shapeDot` en forma
   `carc`/`lenc`, **sin `consOk`** ⇒ `wfAll1Dot w ≠ formCode (wfAll1 w)`: el consecuente es
   estrictamente **más débil** que la imagen del predicado objeto. Convención heredada de A3.
-* **Los DOS reconocedores están DESCONECTADOS**: el reflejado (con `wTs`) y el plano (sin `wTs`,
+* **Los DOS reconocedores están DESCONECTADOS**: el reflejado (con wTs) y el plano (sin wTs,
   con **cero** imagen punteada). Nada los relaciona.
 * La composición con el reconocedor de **FÓRMULA** llevando esta carga: **no hecha**.
 * De `pcc_eval_substfc` sólo está medido el caso `∀`. Los otros 7 constructores: **sin medir**.
@@ -1626,7 +1694,7 @@ de `Φ`**.
 ### 3.27.6 · Tres correcciones al propio registro (material de método)
 
 * **`d783b9f` estaba mal cerrado.** Decía «`pcc_eval_liftc` NO hace falta». **Sí hace falta**:
-  `paso2_caso_forall` la deja como única hipótesis colgando. Se refutó la **razón** del gate, no su
+  `paso2_caso_forall` (archivado con su sondeo, ADR‑141) la deja como única hipótesis colgando. Se refutó la **razón** del gate, no su
   **conclusión**. Modo de fallo: **generalizar de META a OBJETO**, que es donde vive la HI.
 * **La recomendación «acotar» era circular**: acotar y la clausura de un paso son
   **inter‑construibles**, probado en las dos direcciones (`sondeos/AcotarEsLaMismaObligacion.lean`).
@@ -1638,7 +1706,7 @@ de `Φ`**.
 ## §3.28 · EL **DESCENSO**, CERRADO — `pcc_eval_liftc` existe (2026‑08‑30)
 
 Cierra el único lema que §3.27 dejaba abierto. Todo en `sondeos/`, **cero axiomas de Lean nuevos,
-cero `sorry`**, recompilado a mano (`EXIT=0`, build 118 jobs). Commits `2f27a29` y `c8f100f`.
+cero `sorry`**, recompilado a mano (`EXIT=0`, build de entonces: 118 jobs). Commits `2f27a29` y `c8f100f`.
 
 ### 3.28.1 · Los teoremas, con firma
 
@@ -1662,7 +1730,7 @@ theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)
 ```
 
 Con su gemela sobre listas de argumentos (`DESCENSO_lista`) y los controles positivos que
-impiden que sea vacuo: `CRIT_targetLift_real`, `CRIT_real_A`/`_B` sobre términos
+impiden que sea vacuo: `CRIT_targetLift_real`, `CRIT_real_A`/`_B` (archivados con sus sondeos, ADR‑141) sobre términos
 concretos, y `CRIT_hasWit_real` — **todo `t` tiene testigo**.
 
 ### 3.28.2 · El motivo: **una** inducción, con conclusión **conjuntiva**
@@ -1686,8 +1754,8 @@ vez de supuesto** — que es la diferencia entre cerrar una vía y abandonarla.
 ### 3.28.3 · El residuo de acople, también resuelto
 
 Los tres intentos señalaron, sin que se les preguntara, el mismo defecto de encaje: `pcc_eval_liftc`
-llega con **guarda** (`hasWit s`) y el `Φ` del consumidor (`Paso2Ind.PHI`,
-`archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean`) no la tenía. Medido en `archivo/sondeos-2026-10:sondeos/GateGuardaEnriquecida.lean`:
+llega con **guarda** (`hasWit s`) y el `Φ` del consumidor
+(`Paso2Ind.PHI`, `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean`) no la tenía. Medido en `archivo/sondeos-2026-10:sondeos/GateGuardaEnriquecida.lean`:
 
 ```lean
 -- :119
@@ -1705,14 +1773,14 @@ al subcódigo ya existía: `CRIT_hasWit_lift` (`archivo/sondeos-2026-10:sondeos/
 `Prf (hasWit c ⇒ hasWit (liftc zero c))`.
 
 El fichero incluye además el control negativo de que la guarda **no es decorativa**
-(`fail_if_success` contra `PHI_guarded = PHI_actual`) y la fontanería De Bruijn nueva
-(`liftF_hasWit`, `substF_hasWit`, `PHI_guarded_at`).
+(fail_if_success contra `PHI_guarded = PHI_actual`, archivados con su sondeo, ADR‑141) y la fontanería De Bruijn nueva
+(`liftF_hasWit`, `substF_hasWit`, `PHI_guarded_at`, éste archivado, ADR‑141).
 
 ### 3.28.4 · ⚠️ Dónde está el siguiente muro — y **no es donde se miraba**
 
-De los **8** constructores de `substfc` sólo está hecho `pcc_substfc_forall_dot`
-(en `Paso2CasoForall.lean`). **CINCO** de los siete restantes son **mecánicos** (`botc` `implc` `andc` `orc` `exc`). Los DOS distintos son
-`eqc` y `atomc`, que recurren a `substtc`/`substtsc` (ya lo anticipaba `ec_objeto_eq`:
+De los **8** constructores de `substfc` sólo está hecho
+`pcc_substfc_forall_dot` (en `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean`). **CINCO** de los siete restantes son **mecánicos** (`botc` `implc` `andc` `orc` `exc`). Los DOS distintos son
+`eqc` y `atomc`, que recurren a `substtc`/`substtsc` (ya lo anticipaba `ec_objeto_eq`, archivado con su sondeo, ADR‑141:
 *«el `substfc` recurre a `substtc` ⇒ el teorema es MUTUO»*).
 
 **`pcc_eval_substtc` es ESTRICTAMENTE MÁS DURO que el DESCENSO**, por dos razones verificadas en el
@@ -1720,7 +1788,7 @@ código y no conjeturadas:
 
 | | `pcc_eval_liftc` (hecho) | `pcc_eval_substtc` (pendiente) |
 |---|---|---|
-| **la guarda** | **CERRADA**: `liftc zero` ⇒ la condición es `zero < σn`, se descarga **de una vez** | **ABIERTA**: `substtc v s (varc n)` tiene **tres** cláusulas guardadas (`<`, `=`, `>`) con **`v` abstracto** ⇒ hay que reflejar la **tricotomía DENTRO de `Prov`** |
+| **la guarda** | **CERRADA**: `liftc zero` ⇒ la condición es `zero < σn`, se descarga **de una vez** | **ABIERTA**: `substtc v s (varc n)` tiene **tres** cláusulas guardadas (`<`, `=`, `>`) con **`v` abstracto** ⇒ hay que reflejar la **tricotomía DENTRO de Prov** |
 | **la salida** | se mantiene en el mismo vocabulario | `ax_substtc_var_gt` devuelve **`varc (pred n)`** ⇒ pide la evaluación **dotada de `pred`**, que **no existe** |
 
 ⇒ el trabajo pendiente del frente **no** es «siete casos más como el `∀`»: son **CINCO mecánicos**
@@ -1735,12 +1803,12 @@ Contado contra la fuente (las ocho `ax_substfc_*` de `Minimal/Axioms.lean`): `bo
 ### 3.28.5 · 💰 Coste de promoción (medido, no estimado)
 
 `targetLift`, `isTC1`, `wfAll1` y `argsIn` viven **sólo en `sondeos/`**. Promover el DESCENSO a
-`Meta/EvalLiftcPrf.lean` obliga a promover **antes** `ReflectorDesdeConsumidor` y
-`ClausuraLiftSinWTs`. Piezas sueltas que van con ello: `PrfH_mono`/`PrfH_w1` →
+`Meta/EvalLiftcPrf.lean` obliga a promover **antes** `ReflectorDesdeConsumidor` (archivado, ADR‑141) y
+`ClausuraLiftSinWTs` (archivado, ADR‑141). Piezas sueltas que van con ello: `PrfH_mono`/`PrfH_w1` →
 `Meta/HilbertDeduction.lean`; `prf_nil_or_cons` → `Meta/ChainPrf.lean`. Nada de esto es difícil,
 pero **no es gratis** y no figuraba en ninguna estimación previa.
 
-### 3.28.6 · ✅ `paso2_caso_forall` REHECHO en forma `PrfH Γ` — la hipótesis colgante desaparece
+### 3.28.6 · ✅ `paso2_caso_forall` (archivado, ADR‑141) REHECHO en forma `PrfH Γ` — la hipótesis colgante desaparece
 
 `archivo/sondeos-2026-10:sondeos/Paso2Guardado.lean`, recompilado a mano (`EXIT=0`):
 
@@ -1753,9 +1821,9 @@ theorem paso2_caso_forall_guarded (v s f : Term)
 
 **Una sola hipótesis**: la HI legítima sobre el subcódigo `f`. `hLift` ha desaparecido —
 `DESCENSO_hasWit` la descarga desde la guarda, y `CRIT_hasWit_lift` pasa la guarda a la HI.
-Footprint **idéntico** al de `Paso2.paso2_caso_forall`, reprobado en el mismo fichero
-(`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`) ⇒ **la reescritura no añade nada**.
-Controles de no‑vacuidad: `CRIT_guarda_no_vacua` y `paso2_caso_forall_guarded_real` (sobre código
+Footprint **idéntico** al de `Paso2.paso2_caso_forall` (archivado, ADR‑141), reprobado en el mismo fichero
+(`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`, el último retirado después con ADR‑026) ⇒ **la reescritura no añade nada**.
+Controles de no‑vacuidad: `CRIT_guarda_no_vacua` y `paso2_caso_forall_guarded_real` (archivados, ADR‑141; sobre código
 real la guarda se descarga y queda la ecuación **pelada**).
 
 #### ⚠️ Dos correcciones a lo que decía la versión anterior de este apartado
@@ -1766,10 +1834,10 @@ real la guarda se descarga y queda la ecuación **pelada**).
    con la firma exacta ⇒ la cadena se reescribe **1:1**. El mismo bloque trae
    `PrfH_mp_code_apply` y `PrfH_leibniz_apply`.
 2. **Trampa real y nueva: `hasWit` son DOS CONSTANTES DISTINTAS.** `DESCENSO_hasWit` habla de
-   `DescMutua.hasWit` (en `DescensoLiftc.lean`) y `CRIT_hasWit_lift` de `SinWTs.hasWit`
-   (en `ClausuraLiftSinWTs.lean`): definiciones **literalmente iguales**, constantes diferentes,
+   `DescMutua.hasWit` (en `DescensoLiftc.lean`, archivado en `archivo/sondeos-2026-10`, ADR‑141) y `CRIT_hasWit_lift` de `SinWTs.hasWit`
+   (en `ClausuraLiftSinWTs.lean`, archivado en `archivo/sondeos-2026-10`): definiciones **literalmente iguales**, constantes diferentes,
    que Lean **no identifica en el enunciado**. Sin puente, los dos sondeos **no componen**. Cerrado
-   con `hasWit_bridge := rfl`, **net‑0** (`does not depend on any axioms`), lo que certifica que la
+   con `hasWit_bridge := rfl` (archivado, ADR‑141), **net‑0** (`does not depend on any axioms`), lo que certifica que la
    coincidencia es **definicional** y no un apaño. ⇒ para `hasWit`, los dos reconocedores ya **no**
    están desconectados (§3.27.5 sigue valiendo para el resto).
 
@@ -1784,7 +1852,7 @@ teorema, pero **no está resuelto**.
 
 `archivo/sondeos-2026-10:sondeos/EqTransCodeImp2.lean`: `pcc_eq_trans_code_imp2 (X Y Z) (hX) : Prf (⌜X=Y⌝ ⇒ ⌜Y=Z⌝ ⇒ ⌜X=Z⌝)`
 —la transitividad interna con **ambos** eslabones como antecedentes, que no existía— y
-**`prfH_deduction`**, deducción dentro de `PrfH`, que tampoco. Resultaron **innecesarias** para el
+**`prfH_deduction`** (archivado, ADR‑141), deducción dentro de `PrfH`, que tampoco. Resultaron **innecesarias** para el
 objetivo, pero son genéricas y reutilizables.
 
 ### 3.28.7 · ▶ El paso siguiente
@@ -1801,13 +1869,13 @@ Los **5 constructores mecánicos** restantes de `pcc_eval_substfc` (`botc` `impl
 >
 > Este apartado se tituló «los OCHO constructores, cubiertos». **Es falso, y el error es mío.**
 > Verificado por grep sobre todo el árbol: los casos montados sobre `evalSubstfcCode` son
-> `paso2_caso_bottom`, `paso2_caso_bin` (que cubre `implc`/`andc`/`orc`), `paso2_caso_forall` y
-> `paso2_caso_ex_guarded` ⇒ **`botc` `implc` `andc` `orc` `forallc` `exc` = SEIS**.
-> **`eqc`(4) y `atomc`(3) NO están montados en ningún sitio** (`paso2_caso_eq`/`paso2_caso_atom`:
+> `paso2_caso_bottom`, `paso2_caso_bin` (archivado, ADR‑141; cubre `implc`/`andc`/`orc`), `paso2_caso_forall` (archivado) y
+> `paso2_caso_ex_guarded` (archivado) ⇒ **`botc` `implc` `andc` `orc` `forallc` `exc` = SEIS**.
+> **`eqc`(4) y `atomc`(3) NO están montados en ningún sitio** (`paso2_caso_eq`/`paso2_caso_atom`, inexistentes:
 > **0 hits**).
 >
 > **El error de razonamiento**: conté como «caso cubierto» lo que sólo era su **INGREDIENTE**.
-> `pcc_eval_substtc'` y `pcc_eval_substtsc'` existen, son net‑0 y son correctos — pero están
+> `pcc_eval_substtc'` y `pcc_eval_substtsc'` (archivados después, ADR‑141) existen, son net‑0 y son correctos — pero están
 > enunciados sobre `substtc`/`substtsc`, **no sobre `evalSubstfcCode`**. Montarlos es un paso
 > aparte, y es trabajo real.
 >
@@ -1815,7 +1883,7 @@ Los **5 constructores mecánicos** restantes de `pcc_eval_substfc` (`botc` `impl
 > Los apartados de abajo son correctos salvo por esa cuenta.
 
 Cuatro sondeos nuevos, **todos net‑0**, recompilados a mano desde su ubicación final (`EXIT=0`),
-build de producción intacto en 118 jobs. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
+build de producción intacto en los 118 jobs de entonces. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
 matemática — es por un **hallazgo falso** que el verificador cazó (§3.29.5).
 
 ⚠️ **Cubiertos ≠ ensamblado.** Tener los ocho casos **no** es tener `pcc_eval_substfc`: falta la
@@ -1827,16 +1895,16 @@ inducción que los junta. Y todo vive en `sondeos/`, con el coste de promoción 
 |--:|---|---|---|
 | 2 | `botc` | ✅ nulario, 4 eslabones | `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` |
 | 5,7,8 | `implc` `andc` `orc` | ✅ **una prueba, no tres** | `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` |
-| 6 | `forallc` | ✅ (2026‑08‑29/30) | `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean` · `Paso2Guardado.lean` |
+| 6 | `forallc` | ✅ (2026‑08‑29/30) | `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean` · `archivo/sondeos-2026-10:sondeos/Paso2Guardado.lean` |
 | 9 | `exc` | ✅ espejo **perfecto**, factorizado | `archivo/sondeos-2026-10:sondeos/SubstfcEx.lean` |
 | 4 | `eqc` | ✅ vía `pcc_eval_substtc'` | `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` |
 | 3 | `atomc` | ✅ vía `pcc_eval_substtsc'` | `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` |
 
 > 📍 **Dónde viven hoy** (nota de 2026‑09‑08; la columna de arriba es el registro **histórico**
 > de dónde se probó cada caso, y se deja como tal): los ocho casos están **en producción**, en
-> `Meta/EvalSubstfcPrf.lean` (B3.4, §3.42); `pcc_eval_substtc'`/`pcc_eval_substtsc'` son hoy
+> `Meta/EvalSubstfcPrf.lean` (B3.4, §3.42); `pcc_eval_substtc'`/`pcc_eval_substtsc'` (archivados, ADR‑141) son hoy
 > `pcc_eval_substtc`/`pcc_eval_substtsc` de `Meta/EvalSubsttcPrf.lean` (B3.2, §3.41.1) — sin
-> la prima, porque la hipótesis `PredHyp` que la justificaba se descargó al promover.
+> la prima, porque la hipótesis `PredHyp` (archivada, ADR‑141) que la justificaba se descargó al promover.
 
 ### 3.29.2 · 🔑 Los tres binarios son **la misma fórmula salvo el tag** — y se certifica por `rfl`
 
@@ -1849,9 +1917,9 @@ theorem AXBIN_or   : ax_substfc_or   = forall_4 (AXBIN_BODY (numeralM 8)) := rfl
 ```
 
 ⇒ se factorizan en `pcc_substfc_bin_dot` (genérico en la etiqueta como `Term` abstracto) y
-`paso2_caso_bin` (genérico en `k : Nat`); los tres casos finales son **cuatro líneas cada uno**. El
+`paso2_caso_bin` (archivado, ADR‑141; genérico en `k : Nat`); los tres casos finales son **cuatro líneas cada uno**. El
 ensamblaje sale genérico **gratis** porque `binT`, `pcc_dot_bin`, `pcc_dot_bin_symm` y
-`pcc_congr_binT_1/2_code` **ya son paramétricos en `k`** en producción.
+`pcc_congr_binT_1_code`/`pcc_congr_binT_2_code` **ya son paramétricos en `k`** en producción.
 
 ### 3.29.3 · 🔑 La técnica que lo hizo posible, y vale fuera de aquí
 
@@ -1883,11 +1951,11 @@ falta que `t` sea de verdad un código de término, y eso es exactamente lo que 
 **Las dos obstrucciones de §3.28.4, resueltas:**
 * **La tricotomía** sale por **or‑elim EXTERNO** (`Prfᵢ.j3`), no interno. Producción **sí** tiene
   or‑elim interno (`pcc_or_elim_code`, en `Meta/PropCodePrf.lean`) pero **no hizo falta**.
-* **El `pred` dotado**: `PredHyp` **declarada y descargada** (`predHyp`), vía
-  `prf_lt_iff` → `prf_add_succ_t` → `ax26_pred_succ` dentro de `Prov`, **sin inducción**.
+* **El `pred` dotado**: `PredHyp` (archivada, ADR‑141) **declarada y descargada** (`predHyp`, archivado), vía
+  `prf_lt_iff` → `prf_add_succ_t` → `ax26_pred_succ` dentro de Prov, **sin inducción**.
 
-**Empalme**: `isTC1`, `wfAll1`, `argsIn`, `isTermCodeE1`, `shapeUn/Bin`, `consOk` son **idénticas**
-a las de `DescensoLiftc.lean` (verificado def a def) ⇒ **el mismo testigo sirve para las dos
+**Empalme**: `isTC1`, `wfAll1`, `argsIn`, `isTermCodeE1`, `shapeUn`/`shapeBin`, `consOk` son **idénticas**
+a las de `DescensoLiftc.lean` (archivado en `archivo/sondeos-2026-10`; verificado def a def) ⇒ **el mismo testigo sirve para las dos
 evaluaciones**, y los controles adversariales de aquel fichero valen tal cual.
 
 ### 3.29.5 · Lo que el paso adversarial cazó — y por qué el `PARCIAL`
@@ -1895,7 +1963,7 @@ evaluaciones**, y los controles adversariales de aquel fichero valen tal cual.
 El verificador de `substtc` no se fió del «los controles valen tal cual»: montó su **propio**
 fichero de auditoría y compiló los testigos. Resultado: la matemática, **confirmada entera**
 (no vacua sobre `termCodeM t` con `v`/`s` abstractos; guarda **refutable** con código de fórmula y
-testigo abierto ⇒ no es un `⊥ ⇒ …`; siete controles negativos `fail_if_success`).
+testigo abierto ⇒ no es un `⊥ ⇒ …`; siete controles negativos fail_if_success).
 
 ⛔ **Pero uno de los nueve hallazgos era FALSO**: `pcc_eq_tracked` **ya existe** en producción
 (`Meta/Sigma1AtomPrf.lean`), con enunciado idéntico y ya consumido en
@@ -1910,13 +1978,13 @@ definición en dos namespaces». Actuar sobre el hallazgo («debería vivir al l
   (`Meta/MpCodePrf.lean`) y los tres binarios son `forall_4`. **Dos agentes la escribieron por
   separado.** Es **candidata clara a promoción**: `ax_substfc_atom` y `ax_substfc_eq` también son
   `forall_4`, o sea que el frente la volverá a necesitar dos veces más.
-* **`pred` dotado — dos versiones, y la comparación importa**: `EvalPredDot.lean` prueba
+* **`pred` dotado — dos versiones, y la comparación importa**: `EvalPredDot.lean` (archivado en `archivo/sondeos-2026-10`) prueba
   `pcc_eval_pred (n)` **incondicional** para `n` abstracto (por inducción);
-  `EvalSubsttc.lean` prueba `predHyp`, **guardada** por `lt v n`, sin inducción. El segundo agente
+  `EvalSubsttc.lean` (archivado en `archivo/sondeos-2026-10`) prueba `predHyp`, **guardada** por `lt v n`, sin inducción. El segundo agente
   declaró que el primero era «innecesario»: **es media verdad** — para *su* uso sí, pero la
   incondicional es **estrictamente más fuerte** y es la que vale la pena promover.
 * **Piezas que resultaron innecesarias** (útil para no arrastrarlas): de las congruencias internas
-  de `Paso2CasoForall` §4 sólo hace falta **`arg3`**; en los casos planos no interviene nada de
+  de `Paso2CasoForall` (archivado, ADR‑141) §4 sólo hace falta **arg3**; en los casos planos no interviene nada de
   §7‑§9, ni `succcT`, ni `unT`, ni `liftcT`, ni el kit de `liftfcT`/`liftscT`.
 
 ### 3.29.7 · ▶ Lo que queda
@@ -1933,9 +2001,9 @@ definición en dos namespaces». Actuar sobre el hallazgo («debería vivir al l
 ## §3.30 · 🏁 EL MURO DE `substfc` ESTÁ ROTO — `pcc_eval_substfc` PROBADO (2026‑08‑31)
 
 Cierra la rama A del árbol de la fase, y con ella el frente que llevaba abierto desde julio.
-**Tres framings independientes, 1 CONFIRMADO + 2 PARCIAL** (los dos parciales con `medicionFiable`,
+**Tres framings independientes, 1 CONFIRMADO + 2 PARCIAL** (los dos parciales con medicionFiable,
 que era el veredicto correcto: midieron bien y no cerraron). Los tres compilan; recompilados por mí
-desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
+desde su ubicación final. Build de producción intacto, entonces **118 jobs**, **57 `sondeos/`**.
 
 ### 3.30.1 · El teorema
 
@@ -1953,11 +2021,11 @@ theorem pcc_eval_substfc_wit (v s f : Term) :
 ```
 
 Las hipótesis son las **guardas** —testigo para el sustituyendo y para el código de fórmula—, no
-obligaciones colgando: la misma forma que `pcc_eval_liftc` (§3.28) y `pcc_eval_substtc'` (§3.29).
+obligaciones colgando: la misma forma que `pcc_eval_liftc` (§3.28) y `pcc_eval_substtc'` (archivado, ADR‑141; §3.29).
 
 **Footprint, reejecutado por el verificador y por mí**:
 `pcc_eval_substfc`, `pcc_eval_substfc_wit` y `DESCENSO_substfc` →
-`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` (la base sancionada, sin nada nuevo);
+`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` (la base sancionada, sin nada nuevo; el último, retirado después con ADR‑026);
 `hPHI`, `PHI_step`, las cuatro ramas y los cuatro controles de discriminación → **net‑0 puro**.
 
 ### 3.30.2 · 🔑 Las cuatro ideas — y ninguna era la prevista
@@ -1969,33 +2037,33 @@ obligaciones colgando: la misma forma que `pcc_eval_liftc` (§3.28) y `pcc_eval_
 2. **El puente de testigos NO se prueba: SE DISUELVE.** El encargo pedía medir «del testigo de
    FÓRMULA sale el de TÉRMINO para sus subcódigos». No hay que demostrarlo — hay que **DEFINIR** el
    reconocedor de modo que sus casillas de término apunten a `wT` con la forma **exacta** que
-   consume `EvalSubsttc`:
+   consume `EvalSubsttc` (archivado, ADR‑141):
    ```lean
    clEq   wT X := shapeBin X 4 ∧ In (nthc X 1̄) wT ∧ In (nthc X 2̄) wT
    clAtom wT X := shapeBin X 3 ∧ argsIn wT (nthc X 2̄)
    ```
    Con `wfAll1 wT` dentro de la guarda, la premisa de `DESCENSO_imp` sale por **`rfl`**
-   (`bridge_isTC1`, net‑0). **Definir bien salió más barato que probar.**
+   (`bridge_isTC1`, archivado, ADR‑141; net‑0). **Definir bien salió más barato que probar.**
 3. **El gate fue gratis por una decisión tomada por otra razón.** El paquete de testigos ya venía
-   **empaquetado en UN término** (`p`, con `acF/acT/acTs = carc, carc∘cdrc, cdrc∘cdrc`), cosa que
-   `ParticionTresPredicados` decidió por naturalidad de `pcc_bdAll_intro`. ⇒ tres binders, y
-   `FOL.substTerm_liftTerm`/`_liftLift`/`SubstArith.substTerm_liftLiftLift` bastan tal cual.
+   **empaquetado en UN término** (`p`, con acF/acT/acTs = carc, carc∘cdrc, cdrc∘cdrc), cosa que
+   `ParticionTresPredicados` (archivado, ADR‑141) decidió por naturalidad de `pcc_bdAll_intro`. ⇒ tres binders, y
+   `FOL.substTerm_liftTerm`/`FOL.substTerm_liftLift`/`SubstArith.substTerm_liftLiftLift` bastan tal cual.
    *El empaquetado que impuso la mutualidad es lo que hace que el gate sea gratis.*
 4. ⚠️ **«LA MONEDA DE LA INDUCCIÓN OBJETO» — lo caro de verdad, y se pagó tres veces.**
 
 > Un lema de caso con la HI como hipótesis **META** (`Prf A → Prf C`) **no sirve**. La inducción
 > objeto sólo puede consumir implicaciones **OBJETO** (`Prf (A ⇒ C)`) o versiones
 > **Γ‑paramétricas** (`∀ Γ, PrfH Γ A → PrfH Γ C`), porque **la HI sólo existe dentro del `Γ` del
-> paso**. Por eso los cuatro lemas de término/lista de `EvalSubsttc` valían tal cual y los cinco de
+> paso**. Por eso los cuatro lemas de término/lista de `EvalSubsttc` (archivado, ADR‑141) valían tal cual y los cinco de
 > fórmula no. **Regla: un lema de caso destinado a una inducción OBJETO se enuncia en forma
-> Γ‑paramétrica desde el principio.** Conversión mecánica: `imp_of_ctx1`/`imp_of_ctx2`.
+> Γ‑paramétrica desde el principio.** Conversión mecánica: `imp_of_ctx1`/`imp_of_ctx2` (archivados, ADR‑141).
 
 ### 3.30.3 · Piezas que ya estaban y nadie había usado
 
-* **`SinWTs.isFormCodeB2`** (en `ClausuraLiftSinWTs.lean`) — el reconocedor de código de fórmula
+* **`SinWTs.isFormCodeB2`** (en `ClausuraLiftSinWTs.lean`, archivado en `archivo/sondeos-2026-10`) — el reconocedor de código de fórmula
   con **DOS** listas testigo, con su discriminación ya probada (`crit_isFormCodeB2_rejects*`) y
   **sin un solo consumidor**. Sólo le faltaba la versión ecuacional (`isFormCodeE2`).
-* **`SubstfcEx.lean` §MED** ya había medido que los tags 4 y 3 no descienden por `substfc`, y no se
+* **`SubstfcEx.lean` (archivado en `archivo/sondeos-2026-10`) §MED** ya había medido que los tags 4 y 3 no descienden por `substfc`, y no se
   había recogido en ningún documento.
 
 Es la tercera vez en esta semana que aparece trabajo hecho y no usado. La regla del grep sobre el
@@ -2035,7 +2103,7 @@ menciona `∨`**. Escribir `Or (k = 5) (Or …)`.
 ## §3.31 · LA NO‑VACUIDAD, CERRADA — y **A4 resultó IMPOSIBLE** (2026‑08‑31)
 
 Cierra el residuo que §3.30.4 declaraba como «lo único que falta». **Tres rutas independientes,
-3 CONFIRMADAS**, todas con `noVacuo=true`. Recompiladas por mí desde su ubicación final.
+3 CONFIRMADAS**, todas con noVacuo=true. Recompiladas por mí desde su ubicación final.
 
 ### 3.31.1 · El teorema
 
@@ -2051,10 +2119,10 @@ theorem prf_hasWitF_real (φ : Formula) : Prf (ENS.hasWitF (formCodeM φ))
 ```
 
 🔑 **Footprint `[propext, Classical.choice, Quot.sound]` — net‑0 PURO**, ni siquiera arrastra
-`prf_axiomsCodeT_eq` (el `axiom` de entonces, retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`). Los enunciados hablan de las constantes **reales** `ENS.isFC1`/`ENS.hasWitF`
+`prf_axiomsCodeT_eq` (retirado el 2026‑09‑12 con ADR‑026, el `axiom` de entonces: el ancla pasó a la firma como `[AnclaEq]`, clase retirada después, ADR‑118). Los enunciados hablan de las constantes **reales** `ENS.isFC1`/`ENS.hasWitF`
 —no de copias homónimas—, verificado con puentes `rfl` net‑0.
 
-⇒ **`pcc_eval_substfc` deja de ser condicional para códigos reales**: `pcc_eval_substfc_wit_REAL`
+⇒ **`pcc_eval_substfc` deja de ser condicional para códigos reales**: `pcc_eval_substfc_wit_REAL` (archivado, ADR‑141)
 da la ecuación **pelada**, sin guardas, para toda `φ` y todo término `t`.
 
 ### 3.31.2 · ⛔ A4 no es trabajo pendiente: **es imposible tal como estaba enunciado**
@@ -2081,19 +2149,19 @@ prueba de que A4 no existe.
 Prf (ENS.hasWitF c ⇒ ENS.hasWitF (liftc zero c))     -- NO existe
 ```
 La propagación de la guarda bajo el `liftc` **OBJETO**. El análogo del sort TÉRMINO sí existe
-(`SinWTs.CRIT_hasWit_lift`) y el molde debería transportarse — `ENS.liftF_isFC1` ya está y la
+(`SinWTs.CRIT_hasWit_lift`, archivado, ADR‑141) y el molde debería transportarse — `ENS.liftF_isFC1` ya está y la
 estructura es la misma con **dos** binders en vez de uno.
 ⚠️ **`ENS.liftF_hasWitF` NO sirve**: es sólo el lift **De Bruijn**, no el objeto. Son cosas
 distintas con nombres parecidos.
 
 ### 3.31.4 · 🧱 El footprint mínimo, medido — lo más accionable para la rama B
 
-La no‑vacuidad **no necesita nada** del descenso, ni `Paso2`, ni `SFsubsttc`, ni `DescMutua`, ni el
+La no‑vacuidad **no necesita nada** del descenso, ni `Paso2`, ni `SFsubsttc`, ni `DescMutua` (los tres, de sondeos archivados, ADR‑141), ni el
 ensamblaje. Le bastan tres bloques:
 
 | bloque | qué es |
 |---|---|
-| `S_Clausura` (namespace `SinWTs`) | `EvalSubstfcPrf.lean` |
+| S_Clausura (namespace `SinWTs`) | `EvalSubstfcPrf.lean` |
 | el bloque **definicional** `ENS` §1‑§2 | en el mismo sondeo |
 | `def hasWitF` (+ `liftF_hasWitF`) | en el mismo sondeo |
 
@@ -2104,24 +2172,24 @@ del frente entero. Es el primer trozo de la rama B que se puede pagar barato.
 ### 3.31.5 · Medidas de coste que corrigen la estimación previa
 
 * **La ruta que se encargó NO hizo falta.** El encargo decía «copia §19 de
-  `ParticionTresPredicados` (~650 l.) y reescríbelo». **No se abrió §19 ni una vez**: fue
+  `ParticionTresPredicados` (~650 l.; archivado, ADR‑141) y reescríbelo». **No se abrió §19 ni una vez**: fue
   re‑derivación desde el precedente del sort TÉRMINO más un molde ya existente. Coste real
   **~590 líneas**.
 * **El precedente del sort TÉRMINO se reutiliza ENTERO y sin tocar.** `SinWTs.okE1_T`/`okE1_Ts`
   valen byte a byte porque `tcodesF` se definió a base de `tcodes1`/`tcodes1s`. El eje TÉRMINO
   costó **cero líneas de invención**: `okT_F` son 20 líneas de fontanería de `List.mem_append`.
-* **«La tercera lista se absorbe en `argsIn`»: confirmado, y cuesta 8 líneas.** `flcodes`/`WTs` no
+* **«La tercera lista se absorbe en `argsIn`»: confirmado, y cuesta 8 líneas.** `flcodes` (archivado, ADR‑141) y WTs no
   aparecen en ningún sitio.
 * **El eje ECUACIONAL, medido**: **TRES** lemas de forma cubren **los OCHO tags**
-  (`prf_shapeNul_real` 1 l., `_shapeUn_real` 3 l., `_shapeBin_real` 5 l.), y `cl_bin_real`/
+  (`prf_shapeNul_real` 1 l., `prf_shapeUn_real` 3 l., `prf_shapeBin_real` 5 l.), y `cl_bin_real`/
   `cl_un_real` salen **genéricos en el tag `k`** ⇒ los tags 5/7/8 comparten un lema y 6/9 otro, y
   los 8 nodos suman **~55 líneas**. La predicción «en forma ecuacional cada nodo cuesta menos»
   **se quedó corta**: cuesta menos **y se factoriza**.
 
 ### 3.31.6 · ⚠️ Cuarta vez: trabajo hecho y no recogido — ahora en `Probe/`
 
-`Probe/ADV_novacuo.lean` (**7 668 l.**, de una tanda anterior de esa misma noche) ya contenía
-`PROBE_wfAllF_of_list`, el molde general del `∀` acotado que hacía falta, ya medido. Se copió
+`archivo/probe-2026-11-02:Probe/ADV_novacuo.lean` (**7 668 l.**, de una tanda anterior de esa misma noche) ya contenía
+`PROBE_wfAllF_of_list` (archivado con Probe, ADR‑247; su copia es `prf_wfAllF_of_list`), el molde general del `∀` acotado que hacía falta, ya medido. Se copió
 literal.
 
 La regla registrada decía «grepea el árbol de **producción** entero». **Es insuficiente**: hay que
@@ -2140,7 +2208,7 @@ terminan corrigiendo un documento del proyecto.
 
 Este documento viene repitiendo —§3.27.1, y con él parte del razonamiento de ADR‑015— que
 axiomatizar «no es más caro: es **otro teorema**», porque un axioma nuevo entraría en `axioms`,
-`ax_axiomsCodeT_eq` lo metería en `axiomsCodeT`, cambiaría `provCodeC'` y **cambiaría G**. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+`ax_axiomsCodeT_eq` (retirado con la capa ⊢, ADR‑115) lo metería en `axiomsCodeT`, cambiaría `provCodeC'` y **cambiaría G**. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 Medido sobre el `Environment` de Lean, no por grep ni por lectura:
 
@@ -2156,13 +2224,13 @@ son **átomos OPACOS**. `provFormulaC' = ∃p. chainOk nil p ∧ In #1 (runFn ni
 ⇒ **la sentencia G, como fórmula, no depende de `axioms`.**
 
 ⚠️ **El matiz, y es el que importa**: G es **literalmente la misma fórmula**, pero pasa a hablar de
-una **teoría distinta**. Lo que cambia no es el enunciado sino **qué demuestra `Prov`**. Si eso
+una **teoría distinta**. Lo que cambia no es el enunciado sino **qué demuestra Prov**. Si eso
 afecta a la afirmación matemática es decisión del autor — pero **el argumento de coste que se venía
 usando para descartar la enmienda es incorrecto y hay que dejar de repetirlo.**
 
 ### 3.32.2 · La rama C: las tres vías medidas, y dos REFUTADAS
 
-`archivo/sondeos-2026-10:sondeos/MedirC_Deriva.lean` · `MedirC_Carga.lean` · `MedirC_Enmienda.lean`.
+`archivo/sondeos-2026-10:sondeos/MedirC_Deriva.lean` · `MedirC_Carga.lean` · `MedirC_Enmienda.lean` (archivados los tres en `archivo/sondeos-2026-10`).
 
 **(A) ¿sale la guarda del antecedente `lineWF t`? ⛔ REFUTADA** — y no «no conseguida». Se
 construyó una **línea basura** que satisface `lineWF` (usando el `prf_lineWF_q1` de **producción**),
@@ -2175,7 +2243,7 @@ MEDIDA_A_REFUTADA_con_TODO_el_antecedente_de_hcond
   : Prf ⊥
 ```
 
-🔑 **La causa es de una limpieza brutal, y está compilada**: `condQ1_es_UNA_ecuacion_atomica` —
+🔑 **La causa es de una limpieza brutal, y está compilada**: `condQ1_es_UNA_ecuacion_atomica` (archivado, ADR‑141) —
 **la condición entera del tag 9 es UNA sola ecuación de `carc`**. No menciona bien‑formación en
 ningún sitio, y `ax_lineWF_inv` sólo habla de la **etiqueta**. La otra mitad tampoco baja: segunda
 línea basura con un código de **fórmula** en la ranura de **término**.
@@ -2200,9 +2268,9 @@ o sea, exactamente una enmienda de esquema. Aquella pieza se probó para esto y 
 
 ### 3.32.3 · El frente F: su plan declara imposible algo que existe desde julio
 
-`archivo/sondeos-2026-10:sondeos/MedirF_Opaco.lean` · `MedirF_Censo.lean` · `MedirF_Replan.lean`.
+`archivo/sondeos-2026-10:sondeos/MedirF_Opaco.lean` · `MedirF_Censo.lean` · `MedirF_Replan.lean` (archivados los tres en `archivo/sondeos-2026-10`).
 
-`PLAN-NEGVERIFIER.md` §B dice que **`NegVerifier` NO es demostrable** por la opacidad de
+`PLAN-NEGVERIFIER.md` §B dice que **`NegVerifier` (retirado, ADR‑115) NO es demostrable** por la opacidad de
 `axiomsCodeT`. **Es falso**, y las piezas llevan compiladas **y enchufadas** desde julio:
 
 ```lean
@@ -2213,7 +2281,7 @@ derives_lineWF_neg_thy_of_not_prf (φ) (hnp) : axioms ⊢ neg (lineWF ⟨formCod
 ```
 
 🔑 **Las fechas lo explican** (comprobadas en git): el plan es del **2026‑07‑13**,
-`Meta/AxiomListCode.lean` del **2026‑07‑14**. **El módulo se escribió al día siguiente del plan que
+`Meta/AxiomListCode.lean` (retirado con la capa ⊢, ADR‑115) del **2026‑07‑14**. **El módulo se escribió al día siguiente del plan que
 lo declara imposible**, y el propio plan marca ✅ su paso 0.5 («concretar `axiomsCodeT`») **sin
 reescribir la conclusión de §B que ese paso invalidaba**. El documento se contradice a sí mismo.
 
@@ -2222,7 +2290,7 @@ reescribir la conclusión de §B que ese paso invalidaba**. El documento se cont
 plan estimaba en 650‑900. **La opacidad es hoy el 0 % del coste restante.**
 
 **El censo de los 21 tags**: el caso 4 (aridad) es **gratis para 21/21**, el caso 3 cae por la
-cabeza de `carc` en **19/21**, y el único hueco real lo tapa un sustituto de `canon_ne` de
+cabeza de `carc` en **19/21**, y el único hueco real lo tapa un sustituto de canon_ne de
 **~45 líneas net‑0**.
 
 ⚠️ **Y el cuello de botella real de F NO es `axiomsCodeT`: es la rama B.** Los casos 3 y 4 necesitan
@@ -2230,7 +2298,7 @@ cabeza de `carc` en **19/21**, y el único hueco real lo tapa un sustituto de `c
 ⇒ la promoción a `Meta/` bloquea **también** a F.
 
 ⛔ **Y una recomendación del plan que NO hay que ejecutar**: su §0.5 propone añadir un `axiom`
-(`ax_notInAxC`). Se tomó la opción net‑0 y **la dirección negativa es hoy un teorema**; ejecutarla
+(`ax_notInAxC`, propuesto). Se tomó la opción net‑0 y **la dirección negativa es hoy un teorema**; ejecutarla
 añadiría un axioma innecesario a un inventario que sigue en **7**.
 
 ### 3.32.4 · Piezas del frente que faltan en producción (para la rama B)
@@ -2246,7 +2314,7 @@ Detectadas al reconstruirlas a mano durante las mediciones: `prf_isFormCodeE2_st
 
 `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` (2011 l., 198 declaraciones) → **`Meta/EvalLiftcPrf.lean`**.
 Cierra **`pcc_eval_liftc`**, el `hLift` que `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean` dejaba sin descargar.
-Build **124 jobs**, 0 errores, 0 sorrys.
+Build de entonces: **124 jobs**, 0 errores, 0 sorrys.
 
 ### 3.34.1 · El reparto, medido antes de construir
 
@@ -2263,7 +2331,7 @@ doce casi‑duplicados**.
 **El descenso CONECTA** con lo promovido en B1: `targetLift`/`targetLiftsc` se **consumen** de
 `LiftcCodePrf`, no se redefinen. La prueba fuerte no es el `rfl` suelto sino que **`PHI_step`
 consume las cuatro cláusulas ya promovidas** y no tiparía si fueran constantes distintas.
-Y consume las versiones **`_imp`** — la **moneda OBJETO**, ver §3.31.
+Y consume las versiones **\_imp** — la **moneda OBJETO**, ver §3.31.
 
 ### 3.34.2 · 🔑 EL CICLO DE IMPORTS — la restricción estructural de esta rama
 
@@ -2293,10 +2361,10 @@ invisible para los sondeos que la tienen copiada a mano.
 |---|---|---|
 | `psi_lift_form`, `PSI_inst` (genéricos en `Φ`) | `Meta/StrongInductionPrf.lean` | 4 y **7** sondeos |
 | `prf_argsIn_head`, `prf_argsIn_tail` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
-| `prf_isTermCodeE1_of_boundedIn`, `_of_In` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
+| `prf_isTermCodeE1_of_boundedIn`, `prf_isTermCodeE1_of_In` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
 
 `psi_lift_form` salía en **dos líneas** de `psi_lift_eq_subst` + `psi_at`, ambos ya en producción.
-Los dos últimos son el **análogo por sort** de `ENS.prf_isFormCodeE2_of_boundedIn`/`_of_In`, con
+Los dos últimos son el **análogo por sort** de `ENS.prf_isFormCodeE2_of_boundedIn`/`ENS.prf_isFormCodeE2_of_In`, con
 el esqueleto de prueba idéntico línea a línea — el hueco de simetría que el docstring de
 `CodeWitnessPrf` prometía cubierto citando un sondeo que **no existe en producción**.
 
@@ -2310,14 +2378,14 @@ Bruijn y los genéricos.
 ### 3.34.5 · ⚠️ «Net‑0» aquí son CUATRO axiomas, no tres
 
 Los resultados sustantivos salen con
-`[propext, Classical.choice, Quot.sound, Representability2Prf.prf_axiomsCodeT_eq]`.
+`[propext, Classical.choice, Quot.sound, Representability2Prf.prf_axiomsCodeT_eq]` (el último, retirado después con ADR‑026).
 El cuarto es uno de los **7 `axiom` sancionados** y **ya estaba en la línea base** (`refl_termCode`
 y `refl_shapeUn_imp` lo arrastran). **No hay axioma nuevo y net‑0 se sostiene**, pero
 «net‑0 puro» describe sólo los puentes definicionales. La frase estaba mal puesta y se corrigió.
 
 ### 3.34.6 · Los controles §9 no medían lo que decían
 
-Los seis `CRIT_*_real` se vendían como «NO ES VACUO». **Producción ya probaba sus enunciados
+Los seis CRIT\_\*\_real se vendían como «NO ES VACUO». **Producción ya probaba sus enunciados
 sola**, sin descenso, componiendo `LiftcCodePrf.refl_termCode` con `Representability.termCodeM_eq`.
 No son inútiles —la **ruta** importa, porque `refl_termCode` va por recursión META y **no ejercita
 la inducción objeto**— pero el enunciado no era información nueva. Se conservan **tres**,
@@ -2348,22 +2416,22 @@ de los que **294 ya estaban**. Y medida **otra vez después de cada paso**, enco
 `EvalSubstfcPrf` va el **último** porque **407 de sus 522 nombres (78 %) están también en los
 otros cuatro**. Promovido primero serían 249 declaraciones; promovido último, **84**.
 
-Medido de nuevo tras los pasos de hoy: de las 222 que le faltaban, **138 están en `EvalSubsttc`
-o `SubstfcEx`**. La cuenta se sostiene.
+Medido de nuevo tras los pasos de hoy: de las 222 que le faltaban, **138 están en `EvalSubsttc` (archivado, ADR‑141)
+o `SubstfcEx`** (archivado). La cuenta se sostiene.
 
-### 3.35.2 · `SubstfcPlanos` — el sondeo que casi no dio módulo
+### 3.35.2 · `SubstfcPlanos` (archivado, ADR‑141) — el sondeo que casi no dio módulo
 
 Sus 39 declaraciones se repartieron así:
 
 | destino | qué | por qué |
 |---|---|---|
 | `Meta/CodeCtorKit.lean` | `binK`, `binK_binT`, `prf_congr_binK`, `prf_substtc_binK_at` + los 3 `prf_substtc_termCode_*` | **descenso 1** |
-| `Meta/EvalArithPrf.lean` | el KIT TERNARIO: `funcc3` + la imagen dotada `substfcT` | **descenso 2** |
+| `Meta/EvalArithPrf.lean` | el KIT TERNARIO: funcc3 + la imagen dotada `substfcT` | **descenso 2** |
 | `Meta/SubstfcCodePrf.lean` | 17 | el módulo nuevo |
 | — | 4 | **retiradas por MUERTAS** |
 
 **El descenso 2 retira 74 copias a mano** de `sondeos/`: `substfcT` estaba en **once** sondeos y
-los dos `funcc3` en **nueve** cada uno. Es lo que más ha pagado de toda la rama.
+los dos funcc3 en **nueve** cada uno. Es lo que más ha pagado de toda la rama.
 
 ### 3.35.3 · ⛔ El ciclo de imports, aplicado — y el error que casi se cuela
 
@@ -2385,7 +2453,7 @@ no— y **reapuntar una referencia cualificada** en `EvalLiftcPrf` que se rompí
 
 ### 3.35.4 · ⚠️ No se promueve lo MUERTO — «la moneda de la inducción OBJETO», otra vez
 
-`paso2_caso_bin`, `_impl`, `_and`, `_or` **no tienen ni un consumidor de código**. Sus únicas
+`paso2_caso_bin`, `_impl`, `_and`, `_or` (archivados, ADR‑141) **no tienen ni un consumidor de código**. Sus únicas
 apariciones fuera del sondeo son **prosa en comentarios**.
 
 La razón es la lección registrada: el ensamblaje real usa `paso2_caso_bin_imp`, el mismo caso
@@ -2396,7 +2464,8 @@ reprobado en `PrfH Γ` como **implicación**, porque dentro de la inducción la 
 
 ### 3.35.5 · 🔑 La duplicación que ningún censo por nombre puede ver
 
-`archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` declara `psi_substtc_l1`, y **es `psi_lift_form` instanciado a
+`archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` declara `psi_substtc_l1` (archivado con Probe, ADR‑247; ✏️ 2026‑11‑09, ADR‑262: medido hoy, el sondeo lo llama `psi_l1`, con
+`PHI`, y aquel nombre es el de su copia en `archivo/probe-2026-11-02:Probe/B3B_substtc_modulo.lean`), y **es `psi_lift_form` instanciado a
 `Φ := PHIsubsttc`** — el genérico que subió en B2. Es el duplicado **nº 69**, y se le escapó a
 **dos** censos independientes:
 
@@ -2408,10 +2477,10 @@ Es la forma más escurridiza de lo que ADR‑019 persigue, y sólo se ve pregunt
 genérico del que esto sea instancia?»* — que no es una pregunta que un censo conteste.
 
 Subida la escalera entera (`psi_lift_form2`, `psi_lift_form3`, `PSI_inst3`, genéricos en Φ) a
-`Meta/StrongInductionPrf.lean`: sirve a **tres** frentes, porque `EnsamblajeTriple` y
-`EnsamblajeMedida` llevan el mismo bloque **carácter por carácter**.
+`Meta/StrongInductionPrf.lean`: sirve a **tres** frentes, porque `EnsamblajeTriple` (archivado, ADR‑141) y
+`EnsamblajeMedida` (archivado) llevan el mismo bloque **carácter por carácter**.
 
-### 3.35.6 · ⚠️ Las 17 COLISIONES de `EvalSubsttc`, y cómo fallan de verdad
+### 3.35.6 · ⚠️ Las 17 COLISIONES de `EvalSubsttc` (archivado, ADR‑141), y cómo fallan de verdad
 
 17 nombres del sondeo existen en producción **hablando de otra cosa**: el homónimo es de `liftc`,
 no de `substtc`. **Nueve están exportados a la raíz.**
@@ -2430,7 +2499,7 @@ Eso es un fallo silencioso, y es lo que obliga a **renombrar antes de mover**.
 
 **El §13 entero de `EvalSubsttc` está muerto**: producción prueba
 `pcc_eval_pred (n : Term) : Prf (provFromCode (evalPredCode n))` **sin guarda ninguna**, o sea
-algo estrictamente más fuerte que `PredHyp` — que ni existe en producción. Nueve declaraciones
+algo estrictamente más fuerte que `PredHyp` (archivada, ADR‑141) — que ni existe en producción. Nueve declaraciones
 que descargaban esa hipótesis dejan de ser trabajo.
 ---
 
@@ -2469,9 +2538,9 @@ como hipótesis. **Arrastrar hasta arriba es exactamente la «guarda colgante» 
 está refutada porque la D3 resultante sería **vacua**. Una guarda sólo se arrastra si algún
 consumidor concreto puede pagarla.
 
-En la práctica: los constructores genéricos de línea (`prf_lineOk_q1`/`_q2`, `pcc_exIntro_code'`,
+En la práctica: los constructores genéricos de línea (`prf_lineOk_q1`/`prf_lineOk_q2`, `pcc_exIntro_code'`,
 `pcc_forallElim_code*`, `pcc_leibniz_code`) **arrastran**; y los sitios con códigos reales
-—`Representability2`(+`Prf`), `Sigma1TrackedPrf`— **pagan**.
+—`Representability2`(+`Prf`), `Sigma1TrackedPrf` (retirado después, ADR‑161)— **pagan**.
 
 ### 3.36.3 · Lo que la ejecución desmintió de §3.32.2
 
@@ -2480,8 +2549,8 @@ En la práctica: los constructores genéricos de línea (`prf_lineOk_q1`/`_q2`, 
   sus 7 firmas exactas.
 * **D1 estaba pagado desde agosto.** `prf_hasWitF_real` y `CRIT_hasWit_real` (rama A) son
   exactamente lo que la enmienda exige sobre líneas concretas. `archivo/sondeos-2026-10:sondeos/MedirC_Enmienda.lean` ya lo
-  había demostrado (`guardQ1_se_paga`) y no se sabía.
-* **La rama F se ABARATA.** `prf_lineWF_tag` (hoy `prf_lineWF_tag_imp`: el nombre viejo ya no existe) pasa de bicondicional a **implicación**: el `⇔` deja
+  había demostrado (`guardQ1_se_paga`, archivado, ADR‑141) y no se sabía.
+* **La rama F se ABARATA.** `prf_lineWF_tag` (renombrado: hoy `prf_lineWF_tag_imp`; el nombre viejo ya no existe) pasa de bicondicional a **implicación**: el `⇔` deja
   de ser cierto para argumentos arbitrarios (el punto de la enmienda) pero la mitad `→` sigue
   siéndolo **y sale gratis**. Y era la única que se usaba: sus dos consumidores aplicaban
   `and_elim_left` acto seguido. Un `lineWF` más fuerte es más fácil de refutar.
@@ -2510,7 +2579,7 @@ de testigo. **No son específicas de `tcFn`**: valen para el lado `hasWitF`.
   `forallc (formCode φ)`, que **es** `formCode (∀φ)`. Los paga `prf_hasWitF_fc`.
 * **6 piden UNA sola pieza que no existe**:
   `prf_hasWitF_substfc : Prf (hasWitF c) → Prf (hasWit s) → Prf (hasWitF (substfc v s c))`.
-  Salen del patrón de `pcc_thm_inst2/3/4`: la primera ∀‑elim va sobre un `formCode`, las
+  Salen del patrón de `pcc_thm_inst2`/`pcc_thm_inst3`/`pcc_thm_inst4`: la primera ∀‑elim va sobre un `formCode`, las
   siguientes sobre el código ya **sustituido**. Estimación 300‑600 líneas, terreno de
   `pcc_eval_substfc`.
 * **Las guardas de TÉRMINO ya están resueltas**: los 11 módulos consumidores pasan
@@ -2521,8 +2590,8 @@ de testigo. **No son específicas de `tcFn`**: valen para el lado `hasWitF`.
 (`EvalNthcPrf`, `EvalListPrf`, `EvalMulPrf`, `LiftcCodePrf`, `SubstfcCodePrf`…): aparecerán más
 sitios. La diferencia es que **ésos pagan**.
 
-▶ **Antes de escribir la clausura, MEDIR `archivo/sondeos-2026-10:sondeos/HasWitFReal.lean` y `HasWitFCritica.lean`**: ya
-tienen `prf_hasWitF_real`, `PrfH_congr_hasWitF`, `substF_hole_hasWitF` y controles negativos.
+▶ **Antes de escribir la clausura, MEDIR `archivo/sondeos-2026-10:sondeos/HasWitFReal.lean` y `archivo/sondeos-2026-10:sondeos/HasWitFCritica.lean`**: ya
+tienen `prf_hasWitF_real`, `PrfH_congr_hasWitF`, `substF_hole_hasWitF` (éste, archivado, ADR‑141) y controles negativos.
 
 ### 3.36.6 · ⚠️ Dos errores de MEDICIÓN cometidos, para no repetirlos
 
@@ -2543,7 +2612,7 @@ verdad y que un cambio deliberado vuelve falsa** — y por eso es la única *ant
 un esquema, la documentación que presume de generalidad caduca en bloque. Cinco casos, todos de la
 misma familia: `Sigma1CorePrf` («incondicionalmente válida»), `pcc_leibniz_code` («arbitrarios»),
 `pcc_exIntro_code` y `pcc_forallElim_code'` (una hipótesis dada por muerta que **vuelve a
-usarse** — el mismo caso en los **dos espejos**), y `prf_lineWF_tag` (bicondicional; hoy `prf_lineWF_tag_imp`, el nombre viejo ya no existe).
+usarse** — el mismo caso en los **dos espejos**), y `prf_lineWF_tag` (renombrado; era bicondicional: hoy `prf_lineWF_tag_imp`, el nombre viejo ya no existe).
 
 🔑 **Marcador léxico**: al cambiar un esquema o una firma, buscar **«arbitrario», «incondicional»,
 «libre de», «ya no se usa», «cualquier»**. Y **corregir no es borrar**: en tres de los cinco, parte
@@ -2560,8 +2629,8 @@ Dos sondeos, los dos **net‑0 puros**: `sondeos/MergeTestigos.lean` (206 l.) y
 
 Tres cosas que §3.36 daba por buenas y **no lo eran**:
 
-1. **`HasWitFReal`/`HasWitFCritica` NO sirven para la clausura.** El punto de reanudación decía
-   «ya tienen `substF_hole_hasWitF`…». Medido: esas piezas son **fontanería De Bruijn**
+1. **`HasWitFReal`/`HasWitFCritica` (archivados, ADR‑141) NO sirven para la clausura.** El punto de reanudación decía
+   «ya tienen `substF_hole_hasWitF`…» (archivado, ADR‑141). Medido: esas piezas son **fontanería De Bruijn**
    (`substFormula`/`liftFormula`, nivel META), **no** clausura bajo el `substfc` OBJETO. Es la
    misma trampa que el árbol ya registra para `liftF_hasWitF`, y se repitió al redactar el plan.
 2. **`hasWitF (substfc …)` no se enuncia en NINGÚN sitio** — ni producción ni los 58 sondeos.
@@ -2610,7 +2679,7 @@ con `w`, `v`, `s` cuantificados dentro: **tres** binders frente al único de B2.
    Dentro del `PHI_step` habría costado el doble lift cada vez. Es «la moneda de la inducción
    OBJETO» (§3.31) aplicada a los existenciales.
 2. **Los colapsos van paso a paso, no con un `simp` final.** Con tres o cuatro sustituciones
-   anidadas el `simp` grande no reduce: hace falta un `PHI_specK` por binder, aplicado justo tras
+   anidadas el `simp` grande no reduce: hace falta un PHI_specK por binder, aplicado justo tras
    su `PrfH_spec` (patrón de `archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean`), y por eso conviene un `BODY`
    explícito. Y necesitan la escalera **completa** de lifts anidados —`substTerm_liftTerm`,
    `FOL.substTerm_liftLift`, `substTerm_liftLiftLift`, `substTerm_liftLiftLiftLift`—: los cuatro
@@ -2686,7 +2755,7 @@ los dos `un` (6/9) otra.
 
 Piezas nuevas que no existían: `prf_hasWitF_imp`, `prf_isFC1_unN`, `prf_isFC1_binN`,
 `prf_hasWitF_un`, `prf_hasWitF_bin`, `prf_wfAllF_nil`, `PrfH_congr_hasWitF`,
-`prf_hasWitF_bot`/`_atomc`/`_eqc`, los ocho casos y el ensamblaje. Y **`psi_lift_form4` +
+`prf_hasWitF_bot`/`prf_hasWitF_atomc`/`prf_hasWitF_eqc`, los ocho casos y el ensamblaje. Y **`psi_lift_form4` +
 `PSI_inst4`**: `PHIF` lleva **cuatro** binders (`wF`, `wT`, `v`, `s`) y la escalera psi de
 `Meta/StrongInductionPrf.lean` llegaba a tres.
 
@@ -2698,7 +2767,7 @@ la fusión, y ésta). El peaje de la parada es real y creciente.
 
 **Dónde para hoy**: exactamente **10 errores**, todos en `Meta/MpCodePrf.lean`
 (**173, 180, 183, 225, 231, 240, 265, 271, 282, 300**), todos la misma aplicación. La familia
-`pcc_thm_inst`/`inst2`/`inst3`/`inst4` + `pcc_axiom_inst`/`inst2`/`inst3`/`inst4` + los envoltorios
+`pcc_thm_inst`/`pcc_thm_inst2`/`pcc_thm_inst3`/`pcc_thm_inst4` + `pcc_axiom_inst`/`pcc_axiom_inst2`/`pcc_axiom_inst3`/`pcc_axiom_inst4` + los envoltorios
 `pcc_ax4_inst`/`pcc_ax5_inst` **no está enmendada**: toma `w₁…w₄ : Term` sin hipótesis, y
 `pcc_forallElim_code_open` ya pide `hasWitF (↑Ac)` y `hasWit (↑w)`.
 
@@ -2709,7 +2778,7 @@ la fusión, y ésta). El peaje de la parada es real y creciente.
 | `hasWitF ⌜φ⌝`, `hasWitF (forallc ⌜φ⌝)` | `prf_hasWitF_fc` (producción) |
 | `hasWitF (substfc (σ0) (liftc 0 w₁) ⌜φ⌝)` y sus anidados | **`prf_hasWitF_substfc`** + `CRIT_hasWit_lift` |
 
-**La mitad TESTIGO no se puede pagar ahí** —`wᵢ` es un `Term` arbitrario— así que se **ARRASTRA**.
+**La mitad TESTIGO no se puede pagar ahí** —wᵢ es un `Term` arbitrario— así que se **ARRASTRA**.
 Bajo el criterio de §3.36.2 eso sólo vale si algún consumidor concreto puede pagarla; medido:
 **puede**.
 
@@ -2723,7 +2792,7 @@ la copia buena es la promovida).
 **② Enmendar los 9 lemas de la familia**, en `MpCodePrf`.
 
 **③ 40 sitios de llamada** en la zona bloqueada (**29 módulos** detrás de `MpCodePrf`, de los que
-**18** tienen sitios): **29** de la familia `pcc_*_inst*` y **11** de API ya enmendada que aún no
+**18** tienen sitios): **29** de la familia pcc\_\*\_inst\* y **11** de API ya enmendada que aún no
 se ha evaluado (7 de `pcc_leibniz_code`, y uno en cada uno de `Delta0ReflectPrf`,
 `EvalCarcNthcPrf`, `PropCodePrf`, `EvalBoundedPrf`).
 
@@ -2762,7 +2831,7 @@ primera vez cada eslabón tiene con qué pagar.
 ### 3.39.1 · ① `Meta/SubstfcWitnessPrf.lean` — y **ADR‑019 tres veces en la misma pasada**
 
 Las dos clausuras dejan el sondeo y entran en producción: **1 912 líneas, 0 sorrys**, footprint
-`[propext, Classical.choice, Quot.sound]`. El árbol pasa a **112 módulos** (Meta 90).
+`[propext, Classical.choice, Quot.sound]`. El árbol pasa entonces a **112 módulos** (Meta 90).
 
 Medido antes de mover, como manda §3.36.1: **no había ciclo**. El cierre de los 6 imports del
 sondeo son 46 módulos y **ninguno depende de `MpCodePrf`**; 5 de los 6 ya estaban dentro de los 51
@@ -2791,8 +2860,8 @@ visibles desde fuera.
 
 ### 3.39.2 · ② `MpCodePrf` VERDE — la mitad código se paga ENTERA aquí
 
-Los **10** errores cerrados; el módulo compila. Diez lemas enmendados: `pcc_thm_inst`/`_inst2`/
-`_inst3`/`_inst4`, `pcc_axiom_inst`/`_inst2`/`_inst3`/`_inst4` y los envoltorios `pcc_ax4_inst`/
+Los **10** errores cerrados; el módulo compila. Diez lemas enmendados: `pcc_thm_inst`/`pcc_thm_inst2`/
+`pcc_thm_inst3`/`pcc_thm_inst4`, `pcc_axiom_inst`/`pcc_axiom_inst2`/`pcc_axiom_inst3`/`pcc_axiom_inst4` y los envoltorios `pcc_ax4_inst`/
 `pcc_ax5_inst`.
 
 🔑 **Tres lemas de pago, uno por forma en que aparece el `Ac` de cada eliminación:**
@@ -2835,7 +2904,7 @@ y hay que recorrerlos casi de uno en uno.
 | ⭐ sitio realmente nuevo | `EvalBoundedPrf`: el código es un `implc` **construido**, no un `formCode` ⇒ `prf_hasWitF_bin 5` |
 
 ⚠️ **Corrección a §3.38.3**: allí conté 7 sitios de `pcc_leibniz_code` mirando sólo módulos con
-sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente propio: piden
+sitios de la familia pcc\_\*\_inst\*. El censo completo da **6**, y son un frente propio: piden
 `hasWitF Ac` con `Ac` abstracto, así que **arrastran** salvo donde el `Ac` sea un código real.
 
 ---
@@ -2844,7 +2913,7 @@ sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente 
 
 ```
 Build completed successfully (132 jobs)        # entonces (2026‑09‑06d)
-112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
+112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve   # entonces
 ```
 
 Los **29 módulos** que bloqueaba `MpCodePrf` están cerrados, con la enmienda de los 7 esquemas
@@ -2938,7 +3007,7 @@ Corregido en el mismo commit que la firma, que es la única forma de que no salt
    nueve pasan por lemas del propio módulo que se enmendaron *después* del censo. Cada módulo que
    arrastra crea sitios nuevos aguas abajo: **44 era una cota inferior, no un total.**
 2. **`pcc_leibniz_code` era un segundo frente de 8 sitios**, no de 6 — el censo original sólo miró
-   módulos que ya tenían sitios de la familia `pcc_*_inst*`.
+   módulos que ya tenían sitios de la familia pcc\_\*\_inst\*.
 
 ### 3.40.6 · ⭐⭐ LA LECCIÓN DE MÉTODO, y llegó tarde
 
@@ -2996,11 +3065,11 @@ arrastrar. Arrastrar habría contaminado `pcc_lineWF_tracked_of_tree`, que es ch
 
 Los últimos 26 sitios (4 módulos) se analizaron con un workflow de **8 agentes**: uno por módulo
 produciendo el parche exacto, y por cada uno un **refutador** con instrucción de tumbarlo —
-comprobar que el `patch_old` casa **literalmente**, que el veredicto PAGA/ARRASTRA es correcto con
+comprobar que el patch_old casa **literalmente**, que el veredicto PAGA/ARRASTRA es correcto con
 **sesgo hacia PAGAR** (un arrastre innecesario contamina aguas abajo), y buscar con `grep` si alguna
 guarda escapa hacia el ensamblaje o D3.
 
-Resultado: **0 sitios refutados**, `red_line_ok: true` en los cuatro, y los **26 `patch_old`
+Resultado: **0 sitios refutados**, red_line_ok: true en los cuatro, y los **26 patch_old
 casando de forma única** al aplicarlos. Los refutadores no confirmaron sin más: corrigieron cuatro
 citas de línea y **tumbaron una mejora propuesta** —poner autoParam en `PrfH_eq_trans_code`— con el
 argumento correcto: `hw_auto` **no está en scope** en `EvalCarcNthcPrf`, que sólo importa
@@ -3032,7 +3101,7 @@ pcc_eval_substtsc       (w v s t) (hwf) (hargs)          -- la gemela sobre LIST
 pcc_eval_substtc_hasWit (v s t) : Prf (hasWit t ⇒ targetSubsttc v s t)
 ```
 
-Footprint `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` = **la base sancionada**;
+Footprint `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` (el último, retirado después con ADR‑026) = **la base sancionada**;
 ni un axioma nuevo. El molde es el de `EvalLiftcPrf`: **UNA** inducción fuerte con conclusión
 **conjuntiva** sobre los dos sorts, con el testigo, `v` y `s` cuantificados **dentro** del
 predicado (lo exige `liftFormula 1 Φ = Φ`).
@@ -3042,14 +3111,14 @@ se caen es la parte instructiva:
 
 | qué | cuántas | por qué |
 |---|---|---|
-| duplicados exactos | 66 | el §8 entero (38) era copia literal de `DescensoLiftc` |
-| **instancias** de genéricos ya subidos | 4 | `psi_l1/l2/l3`, `PSI_inst` **son** `psi_lift_form3`/`PSI_inst3` con `Φ := PHIsubsttc` |
-| muertas | 3 | `refl_caso_funcc`/`_lista_cons`/`_caso_varc`: cero consumidores; el ensamblaje usa las `_imp` |
+| duplicados exactos | 66 | el §8 entero (38) era copia literal de `DescensoLiftc` (archivado, ADR‑141) |
+| **instancias** de genéricos ya subidos | 4 | `psi_l1/l2/l3` (archivados, ADR‑141), `PSI_inst` **son** `psi_lift_form3`/`PSI_inst3` con `Φ := PHIsubsttc` |
+| muertas | 3 | `refl_caso_funcc`/`refl_lista_cons`/`refl_caso_varc`: cero consumidores; el ensamblaje usa las \_imp |
 | **el §13 entero** | 8 | ⬇ |
 
 ⭐ **El §13 sobraba por completo.** Ocho declaraciones —`ax26_pred_succ` instanciada dentro de
-`Prov`, dos congruencias `PrfH`, una eliminación de ∃ objeto— dedicadas a descargar una hipótesis
-`PredHyp` (`⊢ v < n ⇒ Prov(⌜τ(ṅ) = (τn)˙⌝)`). Producción prueba `pcc_eval_pred'`
+Prov, dos congruencias `PrfH`, una eliminación de ∃ objeto— dedicadas a descargar una hipótesis
+`PredHyp` (archivada, ADR‑141: `⊢ v < n ⇒ Prov(⌜τ(ṅ) = (τn)˙⌝)`). Producción prueba `pcc_eval_pred'`
 (`Meta/EvalPredPrf.lean`) **sin guarda ninguna**, que es estrictamente más fuerte. Queda en:
 
 ```lean
@@ -3058,7 +3127,7 @@ theorem prf_pred_dot_guarded (v n : Term) :
   prf_deduction (prf_to_prfH (pcc_eval_pred' n) [lt v n])
 ```
 
-y `PredHyp` desaparece de las **ocho** firmas que la arrastraban — con ella se caen las tres
+y `PredHyp` (archivada, ADR‑141) desaparece de las **ocho** firmas que la arrastraban — con ella se caen las tres
 versiones primadas del §14, que sólo existían para descargarla.
 
 ### §3.41.2 · ⛔ La trampa que ningún comparador de enunciados ve
@@ -3084,7 +3153,7 @@ arreglan con tres `open`, y los `open` sólo son seguros **porque** se renombrar
 
 El `export` sí se pudo hacer **por consumo** y no por existencia, aunque el módulo no tenga aún
 consumidores en el build: los tiene en `sondeos/`. Grep de las 71 supervivientes contra
-`EvalSubstfcPrf.lean` y `HasWitFReal.lean` → **46 referenciadas de hecho**. Ésas se exportan.
+`EvalSubstfcPrf.lean` y `HasWitFReal.lean` (archivado en `archivo/sondeos-2026-10`) → **46 referenciadas de hecho**. Ésas se exportan.
 
 ### §3.41.3 · `hGuard` — el chasis, y la deuda reducida a DOS lemas
 
@@ -3100,7 +3169,7 @@ consumidores en el build: los tiene en `sondeos/`. Grep de las 71 supervivientes
   casillas. Es lo que convierte la deuda de los 7 tags en **DOS** lemas genéricos —uno por
   constructor de `GuardSlot`—, porque el índice de casilla es un parámetro.
 * `DEUDA_hGuardT` / `DEUDA_hGuardF` quedan **enunciadas, no postuladas** (`abbrev` de `Prop`,
-  idioma de `Meta/Sigma1BoundedPrf.lean`). **Cero `axiom` nuevos.**
+  idioma de `Meta/Sigma1BoundedPrf.lean`, retirado después, ADR‑161). **Cero `axiom` nuevos.**
 
 ### §3.41.4 · ⚠️ La medición que corrigió el diseño: es una CASCADA, no un par
 
@@ -3152,9 +3221,9 @@ Falta el **recorrido** de `isTC1`/`isFC1` bajo el `∃`: la disyunción de forma
 y las **ocho** cláusulas de `isFormCodeE2`) y el `argsIn` interno, que es un segundo `∀` acotado
 anidado. Es un **ensamblaje**, del tamaño de una sesión, no una inducción nueva.
 
-⛔ Sigue vivo el coste que midió `Probe/MC_enmienda.lean` §8: la guarda **DISCRIMINA**
-(`CRIT_hasWitF_rejects_varc`), luego **no** se puede descargar para código abstracto. Es lo que
-la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`/`_q2`.
+⛔ Sigue vivo el coste que midió `archivo/probe-2026-11-02:Probe/MC_enmienda.lean` §8: la guarda **DISCRIMINA**
+(`CRIT_hasWitF_rejects_varc`, archivado, ADR‑141), luego **no** se puede descargar para código abstracto. Es lo que
+la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`/`prf_lineOk_q2`.
 
 ---
 
@@ -3185,14 +3254,14 @@ duplicados exactos (71 %)**, repartidas en cinco namespaces que son cinco sondeo
 | namespace | líneas | decls | qué es |
 |---|---|---|---|
 | `SinWTs` | 40–1406 | 155 (137 DUP) | `Meta/CodeWitnessPrf` |
-| `DescMutua` | 1434–3359 | 198 (183 DUP) | `LiftcCodePrf` + `EvalLiftcPrf` |
-| `Paso2` | 3379–4086 | 82 (34 DUP) | casi todo `SubstfcCodePrf` |
-| `SFsubsttc` | 4120–5950 | 157 (108 DUP) | **B3.2**, cerrado el día anterior |
+| DescMutua | 1434–3359 | 198 (183 DUP) | `LiftcCodePrf` + `EvalLiftcPrf` |
+| Paso2 | 3379–4086 | 82 (34 DUP) | casi todo `SubstfcCodePrf` |
+| SFsubsttc | 4120–5950 | 157 (108 DUP) | **B3.2**, cerrado el día anterior |
 | **`ENS`** | 5973–8372 | 214 (114 DUP + **86 NEW**) | **el trabajo real** |
 
 ⭐ **Lo que hizo limpio el borrado no fue el porcentaje de duplicados: fue el AISLAMIENTO.**
 Medido, `ENS` sólo depende de **41 nombres** de los otros cuatro namespaces, y **31 ya estaban
-en producción**. De los diez restantes, seis son piezas de `Paso2` que suben con el frente
+en producción**. De los diez restantes, seis son piezas de Paso2 que suben con el frente
 (cierre transitivo: 9 declaraciones) y cuatro se repuntan a producción. Total: entran **90**,
 se borran **697 de 806**.
 
@@ -3205,13 +3274,13 @@ se borran **697 de 806**.
 Los tres los destapó algo externo, no la medición:
 
 1. ⚠️ **El regex de referencias perdía TODAS las cualificadas.** El patrón `(?<![A-Za-z0-9_.])`
-   excluye un punto delante, así que `Paso2.unc` y `SFsubsttc.targetSubsttc` eran invisibles.
-   Lo destapó **un mensaje de error del compilador** que citaba `Paso2.unc`. Corregido, las
+   excluye un punto delante, así que `Paso2.unc` y `SFsubsttc.targetSubsttc` (archivados, ADR‑141) eran invisibles.
+   Lo destapó **un mensaje de error del compilador** que citaba `Paso2.unc` (archivado). Corregido, las
    dependencias de `ENS` pasaron de 10 a 41.
    ⚠️ **El mismo fallo está en la cifra «46 exportados por consumo» de §3.41.2**: es una cota
    inferior, no la medida. (Y en efecto: `DESCENSO_substtc_imp` y `DESCENSO_substtc_lista_imp`
    se consumen desde aquí de forma cualificada y no estaban exportados.)
-2. ⚠️ **Había que quitar los COMENTARIOS antes de contar.** `paso2_caso_un_guarded` figuraba
+2. ⚠️ **Había que quitar los COMENTARIOS antes de contar.** `paso2_caso_un_guarded` (archivado, ADR‑141) figuraba
    como dependencia y sólo aparecía en una docstring.
 3. ⚠️ **La propiedad de un nombre no es «quien lo declara primero».** Varios nombres están
    declarados en **dos** namespaces del mismo fichero (`PHI`, `PHI_at`, `pcc_thm_inst4`…), y
@@ -3235,7 +3304,7 @@ los duplicados candidatos. Aquí sólo mordió en `hPHI`, pero habría bastado c
 
 ### §3.42.4 · Los 16 puentes se DISUELVEN
 
-El sondeo llevaba dieciséis lemas `bridge_wfAll1`, `bridge_hasWit_SinWTs`, `gT_substtcT`… todos
+El sondeo llevaba dieciséis lemas `bridge_wfAll1`, `bridge_hasWit_SinWTs`, `gT_substtcT`… (archivados, ADR‑141) todos
 `:= rfl`. Existían para certificar que dos namespaces definían **lo mismo** — la trampa
 registrada de «misma definición en dos namespaces son DOS constantes que no componen».
 
@@ -3243,29 +3312,29 @@ Medido: **cero usos, los dieciséis**. No eran maquinaria, eran **certificados**
 exacto de que el trabajo viviera fuera de producción en copias: al quedar una sola definición ya
 no dicen nada, y se van enteros.
 
-> 🔑 Un `bridge_* := rfl` sin consumidores no es código muerto: es **la factura de vivir en
+> 🔑 Un bridge\_\* := rfl sin consumidores no es código muerto: es **la factura de vivir en
 > `sondeos/`**. Promover la paga.
 
 ### §3.42.5 · Y el resto, que ya era rutina
 
-* **13 renombres** (la familia `PHI*`/`BODY`/`CTXF` → `*substfc`), por la misma razón que en
+* **13 renombres** (la familia `PHI*`/`BODY`/`CTXF` → \*substfc), por la misma razón que en
   §3.41.2, y confirmados de forma independiente por una auditoría adversarial de sólo lectura
   (11 RENOMBRAR + 3 BORRAR, coincidencia exacta).
 * ⛔ **ADR‑019 dos veces más**: `pcc_thm_inst4`/`pcc_axiom_inst4`/`pcc_congr_substfcT_arg3_code`
-  se borran (producción los tiene enmendados por ADR‑020), y `psi_l1`/`psi_l2`/`psi_l3` eran
-  `psi_lift_form1/2/3` instanciados en `PHIsubstfc` — igual que en B3.2, y por tercera vez.
+  se borran (producción los tiene enmendados por ADR‑020), y `psi_l1`/`psi_l2`/`psi_l3` (archivados, ADR‑141) eran
+  `psi_lift_form`/`psi_lift_form2`/`psi_lift_form3` instanciados en `PHIsubstfc` — igual que en B3.2, y por tercera vez.
 * **De 15 errores a 0 en tres pasadas.** Nueve sitios de guarda pagados con `(by hw_auto)`.
 * ⭐ **El décimo no se puede pagar: se ARRASTRA.** `pcc_congr_substfcT_arg2_code` tiene sus
   argumentos **abstractos**, y para un término abstracto `hasWit` no es demostrable —es
   justamente lo que hace útil a la guarda—. La solución no hubo que inventarla: producción ya
-  la tenía en el hermano `_arg3_code` de `SubstfcCodePrf`, con las cuatro guardas como
+  la tenía en el hermano `pcc_congr_substfcT_arg3_code` de `SubstfcCodePrf`, con las cuatro guardas como
   `autoParam := by hw_auto` y el testigo de `Ac` construido a mano con `prf_hasWitF_eq2` +
   `prf_hasWit_funcc3`. Espejarlo fue una línea. Es el criterio **PAGAR vs ARRASTRAR** de
   ADR‑020 aplicado dentro de un solo lema.
 * **`export` por PROPÓSITO DECLARADO, y dicho como tal.** Medido con el filtro correcto
   —descontando los nombres que el propio fichero declara— **ningún** sondeo consume nada de
-  este módulo: `HasWitFReal.lean`, `EnsamblajeTriple.lean`, `EnsamblajeMedida.lean` y
-  `SubstfcEx.lean` son **variantes del mismo trabajo** y declaran ellos mismos los nombres que
+  este módulo: `HasWitFReal.lean`, `EnsamblajeTriple.lean`, `EnsamblajeMedida.lean` (archivados en `archivo/sondeos-2026-10`) y
+  `SubstfcEx.lean` (ídem, archivado) son **variantes del mismo trabajo** y declaran ellos mismos los nombres que
   usan. **Consumo de una copia no es consumo**, y fingir la medición habría sido peor que
   decirlo.
 
@@ -3296,7 +3365,7 @@ el descenso de `substfc` vive en nivel 0» (su §2). De ahí la pregunta natural
 `isTermCodeE1` con `In` atómico?**
 
 ⛔ Eso sería tocar `Minimal/Axioms.lean` **dentro de los 7 axiomas enmendados por ADR‑020**:
-cambia qué demuestra `Prov`, y es decisión del autor. **No hizo falta.**
+cambia qué demuestra Prov, y es decisión del autor. **No hizo falta.**
 
 ### §3.43.2 · 🔑 Por qué el anidamiento no era un muro
 
@@ -3333,7 +3402,7 @@ sondeo, y por eso el kit trae `pcc_carcD_bridge_cons`/`pcc_cdrcD_bridge_cons`.
 
 * `Meta/TrackedAtomsPrf.lean` — el **kit genérico** (21 de 81 declaraciones de aquel sondeo,
   cero homónimos): `pcc_In_atom_tracked`, `pcc_boundedIn_tracked`, `pcc_shape_tracked`,
-  `pcc_child_tracked`, **`pcc_child_tracked_at`**, `pcc_carcIn_tracked`/`_cdrcIn_tracked`.
+  `pcc_child_tracked`, **`pcc_child_tracked_at`**, `pcc_carcIn_tracked`/`pcc_cdrcIn_tracked`.
   Sirve a **C3‑T, C3‑F y D3** a la vez: es la mitad que **no depende del predicado de nodo**.
   ⚠️ De 14 errores a 0 — el sondeo es anterior a ADR‑020. Diez guardas se **pagan** con
   `hw_auto`; la undécima (`PrfH_in_transport`, tres argumentos abstractos) **no se puede pagar**
@@ -3344,7 +3413,7 @@ De `DEUDA_wfAll1_tracked` queda el recorrido de los **dos disyuntos** de `isTerm
 ensamblaje por el `pcc_bdAll_intro` **exterior**. Las dos piezas que ese recorrido consume —la
 de forma (`pcc_shape_tracked`) y la de pertenencia (`pcc_argsIn_pair_tracked`)— ya están.
 
-### §3.43.5 · El recorrido de los dos disyuntos, y el `PsiF` sobre CÓDIGOS (2026‑09‑08b)
+### §3.43.5 · El recorrido de los dos disyuntos, y el PsiF sobre CÓDIGOS (2026‑09‑08b)
 
 `Meta/HasWitTrackedPrf.lean` §5 cierra el recorrido de `isTermCodeE1`, con `wT` y `X`
 **abstractos**, apoyado íntegramente en piezas que ya estaban:
@@ -3362,12 +3431,12 @@ el ensamblaje `pcc_isTermCodeE1_tracked`.
 
 #### ⚠️ Y lo que falta del `pcc_bdAll_intro` EXTERIOR, medido
 
-No se puede alimentar con esto tal cual, y la razón es precisa: el `PsiF w` del `bdAll` exterior
+No se puede alimentar con esto tal cual, y la razón es precisa: el PsiF w del bdAll exterior
 necesita el cuerpo **con el hueco del índice en `varc 0`**, es decir sobre **CÓDIGOS**
 —`nthcT (tcFn w) (varc 0)`—, mientras que `pcc_isTermCodeE1_tracked` entrega la imagen sobre el
 **término objeto**, `tcFn X`.
 
-Es exactamente la distinción que `sondeos/A3IsFCBTracked.lean` (su `PsiF`) ya tenía resuelta:
+Es exactamente la distinción que `sondeos/A3IsFCBTracked.lean` (su PsiF) ya tenía resuelta:
 
 ```lean
 noncomputable def PsiF (w : Term) : Term :=
@@ -3378,16 +3447,16 @@ noncomputable def PsiF (w : Term) : Term :=
 `PrfH_leibniz_apply`»). Eso es cierto **para A3**, y falso para nosotros. Medido:
 
 1. **La imagen debe mencionar el índice SÓLO como `varc 0` en una ranura de código.** Es
-   forzado, no estilístico: `hbody` pide `Prov(⌜substfc zero (tcFn i) (PsiF q)⌝)`, y
+   forzado, no estilístico: `hbody` pide Prov(⌜substfc zero (tcFn i) (PsiF q)⌝), y
    `substfc zero s C` sustituye la variable‑código `varc 0` de `C` por `s`. Luego toda
    aparición del índice en el resultado es **exactamente `tcFn i`** — no puede ser
    `tcFn (lenc (nthc … i …))`. ⇒ todo lo que vaya *aguas abajo del índice* tiene que usar
    accesores **dotados** (`nthcT`, `lencT`, …) sobre códigos. **Eso explica por qué el
-   `nodeOkDot` de A3 toma códigos**: no era una preferencia.
+   `nodeOkDot` de A3 (`sondeos/A3IsFCBTracked.lean`) toma códigos**: no era una preferencia.
 2. ⛔ **Y hay una segunda restricción que A3 nunca tocó**: `bdAllCode B Phic =
    forallc (implc (ltCodeFn (varc 0) B) Phic)` mete la **cota `B` DENTRO del binder**, así que
    `B` tiene que ser cerrada o venir pre‑`liftc`‑ada, o se captura. En A3 eso nunca mordió
-   porque su `PsiF` **no tiene ningún binder** (`nodeOkDot` es `orc`/`andc`/`inFormCodeFn`, y
+   porque su PsiF **no tiene ningún binder** (`nodeOkDot`, de `sondeos/A3IsFCBTracked.lean`, es `orc`/`andc`/`inFormCodeFn`, y
    el `In` va como átomo **a propósito**, su §2). El nuestro **sí** lo tiene: `isTermCodeE1`
    lleva `argsIn`, cuya imagen es otro `bdAllCode`. ⇒ el índice exterior aparece **dentro** de
    un `forallc`, y ahí hay que escribirlo desplazado (`prf_substfc_forall` baja a `succ v` y
@@ -3403,7 +3472,7 @@ niveles, encima del Leibniz. Es la pieza más cara que queda de C3‑T.
 >
 > ⭐ **Y eso reabre la pregunta de la reformulación, pero mejor entendida.** §3.43.1 concluyó
 > que reformular `isTermCodeE1` con `In` atómico **no hacía falta** — cierto para reflejar el
-> `argsIn` (§3.43.2). Para el **ensamblaje exterior** compraría otra cosa: un `PsiF` **sin
+> `argsIn` (§3.43.2). Para el **ensamblaje exterior** compraría otra cosa: un PsiF **sin
 > binders**, o sea exactamente el caso barato de A3. Sigue siendo ADR (toca
 > `Minimal/Axioms.lean` dentro de los 7 axiomas enmendados) y sigue sin ser obligatoria, pero
 > ahora se sabe **qué** compra y **cuánto** cuesta no hacerla.
@@ -3431,7 +3500,7 @@ identificado. La cadena, con todo lo que ya está:
 
 **Medido: ese lema no existe en ninguna parte** (ni producción, ni `sondeos/`, ni `Probe/`), y
 **no es un axioma**: los axiomas objeto de `liftc`/`substtc` son sólo sus ecuaciones de
-recursión (`ax_liftc_var_lt`/`_var_ge`/`_func`, `ax_substtc_var_eq`/`_gt`/`_lt`/`_func`, y las
+recursión (`ax_liftc_var_lt`/`ax_liftc_var_ge`/`ax_liftc_func`, `ax_substtc_var_eq`/`ax_substtc_var_gt`/`ax_substtc_var_lt`/`ax_substtc_func`, y las
 dos de listas). Los tres usos que hay en el árbol (en `BdAllIntroPrf`, `D3InDotPrf` y
 `TrackedAtomsPrf`) son todos el caso **fácil**, con el argumento cerrado.
 
@@ -3444,7 +3513,7 @@ El ensamblaje exterior necesita **una de dos**, y son alternativas reales:
 | vía | qué cuesta | qué toca |
 |---|---|---|
 | **(a)** probar el lema de sustitución/lift a nivel de código | una inducción objeto nueva sobre el código, genérica en `Z` | nada del axioma; es trabajo nuevo puro y **reutilizable** (lo pedirá cualquier `∀` acotado anidado, también en C3‑F y en D3) |
-| **(b)** reformular `isTermCodeE1` con `In` atómico (estilo A3) | ⛔ **ADR**: toca `Minimal/Axioms.lean` dentro de los 7 axiomas enmendados por ADR‑020 ⇒ cambia qué demuestra `Prov` | elimina el binder interno ⇒ **no hace falta el lema**, y el `hbody` pasa a ser el caso barato de A3 |
+| **(b)** reformular `isTermCodeE1` con `In` atómico (estilo A3) | ⛔ **ADR**: toca `Minimal/Axioms.lean` dentro de los 7 axiomas enmendados por ADR‑020 ⇒ cambia qué demuestra Prov | elimina el binder interno ⇒ **no hace falta el lema**, y el `hbody` pasa a ser el caso barato de A3 |
 
 ⭐ Nótese que esto **precisa** la conclusión de §3.43.1: allí se dijo que la reformulación «no
 hacía falta», y era cierto **para reflejar el `argsIn`** (§3.43.2 lo probó). Para el
@@ -3466,14 +3535,14 @@ disyuntiva: **(a)** probarlo (inducción objeto nueva) o **(b)** el ADR de refor
 🔑 **El error fue sobregeneralizar el requisito.** Los `Z` que aparecen de verdad **no son
 arbitrarios**: son códigos de **forma conocida** — `nthcT` sobre `tcFn` y el hueco del índice.
 Para ésos basta con que `liftc` sepa atravesar sus constructores, y los axiomas objeto que eso
-pide (`ax_liftc_var_ge`, `ax_liftc_func`, `ax_liftsc_nil`/`_cons`) **ya estaban en la teoría**.
+pide (`ax_liftc_var_ge`, `ax_liftc_func`, `ax_liftsc_nil`/`ax_liftsc_cons`) **ya estaban en la teoría**.
 Sólo faltaba componerlos.
 
 #### Lo que entra
 
 `Meta/TrackedAtomsPrf.lean` — el **kit de distribución de `liftc`**, cinco líneas por
 constructor: `prf_liftc_varc0` (el desplazamiento del hueco, `⌜v₀⌝ ↦ ⌜v₁⌝`),
-`prf_liftc_funcc1`/`_funcc2`, y sus instancias `prf_liftc_nthcT`/`_lencT`/`_carcT`/`_cdrcT`.
+`prf_liftc_funcc1`/`prf_liftc_funcc2`, y sus instancias `prf_liftc_nthcT`/`prf_liftc_lencT`/`prf_liftc_carcT`/`prf_liftc_cdrcT`.
 
 `Meta/HasWitTrackedPrf.lean` §6 — la cuenta entera para el `Z` que bloqueaba:
 
@@ -3562,14 +3631,14 @@ de `DEUDA_hGuardT`**. Footprint = la base sancionada.
 #### Las cuatro piezas que hubo que construir
 
 1. **`PrfH_bdAllCode_congr_bnd`** — la congruencia de la **cota** de un `∀` acotado *dentro de
-   `Prov`*. Hacía falta porque `bdAllCode` mete la cota dentro del `forallc`, y el paso de
-   `(lenc Y)˙` a `lencT Ẏ` (que es `pcc_eval_lenc`) **sólo vale dentro de `Prov`**: los dos
+   Prov*. Hacía falta porque `bdAllCode` mete la cota dentro del `forallc`, y el paso de
+   `(lenc Y)˙` a `lencT Ẏ` (que es `pcc_eval_lenc`) **sólo vale dentro de Prov**: los dos
    términos no son iguales a nivel objeto. 🔑 El hueco del Leibniz se escribe `⌜v₁⌝`, de modo
    que `substfc zero ·` lo alcanza al bajar por el binder — el mismo truco de §3.43.9.
 2. **`PrfH_argsInDotC_transport`** — el transporte de la lista, con las **dos** ocurrencias
    (cota y cuerpo) rellenadas por **una sola** sustitución.
 3. **`pcc_argsIn_trackedC`** — `argsIn` en forma de códigos. Los `carc`/`cdrc` del `cons` son
-   igualdad **objeto** y se mueven con `prf_provCode_congr`, sin entrar en `Prov`; la cota
+   igualdad **objeto** y se mueven con `prf_provCode_congr`, sin entrar en Prov; la cota
    necesita (1).
 4. **`pcc_isTermCodeE1_trackedC`** — el recorrido en forma de códigos.
 
@@ -3609,7 +3678,7 @@ en el antecedente, el `or`‑elim la conserva en su rama.
 ## §3.44 · 🏁 C3‑T CERRADO — `DEUDA_hGuardT` PROBADA, y media cascada de ADR‑020 descargada (2026‑09‑08c)
 
 > *(entonces)* `Build completed successfully (132 jobs)`. Footprint de `pcc_hGuardT` = la base sancionada
-> (`prf_axiomsCodeT_eq` —`axiom` retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`— + los tres de Lean). **Net‑0 puro**, ni un axioma nuevo.
+> (`prf_axiomsCodeT_eq`, retirado el 2026‑09‑12 con ADR‑026 —era un `axiom`: el ancla pasó a la firma como `[AnclaEq]`, clase retirada después, ADR‑118—, + los tres de Lean). **Net‑0 puro**, ni un axioma nuevo.
 
 ```
 pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) : DEUDA_hGuardT i n t
@@ -3638,7 +3707,7 @@ escrito desde ADR‑020 y nadie lo había desplegado.
 ### §3.44.2 · ⭐ Y no hizo falta ningún teorema objeto nuevo: `CodeTreeReflect` ya lo tenía
 
 La reacción natural —probar en la teoría objeto la implicación
-`carc X = k̇ ∧ lenc X = ṅ → X = ⟨k̄, …⟩` y meterla en `Prov` con `pcc_thm_inst`, al estilo del
+`carc X = k̇ ∧ lenc X = ṅ → X = ⟨k̄, …⟩` y meterla en Prov con `pcc_thm_inst`, al estilo del
 puente de D3 (`hC_dot_of_chainOkBDot`)— **no hacía falta**. La ecuación posicional se refleja
 **directamente**, y las dos piezas caras ya estaban probadas **por inducción sobre el árbol**
 desde el frente de los 14 tags estructurales:
@@ -3674,7 +3743,7 @@ El segundo hallazgo salió de desplegar `substCodeF 0 ṫ (hasWit (nthc #0 ı̄)
 `∀` de `wfAll1`, y `⌜v₂⌝` dentro del `∀` anidado de `argsIn`.
 
 `wfAll1PsiAtC` repetía un `WD` único en las tres ranuras — **válido sólo con testigo cerrado**
-(`tcFn w`), que es el caso que §3.43.9 tenía delante. Ahora lleva **dos** ranuras (`WD`, `WD'`),
+(`tcFn w`), que es el caso que §3.43.9 tenía delante. Ahora lleva **dos** ranuras (WD, WD'),
 y `wfAll1PsiC WD = wfAll1PsiAtC WD WD …` recupera el caso cerrado por `rfl`.
 
 > 🔑 Tercera aparición del mismo patrón: **si un cuerpo bajo binders necesita el mismo dato a
@@ -3722,7 +3791,7 @@ theorem substCodeF_hasWit_nthc (t I : Term) :
 ⚠️ **El único punto que `rfl` no alcanza es el índice**: `numeralM i` con `i` **variable** no
 reduce, y `substCodeT v W (numeralM i) = termCode (numeralM i)` es un **teorema**
 (`substCodeT_closed`), no una defeq. Por eso el `rfl` se enuncia con el índice **abstracto** y
-la instancia se cierra con un `rw`. Con índices literales (los `numeralM 0/1/2/3` de las formas)
+la instancia se cierra con un `rw`. Con índices literales (los numeralM 0/1/2/3 de las formas)
 sí computa, y por eso el resto pasa entero.
 
 ### §3.44.6 · Lo que entra
@@ -3737,11 +3806,11 @@ sí computa, y por eso el resto pasa entero.
 
 * §5′ `treeUn1`/`treeBin1`, `shapeFCun`/`shapeFCbin` (**casados con `formCode` por `rfl`**),
   `pcc_shapeUn_fc`/`pcc_shapeBin_fc`, `shapeUnCtx`/`shapeBinCtx` y sus dos transportes;
-  `prf_substfc_shapeFCun_at`/`_bin_at`; `prf_liftc_termCode_numeralM`.
+  `prf_substfc_shapeFCun_at`/`prf_substfc_shapeFCbin_at`; `prf_liftc_termCode_numeralM`.
 * §5‑§9 rehechos sobre esa imagen, y `tcFn ⌜2⌝ → termCode ⌜2⌝` en todas las ranuras de índice
   (que es lo que `formCode` produce de verdad).
 * §10 `hPinv_wfAll1Psi` + ⭐ **`pcc_wfAll1_trackedC`** — la cota pasa de `(lenc w)˙` a
-  `lencT ẇ`, vía `pcc_eval_lenc` **dentro de `Prov`** (`PrfH_bdAllCode_congr_bnd`), calcado de
+  `lencT ẇ`, vía `pcc_eval_lenc` **dentro de Prov** (`PrfH_bdAllCode_congr_bnd`), calcado de
   `pcc_argsIn_trackedC`.
 * §11 `wfAll1DotAtC`, `hasWitAc`, `prf_substfc_wfAll1DotAtC`, `prf_substfc_hasWitAc`,
   `liftTerm_hasWitAc`, `pcc_isTC1_exc_body` y ⭐ **`pcc_hasWit_exc`**.
@@ -3780,7 +3849,7 @@ específicamente nuevo de C3‑F son las dos listas testigo y el `∃∃` de `ha
 
 ## §3.45 · C3‑F · `Meta/HasWitFTrackedPrf.lean` — la mitad cara de `DEUDA_hGuardF`, probada (2026‑09‑08d)
 
-> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> Entonces: `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
 > `Meta/HasWitFTrackedPrf.lean` (828 l.).
 
 ```
@@ -3866,7 +3935,7 @@ Tres pasos, todos con la máquina ya escrita:
 
 ## §3.46 · 🏁🏁 C3‑F CERRADO — `DEUDA_hGuardF` PROBADA, y la cascada de ADR‑020 sin deudas (2026‑09‑08e)
 
-> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> Entonces: `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
 > `Meta/HasWitFTrackedPrf.lean` (1 230 l.).
 
 ```
@@ -3931,7 +4000,7 @@ comprobado con un `decide`).
 **Lo que NO**: ⚠️ **C3 no queda cerrado.** `pcc_lineWF_tracked_modulo_7` pide un reflector por
 tag, y medido en el árbol hay **14** (`p1`, `p2`, `c1`, `c2`, `c3`, `j1`, `j2`, `j3`, `p3`,
 `gen`, `efq`, `mp`, `thy`, `eqrefl`) y **ninguno de los 7 de sustitución**. Lo que falta de esos
-siete es ahora **sólo la condición ESTRUCTURAL** `C₀` de cada uno —el RHS del esquema, con
+siete es ahora **sólo la condición ESTRUCTURAL** C₀ de cada uno —el RHS del esquema, con
 `substfcT`/`substtcT`/`predcT`/`liftcT`—, que es justo donde entran `pcc_eval_substtc` (B3.2) y
 `pcc_eval_substfc` (B3.4). **El conjunto extra ya no estorba**: `hGuard_of_slots` lo absorbe.
 
@@ -3942,7 +4011,7 @@ mitad que B3.2/B3.4 compraron, no por la que la enmienda añadió.»*
 
 ## §3.47 · C3 · Arranque de los 7 reflectores de sustitución — el chasis del árbol con `substfc` (2026‑09‑08f)
 
-> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
 > Footprint = **sólo los tres axiomas de Lean**: es trabajo estructural puro.
 
 ### §3.47.1 · ⭐ El `liftfc` parte los siete en dos grupos
@@ -4014,7 +4083,7 @@ q2 y leibniz: ya no es «existe una condición estructural», es *ésta*.
 * `pcc_eval_substfc_wit` con las guardas que `hcond_absorbe_1/2/3` ponen en el contexto
   (⚠️ el `tcFn zero` de `evalSubstfcCode` se cruza con el `termCode zero` del árbol por
   `prf_tc_zero`, congruencia META);
-* `pcc_congr_substfcT_arg2_code` / `_arg3_code` para bajar a los hijos dentro de `Prov`.
+* `pcc_congr_substfcT_arg2_code` / `pcc_congr_substfcT_arg3_code` para bajar a los hijos dentro de Prov.
 
 Como esas guardas dependen del nodo, `PrfH_dotVN` para `STree` se enuncia con un predicado
 `SGuards Γ t T` que las exige **sólo en los nodos `sub`** — el resto del árbol no pide nada.
@@ -4023,7 +4092,7 @@ Como esas guardas dependen del nodo, `PrfH_dotVN` para `STree` se enuncia con un
 
 ## §3.48 · 🏁 C3 · TRES de los SIETE reflectores de sustitución, PROBADOS (2026‑09‑09)
 
-> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
 > Footprint = la base sancionada. **Net‑0 puro.**
 
 ```
@@ -4032,7 +4101,7 @@ pcc_lineWF_tracked_q2_imp       (tag 10)
 pcc_lineWF_tracked_leibniz_imp  (tag 13)
 ```
 
-### §3.48.1 · ⚠️ Corrección: `dotVN` **no** paga la guarda; `tc_objAt` sí
+### §3.48.1 · ⚠️ Corrección: dotVN **no** paga la guarda; tc_objAt sí
 
 §3.47.5 dejó escrito que el caso `sub` de `PrfH_dotVN` lo paga `pcc_eval_substfc_wit`. **Es
 falso**, y el reparto correcto es el mismo que en `Meta/CodeTreeReflect.lean`:
@@ -4040,7 +4109,7 @@ falso**, y el reparto correcto es el mismo que en `Meta/CodeTreeReflect.lean`:
 | pieza | qué prueba | quién paga el nodo `sub` |
 |---|---|---|
 | `PrfH_tc_objAt` | `(E(t))˙ = dotV` | ⭐ **`pcc_eval_substfc_wit`** — y por eso pide las guardas |
-| `PrfH_dotVN` | `dotV = dotN` | **pura congruencia** (`pcc_congr_substfcT_arg2/3_code`) |
+| `PrfH_dotVN` | `dotV = dotN` | **pura congruencia** (`pcc_congr_substfcT_arg2_code`/`pcc_congr_substfcT_arg3_code`) |
 
 El error no costó nada porque salió al escribir el enunciado, pero es de la clase que sí cuesta:
 **una atribución de coste puesta en el plan sin haber abierto la prueba**.
@@ -4071,10 +4140,10 @@ de la enmienda —que §3.41.4 midió con siete `rfl` y que parecía arbitraria�
 * **`SGuards Γ t T`** — las guardas por nodo `sub`, y sólo ahí.
 * **`PrfH_tc_objAt`** — el «código del código» del árbol. ⚠️ El `tcFn zero` de
   `evalSubstfcCode` se cruza con el `termCode zero` del árbol por `prf_tc_zero` (congruencia
-  META, no dentro de `Prov`).
+  META, no dentro de Prov).
 * **`PrfH_dotVN`** — pura congruencia, cinco casos.
 * **`pcc_condDS_of_stree`** — el reflector, mismo esqueleto que `pcc_condD_of_tree`: puente
-  `carc`, la hipótesis reescribe el valor, `tc_objAt` lleva a `dotV`, `dotVN` a `dotN`.
+  `carc`, la hipótesis reescribe el valor, tc_objAt lleva a `dotV`, dotVN a `dotN`.
 * **`pcc_lineWF_tracked_of_stree`** — el cierre genérico de un tag: **declarar su árbol y
   desempaquetar su cascada**.
 * Los tres tags.
@@ -4105,7 +4174,7 @@ cuanto `STree` pueda llevar un nodo `lift`.
 
 ## §3.49 · `pcc_eval_liftfc` · la base, y la medición que reclasifica A5 (2026‑09‑09b)
 
-> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (nuevo).
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (nuevo).
 > Footprint = **sólo los tres axiomas de Lean**.
 
 ### §3.49.1 · ⚠️⚠️ `pcc_eval_liftc` sólo vale a nivel `zero` — y eso pone A5 en la ruta crítica
@@ -4129,7 +4198,7 @@ tiene que cuantificar el nivel, y los casos `atom`/`eq` bajan a `liftsc`/`liftc`
 > 🔑 **A5 —«generalizar `hasWitF` / la familia `liftc` más allá del nivel `zero`»— no es una
 > mejora opcional: es PRERREQUISITO de `pcc_eval_liftfc`, y por tanto de los cuatro tags que
 > faltan.** Llevaba catalogada como generalización suelta en el árbol de tareas (`C3e`, antes
-> `C3d`); está en la ruta crítica.
+> C3d); está en la ruta crítica.
 
 ⚠️ Es la misma clase de error de plan que §3.48.1: **una tarea colocada en el árbol por su
 enunciado, sin haber abierto lo que la consume**. Aquí no costó nada porque salió al medir.
@@ -4143,7 +4212,7 @@ enunciado, sin haber abierto lo que la consume**. Aquí no costó nada porque sa
 * `liftfcT_termCode := rfl` — el puente con `formCode`, que es lo que hace que la imagen sea
   **la que el destino impone** y no una elegida (la lección de §3.44.1, aplicada de entrada).
 * `evalLiftfcCode`, `targetLiftfc`, y su naturalidad bajo `liftFormula`/`substFormula`.
-* **Los dos controles.** Uno **negativo** —`fail_if_success (rfl : liftfcT ṫv ṫX = (liftfc v X)˙)`—
+* **Los dos controles.** Uno **negativo** —fail_if_success `(rfl : liftfcT ṫv ṫX = (liftfc v X)˙)`—
   que es el mismo que `Meta/EvalLiftcPrf.lean` pone sobre `liftcT`/`liftscT`: sin él, un
   enunciado así podría ser cierto **por reflexividad** y no decir nada. Y uno positivo sobre
   `termCode`.
@@ -4159,9 +4228,9 @@ enunciado, sin haber abierto lo que la consume**. Aquí no costó nada porque sa
 | las 8 ecuaciones objeto `prf_liftfc_*` | ✅ ya existen **y ya son genéricas en el nivel** (`Meta/ArithPrf.lean`) |
 | la inducción fuerte (`prf_strong_induction`, `psi_lift_form*`) | ✅ **genérica en `Φ`** |
 | el chasis (predicado + gate + instanciación + paso de 8 ramas) | ⬜ mecánico; el molde es `pcc_eval_substfc_modulo_8`, cuyo paso son **41 líneas** que delegan en ocho `Caso*` |
-| `CasoBot`, `CasoBin 5/7/8` | ⬜ **congruencia pura** sobre las ecuaciones que ya están |
-| `CasoAtom`, `CasoEq` | ⛔ piden `pcc_eval_liftc`/`_liftsc` **a nivel arbitrario** = A5 |
-| `CasoUn 6/9` | ⬜ el caso que sube el nivel |
+| `CasoBot`, `CasoBin` 5/7/8 | ⬜ **congruencia pura** sobre las ecuaciones que ya están |
+| `CasoAtom`, `CasoEq` | ⛔ piden `pcc_eval_liftc`/\_liftsc **a nivel arbitrario** = A5 |
+| `CasoUn` 6/9 | ⬜ el caso que sube el nivel |
 
 ⚠️ **Y el chasis de B3.4 no es reutilizable tal cual**: sus `Caso*` están escritos sobre
 `targetSubstfc v s X`. Hacerlo genérico en el operador —que es la jugada correcta a medio
@@ -4175,9 +4244,9 @@ listInd) están **aguas abajo** de él.
 
 ## §3.50 · 🏁 A5 CERRADA — `pcc_eval_liftc_at` / `pcc_eval_liftsc_at`, con el nivel cuantificado (2026‑09‑09c)
 
-> `Build completed successfully (135 jobs)`. `Meta/LiftcCodePrf.lean` (§7bis, §9bis),
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/LiftcCodePrf.lean` (§7bis, §9bis),
 > `Meta/EvalLiftcPrf.lean` (§7bis), `Meta/StrongInductionPrf.lean` (`PSI_inst2`).
-> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq` (`axiom` retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`),
+> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq` (retirado el 2026‑09‑12 con ADR‑026, era un `axiom`: el ancla pasó a la firma como `[AnclaEq]`, clase retirada después, ADR‑118),
 > que ya estaba en la línea base. **Cero módulos nuevos.**
 
 §3.49.1 dejó A5 en la ruta crítica: `pcc_eval_liftc` está clavado a nivel `zero` y
@@ -4220,9 +4289,9 @@ Entran, en `Meta/LiftcCodePrf.lean`:
 
 | pieza | qué es |
 |---|---|
-| `LIFTC_VARLT_BODY` + `_ok := rfl` + **`pcc_liftc_var_lt_code (c n)`** | la mitad de `ax_liftc_var_lt` que **no estaba dotada**, con la guarda interna `ṅ < ċ` sin descargar |
+| `LIFTC_VARLT_BODY` + `LIFTC_VARLT_BODY_ok := rfl` + **`pcc_liftc_var_lt_code (c n)`** | la mitad de `ax_liftc_var_lt` que **no estaba dotada**, con la guarda interna `ṅ < ċ` sin descargar |
 | **`prf_liftc_varc_cases (c a)`** | la tricotomía empaquetada: `⊢ (a < c) ∨ (c < σa)`, vía `prf_lt_trichotomy` + Leibniz sobre el caso `=` |
-| `PrfH_guard_lt_code` / `PrfH_guard_ge_code` | las dos guardas **reflejadas dentro de `Prov`** por `pcc_lt_tracked` (completitud‑Δ₀ del átomo `<` con argumentos abiertos) |
+| `PrfH_guard_lt_code` / `PrfH_guard_ge_code` | las dos guardas **reflejadas dentro de Prov** por `pcc_lt_tracked` (completitud‑Δ₀ del átomo `<` con argumentos abiertos) |
 
 ⚠️ **Y por eso las dos ramas se escriben en `PrfH`, no en `Prf`.** La disyunción se elimina con
 `prf_or_elim`, así que la guarda entra en el **contexto** y toda la cadena interna la tiene que
@@ -4246,7 +4315,7 @@ escribir ni una pieza de fontanería `PrfH` nueva.
 §9bis (moneda de la **inducción OBJETO**, hipótesis como antecedente): `refl_shapeUn_imp_at`,
 `refl_caso_funcc_imp_at`, `refl_shapeBin_imp_at`, `refl_lista_cons_imp_at`.
 
-> ⚠️ **Las `_imp_at` hay que REESCRIBIRLAS, no basta invocar §7bis.** Sin `PrfH_mono`
+> ⚠️ **Las \_imp_at hay que REESCRIBIRLAS, no basta invocar §7bis.** Sin `PrfH_mono`
 > (deuda **B6b**) una premisa `Prf` no sirve cuando la HI llega como hipótesis objeto: la
 > cadena entera se repite en `PrfH`. Es exactamente lo que hacen sus originales a nivel `zero`,
 > y es el precio recurrente de B6b.
@@ -4264,7 +4333,7 @@ escribir ni una pieza de fontanería `PrfH` nueva.
 interno = `w`, `#0` = el código sobre el que se induce.
 
 De ahí `PHIat`, `hPHIat`, `PHIat_use`, `PHIat_step`, `PHIat_all`,
-`DESCENSO_at_imp` / `_lista_imp` / `_hasWit`, y **el resultado**:
+`DESCENSO_at_imp` / `DESCENSO_at_lista_imp` / `DESCENSO_at_hasWit`, y **el resultado**:
 
 ```
 pcc_eval_liftc_at  (c w s) (h : isTC1 w s) :
@@ -4290,7 +4359,7 @@ tipo …».
 que bajan a `liftsc`/`liftc` **al nivel corriente**.
 
 ⬜ **NO cierra `pcc_eval_liftfc`**: siguen pendientes el chasis de ocho ramas, `CasoBot`,
-`CasoBin 5/7/8` (congruencia pura) y `CasoUn 6/9` (el caso que **sube** el nivel). La tabla de
+`CasoBin` 5/7/8 (congruencia pura) y `CasoUn` 6/9 (el caso que **sube** el nivel). La tabla de
 §3.49.3 queda con una fila menos en rojo, no vacía.
 
 ⛔ Y **no toca el sorte fórmula**: `hasWitF` a nivel arbitrario no entra aquí. A5 se enunció en
@@ -4303,14 +4372,14 @@ el sorte TÉRMINO y su lista.
 
 > `Meta/CodeWitnessPrf.lean` (−1 teorema, −1 nombre en el `export`),
 > `Meta/LiftcCodePrf.lean` y `Meta/EvalLiftcPrf.lean` (comentarios corregidos).
-> `Build completed successfully (135 jobs)` — reconstrucción completa aguas abajo.
+> Entonces: `Build completed successfully (135 jobs)` — reconstrucción completa aguas abajo.
 
 Había **dos** `prf_congr_liftc` en producción, la misma congruencia con el nivel en distinta
 posición:
 
 | dónde | firma | `export` |
 |---|---|---|
-| `CodeWitnessPrf.SinWTs` | `{t₁ t₂} (v : Term) (h : Prf (t₁ ≐ t₂))` — nivel **explícito** | sí |
+| `SinWTs` de `CodeWitnessPrf` | `{t₁ t₂} (v : Term) (h : Prf (t₁ ≐ t₂))` — nivel **explícito** | sí |
 | `NumCodeClosedPrf` | `{c a b} (h : Prf (a ≐ b))` — nivel **implícito** | sí |
 
 Los dos módulos son **independientes** (ninguno importa al otro), así que el duplicado nunca
@@ -4329,12 +4398,12 @@ consumidor de `CodeWitnessPrf` lo necesitara, hay que **bajar el general**, no d
 
 ⚠️ **Y se corrigen los DOS comentarios que a partir del borrado mentirían**: `LiftcCodePrf`
 decía que su `open` es selectivo *por* la ambigüedad, y `EvalLiftcPrf` que
-`SinWTs.prf_congr_liftc` es ambiguo «pero este módulo no usa ese nombre». Los dos pasan a
+`SinWTs.prf_congr_liftc` (borrado aquí mismo, B8b) es ambiguo «pero este módulo no usa ese nombre». Los dos pasan a
 hablar **en pasado**. Es la clase de mentira de docstring más barata de producir y más difícil
 de cazar: el comentario **sobrevive al hecho que describía**, y `check-doc-sync` no la ve
 porque `[B]` sólo detecta símbolos inexistentes.
 
-> ⚠️ **Hallazgo colateral, NO tocado**: `CodeWitnessPrf.SinWTs.prf_congr_liftsc` (✏️ 2026-10-04: se borró después; lo cuenta `Meta/CodeWitnessPrf.lean`) tiene
+> ⚠️ **Hallazgo colateral, NO tocado**: `CodeWitnessPrf.SinWTs.prf_congr_liftsc` (borrado después: ✏️ 2026-10-04, lo cuenta `Meta/CodeWitnessPrf.lean`) tiene
 > **también cero consumidores** en todo el árbol, y ni siquiera está exportado. Es código
 > muerto de la misma clase, pero **no es B8b**: se deja a decisión del autor.
 
@@ -4342,7 +4411,7 @@ porque `[B]` sólo detecta símbolos inexistentes.
 
 ## §3.52 · 🧹 Dedup ADR‑019: SEIS familias duplicadas, y una ambigüedad que yo creé (2026‑09‑09d)
 
-> `Build completed successfully (135 jobs)`. 22 ficheros. Footprint sin cambios.
+> Entonces: `Build completed successfully (135 jobs)`. 22 ficheros. Footprint sin cambios.
 
 B8b (§3.51) dejó apuntado un duplicado colateral. En vez de mirar sólo ése se hizo **barrido
 sistemático** de nombres declarados más de una vez en producción: **28 candidatos, SEIS
@@ -4353,12 +4422,12 @@ duplicados reales**. El resto son homónimos legítimos —`CTree` vs `STree`, l
 
 | familia | diagnóstico | resolución |
 |---|---|---|
-| `SinWTs.prf_congr_liftsc` | ⚠️ **NO era duplicado**: no hay congruencia de `liftsc` en ningún otro sitio. Código muerto liso, cero usos, nunca exportado | **borrado** |
-| `InAxiomsCodePrf.substtc_inv_termCode_of_tc` | copia literal de la de `LineWFTrackedPrf`, **cero usos**: su única mención era el `export` | **borrado** |
+| `SinWTs.prf_congr_liftsc` (borrado) | ⚠️ **NO era duplicado**: no hay congruencia de `liftsc` en ningún otro sitio. Código muerto liso, cero usos, nunca exportado | **borrado** |
+| `InAxiomsCodePrf.substtc_inv_termCode_of_tc` (borrado) | copia literal de la de `LineWFTrackedPrf`, **cero usos**: su única mención era el `export` | **borrado** |
 | `PrfH_congr_liftc` | en `CodeWitnessPrf` (nivel explícito) **y** `NumCodeClosedPrf` (implícito), **las dos exportadas**. Ninguna muerta | **bajada** a `ChainPrf` |
-| `PrfH_lt_subst1`/`_subst2` | en `BoundedInPrf` y `NatOrderPrf`, las dos exportadas | **bajadas** a `ChainPrf` (59 refs cualificadas reescritas) |
+| `PrfH_lt_subst1`/`PrfH_lt_subst2` | en `BoundedInPrf` y `NatOrderPrf`, las dos exportadas | **bajadas** a `ChainPrf` (59 refs cualificadas reescritas) |
 | `prf_syll` | `ReprPrf` está **aguas arriba** de `HasWitTcFnPrf` | sobrevive el de `ReprPrf` |
-| `concat_*`/`in_cons_*` | `Representability` tenía copias literales de `ProofChain` | `import ProofChain` |
+| `concat_*`/`in_cons_*` (las copias, borradas) | `Representability` tenía copias literales de `ProofChain` | `import ProofChain` |
 
 ⭐ **Las dos primeras son la lección de `export`**: estaban ahí **por EXISTENCIA, no por
 consumo** — exactamente lo que AI‑GUIDE §17 prohíbe, y exactamente el patrón de B8b.
@@ -4383,7 +4452,7 @@ perezosa**, que es justo lo que convierte a estos homónimos en trampas. Renombr
 
 ### §3.52.3 · Lo que NO se tocó, y por qué
 
-`substFormula_liftFormula` está en `Full/StrongInduction.lean` **y** en
+`substFormula_liftFormula` está en `Full/StrongInduction.lean` (retirado después con la capa ⊢, ADR‑115) **y** en
 `Meta/StrongInductionPrf.lean`. Pero son **capas distintas**: `Full` no importa nada de `Meta`
 (cierre disjunto). Unificarlas crearía una dependencia entre capas que hoy no existe. **Es el
 precio de la independencia de capas, no un duplicado que retirar.**
@@ -4392,8 +4461,8 @@ precio de la independencia de capas, no un duplicado que retirar.**
 
 ## §3.53 · 🏁🏁 `pcc_eval_liftfc` PROBADO — el frente entero, de la fontanería al teorema (2026‑09‑09e)
 
-> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (1 307 l.).
-> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq` (`axiom` retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`).
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (1 307 l.).
+> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq` (retirado el 2026‑09‑12 con ADR‑026, era un `axiom`: el ancla pasó a la firma como `[AnclaEq]`, clase retirada después, ADR‑118).
 
     pcc_eval_liftfc (v X) : Prf (hasWitF X ⇒ Prov(⌜ liftfc(v̇, Ẋ) = (liftfc v X)˙ ⌝))
 
@@ -4403,8 +4472,8 @@ escala B3.4»; se cerró entero, y todos los tramos compilaron a la primera salv
 ### §3.53.1 · La medición que abrió el frente
 
 ⚠️ `NEXT-STEPS` avisaba: «la familia `liftc` **no tiene aritmetización ni a nivel META**». Cierto
-—no hay `prf_liftc_arith_open`— **pero el dotado no lo necesita**. Los ocho `ax_liftfc_*` están
-en `axioms` y tienen forma `forall_n BODY`, que es exactamente la de `ax_liftc_var_lt`: la receta
+—`prf_liftc_arith_open` no existe — **pero el dotado no lo necesita**. Los ocho `ax_liftfc_*` están
+en `axioms` y tienen forma forall_n BODY, que es exactamente la de `ax_liftc_var_lt`: la receta
 con que A5 la dotó (`prf_substfc_arith_open` + `pcc_axiom_inst*`) vale **tal cual**.
 
 ⭐ Y los tags: `liftfc` recorre los **mismos constructores del KIT** que `formCode` —`botc`=`nulT 2`,
@@ -4431,7 +4500,7 @@ escalera que toca es `PSI_inst3` (el que faltaba, `PSI_inst2`, lo puso A5 el dí
 
 🔑 El **nivel va cuantificado dentro de `Φ`** por la razón de siempre (el gate
 `liftFormula 1 Φ = Φ`) **y por una propia de este frente**: los casos `forallc`/`exc` lo
-**cambian** (`σc`), así que la HI hay que tenerla disponible a un nivel distinto del que se
+**cambian** (σc), así que la HI hay que tenerla disponible a un nivel distinto del que se
 concluye.
 
 ⭐ Reutilizado sin copiar (ADR‑019): `descenso_un`/`descenso_bin1`/`descenso_bin2` de
@@ -4440,7 +4509,7 @@ concluye.
 
 ### §3.53.4 · Los ocho casos
 
-`CasoBotL`, `CasoBinL 5/7/8` y `CasoUnL 6/9` salen de las ecuaciones dotadas de §3.53.1 más el
+`CasoBotL`, `CasoBinL` 5/7/8 y `CasoUnL` 6/9 salen de las ecuaciones dotadas de §3.53.1 más el
 transporte de Leibniz. ⚠️ Los núcleos van en `PrfH` porque **las HI llegan como hipótesis
 OBJETO** (deuda B6b), igual que en `substfc`. ⚠️ Y los dos `Un` son los que **suben el nivel**:
 obligan a normalizar el nivel dotado `⌜σc⌝` a `succcT ċ` (`prf_tc_succ'`) antes de encadenar — el
@@ -4458,7 +4527,7 @@ casilla del símbolo viaja **intacta**.
 
 ## §3.54 · 🏁 C3 · q3 (11) y qconf (19) — CINCO de los SIETE, y el nodo `lift` (2026‑09‑09e)
 
-> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean`.
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean`.
 
 `STree` gana un constructor **`lift : Nat → STree → STree`**
 (`objAt t (lift n a) = liftfc (numeralM n) (a.objAt t)`), con sus casos en las cinco funciones y
@@ -4498,15 +4567,15 @@ esto**, así que esa mitad de D3 queda **a la misma distancia que C3**.
 
 ---
 
-## §3.55 · D3 · de «una obligación sin medir» a **DOS obligaciones sobre un `PsiF` fijo** (2026‑09‑09f‑h)
+## §3.55 · D3 · de «una obligación sin medir» a **DOS obligaciones sobre un PsiF fijo** (2026‑09‑09f‑h)
 
-> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` (720 l.),
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` (720 l.),
 > `Meta/BdAllIntroPrf.lean`, `Meta/SubstCodeOpenPrf.lean`. Footprint: la base sancionada, y
 > `hPinv_chainOkBPsi` sale con **sólo los tres axiomas de Lean**.
 
 D3 estaba reducida desde §3.19 a `hC_dot`, y §3.41 la redujo a **`DEUDA_chainOkBDot`**. Esta
 sesión la ataca por partes. Estado al cerrar: **`DEUDA_chainOkBDot_of_two` / `d3_prf_of_two`**,
-o sea D3 desde **`hwP`** y **`hbdAll`**, y nada más.
+o sea D3 desde **`hwP`** y **hbdAll**, y nada más.
 
 ### §3.55.1 · ⛔ El destino NO reduce, y ésa es la primera lección
 
@@ -4528,10 +4597,10 @@ Con el destino abierto, la comparación es:
     destino     : bdAllCode (lencT (liftc 0 ṗ)) Psi    ← ACCESOR DOTADO, y pre‑`liftc`‑ado
     bdAll_intro : bdAllCode (tcFn (lenc p))      Psi'   ← REFLEXIÓN PURA
 
-⛔ **Y ese salto no se puede dar fuera de `Prov`**: que `(lenc p)˙` y `lencT ṗ` sean iguales es
+⛔ **Y ese salto no se puede dar fuera de Prov**: que `(lenc p)˙` y `lencT ṗ` sean iguales es
 **la ecuación de RASTREO**, y postularla a nivel objeto es lo que hizo la teoría INCONSISTENTE
 (ADR‑012/013, `ax_tc_cons`). Lo que sí vale es la **evaluación provable**: `pcc_eval_lenc`, y el
-cambio de cota **dentro** de `Prov` con `PrfH_bdAllCode_congr_bnd`.
+cambio de cota **dentro** de Prov con `PrfH_bdAllCode_congr_bnd`.
 
 ⭐ No hubo que inventar maquinaria: ese lema **ya existía** y es el mismo gesto que
 `pcc_argsIn_trackedC` y `pcc_wfAll1_trackedC` hacen con sus listas. Aquí sólo se instancia
@@ -4560,11 +4629,11 @@ con `c := nil` quedan tres, empaquetados con `cons` y leídos con `carc`/`cdrc`.
 `simp`. **Falso**: `carc` es símbolo objeto. ⇒ **el empaquetado no es gratis**, al revés de lo
 que sugiere leer `argsInPair`: hay que arrastrar `pcc_carcD_bridge_cons`/`pcc_cdrcD_bridge_cons`.
 
-### §3.55.5 · ⭐⭐ El hallazgo que reordenó el frente: los dos `PsiF` van JUNTOS
+### §3.55.5 · ⭐⭐ El hallazgo que reordenó el frente: los dos PsiF van JUNTOS
 
-Intenté fijar el `PsiF` del `bdAll` **interior** por separado y no se puede, por una razón
-estructural: el código de `boundedPremsIn` que D3 necesita es el **sub‑término** del `PsiF` del
-`bdAll` **exterior**, y lleva las capas de `liftc`/`substCodeT` que le impone **su posición bajo
+Intenté fijar el PsiF del bdAll **interior** por separado y no se puede, por una razón
+estructural: el código de `boundedPremsIn` que D3 necesita es el **sub‑término** del PsiF del
+bdAll **exterior**, y lleva las capas de `liftc`/`substCodeT` que le impone **su posición bajo
 los binders del exterior**.
 
 ⇒ **de fuera adentro**. §8 hace el exterior: `chainOkBPsi`, su descomposición por `rfl`, y
@@ -4608,8 +4677,8 @@ punteado**: invariante a todo nivel, su `liftc` colapsa, y el cuerpo no tiene li
 |---|---|
 | toda la cadena aguas abajo, §3–§9 del módulo | ✅ |
 | **`hwP`** — testigo del cuerpo (`hasWitF (bdAllBndCtx …)`) | ⬜ |
-| **`hbdAll`** — `pcc_bdAll_intro` con su `hbody` | ⬜ |
-| ↳ `hbody`(a) = `pcc_lineWF_tracked` | ⬜ **5 de 7** (`modulo_2`) |
+| **hbdAll** — `pcc_bdAll_intro` con su `hbody` | ⬜ |
+| ↳ `hbody`(a) = `pcc_lineWF_tracked` | ⬜ **5 de 7** (`pcc_lineWF_tracked_modulo_2`) |
 | ↳ `hbody`(b) = reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta ensamblar |
 
 ⇒ **`prf_hasWitF_liftfc` desbloquea las dos ramas**: cierra `ind`/`listInd` de C3 y con ellos
@@ -4621,7 +4690,7 @@ Se lanzó un panel de cinco mediciones + síntesis (agentes **read‑only**, sin
 `hPinv`. Balance honesto:
 
 * ✅ **midieron bien**: estructura nodo a nodo con los niveles correctos, inventarios con
-  `file:line`, y ⭐ **cazaron un sobreclaim en un docstring propio** (§4 de `SubstCodeOpenPrf`
+  file:line, y ⭐ **cazaron un sobreclaim en un docstring propio** (§4 de `SubstCodeOpenPrf`
   decía «la obligación `hPinv` de TODA aplicación» cuando está **desplazado un índice** y es de
   nivel término). Tenían razón; está corregido. También detectaron una **contradicción entre tres
   de sus propias mediciones** y dijeron cuál era la buena.
@@ -4637,22 +4706,22 @@ prueba, tratar el veredicto como hipótesis.**
 
 ---
 
-## §3.56 · ⛔ D3 · el `PsiF` de §8 **no era natural** — y con el dotado caen SIETE de las nueve (2026‑09‑09i)
+## §3.56 · ⛔ D3 · el PsiF de §8 **no era natural** — y con el dotado caen SIETE de las nueve (2026‑09‑09i)
 
-> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §10 (888 l.),
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §10 (888 l.),
 > `Meta/LiftcCodePrf.lean` (+`substTerm_formCode`). Footprint: la base sancionada; las piezas
 > nuevas salen con **sólo los tres axiomas de Lean**.
 
-§3.55 dejó D3 en dos obligaciones y dio `hbdAll` por «aplicar `pcc_bdAll_intro` y ya». Al ir a
+§3.55 dejó D3 en dos obligaciones y dio hbdAll por «aplicar `pcc_bdAll_intro` y ya». Al ir a
 aplicarlo aparece una obstrucción que **no es de esfuerzo: es de enunciado**.
 
-### §3.56.1 · ⛔ `hPl` es FALSA para el `PsiF` de §8
+### §3.56.1 · ⛔ `hPl` es FALSA para el PsiF de §8
 
 `pcc_bdAll_intro` pide que el cuerpo sea **natural**:
 
     hPl : ∀ k q, liftTerm k (PsiF q) = PsiF (liftTerm k q)
 
-y con `PsiF q := chainOkBPsi (tcFn q) q` **es falsa**. ⚠️ No es conjetura — el núcleo está
+y con PsiF q := `chainOkBPsi (tcFn q) q` **es falsa**. ⚠️ No es conjetura — el núcleo está
 certificado por el compilador, en dos `rfl`:
 
     liftTerm 0 (substCodeT 1 w #1)                = liftTerm 0 w        -- el HUECO entrega el testigo
@@ -4668,7 +4737,7 @@ manda cada variable del argumento **al hueco `W` o a un `varc` cerrado, según s
 > 📐 **Registrada como [ADR‑021](../DECISIONS.md)** el 2026‑09‑10, y como **MANDATORY M‑7**: no es
 > preferencia de estilo, es que la alternativa está **refutada por el compilador**.
 
-> **El `PsiF` de `pcc_bdAll_intro` se escribe con símbolos de función OBJETO** —`substfc`,
+> **El PsiF de `pcc_bdAll_intro` se escribe con símbolos de función OBJETO** —`substfc`,
 > `liftc`, `tcFn`, `nthcT`— **y nunca con un `substCodeF` aplicado a una fórmula que contenga el
 > parámetro.** Los símbolos objeto son `Term.func`: `liftTerm`/`substTerm` los atraviesan y la
 > naturalidad es `simp`. `substCodeF` es una función de **Lean** que recursa sobre la fórmula, y
@@ -4678,14 +4747,14 @@ manda cada variable del argumento **al hueco `W` o a un `varc` cerrado, según s
 (cdrc p)) (varc 0̄)) (tcFn (carc p))` — **todo objeto**, y por eso sus `liftT_`/`substT_` eran dos
 `simp only`. La condición estaba cumplida, pero **no estaba escrita**; por eso no se vio venir.
 
-### §3.56.3 · ⭐⭐ La salida: el `PsiF` DOTADO, y el puente al revés
+### §3.56.3 · ⭐⭐ La salida: el PsiF DOTADO, y el puente al revés
 
     chainOkBPsiDot q := substfc 1̄ (liftc 0 (tcFn q)) ⌜lineOkB nil #1 #0⌝
 
 Todo objeto, y —la clave— **el código de la fórmula es CERRADO y no contiene `q`**: el parámetro
 entra sólo por `tcFn q`. `hPl` y `hPs` salen en un `simp only` cada una.
 
-Y el paso a `chainOkBPsi` es **`prf_substfc_arith_open` al nivel 1**, dentro de `Prov`. ⭐ Es el
+Y el paso a `chainOkBPsi` es **`prf_substfc_arith_open` al nivel 1**, dentro de Prov. ⭐ Es el
 puente de §3.55.1 **usado al revés**: allí se abría el destino opaco hacia el gemelo computable;
 aquí se cierra el gemelo computable hacia el opaco, que es el que sabe ser natural. Los dos hacen
 falta, y ninguno sustituye al otro:
@@ -4701,7 +4770,7 @@ falta, y ninguno sustituye al otro:
 |---|---|
 | `hCl`, `hCs` | `chainOk nil q` es un **átomo** (`Formula.atom sym!"chainOk" [nil, q]`): `simp` |
 | `hbl`, `hbs` | `lenc` es símbolo objeto: `simp` |
-| `hPl`, `hPs` | §3.56.3 — y eran **falsas** con el `PsiF` de §8 |
+| `hPl`, `hPs` | §3.56.3 — y eran **falsas** con el PsiF de §8 |
 | **`hwPsi`** | ⭐ **cae entera con la rama C de ADR‑020**, sin trabajo nuevo |
 
 ⭐ El detalle de `hwPsi` es el dividendo de haber dotado el cuerpo: `prf_hasWitF_substfc` pide
@@ -4709,7 +4778,7 @@ falta, y ninguno sustituye al otro:
 (`prf_hasWitF_fc`) y el sustituyente un `liftc` de un punteado (`prf_hasWit_tcFn` +
 `CRIT_hasWit_lift`)—. **Sobre el `substCodeF` de §8 no había absolutamente nada que aplicar.**
 
-⇒ **`d3_prf_of_body`: D3 desde TRES obligaciones**, y las tres sobre el `PsiF` dotado: `hwP`,
+⇒ **`d3_prf_of_body`: D3 desde TRES obligaciones**, y las tres sobre el PsiF dotado: `hwP`,
 `hPsiId` y `hbody`.
 
 ### §3.56.5 · El ladrillo que faltaba, y dónde tuvo que vivir
@@ -4749,7 +4818,7 @@ necesario; no era suficiente.
 
 ## §3.57 · 🏁 D3 · `hPsiId` PROBADO — la TERCERA variante de la familia, y D3 a DOS obligaciones (2026‑09‑10)
 
-> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §5,
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §5,
 > `Meta/BdAllIntroPrf.lean`, `Meta/D3ChainDotPrf.lean` §11 (978 l.).
 > Footprint: `hPsiId_chainOkBPsiDot` con **sólo los tres axiomas de Lean**;
 > `d3_prf_of_hbody`, con la base sancionada.
@@ -4774,7 +4843,7 @@ hueco: la identidad sale con testigo **libre**. Actuando **por debajo** cambian 
    `substtc` la sustituye **por el testigo** ⇒ la identidad sólo vale si el testigo **es esa
    misma variable**. Entra la hipótesis `u ≐ varc v̄`.
 2. **El hueco queda una unidad más arriba**, así que la condición de variables libres sube a
-   `liftFormula (v+2) φ = φ` — la de `substfc_inv_substCodeF`, no la de `_at`.
+   `liftFormula (v+2) φ = φ` — la de `substfc_inv_substCodeF`, no la de `substfc_inv_substCodeF_at`.
 
 ⭐⭐ **Y hay una tercera, que es la que FIJA el índice.** Si el código se construyera a `v+2` o
 más, entre el nivel actuante y el hueco quedarían variables `w` con `v < w < v+2`, que `substtc`
@@ -4786,8 +4855,8 @@ cosmético (§3.55.6 y §3.56.6 fueron las otras dos).
 
 | pieza | módulo | qué |
 |---|---|---|
-| `prf_liftc_varc_numeral` | `SubstCodeOpenPrf` §5 | `liftc 0 ⌜v_k⌝ ≐ ⌜v_{k+1}⌝`, **genérico en el nivel** |
-| `substtc_id_substCodeT` / `_Ts` | `SubstCodeOpenPrf` §5 | sorte TÉRMINO |
+| `prf_liftc_varc_numeral` | `SubstCodeOpenPrf` §5 | liftc 0 ⌜v_k⌝ ≐ ⌜v_{k+1}⌝, **genérico en el nivel** |
+| `substtc_id_substCodeT` / `substtc_id_substCodeTs` | `SubstCodeOpenPrf` §5 | sorte TÉRMINO |
 | `substfc_id_substCodeF` | `BdAllIntroPrf` | sorte FÓRMULA |
 | `hPsiId_chainOkBPsiDot` | `D3ChainDotPrf` §11 | la instancia de D3 |
 
@@ -4834,7 +4903,7 @@ caso `v = 0`, que es lo que autorizó el dedup.
 |---|---|
 | §3–§10 y **ocho de las nueve** obligaciones del chasis | ✅ |
 | **`hwP`** — `hasWitF (bdAllBndCtx (chainOkBPsi …))` | ⬜ **no depende de C3** |
-| **`hbody`**(a) — reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** (`modulo_2`) |
+| **`hbody`**(a) — reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** (`pcc_lineWF_tracked_modulo_2`) |
 | **`hbody`**(b) — reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta ensamblar |
 
 ⇒ **`d3_prf_of_hbody`: D3 desde `hwP` y `hbody`.** Sólo `hbody`(a) sigue aguas abajo de C3, y su
@@ -4845,7 +4914,7 @@ desbloqueo es `prf_hasWitF_liftfc`.
 
 ## §3.58 · 🏁🏁 D3 · `hwP` PROBADO **en cuatro líneas** — y D3 queda en **UNA sola obligación** (2026‑09‑10)
 
-> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §12.
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §12.
 > `hwP_chainOkBPsi` con **sólo los tres axiomas de Lean**; `d3_prf_of_body_only`, con la base
 > sancionada. ✅ Y la **CI en verde** (2 m 53 s con caché).
 
@@ -4862,7 +4931,7 @@ El KIT de ADR‑020 lo abre en dos (`prf_hasWitF_forallc` + `prf_hasWitF_implc`)
 * la **cota** —un átomo de `lt` entre dos **variables de código**— la cierra **`hw_auto` sola**;
 * el **cuerpo** es donde §3.56 cobra.
 
-### §3.58.2 · ⭐⭐ Y el cuerpo sale del `PsiF` DOTADO, transportado
+### §3.58.2 · ⭐⭐ Y el cuerpo sale del PsiF DOTADO, transportado
 
 `hwPsi_chainOkBPsiDot` —el testigo del cuerpo **dotado**, que §3.56.4 obtuvo **gratis** de la rama
 C de ADR‑020— se transporta al cuerpo **computable** por el mismo puente `chainOkBPsiDot_eq`, esta
@@ -4887,11 +4956,11 @@ las tres tenía por dónde pasar.
     hbody : ∀ q i, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
               provFromCode (substfc 0 (tcFn i) (chainOkBPsiDot q))))
 
-y se parte —por `chainOkBPsi_split` (§3.55.5), que conecta los dos `PsiF` **por construcción**— en:
+y se parte —por `chainOkBPsi_split` (§3.55.5), que conecta los dos PsiF **por construcción**— en:
 
 | mitad | estado | ¿depende de C3? |
 |---|---|---|
-| **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`modulo_2`) | ✅ **sí** — faltan `ind` (18) y `listInd` (20) |
+| **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`pcc_lineWF_tracked_modulo_2`) | ✅ **sí** — faltan `ind` (18) y `listInd` (20) |
 | **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta **ensamblar** | ⛔ **ver §3.59.2** |
 
 ⚠️⚠️ **CORREGIDO EN §3.59.2 (2026‑09‑10).** Aquí se dijo que **(b) no depende de C3 en absoluto**.
@@ -4908,8 +4977,8 @@ cuatro tramos ha pasado a **una** obligación, y las paradas intermedias dicen p
 
 | tramo | de → a | la pieza que lo movió |
 |---|---|---|
-| §3.55 | sin medir → **2** | el destino abierto y su forma fijada por `rfl`; la cota **dentro de `Prov`**; `hPinv` genérico |
-| §3.56 | 2 → **3** ⚠️ | ⛔ el chasis **no era aplicable**: `hPl` era FALSA ⇒ el `PsiF` **dotado** |
+| §3.55 | sin medir → **2** | el destino abierto y su forma fijada por `rfl`; la cota **dentro de Prov**; `hPinv` genérico |
+| §3.56 | 2 → **3** ⚠️ | ⛔ el chasis **no era aplicable**: `hPl` era FALSA ⇒ el PsiF **dotado** |
 | §3.57 | 3 → **2** | `hPsiId` con la **tercera variante** de la familia |
 | §3.58 | 2 → **1** | `hwP` transportando el testigo por el puente de §3.56 |
 
@@ -4921,13 +4990,13 @@ obligaciones abiertas no mide el progreso: medía una cadena que no cerraba.
 
 ## §3.59 · D3 · la COMPOSICIÓN de dos `substfc`, `hbody` partido — y ⛔ una CORRECCIÓN de §3.58.3 (2026‑09‑10)
 
-> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §6,
+> Entonces: `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §6,
 > `Meta/BdAllIntroPrf.lean`, `Meta/D3ChainDotPrf.lean` §13.
 > `substfc_chainOkBPsiDot` con **sólo los tres axiomas de Lean**.
 
 ### §3.59.1 · La pieza: el DOS HUECOS
 
-`pcc_bdAll_intro` entrega su `hbody` sobre `substfc 0̄ (tcFn i) (PsiF q)`, y el `PsiF` **dotado**
+`pcc_bdAll_intro` entrega su `hbody` sobre substfc 0̄ (tcFn i) (PsiF q), y el PsiF **dotado**
 de [ADR‑021](../DECISIONS.md) es él mismo un `substfc` sobre un `formCode` cerrado. Componerlos es
 el paso obligado antes de poder mirar el cuerpo — y el resultado **no es otro `substCodeF`**:
 tiene **DOS** huecos rellenos, la variable `v+1` por `W` y la `v` por `u`. Eso pide función meta
@@ -4956,7 +5025,7 @@ símbolo `premsOf` **DOTADO**:
     lencT (premsOfT (nthcT (liftc 0 W) (varc 1̄)))
 
 y `pcc_bdAll_intro` entrega la cota como **reflexión pura**, así que hay que cruzar —dentro de
-`Prov`— la cadena
+Prov— la cadena
 
 | eslabón | estado |
 |---|---|
@@ -5005,7 +5074,7 @@ haciendo falta. Lo que no valía era la **estimación** de que bastaban.
 |---|---|
 | `prf_hasWit_liftc` (`SubstfcWitnessPrf`) | sorte **TÉRMINO** y **sólo a nivel `zero`** |
 | `prf_hasWit_liftcT` / `liftscT` (`LiftcCodePrf`) | sobre el **constructor dotado** `liftcT`, no sobre `liftfc` |
-| `pcc_eval_liftfc` (§3.53) | la **evaluación** dentro de `Prov` — no da el testigo |
+| `pcc_eval_liftfc` (§3.53) | la **evaluación** dentro de Prov — no da el testigo |
 
 ⛔ **Ni la mitad TÉRMINO a nivel arbitrario existe.** Y el molde, `prf_hasWitF_substfc`, es la
 culminación de la inducción `PHIF` —§16 a §22 de un módulo de **2 088 líneas**—, conjuntiva sobre
@@ -5031,7 +5100,7 @@ invertido en probarla.
 
 ## §3.61 · 🏁 `prf_hasWitF_liftfc` PROBADO — y por qué la medida de §3.60 falló **a la baja** (2026‑09‑10d)
 
-> `Build completed successfully (139 jobs)`. `Meta/LiftfcWitnessPrf.lean` (nuevo, 657 l.).
+> Entonces: `Build completed successfully (139 jobs)`. `Meta/LiftfcWitnessPrf.lean` (nuevo, 657 l.).
 > Footprint **net‑0 PURO**: `[propext, Classical.choice, Quot.sound]`.
 
 §3.60 midió esta deuda y la clasificó como **«un FRENTE, sin atajo»**, con el molde
@@ -5065,8 +5134,8 @@ con el **nivel libre**, que es la guarda que §3.60.1 midió copiándola del **c
 ### §3.61.3 · 🔑 Por qué la estimación fue pesimista, y qué se aprende
 
 El molde **ya había pagado y exportado** toda la maquinaria genérica: `hasWitArgs`,
-`prf_hasWit_varc`, `prf_hasWit_funcc`, `prf_hasWitArgs_nil`/`_cons`, `prf_hasWitF_bot`/`_atomc`/`_eqc`,
-`prf_hasWitF_un`/`_bin`, las **ocho** inyecciones, `nilOrCons`. Lo que quedaba por escribir eran las
+`prf_hasWit_varc`, `prf_hasWit_funcc`, `prf_hasWitArgs_nil`/`prf_hasWitArgs_cons`, `prf_hasWitF_bot`/`prf_hasWitF_atomc`/`prf_hasWitF_eqc`,
+`prf_hasWitF_un`/`prf_hasWitF_bin`, las **ocho** inyecciones, `nilOrCons`. Lo que quedaba por escribir eran las
 **armazones**, no la maquinaria.
 
 ⇒ **Medir un frente por el TAMAÑO del molde sobreestima**, porque el molde incluye lo que ya está
@@ -5077,7 +5146,7 @@ molde, no de su `wc -l`.
 
 ## §3.62 · 🏁🏁🏁 **C3 CERRADO**: `pcc_lineWF_tracked` es INCONDICIONAL (2026‑09‑10e)
 
-> `Build completed successfully (139 jobs)`. `Meta/SubstTreeReflect.lean` §10bis + §11ter.
+> Entonces: `Build completed successfully (139 jobs)`. `Meta/SubstTreeReflect.lean` §10bis + §11ter.
 > Footprint = la base sancionada.
 
 ### §3.62.1 · Los dos últimos reflectores: `ind` (18) y `listInd` (20)
@@ -5090,7 +5159,7 @@ Con §3.61 en la mano, los dos tags que §3.54 había medido como bloqueados sal
 ⚠️ **Su dotado es el punto delicado del nodo**, y va por la **VÍA NUMERAL** (§3.44): la ecuación
 directa `tcFn (termCodeM x) ≐ termCode (termCodeM x)` es **la que se retiró por inconsistente**
 (`ax_tc_cons`). Se prueba fuera en forma numeral (`prf_termCodeM_numeral`, `prf_tc_termCodeM`) y se
-convierte **dentro de `Prov`** con D1 dotando el puente. En `PrfH_dotVN` el caso es pura congruencia
+convierte **dentro de Prov** con D1 dotando el puente. En `PrfH_dotVN` el caso es pura congruencia
 y en `SGuards` es `True` — el nodo **no tiene hijos**, luego no hay guarda que cobrar.
 
 Los dos árboles se casan **por `rfl` con `ax_lineWF_ind` y `ax_lineWF_listInd` ENTEROS**, cascada de
@@ -5152,7 +5221,7 @@ Tres cosas pasan en `hA_lineWFDotAt`:
 1. `chainOk → chainOkB` y `∀`‑elim en `i` ⇒ `lineWF (nthc q i)`.
 2. `pcc_lineWF_tracked` ⇒ `Prov(⌜lineWF (nthc q i)⌝)`, con el código en **reflexión pura**.
 3. ⚠️ **La MONEDA otra vez** (§3.55.2): el destino pide el **accesor dotado** `nthcT q̇ i̇`. El salto
-   lo paga `pcc_eval_nthc` **dentro de `Prov`** (simetría interna + Leibniz codificado), y el `liftc`
+   lo paga `pcc_eval_nthc` **dentro de Prov** (simetría interna + Leibniz codificado), y el `liftc`
    que el binder impone **colapsa** con `prf_liftc_tcFn`.
 
 Dos mediciones por `rfl` **antes** de escribir la prueba, según la regla de §3.44:
@@ -5164,7 +5233,7 @@ Dos mediciones por `rfl` **antes** de escribir la prueba, según la regla de §3
 
 ## §3.63 · ⭐⭐ `premsOf` **SÍ** se evalúa — la obstrucción de §3.59.2, levantada (2026‑09‑10e)
 
-> `Build completed successfully (139 jobs)`. `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean`
+> Entonces: `Build completed successfully (139 jobs)`. `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean`
 > (nuevos, 208 + 417 l.). Footprint **net‑0 PURO** en los dos.
 
 ### §3.63.1 · Lo que decía la obstrucción, y qué le faltaba
@@ -5211,7 +5280,7 @@ veces la misma cadena; escribirla una vez con `k`, `m` y `R` abstractos la hace 
 
 `ax_lineWF_mp` es el **único** de los 21 cuyo bicondicional **no lleva condición estructural**: es
 `lwfVar ⇔ lencMp`, sin `Formula.and`. La razón está en su propio comentario en `Minimal/Axioms.lean`:
-la fidelidad de `mp` **la liga íntegramente `ax_premsOf_mp`** (exige `implc premA concl` y `premA`
+la fidelidad de `mp` **la liga íntegramente `ax_premsOf_mp`** (exige implc premA concl y premA
 entre las premisas de contexto), así que el `lineWF` no tiene nada que añadir.
 
 ⇒ **dos** envoltorios (`prf_premsOf_tag_and` para los veinte, `prf_premsOf_tag_plain` para `mp`), no
@@ -5225,20 +5294,20 @@ Esto es el nivel **OBJETO**. Faltan tres piezas, y ahora se sabe cuáles:
 | pieza | qué es | apoyo que ya existe |
 |---|---|---|
 | **B1** | `Prov(premsOfT ṫ ≐ (premsOf t)˙)` — la reflexión **punteada** | la ruta de `pcc_eval_carc` (axioma **codificado** + `pcc_dot_cons`), y §3.63 da el `t ≐ etaTag t m k` |
-| **B2** | el puente de la **cota** dentro de `Prov`: `lencT (premsOfT (nthcT q̇ i̇)) ↦ (lenc (premsOf (nthc q i)))˙` | `pcc_eval_nthc` ✅ · **B1** ⬜ · `pcc_eval_lenc` ✅ |
-| **B3** | el `pcc_bdAll_intro` **interior** de `boundedPremsIn` (9 obligaciones, triple empaquetado) | el `PsiF` exterior (§3.55.4) y `chainOkBPsi_split`; el núcleo abstracto de §5–§6 |
+| **B2** | el puente de la **cota** dentro de Prov: `lencT (premsOfT (nthcT q̇ i̇)) ↦ (lenc (premsOf (nthc q i)))˙` | `pcc_eval_nthc` ✅ · **B1** ⬜ · `pcc_eval_lenc` ✅ |
+| **B3** | el `pcc_bdAll_intro` **interior** de `boundedPremsIn` (9 obligaciones, triple empaquetado) | el PsiF exterior (§3.55.4) y `chainOkBPsi_split`; el núcleo abstracto de §5–§6 |
 
 ⇒ Con B1+B2+B3, `hbody_of_halves` cierra `hbody`, `d3_prf_of_halves` cierra **D3**, y se retira
 `axiom d3`. **No hay nada más aguas abajo.**
 
 ---
 
-## §3.64 · 🏁🏁 **B1** · `premsOf` REFLEJADO dentro de `Prov` — las 21 ramas (2026‑09‑10f)
+## §3.64 · 🏁🏁 **B1** · `premsOf` REFLEJADO dentro de Prov — las 21 ramas (2026‑09‑10f)
 
-> `Build completed successfully (141 jobs)`. `Meta/PremsOfDotPrf.lean` (nuevo, 1 059 l.).
+> Entonces: `Build completed successfully (141 jobs)`. `Meta/PremsOfDotPrf.lean` (nuevo, 1 059 l.).
 > Footprint = la base sancionada.
 
-§3.63 evaluó `premsOf` a nivel **OBJETO**. Esto lo cruza a `Prov`:
+§3.63 evaluó `premsOf` a nivel **OBJETO**. Esto lo cruza a Prov:
 
     ⊢ lineWF t  ⇒  Prov( ⌜ premsOf ṫ = (premsOf t)˙ ⌝ )
 
@@ -5251,7 +5320,7 @@ le faltaba (§13.1/§13.3 de `D3ChainDotPrf`).
 2. abrir hacia el gemelo computable (`prf_substfc_arith_open`) y **casar por `rfl`**;
 3. los `liftc` de los testigos **colapsan** (`prf_liftc_tcFn`);
 4. los `substfc` externos, distribuidos sobre el código explícito;
-5. los subtérminos **cerrados** (`k̄`, `nil`, el `5̄` de `implc`), dotados — **a nivel objeto**;
+5. los subtérminos **cerrados** (k̄, `nil`, el `5̄` de `implc`), dotados — **a nivel objeto**;
 6. y el **transporte en cascada** `consT ẋ ẏ ↦ (cons x y)˙`.
 
 ⭐ **El paso 6 es lo único que hubo que inventar**, y sale genérico: `pcc_rw_dot_consN` recorre una
@@ -5274,7 +5343,7 @@ Cuatro plantillas (una por aridad, con RHS `nil`) + `gen` + `mp` + 21 instancias
 
 ---
 
-## §3.65 · 🏁🏁 **B2** · LA COTA de `hbody`(b), cruzada dentro de `Prov` (2026‑09‑10f)
+## §3.65 · 🏁🏁 **B2** · LA COTA de `hbody`(b), cruzada dentro de Prov (2026‑09‑10f)
 
 > `Meta/D3BodyPrf.lean` §2–§3. Footprint = la base sancionada.
 
@@ -5314,8 +5383,8 @@ consumirá cuando B3 produzca el `bdAllCode`.
 
 ### §3.66.1 · ⭐⭐ ADR‑021 se cumple **sola** aquí — y la regla se AFINA
 
-En el chasis EXTERIOR (§3.56) la obligación `hPl` era **FALSA** para el `PsiF` que casaba el
-destino, y de ahí salió ADR‑021: hubo que escribir un `PsiF` **dotado** y puentear dentro de `Prov`.
+En el chasis EXTERIOR (§3.56) la obligación `hPl` era **FALSA** para el PsiF que casaba el
+destino, y de ahí salió ADR‑021: hubo que escribir un PsiF **dotado** y puentear dentro de Prov.
 Aquí **no hace falta**, y la razón es estructural:
 
 > En `premsPsi q i = substCodeF2 1 (liftc 0 i̇) (liftc 0 (liftc 0 q̇)) premsBodyF`, el cuerpo
@@ -5356,28 +5425,28 @@ variable al hueco o a un `varc` cerrado **según su nivel** ⇒ el `liftTerm` la
 ⚠️ **La única fricción, y está localizada**: §5 escribe el testigo del `∃` como `liftc 0 ẏ`, y lo
 que `substCodeF2` produce en esa posición es el **accesor dotado**
 `nthcT (premsOfT (nthcT q̇ i̇)) j̇`. Es **la misma moneda de §3.55.2 por CUARTA vez**, y las dos
-piezas que la cruzan **ya existen**: **B2** lleva `premsOfT (nthcT q̇ i̇)` a `L̇`, y
+piezas que la cruzan **ya existen**: **B2** lleva `premsOfT (nthcT q̇ i̇)` a L̇, y
 `pcc_eval_nthc L j` lleva `nthcT L̇ j̇` a `(nthc L j)˙` **bajo `j < lenc L`** — que es exactamente
 la cota del `∀` interior, o sea una hipótesis que el `hbody` **tiene a mano**.
 
-⇒ Lo que hace falta es **generalizar `pcc_bdCarcLt_reflect` en su `Phic`** (hoy fijo a
+⇒ Lo que hace falta es **generalizar `pcc_bdCarcLt_reflect` en su Phic** (hoy fijo a
 `bdCarcLtPhic`), porque el hueco a reescribir queda **bajo el binder del `exc`** y `pcc_rw` no
-llega ahí. `PrfH_bdEx_intro_open` ya es genérico en `Phic`, así que la generalización es de la
+llega ahí. `PrfH_bdEx_intro_open` ya es genérico en Phic, así que la generalización es de la
 envoltura, no del núcleo.
 
 ---
 
 ## §3.67 · 🏁🏁🏁🏁 **D3 PROBADA — y `axiom d3` RETIRADO** (2026‑09‑10g)
 
-> `Build completed successfully (141 jobs)`. `Meta/PremsBdAllPrf.lean` §9bis–§10 +
+> Entonces: `Build completed successfully (141 jobs)`. `Meta/PremsBdAllPrf.lean` §9bis–§10 +
 > `Meta/GodelTwo.lean`. Footprint de `d3_prf_real` = la base sancionada.
 > **5 `axiom` de Lean** (eran 7).
 
     d3_prf_real (φ) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))
 
 La **tercera condición de derivabilidad** de Hilbert‑Bernays‑Löb es un **teorema**. Con ella,
-`GodelTwo.d3` deja de ser `axiom` y pasa a `theorem`: ⇒ **la cadena D1/D2/D3 no postula ninguna de
-las tres**, y `goedel_second'` ya no depende de `d3`.
+`GodelTwo.d3` (retirado después con la capa ⊢, ADR‑115) deja de ser `axiom` y pasa a `theorem`: ⇒ **la cadena D1/D2/D3 no postula ninguna de
+las tres**, y `goedel_second'` (retirado al día siguiente, 2026‑09‑11) ya no depende de `d3`.
 
 ### §3.67.1 · La novena obligación (`DEUDA_premsBody`)
 
@@ -5387,15 +5456,15 @@ y la previsión acertó punto por punto:
 * el cuerpo se parte por el `lor` (`prf_substfc_or`);
 * el disyunto **izquierdo** (`In y nil`) es **vacuo** —`prf_not_in_nil`— y su código queda
   **arbitrario**: no hay que calcularlo;
-* el **derecho** lo refleja `pcc_bdCarcLt_reflect`, **generalizado en su `Phic`**;
+* el **derecho** lo refleja `pcc_bdCarcLt_reflect`, **generalizado en su Phic**;
 * la fricción es **la MONEDA de §3.55.2 por CUARTA vez**, y sus dos piezas ya existían: **B2**
-  lleva `premsOfT (nthcT q̇ i̇)` a `L̇`, y `pcc_eval_nthc L j` lleva `nthcT L̇ ȷ̇` a `(nthc L j)˙`
+  lleva `premsOfT (nthcT q̇ i̇)` a L̇, y `pcc_eval_nthc L j` lleva `nthcT L̇ ȷ̇` a `(nthc L j)˙`
   bajo `j < lenc L` — que es **exactamente** la cota del `∀` interior.
 
 ⛔ **Por qué había que generalizar §5**: el hueco a reescribir vive **bajo el binder del `exc`** y
 `pcc_rw` (que reescribe con `substfc zero`) **no llega ahí**. El sitio donde el salto **sí** se
 puede dar es la obligación `hphi` — el cuerpo **ya instanciado en el testigo**, o sea con el binder
-**abierto**. ⭐ `PrfH_bdEx_intro_open` era genérico en `Phic` **desde siempre**; lo único
+**abierto**. ⭐ `PrfH_bdEx_intro_open` era genérico en Phic **desde siempre**; lo único
 especializado era la envoltura.
 
 ### §3.67.2 · ⚠️ Tres cosas que la previsión NO vio, y las tres de FORMA
@@ -5439,7 +5508,7 @@ nivel `v+1` las variables que sobreviven son todas `≤ v`.
 
     hbody_of_halves hA_lineWFDotAt hB_premsDotAt   →   d3_prf_of_halves   →   d3_prf_real
 
-y en `Meta/GodelTwo.lean`, `axiom d3` pasa a `theorem d3 := prf_to_derives (d3_prf_real φ)`.
+y en `Meta/GodelTwo.lean`, `axiom d3` pasa a `theorem d3 := prf_to_derives (d3_prf_real φ)` (los dos, retirados después con la capa ⊢, ADR‑115).
 ⚠️ **`GodelTwo` no lo importa nadie** salvo el barril, así que meter la cadena entera de D3 no
 crea ningún ciclo. Y **retirar un axioma sólo puede fortalecer**: lo que antes se suponía ahora se
 deriva, y todo lo que dependía de `d3` conserva su enunciado con un footprint más pequeño.
@@ -5448,15 +5517,15 @@ deriva, y todo lo que dependía de `d3` conserva su enunciado con un footprint m
 
 ## §3.68 · ⭐ **LA CLASE DE TESTIGOS, ESTRECHADA** — ADR‑022 (2026‑09‑10h)
 
-`reflects_of_omega : OmegaConsistent → NegVerifier → Reflects φ` hace pivotar toda la mitad
-`⊬¬G` sobre **una sola clase**, `StdChain`, que aparece en las **dos** hipótesis. Estrecharla
-**debilita** `NegVerifier` y **refuerza** `OmegaConsistent`: es un intercambio, no una mejora, y
+`reflects_of_omega : OmegaConsistent → NegVerifier → Reflects φ` (retirados con la capa ⊢, ADR‑115) hace pivotar toda la mitad
+`⊬¬G` sobre **una sola clase**, `StdChain` (retirada con su módulo, ADR‑160), que aparece en las **dos** hipótesis. Estrecharla
+**debilita** `NegVerifier` (retirado, ADR‑115) y **refuerza** `OmegaConsistent` (retirada, ADR‑115): es un intercambio, no una mejora, y
 por eso va a ADR.
 
 ### §3.68.1 · El motivo, y no es de gusto
 
-El docstring de `IsCodeShaped` justificaba la clase ancha diciendo que las comparaciones de
-`NegVerifier` son *«PARALELAS POR TIPO — nunca `cons` contra `numeral` en la misma ranura»*.
+El docstring de `IsCodeShaped` (retirado, ADR‑160) justificaba la clase ancha diciendo que las comparaciones de
+`NegVerifier` (retirado, ADR‑115) son *«PARALELAS POR TIPO — nunca `cons` contra `numeral` en la misma ranura»*.
 
 ⛔ **Era falso sobre su propia clase**, con contraejemplo **ya compilado** en
 `archivo/sondeos-2026-10:sondeos/MedirF_Censo.lean` §4:
@@ -5465,19 +5534,19 @@ El docstring de `IsCodeShaped` justificaba la clase ancha diciendo que las compa
 
 Refutarla obliga a comparar `formCode ⊥` (**un `cons`**) con `numeralM 3` (**un numeral**) en la
 misma ranura, y ahí lo estructural no vale: `cons nil nil ≐ numeralM 2` es **provable**. La única
-vía es por **VALOR** (`numTree_ne`), que pide `m ≠ n` **en META** — y `codeNat (⊥⇒⊥)` ya son
+vía es por **VALOR** (`numTree_ne`, archivado, ADR‑141), que pide `m ≠ n` **en META** — y `codeNat (⊥⇒⊥)` ya son
 **583 734**, con `triN` en recursión unaria. Para la `G` del punto fijo, astronómico.
 
 ### §3.68.2 · ⚠️ La medición previa era CORRECTA y su conclusión NO
 
-El mismo sondeo concluía en su §4: *«¿hay que cambiar `StdChain`? **NO**: `NumTree` ya la
-subsume»*, apoyado en `numTree_of_isCodeShaped`, que **es un teorema verdadero**.
+El mismo sondeo concluía en su §4: *«¿hay que cambiar `StdChain` (retirada, ADR‑160)? **NO**: `NumTree` (archivado, ADR‑141) ya la
+subsume»*, apoyado en `numTree_of_isCodeShaped` (archivado, ADR‑141), que **es un teorema verdadero**.
 
 🔑🔑 **Subsumir la CLASE no es descargar la OBLIGACIÓN.** Que todo elemento de la clase *tenga*
 valor no da que el valor se pueda *decidir*. La regla queda como **M‑8** en `DECISIONS.md`.
 
-⭐ Lo que del sondeo **sí sobrevive**, y sigue haciendo falta: `numTree_ne` y las cotas
-`consN_ge`/`codeNat_ge : 3 ≤ codeNat φ`, que resuelven por **aritmética acotada** los choques
+⭐ Lo que del sondeo **sí sobrevive**, y sigue haciendo falta: `numTree_ne` (archivado, ADR‑141) y las cotas
+`consN_ge`/`codeNat_ge : 3 ≤ codeNat φ` (archivados, ADR‑141), que resuelven por **aritmética acotada** los choques
 contra numerales **pequeños** sin tocar un solo `triN`.
 
 ### §3.68.3 · La clase nueva y las dos comprobaciones
@@ -5491,20 +5560,20 @@ def StdChain (l : List Term) : Prop := ∀ x ∈ l, StdLine x
 
 | comprobación | qué asegura |
 |---|---|
-| **`stdLine_lineCode' (acc f r)`** | los **21 tags** producen líneas estándar |
-| 🏁 **`stdChain_proofCode' (rs acc)`** | **el código de CUALQUIER demostración‑secuencia es un testigo estándar** ⇒ no se deja fuera ningún testigo honesto |
-| **`junk_line_not_stdLine`** | la línea basura de `MedirF_Censo` §4 queda **FUERA** |
+| **`stdLine_lineCode' (acc f r)`** (retirado con su módulo, ADR‑160) | los **21 tags** producen líneas estándar |
+| 🏁 **`stdChain_proofCode' (rs acc)`** (retirado con su módulo, ADR‑160) | **el código de CUALQUIER demostración‑secuencia es un testigo estándar** ⇒ no se deja fuera ningún testigo honesto |
+| **`junk_line_not_stdLine`** (retirado, ADR‑160) | la línea basura de `MedirF_Censo` (archivado, ADR‑141) §4 queda **FUERA** |
 
-⚠️ Sin la segunda, estrechar sería una trampa: en el límite —clase vacía— `NegVerifier` es trivial
-y `OmegaConsistent` **falsa**.
+⚠️ Sin la segunda, estrechar sería una trampa: en el límite —clase vacía— `NegVerifier` (retirado, ADR‑115) es trivial
+y `OmegaConsistent` (retirada, ADR‑115) **falsa**.
 
 ### §3.68.4 · El precio, en cuatro puntos
 
-1. `OmegaConsistent` cuantifica sobre **menos** `l` ⇒ hipótesis **estrictamente más fuerte**.
+1. `OmegaConsistent` (retirada, ADR‑115) cuantifica sobre **menos** `l` ⇒ hipótesis **estrictamente más fuerte**.
 2. ⚠️ El argumento genérico «toda teoría **sólida** es ω‑consistente» **ya no la cubre**: la
    solidez da un testigo en ℕ que podría no tener forma de línea estándar.
-3. ⭐ **Pero sí la cubre en el único `∃` al que se aplica** (`A = provBody ⌜φ⌝`), cuyos testigos
-   honestos son códigos de prueba ⇒ `stdChain_proofCode'`. El hueco del punto 2 es **genérico, no
+3. ⭐ **Pero sí la cubre en el único `∃` al que se aplica** (`A = provBody ⌜φ⌝`; provBody, retirado con su módulo, ADR‑160), cuyos testigos
+   honestos son códigos de prueba ⇒ `stdChain_proofCode'` (retirado con su módulo, ADR‑160). El hueco del punto 2 es **genérico, no
    operativo**.
 4. Atenuante ya medido: **tampoco antes era la ω‑consistencia clásica pura** — cuantifica sobre
    `objList l`, no sobre numerales arbitrarios. Es **estrechar lo ya estrecho**.
@@ -5520,6 +5589,11 @@ y `OmegaConsistent` **falsa**.
 > FOL (§3.71), los 120 en él (§3.72), la solidez (§3.73), la consistencia (§3.74), W1 y la mitad `⊬¬G` (§3.75),
 > Tarski (§3.76), y W1 y E10 en todo modelo estándar, con el segundo modelo (§3.77). Firmas abreviadas; las exactas,
 > en los ficheros. Qué usa cada titular (las clases (i)–(iii)), en [TEOREMAS-E-HIPOTESIS.md](../TEOREMAS-E-HIPOTESIS.md) §1.
+>
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): después vinieron §3.78–§3.79 (ADR‑191: la solidez sin lógica clásica y
+> Prov fiel) y §3.80 (ADR‑195: el puente de FOL). El diagrama es el de aquella fecha: hoy `Consistencia` importa además
+> `SolidezDobleNegacion`, `SegundoModelo` llega a `RigidezEstandar` por `ProvFiel`, y `PuenteFOL` importa `RigidezEstandar`
+> y `TarskiPrf`.
 
 ```text
 ModeloCodigo ─► ModeloEstandar ─► ModeloCodificacion ─► Consistencia ─► SolidezVerificador ─► RigidezEstandar
@@ -5567,6 +5641,7 @@ theorem MN_coreAxioms (v) : ∀ φ, List.Mem φ coreAxioms → evalFormula (MNV 
 
 ```lean
 theorem v_substtc_var_eq … v_vpf_thy        -- cada axioma de codificación, verdadero en MNV V
+-- ✏️ 2026‑11‑09 (ADR‑262): v_vpf_thy y los demás v_vpf_* salieron con los 22 ax_vpf_* (ADR‑192, T68).
 theorem v_lineWF_*                         -- por Iff.rfl entre el axioma abierto y su cláusula de lineWFT
 theorem MN_codingAxioms (v) : ∀ φ, List.Mem φ codingAxioms → evalFormula (MNV V) v φ
 theorem v_ancla : ∀ v, evalFormula (MNV V₀) v ax_axiomsCodeT_def   -- por rw con lemas ∀, sin lema diagonal semántico
@@ -5695,7 +5770,7 @@ theorem no_refuta (hM : EstandarDN M) (D hD) (hP) (v) (hφ : evalFormula M v φ)
 ```
 
 Sólo `S` (de `gg φ` a `φ`) pide algo del modelo: que sean decidibles los átomos en su posición y la disyunción que
-decide; `∃` en posición `S` no pasa (sería Markov). De los 141 de entonces pasaban 134 sin decidir nada, y los 141 con `∈` (hoy, de 119, 112 y los 119: los siete que fallan
+decide; `∃` en posición `S` no pasa (sería Markov). De los 141 de entonces pasaban 134 sin decidir nada, y los 141 con `∈` (medido con ADR‑192, el 2026‑10‑27: de 119, 112 y los 119: los siete que fallan
 sin decidir son `lineWF` de la sustitución, ninguno de los retirados por ADR‑192)
 de aridad 2 decidible (los siete restantes son los `lineWF` de la sustitución, por las guardas); el ancla es un átomo.
 

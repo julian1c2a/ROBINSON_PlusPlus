@@ -3,19 +3,19 @@
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5).
 > Índice raíz: [REFERENCE.md](../REFERENCE.md).
 > **Nodos relacionados:** [Núcleo](REFERENCE-Kernel.md) (axiomas), [Incompletitud](REFERENCE-Incompleteness.md)
-> (Nivel D se construye sobre `formCode`/`provCodeC'`). ([Aritmética](REFERENCE-Arithmetic.md), con `Block6`,
-> se retiró con la capa `⊢`: ADR‑115.)
+> (Nivel D se construye sobre `formCode`/`provCodeC'`). ([Aritmética](REFERENCE-Arithmetic.md), con `Block6`, se retiró
+> con la capa `⊢`: ADR‑115.)
 > **Ficheros `.lean`:** [Meta/Godel.lean](../ROBINSON_PlusPlus/Meta/Godel.lean),
 > [Meta/Provability.lean](../ROBINSON_PlusPlus/Meta/Provability.lean).
 
 **Contenido:** Nivel B (codificación `⌜·⌝`, `G`, Teorema G1 como **meta‑inyectividad**) y Nivel C
 (`formCode`, `IsFormula` — núcleo real de codificación). La capa legacy postulada se retiró en F7a; lo
-que había sobre `⊢` (`Provable`, la versión objeto de G1), con [ADR‑115](../DECISIONS.md).
-**Last updated:** 2026-10-21 · Lean v4.35.0 — §3.13bis ([ADR‑186](../DECISIONS.md), T29): la codificación en ℕ (`triN`, `consN`, `codeNat`, `codeNatList`, `V₀`) y su inversa, `dec`, de las que dependen el modelo y W1. Antes, 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos son `List Char` y
+que había sobre `⊢` (`Provable`, retirado, y la versión objeto de G1), con [ADR‑115](../DECISIONS.md).
+**Last updated:** 2026-11-09 — [ADR‑262](../DECISIONS.md): las once citas de lo retirado, con su marca (y ¬Prov, en texto plano), y la cifra de `V₀` en §3.13bis, al día (120 desde ADR‑192). Antes, 2026-10-21 · Lean v4.35.0 — §3.13bis ([ADR‑186](../DECISIONS.md), T29): la codificación en ℕ (`triN`, `consN`, `codeNat`, `codeNatList`, `V₀`) y su inversa, `dec`, de las que dependen el modelo y W1. Antes, 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos son `List Char` y
 `strCode` es `charsCode` (§3.12, §3.13). Antes, 2026-10-05 — Gödel I/II SIN HIPÓTESIS (ADR‑120: `ConsistentH` es teorema, un
 modelo de los 142) y Gödel I ENTERO (ADR‑121: `⊬ ¬G`). Antes, 2026-10-04 — Gödel I/II, ya no vacuos por F1 y
 condicionales a `ConsistentH` (ADR‑117). Antes, 2026-10-02 — revisado entero tras retirar la capa `⊢` (ADR‑115):
-fuera `Block6`, `encode_cons_inj`/`encode_cons_neq_nil`, `Provable`/`provable_formCode_iff`, y los
+fuera `Block6`, `encode_cons_inj`/`encode_cons_neq_nil`, `Provable`/`provable_formCode_iff` (retirados), y los
 meta‑axiomas de F7a marcados como lo que son, un registro.
 
 ---
@@ -29,7 +29,7 @@ meta‑axiomas de F7a marcados como lo que son, un registro.
 **@importance**: `high`
 **@axiom_system**: `none` (meta-codificación pura sobre `Minimal/`; **no añade axiomas**)
 **Last updated**: 2026-06-06 (creado)
-**Dependencias**: `Axioms` (usa `cons`, `nil`); `FOL.Theorems.Eq`. (Hasta ADR‑115 importaba `Block6`.)
+**Dependencias**: `Axioms` (usa `cons`, `nil`); `FOL.Theorems.Eq`. (Hasta ADR‑115 importaba `Block6`, retirado.)
 
 #### Defs
 
@@ -56,8 +56,8 @@ theorem encode_cons (s S) : ⌜s :: S⌝ = cons (G s) ⌜S⌝
 theorem encode_injective (S S' : List Sym) : ⌜S⌝ = ⌜S'⌝ → S = S'
 ```
 
-🗑️ La versión object‑level (`encode_cons_inj`, `encode_cons_neq_nil`: `axioms ⊢ …`, vía `Block6`) se
-retiró con la capa `⊢` (ADR‑115).
+🗑️ La versión object‑level (`encode_cons_inj`, `encode_cons_neq_nil`: `axioms ⊢ …`, vía `Block6`) se retiró
+con la capa `⊢` (ADR‑115).
 
 **Sobre Teo G1**: el enunciado del spec `⌜S⌝ = ⌜S'⌝ ⟹ S = S'` mezcla antecedente
 sobre códigos (`Term`) con conclusión meta (`S = S' : List Sym`). La inyectividad
@@ -93,7 +93,7 @@ def IsFormula (x : Term) : Prop := ∃ φ : Formula, x = formCode φ            
 ```
 
 🗑️ `Provable` (`∃ φ, x = formCode φ ∧ axioms ⊢ φ`) se retiró con la capa `⊢` (ADR‑115);
-`goedelSentence` (punto fijo de `¬Prov`) se retiró en F7a.
+`goedelSentence` (punto fijo de ¬Prov) se retiró en F7a.
 
 #### Exports — demostrado (consistency-free)
 
@@ -122,7 +122,7 @@ axiom diagonal_lemma (φ) : ∃ ψ, axioms ⊢ (ψ ⇔ substFormula 0 (formCode 
 Los meta‑axiomas de arriba se retiraron en F7a: la aritmetización (`Dem`, `Meta/HilbertSeq.lean`), la
 representabilidad y el punto fijo viven hoy como teoremas sobre `Prf` en el Nivel D
 ([Incompletitud](REFERENCE-Incompleteness.md)), donde Gödel I/II son `goedel_first_prf`/
-`goedel_second_prf` — ⛔ vacuos por `[AnclaEq]` (F1, ADR‑114) hasta ADR‑117 (2026‑10‑04); hoy su única
+`goedel_second_prf` — ⛔ vacuos por `[AnclaEq]` (la clase, retirada con ADR‑118; F1, ADR‑114) hasta ADR‑117 (2026‑10‑04); hoy su única
 hipótesis es `ConsistentH` (el ancla es el teorema `prf_ancla`); ✏️ desde ADR‑120 (2026‑10‑05) la descarga `consistencia`, un modelo de los 142, y `goedel_I`/`goedel_II` van sin hipótesis.
 
 ---
@@ -145,6 +145,9 @@ def codeNat : Formula → Nat                -- etiquetas 2–9: ⊥, átomo, =,
 def codeNatList : List Formula → Nat       -- (Meta/ModeloCodigo.lean)
 def V₀ : Nat                               -- el código de los 142: los 141 de axiomsBase y el diagonal (ídem)
 ```
+
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): desde ADR‑192, `V₀` es el código de los **120**: los 119 de `axiomsBase` y el
+> diagonal (`V₀_eq_codigo`).
 
 Las propiedades: la inyectividad (`consN_inj`, `codeNat_inj`, `codeNatTerm_inj`, `Meta/CodeNatInjPrf.lean`); las
 listas por Cantor en ℕ (`decodeL`, `encodeL`, `decodeL_consN`, `Meta/ModeloCodigo.lean`); y

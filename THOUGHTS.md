@@ -1,7 +1,15 @@
 # Thoughts — ProjectName
 
-**Last updated:** 2026-06-05
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-06-05
 **Author**: Julián Calderón Almendros
+
+> 🗄️ **HISTÓRICO, sobre la PLANTILLA** (✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md)): es el THOUGHTS.md de la plantilla
+> lean4-project-template —el título «ProjectName», los huecos entre corchetes y las «Lessons Learned» son suyos—, con
+> notas del proyecto de abril a junio de 2026; la del 2026‑04‑21 (las tácticas) es la de `../FOL/THOUGHTS.md`, llegada
+> con la historia de FOL (`cab6eaf`). Desde entonces se retiraron los bloques de `Minimal` que citan (Block1…Block8, con
+> la capa `⊢`, ADR‑115) y la lista de axiomas es otra (120); el «Pendiente de ejecutar» de la nota del 2026‑05‑11 se
+> hizo ese mismo día: `Cons`/`Nil` (renombrados a `cons`/`nil`, `6dcc33f`). Lo de abajo es registro; lo vigente,
+> [AXIOMS.md](AXIOMS.md) y [DECISIONS.md](DECISIONS.md).
 
 > This is an informal design journal. Record ideas, alternatives considered,
 > open questions, and future directions here. Not normative — purely exploratory.

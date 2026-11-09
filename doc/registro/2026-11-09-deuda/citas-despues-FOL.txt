@@ -1,0 +1,34 @@
+# ADR-262: las citas muertas de [B] que QUEDAN en FOL (b-uno.bash), cada una con su razón en el LEEME
+REFERENCE.md:93 · B · _of_ · _of_
+REFERENCE.md:434 · B · derive_hyp · derive_hyp
+REFERENCE.md:435 · B · derive_rewrite · derive_rewrite
+REFERENCE.md:436 · B · derive_weaken · derive_weaken
+REFERENCE.md:1314 · B · derive_hyp · derive_hyp
+REFERENCE.md:1314 · B · derive_rewrite · derive_rewrite
+REFERENCE.md:1314 · B · derive_weaken · derive_weaken
+REFERENCE.md:1486 · B · derive_hyp · derive_hyp
+REFERENCE.md:1511 · B · of_decide_eq_false · of_decide_eq_false
+AXIOMS.md:37 · B2 · ../Peano-from-ROB-n-FOL/BLOQUEO-2026-10-01.md · ../Peano-from-ROB-n-FOL/BLOQUEO-2026-10-01.md
+AXIOMS.md:507 · B · derive_hyp · derive_hyp
+AXIOMS.md:558 · B · not_eq_of_beq_eq_false · not_eq_of_beq_eq_false
+AXIOMS.md:558 · B · of_decide_eq_false · of_decide_eq_false
+NEXT-STEPS.md:44 · B2 · PeanoRF/Prelim.lean · PeanoRF/Prelim.lean
+NEXT-STEPS.md:85 · B · PeanoRF.Prelim · PeanoRF.Prelim
+NEXT-STEPS.md:86 · B2 · BLOQUEO-2026-10-01.md · BLOQUEO-2026-10-01.md
+NEXT-STEPS.md:86 · B2 · ../Peano-from-ROB-n-FOL/ · ../Peano-from-ROB-n-FOL/
+NEXT-STEPS.md:86 · B2 · PeanoRF/Prelim.lean · PeanoRF/Prelim.lean
+NEXT-STEPS.md:86 · B2 · Omega/Basic.lean · Omega/Basic.lean
+NEXT-STEPS.md:86 · B · Prelim · Prelim
+NEXT-STEPS.md:86 · B2 · PeanoRF.lean · PeanoRF.lean
+NEXT-STEPS.md:86 · B2 · Omega/Basic · Omega/Basic
+NEXT-STEPS.md:86 · B2 · Meta/AxiomCheck · Meta/AxiomCheck
+NEXT-STEPS.md:86 · B · _template · _template
+NEXT-STEPS.md:86 · B · Prelim · Prelim
+NEXT-STEPS.md:86 · B2 · ../Peano-from-ROB-n-FOL/BLOQUEO-2026-10-01.md · ../Peano-from-ROB-n-FOL/BLOQUEO-2026-10-01.md
+NEXT-STEPS.md:153 · B · of_decide_eq_false · of_decide_eq_false
+NEXT-STEPS.md:181 · B · not_not_em · not_not_em
+DECISIONS.md:51 · B · DautoImplicit · DautoImplicit
+TOTAL AXIOMS.md: 4 citas muertas
+TOTAL DECISIONS.md: 1 citas muertas
+TOTAL REFERENCE.md: 9 citas muertas
+TOTAL NEXT-STEPS.md: 15 citas muertas

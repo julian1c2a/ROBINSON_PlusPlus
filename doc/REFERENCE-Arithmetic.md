@@ -1,60 +1,62 @@
-# REFERENCE — Aritmética desarrollada · `Minimal/Theorems/Block1–8` · ROBINSON_PlusPlus
+# REFERENCE — Aritmética desarrollada · `Minimal/Theorems/Block1–8` (retirados) · ROBINSON_PlusPlus
 
 > 🗑️🗑️ **2026‑10‑02 · TODO LO QUE DESCRIBE ESTE NODO SE RETIRÓ** ([ADR‑115](../DECISIONS.md)).
-> `Minimal/Theorems/Block1–8` eran teoremas `axioms ⊢ …`, y la capa `⊢` se retiró de RPP porque sus
+> `Minimal/Theorems/Block1–8` (retirados) eran teoremas `axioms ⊢ …`, y la capa `⊢` se retiró de RPP porque sus
 > postulados eran falsos (`sondeos/MetaReglasRefutables.lean`). El nodo se conserva **sólo como
 > registro** de lo que hubo; ninguno de sus ficheros existe ya.
+> ✏️ *2026‑11‑09 ([ADR‑262](../DECISIONS.md))*: los diez ficheros (los ocho bloques, más «Block4_C5» y «Block4_C6_C7»)
+> se recuperan de la etiqueta `pre-adr115` (ADR‑116 §6): ver «Ficheros `.lean`», abajo.
 
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5).
 > Índice raíz: [REFERENCE.md](../REFERENCE.md).
 > **Nodos relacionados:** [Núcleo](REFERENCE-Kernel.md) (axiomas base), [Full](REFERENCE-Full.md)
 > (inducción general que estos bloques no tienen), [Gödelización](REFERENCE-Godelization.md)
-> (`Block6` listas → codificación).
-> **Ficheros `.lean`:** `ROBINSON_PlusPlus/Minimal/Theorems/Block1.lean` … `Block8.lean`
-> (ver [directorio](../ROBINSON_PlusPlus/Minimal/Theorems/)).
+> (`Block6`, retirado: listas → codificación).
+> **Ficheros `.lean`:** `pre-adr115:ROBINSON_PlusPlus/Minimal/Theorems/Block1.lean` …
+> `pre-adr115:ROBINSON_PlusPlus/Minimal/Theorems/Block8.lean` (el directorio ya no existe en el repositorio).
 
 **Contenido:** la aritmética desarrollada sobre Q++ sin inducción general — aritmética básica, raíz
 cuadrada y orden, `div2`/`mod2`, función de emparejamiento de Cantor (paridad/totalidad/inyectividad/
 sobreyectividad/unicidad), pares y proyecciones, listas, funciones discretas, primos y factorización
-(TFA a nivel objeto). **Last updated:** 2026-07-12 · Lean v4.31.0.
+(TFA a nivel objeto). **Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): todo el nodo es registro de lo retirado con ADR‑115; cada cita lleva su marca, los ficheros, su etiqueta (`pre-adr115`), y la frase de §3.11 que daba la incompletitud por pendiente, su nota. Antes, 2026-07-12 · Lean v4.31.0.
 
 ---
 
 ## Descripción de módulos
 
-### 3.2 `Block1.lean` — Aritmética Básica
+### 3.2 `Block1.lean` (retirado) — Aritmética Básica
 
-**Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block1`
+**Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block1` (retirado)
 **Status**: ✅ Complete
 **@axiom_system**: `Minimal`
 **@importance**: `high`
-**Last updated**: 2026-06-02 (añadidos `mul_two_succ_ne_zero`, `mul_two_lt_mono`; reprobado `teo_2_11` directamente)
+**Last updated**: 2026-06-02 (añadidos `mul_two_succ_ne_zero`, `mul_two_lt_mono`, retirados; reprobado `teo_2_11` directamente, retirado)
 
-**Constantes**: `three`, `four` (`def`).
+**Constantes**: `three`, `four` (retirados; eran `def`).
 
 #### Teoremas (orden de declaración)
 
 | Nombre | Enunciado | Notas |
 |---|---|---|
-| `teo_1_1` … `teo_1_7` | 1+0=1, 0+1=1, 1+1=2, 2+1=3, 1+2=3, 3+1=4, 2+2=4 | evaluación constantes |
-| `teo_1_8`, `teo_1_9`, `teo_1_10` | 1·1=1, 2·1=2, 2·2=4 | |
-| `teo_1_11`, `teo_1_12`, `teo_1_13_*` | desigualdades entre 0, 1, 2, 3 | |
-| `teo_2_1`, `teo_2_2` | ∀n, n+0=n y 0+n=n | |
-| `teo_2_3`, `teo_2_4` | ∀n, n·0=0 y 0·n=0 | |
-| `teo_2_5`, `teo_2_6` | ∀n, n·1=n y 1·n=n | |
-| `teo_2_7` | ∀n, 2·n = n+n | clave para muchos lemas |
-| **`mul_two_succ_ne_zero` (k)** | ¬(2·σ(k) = 0) | NUEVO 2026-06-02; helper para teo_2_11 |
-| **`mul_two_lt_mono` ({a,b}, h:a<b)** | 2a < 2b | NUEVO 2026-06-02; monotonía estricta |
-| `teo_2_8` | ∀n, σ(n) = n+1 | |
-| `teo_2_9` | a+b=0 ⇒ a=0 ∧ b=0 | |
-| `teo_2_10` | a·b=0 ⇒ a=0 ∨ b=0 | |
-| **`teo_2_11`** | ∀a, b, 2a=2b ⇒ a=b | REPROBADO 2026-06-02 sin inducción; ax28 eliminado |
-| `teo_3_11` | ∀n, n≠0 ⇒ ∃m, σ(m)=n (ex-Ax 4) | predecesor totalizado vía tricotomía |
-| `eq_decidable` | ∀n, m, n=m ∨ n≠m (= ax20) | demostrado vía tricotomía + sustitución |
+| `teo_1_1 … teo_1_7` (retirados) | 1+0=1, 0+1=1, 1+1=2, 2+1=3, 1+2=3, 3+1=4, 2+2=4 | evaluación constantes |
+| `teo_1_8`, `teo_1_9`, `teo_1_10` (retirados) | 1·1=1, 2·1=2, 2·2=4 | |
+| `teo_1_11`, `teo_1_12`, `teo_1_13_*` (retirados) | desigualdades entre 0, 1, 2, 3 | |
+| `teo_2_1`, `teo_2_2` (retirados) | ∀n, n+0=n y 0+n=n | |
+| `teo_2_3`, `teo_2_4` (retirados) | ∀n, n·0=0 y 0·n=0 | |
+| `teo_2_5`, `teo_2_6` (retirados) | ∀n, n·1=n y 1·n=n | |
+| `teo_2_7` (retirado) | ∀n, 2·n = n+n | clave para muchos lemas |
+| **`mul_two_succ_ne_zero` (k)** (retirado) | ¬(2·σ(k) = 0) | NUEVO 2026-06-02; helper para teo_2_11 |
+| **`mul_two_lt_mono` ({a,b}, h:a<b)** (retirado) | 2a < 2b | NUEVO 2026-06-02; monotonía estricta |
+| `teo_2_8` (retirado) | ∀n, σ(n) = n+1 | |
+| `teo_2_9` (retirado) | a+b=0 ⇒ a=0 ∧ b=0 | |
+| `teo_2_10` (retirado) | a·b=0 ⇒ a=0 ∨ b=0 | |
+| **`teo_2_11`** (retirado) | ∀a, b, 2a=2b ⇒ a=b | REPROBADO 2026-06-02 sin inducción; ax28 eliminado |
+| `teo_3_11` (retirado) | ∀n, n≠0 ⇒ ∃m, σ(m)=n (ex-Ax 4) | predecesor totalizado vía tricotomía |
+| `eq_decidable` (retirado) | ∀n, m, n=m ∨ n≠m (= ax20) | demostrado vía tricotomía + sustitución |
 
 ---
 
-### 3.3 `Block2.lean` — Raíz cuadrada y orden
+### 3.3 `Block2.lean` (retirado) — Raíz cuadrada y orden
 
 **Namespace**: `…Block2`
 **Status**: ✅ Complete
@@ -81,13 +83,13 @@ theorem sq_le_mono {a b}(h : Γ⊢(a≤b)) : Γ ⊢ (sq a ≤ sq b)
 
 ---
 
-### 3.4 `Block3.lean` — div2 / mod2
+### 3.4 `Block3.lean` (retirado) — div2 / mod2
 
 **Namespace**: `…Block3`
 **Status**: ✅ Complete
 **@importance**: `medium`
 
-**Nota de tamaño** (~1900 líneas): documentado en el header del archivo. Sin inducción, los `div2_n`/`mod2_n` se enumeran por numeral. En `Intermediate/` se reduce a ~5 teoremas.
+**Nota de tamaño** (~1900 líneas): documentado en el header del archivo. Sin inducción, los div2_n/mod2_n se enumeran por numeral. En `Intermediate/` (eliminado el 2026‑06‑11) se reduce a ~5 teoremas.
 
 #### Teoremas públicos
 
@@ -108,12 +110,12 @@ theorem mod2_range (n : Term) : Γ ⊢ ((mod2 n =eq zero) ∨ (mod2 n =eq one))
 
 ---
 
-### 3.5 `Block4.lean` — Función de Cantor (Bloque IV: paridad, totalidad, inyectividad)
+### 3.5 `Block4.lean` (retirado) — Función de Cantor (Bloque IV: paridad, totalidad, inyectividad)
 
 **Namespace**: `…Block4`
 **Status**: ✅ Complete
 **@importance**: `high`
-**Last updated**: 2026-06-02 (cantor_injective_c ahora usa `teo_2_11` real)
+**Last updated**: 2026-06-02 (cantor_injective_c ahora usa `teo_2_11` real; los dos, retirados)
 
 #### Defs
 
@@ -142,9 +144,9 @@ theorem cantor_injective_c (x y c c') : Γ ⊢ land (is_cantor x y c)(is_cantor 
 
 ---
 
-### 3.6 `Block4_C5.lean` — Lema C5 (Bloque IV Fase 9) + ~25 helpers exportados
+### 3.6 `Block4_C5.lean` (retirado) — Lema C5 (Bloque IV Fase 9) + ~25 helpers exportados
 
-**Namespace**: `…Block4_C5`
+**Namespace**: `…Block4_C5` (retirado)
 **Status**: ✅ Complete
 **@importance**: `high`
 
@@ -194,12 +196,12 @@ theorem add_comm' / add_assoc' / mul_comm' / mul_assoc' / mul_distrib' / mul_dis
 
 ---
 
-### 3.7 `Block4_C6_C7.lean` — Sobreyectividad y Unicidad Cantor
+### 3.7 `Block4_C6_C7.lean` (retirado) — Sobreyectividad y Unicidad Cantor
 
-**Namespace**: `…Block4_C6_C7`
+**Namespace**: `…Block4_C6_C7` (retirado)
 **Status**: ✅ Complete
 **@importance**: `high`
-**Last updated**: 2026-06-03 (proj1/proj2 defs concretas; `proj_is_cantor` reemplaza ax22; `mod2_of_even` movido aquí desde Block5)
+**Last updated**: 2026-06-03 (proj1/proj2 defs concretas; `proj_is_cantor` (retirado) reemplaza ax22; `mod2_of_even` (retirado) movido aquí desde Block5)
 
 #### Defs
 
@@ -229,7 +231,7 @@ theorem cantor_uniqueness (x y x' y' c) :
 
 ---
 
-### 3.8 `Block5.lean` — Pares y proyecciones (Bloque V)
+### 3.8 `Block5.lean` (retirado) — Pares y proyecciones (Bloque V)
 
 **Namespace**: `…Block5`
 **Status**: ✅ Complete
@@ -251,7 +253,7 @@ theorem pair_inj {x y x' y'} : Γ ⊢ (pair x y =eq pair x' y') ⇒ land (x=eq x
 
 ---
 
-### 3.9 `Block6.lean` — Listas (Bloque VI)
+### 3.9 `Block6.lean` (retirado) — Listas (Bloque VI)
 
 **Namespace**: `…Block6`
 **Status**: ✅ Complete
@@ -275,7 +277,7 @@ theorem in_concat_iff (x L M)   : Γ ⊢ In x (concat L M) ⇔ lor (In x L)(In x
 
 ---
 
-### 3.10 `Block7.lean` — Funciones discretas (Bloque VII)
+### 3.10 `Block7.lean` (retirado) — Funciones discretas (Bloque VII)
 
 **Namespace**: `…Block7`
 **Status**: ✅ Complete
@@ -304,14 +306,14 @@ theorem teo_F2 {F x y y'} (h_isF : IsFunction F)
 theorem teo_F3 (F : Term) : IsFunction F ↔ Functional F               -- Teo F3 (isomorfismo)
 ```
 
-**Nota de estilo**: `IsFunction`/`Functional` son meta-predicados Lean (`Term → Prop`), no `Formula` con `forall_2/3`. Esto evita el manejo manual de De Bruijn (`liftTerm`/`substTerm`) en los cuantificadores externos; el contenido FOL queda en los cuerpos derivables (`axioms ⊢ ...`).
+**Nota de estilo**: `IsFunction`/`Functional` (retirados) son meta-predicados Lean (`Term → Prop`), no `Formula` con `forall_2/3`. Esto evita el manejo manual de De Bruijn (`liftTerm`/`substTerm`) en los cuantificadores externos; el contenido FOL queda en los cuerpos derivables (`axioms ⊢ ...`).
 
 ---
 
-### 3.11 `Block8.lean` — Primos y factorización (Bloque VIII, Fase 17 completa)
+### 3.11 `Block8.lean` (retirado) — Primos y factorización (Bloque VIII, Fase 17 completa)
 
 **Namespace**: `…Block8`
-**Status**: ✅ Complete (Fase 17 completa con `IsFactorization` + `Ax-P` TFA)
+**Status**: ✅ Complete (Fase 17 completa con `IsFactorization` (retirado) + `Ax-P` TFA)
 **@importance**: `high`
 **Last updated**: 2026-06-06 (extensión con Bloque VIII extendido)
 
@@ -363,7 +365,7 @@ axiom ax_p_tfa : ∀ n : Term, axioms ⊢ lt zero n →
     ∀ f' : Term, IsFactorization f' n → axioms ⊢ (f =eq f')
 ```
 
-#### Exports — Álgebra de `Dvd` (sin inducción, 2026-06-06)
+#### Exports — Álgebra de `Dvd` (retirado; sin inducción, 2026-06-06)
 
 ```lean
 theorem dvd_trans {a b c}    : Dvd a b → Dvd b c → Dvd a c          -- testigo q₁·q₂
@@ -374,7 +376,7 @@ theorem dvd_mul_of_dvd_right {a c} : Dvd a c → ∀ b, Dvd a (mul b c) -- testi
 theorem dvd_add {a b c}      : Dvd a b → Dvd a c → Dvd a (add b c)  -- testigo q₁+q₂ (distrib)
 ```
 
-#### Exports — Corolarios del TFA (`ax_p_tfa`, 2026-06-06)
+#### Exports — Corolarios del TFA (`ax_p_tfa`, retirado el 2026‑09‑12; 2026-06-06)
 
 ```lean
 theorem factorization_exists (n) : axioms ⊢ lt zero n → ∃ f, IsFactorization f n
@@ -384,18 +386,18 @@ theorem lt_zero_one : axioms ⊢ lt zero one                          -- testigo
 theorem factorization_one_eq_nil {f} : IsFactorization f one → axioms ⊢ (f =eq nil)
 ```
 
-**Fuera de scope `Minimal/`**: el **lema de Euclides** (`IsPrime p → p ∣ a·b → p ∣ a ∨ p ∣ b`)
+**Fuera de scope `Minimal/`**: el **lema de Euclides** (`IsPrime p → p ∣ a·b → p ∣ a ∨ p ∣ b`, con el predicado de Block8, hoy retirado)
 y la **multiplicatividad** (`prod_pairs (concat f g) = prod_pairs f · prod_pairs g`) requieren
-`prod_pairs_concat` (recursión sobre la lista), no demostrable sin inducción. Se difieren a
-`Intermediate/`/`Full/`.
+`prod_pairs_concat` (no existe; recursión sobre la lista), no demostrable sin inducción. Se difieren a
+`Intermediate/`/`Full/` (el primero, eliminado el 2026‑06‑11).
 
-**Forma de los teoremas de no-primalidad**: NO podemos probar `¬IsPrime zero` directamente en Lean (requeriría meta-consistencia, que no demostramos). En su lugar, probamos "`IsPrime zero` derivaría `axioms ⊢ ⊥`" — el contenido genuino del enunciado.
+**Forma de los teoremas de no-primalidad**: NO podemos probar `¬IsPrime zero` (retirado) directamente en Lean (requeriría meta-consistencia, que no demostramos). En su lugar, probamos "`IsPrime zero` (retirado) derivaría `axioms ⊢ ⊥`" — el contenido genuino del enunciado.
 
-**Sobre la formulación de `IsFactorization`**: meta-Prop combinando derivación object-level (`prod_pairs f =eq n`) con cuantificación meta-level sobre los pares `(p,e)` que aparecen como elementos de `f`. La permisividad sobre la forma de los elementos (no obliga a que sean literalmente `pair p e`) queda compensada por `ax_prodp_cons`, que sólo se activa en cabezas `pair p e`.
+**Sobre la formulación de `IsFactorization` (retirado)**: meta-Prop combinando derivación object-level (`prod_pairs f =eq n`) con cuantificación meta-level sobre los pares `(p,e)` que aparecen como elementos de `f`. La permisividad sobre la forma de los elementos (no obliga a que sean literalmente `pair p e`) queda compensada por `ax_prodp_cons`, que sólo se activa en cabezas `pair p e`.
 
-**Sobre `Ax-P` (TFA)**: justificado en spec §Apéndice B.4 como axioma porque requiere inducción fuerte para ser derivable. En `Minimal/` se adopta meta-axiomáticamente (estilo `imp_intro`, etc.); en `Intermediate/` será un teorema mediante inducción fuerte sobre `n`.
+**Sobre `Ax-P` (TFA)**: justificado en spec §Apéndice B.4 como axioma porque requiere inducción fuerte para ser derivable. En `Minimal/` se adopta meta-axiomáticamente (estilo `imp_intro`, retirado, etc.); en `Intermediate/` (eliminado el 2026‑06‑11) iba a ser un teorema mediante inducción fuerte sobre `n`.
 
-**Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem). El **Nivel B** (G, ⌜·⌝, Teo G1) ya está implementado en `Meta/Godel.lean` (ver §3.12). Los Niveles C-D (IsFormula, Dem, incompletitud) siguen pendientes.
+**Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem). El **Nivel B** (G, ⌜·⌝, Teo G1) ya está implementado en `Meta/Godel.lean` (ver §3.12). Los Niveles C-D (IsFormula, Dem, incompletitud) siguen pendientes. (✏️ 2026‑11‑09, ADR‑262: era el estado del 2026‑06‑06; hoy están demostrados Gödel I y II, `goedel_I` y `goedel_II` en `Meta/Consistencia.lean`: [Incompletitud](REFERENCE-Incompleteness.md).)
 
 ---
 

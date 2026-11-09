@@ -1,0 +1,36 @@
+"""a2-uno.py DOC — réplica de [A2] de check-doc-sync.bash (RPP) sobre UN documento: las líneas 101 en adelante con una
+cifra que no es la de hoy (jobs, módulos activos, conteo de Meta, cuarentena, axiom de Lean, sorry, sondeos), salvo
+las exentas (un marcador de historia en la línea, lo citado entre «», lo tachado, «~» delante, «→» detrás, un rango).
+Los valores de hoy (2026-11-09): 150 jobs, 120 módulos activos, Meta 117, 0 en cuarentena/, 0 axiom, 0 sorry, 48 sondeos/.
+Uso: py -3.15 a2-uno.py RUTA_DEL_DOC"""
+import io, re, sys
+HOY = {'jobs': 150, 'módulos activos': 120, 'conteo de Meta': 117, 'cuarentena': 0, 'axiom de Lean': 0, 'sorry': 0,
+       'sondeos': 48}
+NB = r'(\*\*)?'
+PAT = [('jobs', r'[0-9]+' + NB + ' jobs'), ('módulos activos', r'[0-9]+' + NB + ' módulos activos'),
+       ('conteo de Meta', 'meta ' + NB + r'([0-9]+' + NB + r' [+]|[0-9]+' + NB + r'[)])'),
+       ('cuarentena', r'[0-9]+' + NB + ' (módulos )?en `cuarentena/`'),
+       ('axiom de Lean', r'[0-9]+' + NB + ' `?axiom`?' + NB + ' (de lean|en el build)'),
+       ('sorry', r'[0-9]+' + NB + ' `?sorrys?'), ('sondeos', r'[0-9]+' + NB + ' `sondeos/`')]
+MARC = re.compile(r'[^a-z0-9_](hist(o|ó)ric(o|a|os|as)|previ(o|a|os|as)|antes|era|eran|fueron|entonces|ya no|en su momento|'
+                  r'ejemplos?|p[.] ej|umbral|retirad(o|a|os|as))[^a-z0-9_]')
+def fuera(s, a, b):
+    while True:
+        p = s.find(a)
+        if p < 0: return s
+        q = s.find(b, p + len(a))
+        if q < 0: return s
+        s = s[:p] + ' ' + s[q + len(b):]
+d = sys.argv[1]
+for n, l in enumerate(io.open(d, encoding='utf-8'), 1):
+    if n < 101: continue
+    t = ' ' + fuera(fuera(l.rstrip('\r\n'), '«', '»'), '~~', '~~').lower() + ' '
+    if MARC.search(t): continue
+    for e, p in PAT:
+        for m in re.finditer(p, t):
+            seg = m.group(0); num = re.search(r'[0-9]+', seg); p0 = m.start() + num.start()
+            antes = ' ' + t[:p0]; despues = t[m.end():]
+            if re.search(r'~ *$', antes) or re.match(r' *(→|->)', despues) or (len(num.group(0)) <= 3 and re.search(r'[^0-9-][0-9]{1,3}-$', antes)):
+                continue
+            if int(num.group(0)) != HOY[e]:
+                print('%d · %s · dice %s (hoy %d) · %s' % (n, e, num.group(0), HOY[e], l.strip()[:200]))

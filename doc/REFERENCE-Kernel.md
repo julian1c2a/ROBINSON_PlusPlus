@@ -10,17 +10,17 @@
 **Contenido:** la teoría objeto FOL⁼ (Q++) — axiomas de Robinson extendidos, esquemas del verificador
 estructural (`lineWF`, `premsOf`, tags), y los axiomas de la capa Δ₀ (`lenc`/`nthc`/`ax_lineWF_inv`/
 `ax_lineWF_cons`) *(✏️ 2026‑10‑12, [ADR‑134](../DECISIONS.md): es la LISTA de axiomas, sin esquema de inducción; la
-teoría de los titulares, `T_Prf`, le añade los esquemas de `Prf`, con la inducción para toda fórmula, y contiene a PA:
-[AXIOMS.md](../AXIOMS.md) §0)*. **Last updated:** 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos de
+teoría de los titulares, T_Prf, le añade los esquemas de `Prf`, con la inducción para toda fórmula, y contiene a PA:
+[AXIOMS.md](../AXIOMS.md) §0)*. **Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): la tabla de §3.1.5 (los 34 de `coreAxioms`, uno a uno) y las definiciones de §3.1.1–§3.1.4, contrastadas con `Minimal/Axioms.lean`; notas nuevas para `proj1`/`proj2` (ya no existen), para `≤`/`∈` (en `Objeto` desde ADR‑260) y para Ax 28, y las citas de lo retirado, marcadas. Antes, 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos de
 §3.1.1 son `List Char` y se escriben `sym!"…"`. Antes, 2026-07-12 — ⚠️ revisado el 2026‑09‑11 (entonces el kernel no
 había cambiado; adjudicación del aviso `[E]` del control).
 
-> 🏁 **2026‑10‑05 · D7 (ADR‑129).** Los símbolos son `List Char`, no `String`: los 17 `*_sym` son
+> 🏁 **2026‑10‑05 · D7 (ADR‑129).** Los símbolos son `List Char`, no `String`: los 17 símbolos (`succ_sym`, …, `zero_sym`) son
 > `List Char := sym!"…"` (§3.1.1), con la macro de `Minimal/SymLit.lean`, que arma la lista de caracteres al
 > elaborar; `strCodeM s := charsCodeM s` y `codeNatStr s := codeNatChars s`, sin `.toList`. Son los mismos
 > caracteres, así que ningún código cambia de valor (`codeNat`, el ancla). `termToString` sigue dando `String`.
 
-> 🏁 **2026‑10‑04 · ADR‑117.** `Minimal/Axioms.lean` cambia otra vez: `axioms` tiene **142** fórmulas, los 141 de
+> 🏁 **2026‑10‑04 · ADR‑117.** `Minimal/Axioms.lean` cambia otra vez: `axioms` tiene **142** fórmulas (✏️ 120 desde ADR‑192: los 119 de la base y el ancla), los 141 de
 > `axiomsBase := coreAxioms ++ codingAxioms` y, AL FINAL, el ancla diagonal `ax_axiomsCodeT_def := axD axiomsBase`;
 > `axioms_split : axioms = axiomsBase ++ [ax_axiomsCodeT_def]` (por `rfl`) sustituye a `axioms_eq`, retirado.
 > Entran `diagTermM`, `psiD`, `nD`, `deltaD`, `axD` y `axD_lift`, y bajan aquí `triN`, `consN` y la familia
@@ -28,7 +28,7 @@ había cambiado; adjudicación del aviso `[E]` del control).
 > numeral de `nD`, astronómico, y no acabaría. El ancla de antes, `axiomsCodeT =eq listFormCodeM axioms`, es hoy un
 > teorema de `Prf` (`prf_ancla`, `Meta/Representability2Prf.lean`).
 
-> 🗑️ **2026‑10‑02 · ADR‑115.** `Minimal/Axioms.lean` sí cambió: perdió el `import` y el re‑export de `FOL.MetaRules`,
+> 🗑️ **2026‑10‑02 · ADR‑115.** `Minimal/Axioms.lean` sí cambió: perdió el `import` y el re‑export de `FOL.MetaRules` (retirado de FOL con ADR‑115),
 > la `CoeFun` sobre `Derives` y sus lemas sobre `⊢` (el ancla `ax_axiomsCodeT_eq`, `ax_inAxC`, los *helpers*: todos retirados).
 > **Las listas y las 141 fórmulas no cambian** (hasta ADR‑117, 2026‑10‑04: ver arriba). §3.1.6 y §3.1.7 de abajo
 > describen lo retirado: son registro.
@@ -40,10 +40,10 @@ había cambiado; adjudicación del aviso `[E]` del control).
 ### 3.1 `Minimal/Axioms.lean`
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Axioms`
-**Status**: ✅ Complete — **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización); 0 `axiom` de Lean (las meta-reglas de FOL ya no se importan, ADR‑115).
+**Status**: ✅ Complete — **34 axiomas matemáticos** (23 aritméticos + 7 listas + 4 factorización; ✏️ 2026‑11‑09, ADR‑262: decía «25 aritm + 7 listas + 2 factorización», y la tabla de §3.1.5 tiene 23, 7 y 4); 0 `axiom` de Lean (las meta-reglas de FOL ya no se importan, ADR‑115).
 **@axiom_system**: `Minimal`
 **@importance**: `foundational`
-**Last updated**: 2026-06-06 (Bloque VIII ext.: +pow, +prod_pairs, +4 axiomas) · ✏️ 2026‑10‑05: §3.1.1, símbolos `List Char` (D7, ADR‑129)
+**Last updated**: 2026-06-06 (Bloque VIII ext.: +pow, +prod_pairs, +4 axiomas) · ✏️ 2026‑10‑05: §3.1.1, símbolos `List Char` (D7, ADR‑129) · ✏️ 2026‑11‑09: §3.1.2, §3.1.4 y la nota de Ax 28 (ADR‑262)
 
 #### 3.1.1 Language symbols
 
@@ -67,10 +67,10 @@ def in_sym    : List Char := sym!"∈"
 def zero_sym  : List Char := sym!"0"
 ```
 
-> ✏️ **2026‑10‑05 (D7, ADR‑129)**: hasta ese día, `String := "σ"`, …, con los mismos caracteres. `proj1_sym`/`proj2_sym`
-> (`"π₁"`/`"π₂"`) ya no existen (nota de abajo) y salen de la tabla.
+> ✏️ **2026‑10‑05 (D7, ADR‑129)**: hasta ese día, `String := "σ"`, …, con los mismos caracteres.
+> `proj1_sym`/`proj2_sym` ya no existen (eran `"π₁"`/`"π₂"`; nota de abajo) y salen de la tabla.
 
-> **Nota 2026-06-02**: `proj1_sym`/`proj2_sym` ya **no son símbolos opacos** del lenguaje. `proj1`/`proj2` son ahora defs concretas en `Block4_C6_C7.lean` (`proj1 := x_of_c`, `proj2 := y_of_c`).
+> **Nota 2026-06-02**: `proj1_sym`/`proj2_sym` (retirados) ya **no son símbolos opacos** del lenguaje. `proj1`/`proj2` (retirados con ADR‑115) son ahora defs concretas en `Block4_C6_C7.lean` (retirado), con `proj1 := x_of_c` y `proj2 := y_of_c` (retirados).
 
 #### 3.1.2 Term constructors (computable, no termination proof needed)
 
@@ -103,6 +103,8 @@ def pair (x y : Term) : Term := cantor_func x y
 def nil : Term := zero
 ```
 
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): `proj1` y `proj2` ya no existen (eran defs de `Block4_C6_C7.lean`, retirado con ADR‑115: la nota de §3.1.1); el resto del bloque está en el código, con esas definiciones.
+
 #### 3.1.3 Formula constructors
 
 ```lean
@@ -125,7 +127,11 @@ scoped notation:50 x  " ∈ " l   => In x l
 abbrev ex := @Formula.ex
 ```
 
-#### 3.1.5 Axiomas matemáticos (30 axiomas en la lista `axioms`: 23 aritméticos + 7 listas)
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): desde ADR‑260 (2026‑11‑05), `≤` y `∈` están en su propio espacio,
+> `ROBINSON_PlusPlus.Minimal.Axioms.Objeto`, y sólo los abre `Minimal/Axioms.lean` (`open scoped Objeto`); `=eq` y `ex`
+> siguen en `ROBINSON_PlusPlus.Minimal.Axioms`.
+
+#### 3.1.5 Axiomas matemáticos (los 34 de `coreAxioms`: 23 aritméticos + 7 listas + 4 factorización; ✏️ 2026‑11‑09, ADR‑262: decía «30 axiomas … 23 aritméticos + 7 listas»)
 
 > ✏️ 2026‑10‑12 (ADR‑134): son **34** (`coreAxioms`), y la tabla los lista todos; `axioms` tiene 142 (✏️ 120 desde ADR‑192, que retiró los 22 «ax_vpf_*»). La fila de
 > `ax_L0_cons_def` daba la codificación de antes de ADR‑113.
@@ -167,11 +173,11 @@ abbrev ex := @Formula.ex
 | Ax-ProdP-nil | `ax_prodp_nil` | prod_pairs [] = 1 (Bloque VIII ext.) |
 | Ax-ProdP-cons | `ax_prodp_cons` | ∀ p, e, t, prod_pairs ((p,e)::t) = p^e · prod_pairs t (Bloque VIII ext.) |
 
-**Ax 20** (`ax20_eq_decidable`): definido pero NO en la lista — convertido en teorema `eq_decidable` (Block1).
-**Ax 27** (`ax27_add_left_cancel`): **ELIMINADO 2026-06-03** — derivable en PA⁻ vía tricotomía (ax19) + monotonía (`lt_add_const_of_le_left`) + irreflexividad (ax18). Ver `add_left_cancel` en `Block4_C6_C7`.
-**Ax 22** (`ax22_cantor_proj_exists`): **ELIMINADO 2026-06-02** — `proj1`/`proj2` ya no son símbolos opacos sino defs concretas en `Block4_C6_C7` (`proj1 := x_of_c`, `proj2 := y_of_c`). El contenido de ax22 se demuestra como teorema `proj_is_cantor` allí mismo.
-**Ax 23** (`ax23_cantor_proj_uniq`): **ELIMINADO 2026-06-02** — `cantor_uniqueness` (Block4_C6_C7) probado constructivamente; ax23 nunca se usó en código.
-**Ax 28** (`ax28_mul_two_cancel`): **ELIMINADO 2026-06-02** — derivable sin inducción, ver `teo_2_11` (Block1). El `def` permanece comentado en `Axioms.lean` como nota histórica.
+**Ax 20** (`ax20_eq_decidable`): definido pero NO en la lista — convertido en teorema `eq_decidable` (Block1; retirado con ADR‑115).
+**Ax 27** (`ax27_add_left_cancel`): **ELIMINADO 2026-06-03** — derivable en PA⁻ vía tricotomía (ax19) + monotonía (`lt_add_const_of_le_left`, retirado) + irreflexividad (ax18). Ver `add_left_cancel` (retirado) en `Block4_C6_C7` (retirado).
+**Ax 22** (`ax22_cantor_proj_exists`): **ELIMINADO 2026-06-02** — `proj1`/`proj2` (retirados con ADR‑115) ya no son símbolos opacos sino defs concretas en `Block4_C6_C7` (retirado), con `proj1 := x_of_c` y `proj2 := y_of_c` (retirados). El contenido de ax22 se demostraba como teorema `proj_is_cantor` (retirado) allí mismo.
+**Ax 23** (`ax23_cantor_proj_uniq`): **ELIMINADO 2026-06-02** — `cantor_uniqueness` (Block4_C6_C7; retirado con ADR‑115) probado constructivamente; ax23 nunca se usó en código.
+**Ax 28** (`ax28_mul_two_cancel`): **ELIMINADO 2026-06-02** — derivable sin inducción, ver `teo_2_11` (Block1; retirado con ADR‑115). El `def` permanece comentado en `Axioms.lean` como nota histórica (✏️ 2026‑11‑09, ADR‑262: no; el `def` se borró el 2026‑06‑02, en `38f0f1a`, y lo que queda en `Axioms.lean` es un comentario sobre su eliminación).
 
 #### 3.1.6 🗑️ REGISTRO — Meta-reglas FOL (5 `axiom`, ADR-008), retiradas con la capa `⊢` (ADR‑115)
 

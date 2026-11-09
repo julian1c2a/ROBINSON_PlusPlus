@@ -1,6 +1,6 @@
 # FRENTE (a) — ¿vuelve la capa rastreada? (D3 y Gödel II)
 
-**Last updated:** 2026-08-22 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-08-22 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
 
 > 🗄️ **HISTÓRICO** (✏️ 2026‑10‑28, [ADR‑196](DECISIONS.md), T55): el frente del 2026‑08‑19, tras retirar
 > `ax_tc_cons`. Está cerrado: D3 es teorema (`d3_prf_real`), Gödel II también (`goedel_second_prf`, y sin hipótesis
@@ -14,7 +14,7 @@
 
 ## La pregunta
 
-Retirar `ax_tc_cons` dejó 31 módulos en cuarentena (histórico; hoy quedan 14). **¿Se pueden recuperar sin reintroducir la
+Retirar `ax_tc_cons` dejó 31 módulos en cuarentena (histórico; «hoy quedan 14» era el 2026‑08‑23 —✏️ 2026‑11‑09, ADR‑262: hoy, 0: `cuarentena/` sólo guarda su README—). **¿Se pueden recuperar sin reintroducir la
 inconsistencia?** La vía candidata es probar la **Σ₁‑completitud internalizada** con **inducción
 interna** en vez de con la ecuación `tc` sintáctica.
 

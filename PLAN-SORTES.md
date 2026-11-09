@@ -1,6 +1,14 @@
 # PLAN — Reparar la inconsistencia de `tcFn`
 
-**Last updated:** 2026-08-17 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-08-17 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
+> 🗄️ **HISTÓRICO** (✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md)): el plan para reparar la inconsistencia de `tcFn`, con sus
+> sondeos S1–S5 y el piloto diagonal. Según git se escribió el 2026‑08‑16 y el 2026‑08‑17 (de 182bc77 a 7ee4ba8), y no
+> cambió hasta el 2026‑08‑21; las fechas «2026‑08‑19» de abajo (la cabecera, una fila de §2 y los títulos de §4bis,
+> §4ter, §4quater y §4sexies) las puso la auditoría de ese día (43cf332), que corrigió así un «2026‑07‑27». La reparación
+> se ejecutó el 2026‑08‑18: ADR‑012 (los códigos de Gödel, numerales; `ax_tc_cons`, fuera de `axioms`) y ADR‑013 (la capa
+> rastreada, a la cuarentena, hoy vacía); y la consistencia de `Prf` es teorema desde ADR‑120 (`consistencia`). El
+> «estado vigente» de abajo es el de agosto. Lo de abajo es registro; lo vigente, `AXIOMS.md` y `TEOREMAS-E-HIPOTESIS.md`.
 
 **Creado:** 2026‑08‑19 · **Última medición:** 2026‑08‑19 (sondeos S1–S5 + piloto diagonal)
 **Contexto:** memoria `project-inconsistencia-tcfn-cons`, `AXIOMS.md`, `sondeos/README.md`.

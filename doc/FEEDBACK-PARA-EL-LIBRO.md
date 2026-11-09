@@ -1,6 +1,15 @@
 # Feedback para la tarea del LIBRO — 2026‑09‑11
 
-**Last updated:** 2026-10-04 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](../DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-10-04 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
+> 🗄️ **REGISTRO DE SUS FECHAS** (✏️ 2026‑11‑09, [ADR‑262](../DECISIONS.md)): el canal del desarrollo al LIBRO, con
+> cuatro entradas fechadas —2026‑09‑11 (y su addendum), 2026‑09‑12, 2026‑09‑18 y 2026‑11‑02 (T49, ADR‑242)— y sus notas
+> ✏️ posteriores; cada una describe el árbol de su día, y no se ha re‑medido. El libro está en espera desde el 2026‑10‑14
+> (ADR‑136 §3), y el propietario lo dejó para cuando esté terminado todo lo demás (2026‑11‑03, en `NEXT-STEPS.md`). Desde
+> las entradas de septiembre, `ConsistentOmega` (retirada con la capa `⊢`, ADR‑115) y la clase `AnclaEq` (retirada,
+> ADR‑118) ya no existen, los axiomas objeto son 120 (ADR‑192) y los titulares, 35 (ADR‑250). La deriva del libro la
+> mide hoy la CI en cada run, como informe (ADR‑242); la entrada del 2026‑11‑02 es su lista de partida. Lo de abajo es
+> registro; lo vigente, `CURRENT-STATUS-PROJECT.md` y `TEOREMAS-E-HIPOTESIS.md`.
 
 > **De**: la tarea de programación y prueba. **Para**: la tarea del libro.
 > **Por qué existe**: `PLAN-LIBRO.md` §0 pone los `.lean` en sólo lectura para el libro, y los
@@ -196,6 +205,8 @@ ayer parecía:
 >
 > ✏️ *2026‑10‑04: el «único axioma» no duró: al día siguiente pasó a ser la hipótesis `[AnclaEq]`, que los hacía
 > VACUOS (F1); hoy es un TEOREMA, por el axioma objeto 142.º (ADR‑117). El matiz, en el 📌 2026‑09‑12, §3.*
+> ✏️ *2026‑11‑09 ([ADR‑262](../DECISIONS.md)): el ancla sigue siendo un TEOREMA (`prf_ancla`); desde ADR‑192 su
+> axioma diagonal, `ax_axiomsCodeT_def`, es el 120.º y último de `axioms` (`axioms_len`).*
 
 ⚠️ ⇒ El `muro` que §3 pedía para el cap. 13 **sigue teniendo sentido**, pero cambia de asunto:
 ya no es «cuidado, la hipótesis es más fuerte de lo que parece» sino **«hay TRES nombres parecidos
@@ -215,7 +226,8 @@ tres»**, que es la buena noticia.
 | `sorry` | **0** |
 
 ✏️ *2026‑10‑04: cifras de aquel día (las vigentes, en [README.md](../README.md)). Desde ADR‑117, por ejemplo,
-los axiomas objeto son **142** = 34 + 107 + 1: el ancla diagonal `ax_axiomsCodeT_def`.*
+los axiomas objeto son **142** = 34 + 107 + 1: el ancla diagonal `ax_axiomsCodeT_def`.* ✏️ *2026‑11‑09
+([ADR‑262](../DECISIONS.md)): y desde ADR‑192, **120** = 34 + 85 + 1 (`axioms_len`, `codingAxioms_len`).*
 
 ---
 
@@ -280,7 +292,9 @@ VACUOS. Hoy no lo son por F1, pero «cero axiomas del proyecto» sigue sin poder
 dos son CONDICIONALES a `ConsistentH`, y la consistencia de los 142 axiomas no está probada (no hay
 modelo). ✏️ **2026‑10‑12 ([ADR‑134](../DECISIONS.md))**: desde ADR‑120 sí lo está —`consistencia`, por un modelo estándar de
 los 142 (`MNV V₀`) y `prf_sound`—, y es la de toda la teoría `T_Prf`, que contiene a PA; `goedel_I` y `goedel_II` van
-sin hipótesis. La teoría, en [AXIOMS.md](../AXIOMS.md) §0.
+sin hipótesis. La teoría, en [AXIOMS.md](../AXIOMS.md) §0. ✏️ **2026‑11‑09 ([ADR‑262](../DECISIONS.md))**: desde
+ADR‑192 los axiomas son 120 (el ancla, el 120.º: `axioms_len`), y desde ADR‑189 `goedel_first_prf` y
+`goedel_second_prf` van sin `Classical.choice`: `[propext, Quot.sound]` (`check-footprints.bash`).
 
 ### 4 · `AXIOMS.md` publicaba una afirmación **medible‑mente falsa** sobre `ax_p_tfa`
 

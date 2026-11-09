@@ -1,6 +1,6 @@
 # Análisis de Minimalidad del Sistema Axiomático `Minimal`
 
-**Last updated:** 2026-06-06
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-06-06
 **Author:** Julián Calderón Almendros
 **Estado:** 34 axiomas matemáticos (25 aritméticos + 7 listas + 2 factorización) + 5 meta-reglas FOL + 1 meta-axioma Ax-P (TFA), 0 sorrys reales.
 
@@ -8,7 +8,10 @@
 > axiomas, y no se ha re‑medido: las meta‑reglas de FOL y Ax‑P se retiraron (ADR‑115; `ax_p_tfa`, el 2026‑09‑12), y
 > `axioms` tiene hoy 120 (los 34, 85 de codificación y el ancla; 142 hasta ADR‑192, que retiró los 22 `ax_vpf_*`). Lo que dice de la lista, que no tiene esquema de
 > inducción, es cierto; la teoría de los titulares, `T_Prf`, sí lo tiene y contiene a PA ([AXIOMS.md](AXIOMS.md) §0). Y
-> §5 tenía frases falsas: ver su nota.
+> §5 tenía frases falsas: ver su nota. *(✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md): de los módulos que cita sólo queda
+> `Minimal/Axioms.lean`: `Intermediate/` (borrado el 2026‑06‑11), los bloques Block1…Block8 y `Full/Mod2.lean` (retirados
+> con la capa `⊢`, ADR‑115) ya no existen, y en el último la nota del 2026‑09‑10 de §3.2 da por demostrado
+> `ax_mod2_alternation` (retirado con él).)*
 
 Este documento recoge la información obtenida por **web research** y por **razonamiento sobre el sistema actual** para evaluar si el conjunto de 34 axiomas que sustenta `Minimal/` es minimal — o cerca de serlo — relativo a su objetivo de diseño: **construir aritmética de Cantor + tuplas + listas + factorización prima sin esquema de inducción**.
 

@@ -1,11 +1,14 @@
 # Escalando el proyecto: ROBINSON_PlusPlus ↔ DeepArithmetic (sobre FOL⁼)
 
-**Last updated:** 2026-07-08 *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-07-08 *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor:** Julián Calderón Almendros
 
 > ✏️ **2026‑10‑14 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es un estudio del 2026‑07‑08, y no se ha re‑medido.
-> Hoy no hay puente de `Prf` a `⊢` (`prf_to_derives` se retiró con esa capa, ADR‑115) ni en ninguna dirección (T67; ✏️ 2026‑10‑28, ADR‑195: hoy sí en una, de FOL a `Prf`, `Meta/PuenteFOL.lean`), el
+> Hoy no hay puente de `Prf` a `⊢` (`prf_to_derives` se retiró con esa capa, ADR‑115) ni en ninguna dirección (T67; ✏️ 2026‑10‑28, ADR‑195: hoy sí en una, de FOL a `Prf`, `Meta/PuenteFOL.lean`; ✏️ 2026‑11‑09, ADR‑262: y desde ADR‑253 también en la otra, de `Prf` a FOL, sobre las clausuras universales de `AxiomasT`: `prf_iff_derivesSet_clausuras`), el
 > TFA objeto se retiró, y la teoría de los titulares no es la lista sin inducción: [AXIOMS.md](AXIOMS.md) §0.
+> *(✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md): y el módulo `FOL/MetaRules.lean` que §1 cita en el núcleo común (borrado en FOL el
+> 2026‑10‑02, ADR‑115) ya no existe: de sus seis nombres, `imp_intro`, `raa`, `or_elim` y `ex_elim` se retiraron con él;
+> `gen` y `dne` siguen, como los constructores `Derives.gen_rule` y `Derives.dne_rule` de `FOL/FOL.lean`.)*
 
 > Estudio del enlace entre `ROBINSON_PlusPlus` y `Lean4_vs_PureLogic` (proyecto **DeepArith**),
 > y de cómo el trabajo actual (cierre de Gödel II vía la Σ₁-completitud provable) fabrica el

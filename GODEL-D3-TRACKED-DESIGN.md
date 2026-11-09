@@ -1,6 +1,16 @@
 # Diseño: Predicado de demostrabilidad con **testigo rastreado** (cierre de D3 / Gödel II)
 
-**Last updated:** 2026-07-12 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-07-12 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
+> 🗄️ **HISTÓRICO** (✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md)): la propuesta de diseño del 2026‑07‑05 para cerrar D3 con
+> un testigo rastreado, y su diario de ejecución (§10–§33) hasta el 2026‑07‑12, con la decisión (B) de la forma punteada;
+> sus cifras y su diagnóstico son de esas fechas. Después, la ecuación `ax_tc_cons`, que el diseño usa por `prf_tc_cons` (retirado con ella),
+> hacía la teoría inconsistente y salió de `axioms` el 2026‑08‑18 (ADR‑012; `PLAN-SORTES.md`); la reducción
+> `d3_prf_of_sigma1` de §0 se retiró con su módulo (ADR‑161:
+> `archivo/fuera-del-cono-2026-10-18:ROBINSON_PlusPlus/Meta/ReflectionPrf.lean`); y D3 es teorema desde el 2026‑09‑10
+> (`d3_prf_real`, en `Meta/PremsBdAllPrf.lean`; 9ca5e66 retiró el `axiom` `d3`), con Gödel II sin hipótesis
+> (`goedel_II`, ADR‑120). Lo de abajo es registro; lo vigente, `TEOREMAS-E-HIPOTESIS.md` (D1–D3) y
+> `doc/REFERENCE-Incompleteness.md`.
 
 > **Estado:** propuesta de diseño (previa a tocar código). 2026‑07‑05.
 > **Autor:** Julián Calderón Almendros (con asistencia).

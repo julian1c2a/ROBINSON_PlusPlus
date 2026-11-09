@@ -1,0 +1,13 @@
+# ADR-262: las citas muertas de [B] que QUEDAN en RPP (b-uno.bash, el núcleo de [B] con las entradas del 2026-11-09), cada una con su razón en el LEEME
+DECISIONS.md:626 · B2 · ci/** · ci/**
+sondeos/README.md:110 · B2 · sondeos/pasadas/salida/ · sondeos/pasadas/salida/
+sondeos/README.md:142 · B · censoFrontera · censoFrontera
+sondeos/README.md:148 · B · if_neg · if_neg
+sondeos/README.md:148 · B · decodeTerm.eq_1 · decodeTerm.eq_1
+sondeos/README.md:157 · B2 · Sugerencias.md · Sugerencias.md
+sondeos/README.md:159 · B · exact? · exact?
+sondeos/README.md:159 · B · exact? · exact?
+sondeos/README.md:173 · B · noExiste · noExiste
+sondeos/README.md:299 · B2 · Sugerencias.md · Sugerencias.md
+TOTAL DECISIONS.md: 1 citas muertas
+TOTAL sondeos/README.md: 9 citas muertas

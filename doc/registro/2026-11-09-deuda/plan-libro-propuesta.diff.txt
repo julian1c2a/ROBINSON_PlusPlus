@@ -1,0 +1,33 @@
+diff --git a/PLAN-LIBRO.md b/PLAN-LIBRO.md
+index c931ded..6fd0e19 100644
+--- a/PLAN-LIBRO.md
++++ b/PLAN-LIBRO.md
+@@ -1,6 +1,18 @@
+ # PLAN — Libro en LaTeX: *Incompletitud, formalizada*
+ 
+-> ## ESTADO REAL — 2026-09-10h · `master` · **Parte IV escrita hasta el cap. 15**
++> 🗄️ **PLAN DE SU FECHA, EN ESPERA** (✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md)): el plan del libro, creado el 2026‑08‑19
++> y revisado hasta el 2026‑09‑11; después sólo recibió la nota de ADR‑138 (cap. 6, 2026‑10‑16) y el formato de su marca
++> (ADR‑233). Nada de él se ha re‑medido. El libro está en espera desde el 2026‑10‑14 (ADR‑136 §3: no se toca `doc/book/`
++> ni este plan; aquí, por ADR‑262, sólo esta cabecera y la marca), y el propietario lo dejó para cuando esté terminado todo
++> lo demás (2026‑11‑03, en `NEXT-STEPS.md`). Lo que el código ha dejado atrás lo midió la entrada del 2026‑11‑02 de
++> `doc/FEEDBACK-PARA-EL-LIBRO.md` (T49, ADR‑242), y la CI lo repite en cada run como informe: entre otras cosas, los dos
++> avisos editoriales obligatorios de §6 ya no son ciertos (la consistencia es teorema, `consistencia`, desde ADR‑120,
++> relativa a Lean, ADR‑138; y `⊬¬G` también, `goedel_I_neg`, desde ADR‑121). Lo de abajo es registro; lo vigente del
++> código, `CURRENT-STATUS-PROJECT.md` y `TEOREMAS-E-HIPOTESIS.md`.
++
++> ## 🗄️ ESTADO DE ENTONCES — 2026-09-10h · `master` · **Parte IV escrita hasta el cap. 15**
++>
++> *(✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md): decía «ESTADO REAL»; son las cifras de ese día, y no se han re‑medido.)*
+ >
+ > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+ > **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
+@@ -17,7 +29,7 @@
+ > 2026-08-22) y el pedagógico (`Sobre_el_libro.md`) — y **corrige** las afirmaciones que el
+ > proyecto ha refutado desde entonces. El registro de correcciones está en §8.
+ 
+-**Last updated:** 2026-09-09 (2ª) — **Parte I escrita** y migración 3b completada; *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
++**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-09-09 (2ª) — **Parte I escrita** y migración 3b completada; *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+ previo, **§3 reestructurado**: nueva **Parte I pedagógica**
+ (los artículos de Gödel, los lenguajes, lo mínimo de Lean) y cinco partes en total; **nuevo §2.9**
+ (ninguna parte empieza sin decir qué pregunta contesta) con los números de capítulo mecanizados;

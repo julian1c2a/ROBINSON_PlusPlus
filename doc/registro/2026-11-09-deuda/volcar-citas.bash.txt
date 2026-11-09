@@ -1,0 +1,23 @@
+#!/bin/bash
+# Vuelca TODAS las citas muertas que ve [B] (la salida entera de b-citas.awk) de RPP y de FOL, y las ENTRADAS de
+# b-citas.awk (vivos, entorno, sondeos, módulos, rutas, historia), con un gancho TEMPORAL en b-control.bash (unas líneas
+# tras `b_cuenta < "$B_CIT" > "$B_ACT"`), que se deshace con git checkout al acabar.
+# Uso (Git Bash, desde PowerShell): bash volcar-citas.bash [RPP|FOL|ambos]
+S=/d/msys64/tmp/claude/d75c25be1c300eb1/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/deuda
+export PATH=/c/Users/julia/.elan/bin:$PATH
+QUE=${1:-ambos}
+for R in ROBINSON_PlusPlus FOL; do
+  case "$QUE" in RPP) [ "$R" = FOL ] && continue ;; FOL) [ "$R" = ROBINSON_PlusPlus ] && continue ;; esac
+  cd /e/dropbox/github/lean4/$R || exit 2
+  n=$(grep -n '^  b_cuenta < "$B_CIT" > "$B_ACT"$' b-control.bash | cut -d: -f1)
+  [ -n "$n" ] || { echo "$R: no encuentro la línea del gancho"; exit 2; }
+  E="$S/entradas-$R"; mkdir -p "$E"
+  awk -v n="$n" -v out="$S/citas-$R.txt" -v e="$E" '{ print } NR == n {
+      print "  cp \"$B_CIT\" \"" out "\""
+      print "  cp \"$B_DECLS_A\" \"" e "/vivos\"; cp \"$B_ENV_A\" \"" e "/env\"; cp \"$B_SOND_A\" \"" e "/sond\""
+      print "  cp \"$B_MOD_A\" \"" e "/mod\"; cp \"$B_RUT_A\" \"" e "/rut\"; cp \"$B_HIST\" \"" e "/hist\"" }' b-control.bash > "$S/b-control.tmp"
+  cp "$S/b-control.tmp" b-control.bash
+  bash check-doc-sync.bash > "$S/ds-$R.txt" 2>&1
+  git checkout -- b-control.bash
+  echo "$R: $(git status --short b-control.bash | wc -l) cambios en b-control.bash tras restaurar; $(grep -c '^B' "$S/citas-$R.txt") citas muertas; entradas: $(wc -l "$E"/* | tail -1)"
+done

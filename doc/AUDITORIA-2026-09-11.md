@@ -1,6 +1,16 @@
 # Auditoría del proyecto — 2026-09-11 · **dos ciclos, en las dos direcciones**
 
-**Last updated:** 2026-09-11 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](../DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-09-11 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+
+> 🗄️ **HISTÓRICO** (✏️ 2026‑11‑09, [ADR‑262](../DECISIONS.md)): la auditoría del 2026‑09‑11, sobre el árbol de ese
+> día (142 jobs, 5 `axiom` de Lean). Sus once hallazgos (F‑1…F‑10 y F‑1b) están, con su estado de hoy, en
+> `doc/control/hallazgos.tsv` (T37, ADR‑241): los once, «hecho». Los cuatro abiertos se cerraron el mismo día: F‑1 con
+> la medición de `axioms ⊢` (sintácticamente completo, ADR‑024; `goedel_second'` y `con_imp_godel'`, retirados en 1082d44)
+> y Gödel II ensamblado sobre `Prf` (900410a); F‑4, F‑8 y F‑9 con `PLAN-PRUEBAS.md`, los controles del libro en la CI
+> y M‑9 (2a21b7d). Después, la capa `⊢` y `FOL/MetaRules.lean` se retiraron (ADR‑115, 2026‑10‑02), Gödel I y II
+> quedaron sin hipótesis (`goedel_I`, `goedel_II`: ADR‑120), `Probe/` se archivó en `archivo/probe-2026-11-02` (ADR‑247),
+> y hoy hay 0 `axiom` de Lean en el build y 120 axiomas objeto (`axioms_len`). Lo de abajo es registro; lo vigente,
+> `CURRENT-STATUS-PROJECT.md`, `TEOREMAS-E-HIPOTESIS.md` y `doc/control/hallazgos.tsv`.
 
 **Alcance:** la **intención** declarada, la **documentación de salida**, el **plan de prueba** y el
 **código** — recorridos de arriba abajo y de abajo arriba, dos veces.

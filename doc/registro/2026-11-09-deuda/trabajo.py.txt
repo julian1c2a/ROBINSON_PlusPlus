@@ -1,0 +1,47 @@
+"""Una hoja de trabajo por documento con deuda de [B]: cada cita muerta (línea, clase, clave, cita) y, por cada clave,
+su HECHO medido de la historia de git (de hechos.tsv). Salida: trabajo/<REPO>__<doc con / → _>.md
+Uso: py -3.15 trabajo.py"""
+import io, os, re, collections
+
+S = os.path.dirname(os.path.abspath(__file__))
+hechos = {}
+for l in io.open(os.path.join(S, 'hechos.tsv'), encoding='utf-8'):
+    c = l.rstrip('\n').split('\t')
+    if c[0] in ('B', 'B2'):
+        hechos[(c[0], c[1])] = c
+os.makedirs(os.path.join(S, 'trabajo'), exist_ok=True)
+for repo, fich in (('RPP', 'citas-ROBINSON_PlusPlus.txt'), ('FOL', 'citas-FOL.txt')):
+    por_doc = collections.defaultdict(list)
+    for l in io.open(os.path.join(S, fich), encoding='utf-8', errors='replace'):
+        c = l.rstrip('\n').split('|')
+        if len(c) < 4 or c[0] not in ('B', 'B2'):
+            continue
+        m = re.match(r'(.*):([0-9]+)$', c[3])
+        por_doc[m.group(1)].append((int(m.group(2)), c[0], c[1], c[2]))
+    for doc, citas in por_doc.items():
+        citas.sort()
+        p = os.path.join(S, 'trabajo', repo + '__' + doc.replace('/', '_') + '.md')
+        with io.open(p, 'w', encoding='utf-8', newline='\n') as f:
+            f.write('# [B] de %s:%s — %d citas muertas (medido el 2026-11-09)\n\n' % (repo, doc, len(citas)))
+            f.write('Comprueba lo que queda con: bash %s/b-uno.bash %s %s\n\n' % (S.replace('\\', '/'), repo, doc))
+            f.write('## Las citas, por línea (línea · clase · clave · lo citado)\n\n')
+            for ln, cl, k, ci in citas:
+                f.write('- %d · %s · `%s`%s\n' % (ln, cl, k, '' if ci == k else ' · cita: `%s`' % ci))
+            f.write('\n## Los hechos de cada clave (de la historia de git: HEAD y etiquetas de RPP y FOL)\n\n')
+            f.write('«historia» es un HECHO medido por hechos.py; «pistas» son nombres VIVOS parecidos, NO un hecho: '
+                    'compruébalos en doc/indice.tsv (o con git) antes de usarlos.\n\n')
+            vistos = []
+            for ln, cl, k, ci in citas:
+                if (cl, k) not in vistos:
+                    vistos.append((cl, k))
+            for cl, k in vistos:
+                h = hechos.get((cl, k))
+                if not h:
+                    f.write('- %s `%s`: (sin hecho)\n' % (cl, k)); continue
+                extra = ''
+                if h[5]:
+                    extra += ' Lo declara un SONDEO: %s (si la línea nombra ese sondeo, [B] la absuelve).' % h[5]
+                if h[6]:
+                    extra += ' Pistas vivas: %s.' % h[6]
+                f.write('- %s `%s` — %s.%s En todos los documentos: %s.\n' % (cl, k, h[4], extra, h[3]))
+print(len(os.listdir(os.path.join(S, 'trabajo'))), 'hojas')

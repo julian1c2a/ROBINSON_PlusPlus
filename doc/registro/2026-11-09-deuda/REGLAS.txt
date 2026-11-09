@@ -1,0 +1,147 @@
+# La deuda de documentación de [E], [B] y [A2] — reglas del lote (2026-11-09, ADR‑262 de RPP)
+
+Lo pide el propietario: «vamos a por la deuda de documentación de [E], [B] y [A2]». Cada editor tiene una lista de
+ficheros SUYOS (nadie más los toca). Lee esto entero antes de tocar nada.
+
+Repos: RPP = `E:/dropbox/github/lean4/ROBINSON_PlusPlus` (en Git Bash `/e/dropbox/github/lean4/ROBINSON_PlusPlus`), FOL =
+`E:/dropbox/github/lean4/FOL`. Carpeta del lote: `D:/msys64/tmp/claude/d75c25be1c300eb1/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/deuda`
+(abajo, `$DEUDA`; en Git Bash, `/d/msys64/tmp/claude/d75c25be1c300eb1/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/deuda`).
+
+## 0 · Reglas duras (romper una invalida el lote)
+
+1. Sólo editas TUS ficheros. Nunca un `.lean`, un script (`*.bash`, `*.awk`, `*.py` del repo), `doc/control/*.tsv`,
+   `doc/indice.tsv`, `check-doc-sync.bash` ni `DECISIONS.md` (salvo que sea tuyo). No crees ficheros en los repos.
+2. Nunca `lake`, `check-doc-sync.bash`, `check-*.bash`, ni ningún build: hay otros editores a la vez y se pisan.
+   Tus herramientas son `b-uno.bash` (abajo), `grep`, `git log/show/diff` (sólo lectura) y `doc/indice.tsv`.
+3. Nunca `git add/commit/stash/checkout/reset/restore`, ni nada que escriba en git.
+4. Edita con la herramienta **Edit**, o en lote con `py -3.15 $DEUDA/aplicar.py RUTA_DOC CAMBIOS.json` (todos los
+   reemplazos o ninguno; escribe el JSON con la herramienta **Write**, en `$DEUDA/tmp/`, nunca con un heredoc). Nada
+   de `sed -i`, `perl -pi` ni Python propio sobre los documentos: los ficheros tienen finales CRLF y se rompen.
+5. NO INVENTES HISTORIA. Todo «retirado en ADR‑NNN», «renombrado a `X`», «archivado en la etiqueta …» sale de un HECHO:
+   la hoja de trabajo de tu documento (sección «Los hechos»), `$DEUDA/hechos.md`, o una orden que ejecutas (`git log -S`,
+   `git show`, `grep` en `doc/indice.tsv`, `grep '^## ADR-NNN' DECISIONS.md doc/historia/DECISIONS-001-130.md`). Si no
+   lo puedes comprobar, no lo escribas: usa un marcador neutro («(no existe hoy)», «(ya no existe)») o déjalo y dilo en
+   tu informe.
+6. NO BORRES contenido para bajar la cuenta. Una cita muerta se ARREGLA (abajo); un párrafo de historia se queda.
+7. Una corrección hereda el error que corrige si no sabes POR QUÉ era falso (memoria del proyecto: 30 defectos en un
+   lote así). Ante la duda, una nota fechada «✏️ 2026‑11‑09 (ADR‑262): …» que diga lo que MEDISTE, no una reescritura.
+
+## 1 · [B] — citas muertas
+
+`[B]` (`b-citas.awk`) mira lo que va entre comillas invertidas en la prosa: un identificador o una ruta está VIVO si
+existe hoy (una constante de Lean del proyecto o de Lean, un módulo, un fichero versionado, una etiqueta de git o
+«etiqueta:ruta»); si no, está MUERTO salvo que lo ABSUELVA un **marcador de estado** —palabra entera: retirado, borrado,
+eliminado, archivado, descartado, propuesto, candidato, hipotético, histórico, muerto, desaparecido, obsoleto,
+renombrado, sustituido, reemplazado, legacy, inexistente, «no existe», «ya no existe», «falta», «pendiente», «por
+construir/hacer/medir/escribir/demostrar/decidir/probar», «se borró/retiró/eliminó/archivó/descartó», «aquí vivía»,
+«habría que», ⏳, 🗑 (y sus femeninos/plurales)— a 100 bytes o menos, en la MISMA celda de tabla, sin otra cita en medio.
+La fecha NO absuelve, ni «necesita», «pide», «exige», «hace falta», ni un marcador negado («no está retirado»), ni uno
+usado como sustantivo («la propuesta», «el histórico»). Un nombre que declara un SONDEO vive si la línea nombra ese
+sondeo (`sondeos/X.lean` o `X.lean`; un sondeo archivado, con su etiqueta: `archivo/sondeos-2026-10:sondeos/X.lean`).
+
+Tu herramienta: `bash $DEUDA/b-uno.bash RPP|FOL RUTA_DOC` (Git Bash; la ruta relativa a la raíz del repo) — imprime
+cada cita muerta que queda (`fichero:línea · clase · clave · cita`) y el TOTAL, en 3 segundos, con el MISMO núcleo que
+la CI. Tu hoja de trabajo: `$DEUDA/trabajo/<REPO>__<ruta con / → _>.md` (las citas por línea y los hechos de cada
+clave). Las líneas de la hoja son las del documento SIN tocar: tras editar, se mueven; re‑mide con `b-uno.bash`.
+
+Cómo se arregla cada una (en este orden de preferencia):
+
+- **(a) El texto habla del PRESENTE y la cosa existe hoy con otro nombre** (comprobado en `doc/indice.tsv` de RPP o de
+  FOL, o con `git log`): el nombre de hoy. Ej.: `Prf₀` → `Prfᵢ` (ADR‑102), si la frase describe el cálculo de hoy.
+- **(b) El texto habla de algo RETIRADO** (historia, un ADR, una sección fechada, «antes…»): el nombre se queda y lleva
+  su marcador justo DETRÁS, entre paréntesis: «`NegVerifier` (retirado, ADR‑115)», «`AnclaEq` (retirada, ADR‑118)»,
+  «`HenkinSaleDeRaa.lean` (archivado en `archivo/sondeos-2026-10`, ADR‑141)». Un grupo unido sólo por comas, «y», «o» o
+  barras lleva UN marcador detrás del grupo: «`ChainNegPrf`, `VerifierSound` y `CodeDecode` (retirados, ADR‑160)».
+  Pon el ADR SÓLO si está en el hecho (el asunto del commit lo nombra) o lo compruebas.
+- **(c) Un fichero o un sondeo ARCHIVADO en una etiqueta**: la ruta con su etiqueta, que es una cita VIVA y dice dónde
+  está: `archivo/sondeos-2026-10:sondeos/X.lean`, `archivo/t66-2026-10-18:ROBINSON_PlusPlus/Meta/ChainNegPrf.lean`,
+  `archivo/fuera-del-cono-2026-10-18:…`, `archivo/probe-2026-11-02:Probe/…`. Compruébalo: `git -C REPO ls-tree -r
+  --name-only ETIQUETA | grep RUTA`. Etiquetas de RPP: `archivo/fuera-del-cono-2026-10-18`, `archivo/probe-2026-11-02`,
+  `archivo/sondeo-s1-sin-ax-tc-cons-2026-08-16`, `archivo/sondeos-2026-10`, `archivo/t66-2026-10-18`, `pre-adr115`,
+  `v1.0.0`; de FOL: `archivo/feature-fol-igualdad-2026-05-05`, `v1.0.0`, `v1.5.0`.
+- **(d) No es un nombre de Lean** (la hoja dice «NUNCA declarado … ni fue un módulo»): una notación de la prosa, una
+  abreviatura, un parámetro, una táctica, una función de shell. Si la forma de código no aporta nada, TEXTO PLANO (sin
+  comillas): Prov(⌜φ⌝), T_Prf, Con', G, PsiF. Si nombra algo de Lean que existe, el nombre de Lean: Prov ↔
+  `provFromCode` (`Meta/Sigma1Prf`), Con' ↔ `consistencyFormula'` (`Meta/GodelTwo`), G ↔ `godelCN`
+  (`Meta/DiagonalNumeral`), PsiF es un PARÁMETRO de `pcc_bdAll_intro` («el parámetro PsiF de `pcc_bdAll_intro`»). Una
+  abreviatura de familia («`pcc_dot_nul`/`_un`/`_bin`»): los nombres enteros que EXISTEN (compruébalos) o texto plano.
+  Si quitar el formato estropea el sentido (una táctica dentro de una orden de Lean, un fragmento de código), déjala y
+  apúntala en tu informe como «falso positivo de [B]» con la razón: no la fuerces.
+- **(e) Un error de la cita** (una errata, una ruta relativa a otro directorio): la cita correcta, comprobada.
+
+Comprueba cada documento con `b-uno.bash` al acabar: el TOTAL tiene que bajar, y ninguna clave nueva puede aparecer
+(si aparece una cita muerta NUEVA, la has creado tú: arréglala).
+
+## 2 · [A2] — cifras viejas en el cuerpo (sólo doc/REFERENCE-Incompleteness.md tiene deuda)
+
+Una línea de la 101 en adelante que dice «N jobs», «N módulos activos», «Meta N +», «N `sondeos/`», «N `axiom` de
+Lean», «N sorry» con una N que no es la de hoy. Se arregla con un marcador de historia EN LA MISMA LÍNEA —«entonces»,
+«histórico», «previo», «antes», «era/eran/fueron», «en su momento»— o con la cifra de hoy si la línea habla del
+presente. Ej.: «> `Build completed successfully (135 jobs)`.» → «> Entonces: `Build completed successfully (135 jobs)`.».
+Comprueba con `py -3.15 $DEUDA/a2-uno.py RUTA_DOC` (la réplica de [A2]): no puede quedar ninguna línea.
+
+## 3 · [E] — la deuda de CONTENIDO (el cuerpo no se ha revisado desde la marca)
+
+`[E]` compara la marca de cabecera (`**Last updated:** AAAA-MM-DD …`, la PRIMERA del documento, con la fecha justo
+detrás) con la fecha del último commit que tocó el documento. Un documento de `E_DEUDA` sale de la deuda cuando alguien
+REVISA su cuerpo y entonces sube la marca. ⛔ Subir la marca sin revisar es exactamente el defecto que `[E]` caza.
+Dos clases (tu encargo dice cuál es cada fichero tuyo):
+
+- **(N) NORMATIVO o de REFERENCIA** (describe el árbol de hoy): cada afirmación del PRESENTE —un nombre, un fichero,
+  una cifra, un estado («abierto», «pendiente», «hoy»), una regla, una orden— tiene que ser CIERTA hoy, o pasar a
+  historia con una nota fechada. Compruébala (indice.tsv, `git ls-files`, `grep` en el código, los hechos de hoy de
+  abajo). Las secciones FECHADAS de historia dentro del documento (un diario «§3.40 · … (2026‑09‑06)») son registro:
+  se quedan, con sus citas arregladas por [B], sin re‑medirlas; comprueba que estén fechadas o rotuladas como historia.
+  ADR‑233 §6: un autoritativo se salda con su [B] e [I] en VERDE (cero citas muertas en el documento). Entonces:
+  `**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): <qué cambió, en una frase>. Antes, <la marca anterior, tal cual>`
+- **(H) HISTÓRICO o PLAN de su fecha**: su cuerpo es REGISTRO de su fecha (M‑13) y no se re‑mide ni se reescribe. La
+  revisión es: (1) que la CABECERA (antes de la marca o justo después) diga, con verdad, que es historia o un plan de
+  su fecha y dónde está lo vigente (si no lo dice, añade un aviso: `> 🗄️ **HISTÓRICO** (✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md)): <qué es, de cuándo, qué se retiró o cambió desde entonces —sólo hechos comprobados—>. Lo de abajo es registro; lo vigente, <documento>.`);
+  (2) que cada nota ✏️ o aviso añadido DESPUÉS de la marca vieja sea cierto hoy (`git log -p --since=FECHA_DE_LA_MARCA -- DOC`
+  te dice qué se añadió); (3) las citas de [B], si el documento está en la lista de [B] (sólo los de la sección 1).
+  Entonces: `**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, <la marca anterior>`
+- Un documento tuyo que NO está en `E_DEUDA` y que editas (p. ej. sondeos/README.md, TEOREMAS, NEXT-STEPS, README, los
+  de FOL que no están en su `E_DEUDA`): sube su marca a hoy en la misma edición, con la nota de lo que hiciste:
+  `**Last updated:** 2026-11-09 — [ADR‑262](DECISIONS.md): <qué>. Antes, <la marca anterior>` (en FOL, «ADR‑262 de RPP»).
+- La fecha va JUSTO detrás de `**Last updated:** ` (formato AAAA-MM-DD, guiones normales). No pongas otra fecha que
+  2026-11-09. No toques la marca de un documento que no revisaste.
+
+## 4 · No rompas los otros controles (los mira el coordinador al final, pero se evitan así)
+
+- `[A]`: las primeras 100 líneas de un autoritativo no pueden decir una cifra vieja en las frases fijas («N jobs»…).
+- `[I]`: no escribas que algo demostrado está abierto («⊬¬G no está cerrada», «D3 sin probar»…).
+- `[N]`: en los documentos de referencia, NUNCA una cita por número de línea (`Meta/X.lean:123`); cita por símbolo.
+- `[C]`: REFERENCE.md §1 tiene una fila por módulo del árbol: no quites ni renombres filas.
+- `[T]`: en TEOREMAS-E-HIPOTESIS.md no cambies la primera columna de ninguna fila de las tablas de titulares, ni añadas
+  ni quites filas.
+- `[M]`: la columna «Verificación» de la tabla MANDATORIES (DECISIONS.md) tiene que nombrar cosas que existen.
+- `[H]`: sondeos/README.md tiene una fila por sondeo del disco: no quites ni renombres filas.
+- `[P]`: no cambies un footprint escrito en la prosa sin comprobarlo en `check-footprints.bash`.
+- Vallas de código (```) y comentarios HTML: no dejes ninguno abierto (b-uno.bash lo avisa: «VALLA … ABIERTO»).
+
+## 5 · Los hechos de hoy (RPP `a453edd`, FOL `510da2a`, 2026‑11‑09; los mide CURRENT-STATUS-PROJECT.md §1)
+
+Build 150 jobs · 120 módulos activos (Minimal 2 + Meta 117 + Full 1) + el barril `Meta.lean` y la raíz · 0 en
+`cuarentena/` · 48 `sondeos/` (11 de control) · 0 `sorry` · 0 `axiom` de Lean (en RPP y en FOL) · 120 axiomas objeto (34
+`coreAxioms` + 85 `codingAxioms` + el ancla diagonal; 142 hasta ADR‑192) · 35 titulares (TEOREMAS §1/§3) · 652 footprints
+· 12 estratos · 0 avisos · Lean v4.35.0 · 426 hallazgos (221 hechos, 0 pendientes, 32 descartados, 173 sustituidos) ·
+el último ADR, ADR‑261. Gödel I entero (`goedel_I`, `goedel_I_neg`), Gödel II (`goedel_II`, `goedel_second_formalizado`),
+Tarski, Rosser (`rosser_ext`), Löb (`lob`), D1–D3 demostradas, `consistencia` (relativa a Lean).
+
+Las retiradas grandes (compruébalas en DECISIONS.md / doc/historia/DECISIONS-001-130.md; los hechos de tu hoja mandan):
+ADR‑026 (2026‑09‑12, el ancla deja de ser `axiom`: clase `AnclaEq`), ADR‑102 (`Prf₀` → `Prfᵢ`), ADR‑115 (2026‑10‑02, la
+capa `⊢` RETIRADA de RPP —27 módulos, 633 declaraciones— y `FOL/MetaRules.lean` retirado en FOL), ADR‑117 (el ancla,
+diagonal), ADR‑118 (2026‑10‑05, la clase `AnclaEq` retirada), ADR‑129 (D7: símbolos `List Char`), ADR‑141 (2026‑10‑16,
+53 sondeos archivados en `archivo/sondeos-2026-10`), ADR‑142 (la historia a `doc/historia/`), ADR‑160 (2026‑10‑18, T66:
+`ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode`, `CodeDecode` fuera del build, en `archivo/t66-2026-10-18`),
+ADR‑161 (2026‑10‑18: `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf`, `Full/PrimeFactor` fuera, en
+`archivo/fuera-del-cono-2026-10-18`), ADR‑192 (los 22 `ax_vpf_*` fuera), ADR‑247 (`Probe/` archivado en
+`archivo/probe-2026-11-02`). F7a (2026‑07‑09, `f03eacf`): `Meta/Incompleteness.lean` y sus postulados, borrados.
+
+## 6 · Tu informe (tu última respuesta, para el coordinador)
+
+Por cada fichero tuyo: (1) citas muertas antes → después (las dos cifras de `b-uno.bash`); (2) qué hiciste, por clase
+(a)–(e), con cuántas; (3) para (N)/(H): las afirmaciones del presente que corregiste, CADA UNA con la orden o el fichero
+que la comprueba; (4) lo que dejaste y por qué (falsos positivos de [B], dudas); (5) si subiste la marca, la marca
+exacta. Sé breve en lo que salió bien y preciso en lo dudoso. NO digas «verificado» de algo que no comprobaste con
+una orden.

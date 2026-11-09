@@ -639,45 +639,45 @@ echo "════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) �
 # lo que son. Y un TECHO, como el de [B] desde ADR-167: las dos tablas juntas no pueden tener un documento que no tenga
 # la base verificada (un número de tope dejaba cambiar uno por otro).
 read -r -d '' E_DEUDA <<'EOF'
-REFERENCE.md
+# REFERENCE.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
 # CURRENT-STATUS-PROJECT.md — SALDADA el 2026-10-21 (ADR-182, T26): reescrito entero, con su marca.
 # DEPENDENCIES.md — SALDADA el 2026-11-02 (ADR-238, T30): lo GENERA gen-dependencies.py, y la CI comprueba su --check.
 # README.md — SALDADA el 2026-10-21 (ADR-183, T25): reescrito contra el árbol, con su marca.
-AXIOMS.md
+# AXIOMS.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
 # GODEL-STATUS.md — SALDADA el 2026-10-21 (ADR-185, T28): reescrito entero, con su marca.
-doc/REFERENCE-Arithmetic.md
-doc/REFERENCE-Full.md
-doc/REFERENCE-Incompleteness.md
-doc/REFERENCE-Kernel.md
-cuarentena/README.md
+# doc/REFERENCE-Arithmetic.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
+# doc/REFERENCE-Full.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
+# doc/REFERENCE-Incompleteness.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
+# doc/REFERENCE-Kernel.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
+# cuarentena/README.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
 # ── ampliación del universo, 2026-09-22 (ADR-084): los 21 defectos de los 25
 #    documentos que `[E]` nunca había mirado. La cifra sólo puede BAJAR.
 # .claude/commands/docsync.md — SALDADA el 2026-10-31 (ADR-235, T21): revisado entero, cada afirmación contra el código.
-AI-GUIDE.md
-CHANGELOG.md
-DISCUSIONES.md
-doc/AUDITORIA-2026-09-11.md
-doc/AUDITORIA-FOL-2026-09-12.md
-doc/FEEDBACK-PARA-EL-LIBRO.md
-GODEL-D3-TRACKED-DESIGN.md
-GODEL-D-ARITHMETIZATION.md
-MINIMAL-AXIOMS.md
-PLAN-FRENTE-A.md
+# AI-GUIDE.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
+# CHANGELOG.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# DISCUSIONES.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# doc/AUDITORIA-2026-09-11.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# doc/AUDITORIA-FOL-2026-09-12.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# doc/FEEDBACK-PARA-EL-LIBRO.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# GODEL-D3-TRACKED-DESIGN.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# GODEL-D-ARITHMETIZATION.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# MINIMAL-AXIOMS.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# PLAN-FRENTE-A.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
 PLAN-LIBRO.md
-PLAN-NEGVERIFIER.md
-PLANNING.md
+# PLAN-NEGVERIFIER.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# PLANNING.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
 # PLAN-PRUEBAS.md — SALDADA el 2026-10-21 (ADR-185, T28): en AUTHORITATIVE, revisado, con su marca.
-PLAN-SORTES.md
-Sobre_el_libro.md
+# PLAN-SORTES.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# Sobre_el_libro.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
 # TEOREMAS-E-HIPOTESIS.md — SALDADA el 2026-10-02 (ADR-115): reescrito entero, con su marca.
-THOUGHTS.md
-TuplasFuncionesYListas.md
+# THOUGHTS.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# TuplasFuncionesYListas.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
 # WORKFLOW.md — SALDADA el 2026-10-28 (ADR-212): la Parte 4, con el orden del bump; su marca, al día.
 # ── y estas TRES las cazó el propio control, no la medición a mano: `comm` con
 #    locales distintos se las había comido. 🔑 Mi red era la estrecha esta vez.
-doc/PLAN-COMPLETITUD-FINITISTA.md
-ESCALANDO_EL_PROYECTO.md
-NAMING-CONVENTIONS.md
+# doc/PLAN-COMPLETITUD-FINITISTA.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# ESCALANDO_EL_PROYECTO.md — SALDADA el 2026-11-09 (ADR-262): revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha.
+# NAMING-CONVENTIONS.md — SALDADA el 2026-11-09 (ADR-262): revisado contra el árbol, con su [B] a cero si está en la lista de [B].
 EOF
 read -r -d '' E_DEUDA_FORMATO <<'EOF'
 # ── vacía desde el 2026-10-31 (T24, ADR-233): los 18 que no tenían marca la llevan, con la fecha de su última revisión

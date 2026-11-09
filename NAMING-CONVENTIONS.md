@@ -9,7 +9,7 @@
 > La prosa de este documento (explicaciones, motivación) va en español para que quede
 > clara sin ambigüedad.
 
-**Last updated:** 2026-09-26 — §9: subíndices de cálculo (`Prf₀` → `Prfᵢ`, ADR-102) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): §6 y §9, al día con notas fechadas —`Full/` con un solo módulo, los axiomas objeto (`def`, ningún `axiom` de Lean) con su prefijo, el índice que abre `scoped FOL`, 6 de los 120 módulos— y los ADR‑001…130, en `doc/historia/`. Antes, 2026-09-26 — §9: subíndices de cálculo (`Prf₀` → `Prfᵢ`, ADR-102) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor**: Julián Calderón Almendros
 
 ---
@@ -272,17 +272,20 @@ predecible.
 - Cerrar siempre el namespace explícitamente (`end MiNamespace`) para evitar
   confusiones de alcance.
 - Los bloques `variable` se declaran justo después de abrir el namespace.
-- **Namespace = ruta del fichero** (`DECISIONS.md` ADR-005):
+- **Namespace = ruta del fichero** (ADR-005, en `doc/historia/DECISIONS-001-130.md`):
   `Meta/ArithPrf.lean` → `namespace ROBINSON_PlusPlus.Meta.ArithPrf`. Aquí el mirroring
-  **sí se sigue** —109 de 122 módulos, medido el 2026-09-09—, y por eso ROBINSON_PlusPlus
+  **sí se sigue** —109 de 122 módulos, medido el 2026-09-09; ✏️ 2026‑11‑09 (ADR‑262), 119 de los 120, medido con el
+  primer `namespace ROBINSON_PlusPlus…` de cada fichero: la excepción es `Full/Induction.lean`—, y por eso ROBINSON_PlusPlus
   **no** adopta la regla «namespace plano» que los proyectos hermanos corrigieron en su
   ADR-005: allí nadie seguía el mirroring, aquí sí. Ver el addendum de ADR-005.
 - ⚠️ **Un namespace, un fichero — nunca compartido.** Que dos ficheros «traten del mismo
   tema» no autoriza a fusionar sus declaraciones en un namespace común: oculta qué fichero
-  define qué símbolo y arrastra colisiones de nombre —justo el tipo de trampa de §3.52,
-  donde dos homónimos legítimos convivían porque *la ambigüedad de `open` en Lean es
+  define qué símbolo y arrastra colisiones de nombre —justo el tipo de trampa de §3.52 de
+  `doc/REFERENCE-Incompleteness.md`, donde dos homónimos legítimos convivían porque *la ambigüedad de `open` en Lean es
   perezosa*—. Deuda registrada: los **11 módulos de `Full/`** comparten
-  `ROBINSON_PlusPlus.Full`.
+  `ROBINSON_PlusPlus.Full`. ✏️ 2026‑11‑09 (ADR‑262): ya no se comparte. Hoy `Full/` tiene un solo módulo,
+  `Full/Induction.lean`, el único que declara en `ROBINSON_PlusPlus.Full` (sin el espejo de su ruta); los otros diez
+  salieron: ocho con la capa `⊢` (ADR‑115), `Full/PrimeFactor.lean` (archivado, ADR‑161) y `Full/Numerals.lean` (retirado, ADR‑190).
 - **Sub-namespaces dentro de un fichero, permitidos** para sub-conceptos (`CTree`, `ENS`,
   `HW` en `Meta/`), siempre que se documenten localmente.
 
@@ -346,9 +349,17 @@ consistentemente el prefijo `ax_` (`ax_induction`, `ax_list_induction`,
 `ax_mod2_alternation`, `ax_inAxC`, `ax_p_tfa`, `ax_lineWF_cons`, …). Esto las hace
 distinguibles a simple vista de los teoremas ordinarios sin necesidad de abrir el
 fichero. Los cinco meta-axiomas de `Minimal/Axioms.lean` documentados en
-`DECISIONS.md` ADR-010 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) eran la
-excepción histórica (✏️ 2026‑10‑14, ADR‑134: retirados con la capa `⊢`, ADR‑115; hoy no existen) — no llevan el prefijo por ser anteriores a esta convención;
-no renombrarlos retroactivamente sin coordinar con ADR-010.
+ADR-010 (hoy en `doc/historia/DECISIONS-001-130.md`: `imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) eran la
+excepción histórica (✏️ 2026‑10‑14, ADR‑134: retirados con la capa `⊢`, ADR‑115; hoy no existen) — no lo llevaban por ser anteriores a esta convención,
+y la regla era no renombrarlos retroactivamente sin coordinar con ADR-010.
+
+✏️ 2026‑11‑09 (ADR‑262), **medido: hoy no hay ningún `axiom` de Lean, ni en RPP ni en FOL** (FOL no tiene axiomas
+desde el 2026‑10‑02: su `NAMING-CONVENTIONS.md` §9). El prefijo lo llevan los 120 axiomas OBJETO, que son
+`def … : Formula` de `Minimal/Axioms.lean`: llevan `ax_` los 85 de `codingAxioms`, 11 de los 34 de `coreAxioms` y el
+ancla, `ax_axiomsCodeT_def`; los otros 23 de `coreAxioms`, `ax` y su número (`ax2_peano_succ_neq_zero`, …,
+`ax29_sub_witness`). De los ejemplos de arriba sigue `ax_lineWF_cons` (en `codingAxioms`), y ninguno más:
+`ax_induction`, `ax_list_induction`, `ax_mod2_alternation` e `ax_inAxC` (retirados con la capa `⊢`, ADR‑115, 2026‑10‑02)
+y `ax_p_tfa` (retirado el 2026‑09‑12, `32f669d`).
 
 ### Subíndices de cálculo — `₀` clásico, `ᵢ` intuicionista (decidida 2026-09-26, ADR-102)
 
@@ -365,7 +376,8 @@ excepción histórica, igual que `Derives` en FOL (regla 4 de FOL): llamarlo `Pr
 marca que acaba de cambiar de sentido, y costaría 4565 apariciones en 97 ficheros (más 16079
 prefijos `prf_`), medido el 2026-09-26. **Decisión del propietario (2026-09-26): `Prf` se queda sin
 subíndice** (ADR-104). ⚠️ Los registros HISTÓRICOS (`DECISIONS.md`,
-`CHANGELOG.md`, `doc/AUDITORIA-*`, `doc/book/`) conservan `Prf₀` tal como se escribió.
+`CHANGELOG.md`, `doc/AUDITORIA-*`, `doc/book/` y, desde ADR‑142, `doc/historia/`, donde está ADR‑102) conservan
+`Prf₀` tal como se escribió.
 
 ### `=eq` y `≐`: dos notaciones del MISMO `Formula.eq` (escrita el 2026‑11‑05, FOL0912:R‑9, ADR‑257)
 
@@ -381,16 +393,19 @@ subíndice** (ADR-104). ⚠️ Los registros HISTÓRICOS (`DECISIONS.md`,
   `≐`, en esos tres módulos, y sólo `Meta/Representability2Prf.lean` usa las dos; en FOL, ninguna de las dos fuera de
   su definición. La auditoría de FOL del 2026‑09‑12 contaba 4410 y 201, con los comentarios y sobre otro árbol, y «20+
   módulos de `Meta/`» que las mezclaban.
-* Lean imprime `≐`, la global, salvo con el espacio abierto: el índice de las constantes (`doc/indice.tsv`, que no
-  abre nada) la da en 1011 enunciados.
+* Lean imprime `≐`, la global, salvo con el espacio abierto: el índice de las constantes (`doc/indice.tsv`, cuyo
+  generador no abre ese espacio —sí `scoped FOL`, desde ADR‑258—) la da en 1022 enunciados (✏️ 2026‑11‑09, ADR‑262:
+  re‑contado con `grep -c '≐' doc/indice.tsv`; decía «que no abre nada» y 1011, lo de ADR‑257, antes de ADR‑258…261).
 
 ### `¬ ∧ ∨` de las fórmulas: `open scoped FOL`, sólo donde se escriben (2026‑11‑05, L5‑08, ADR‑258)
 
 Las notaciones `¬`, ` ∧ ` y ` ∨ ` de las fórmulas de FOL son `scoped` en `FOL` (antes eran globales y sombreaban los
 conectivos de Lean en todo módulo: `k = 5 ∨ k = 7` no se leía, y un `∧` en el tipo de un `have` era `Formula.and`). Un
 módulo de RPP que escribe fórmulas con ellas pone `open scoped FOL` tras sus `import`; los demás no, y en ellos `∧`,
-`∨` y `¬` son los de Lean. MEDIDO: hoy la llevan 6 de los 119 módulos (`Minimal/Axioms.lean`, `Meta/Hilbert.lean`,
-`Meta/HilbertSeq.lean`, `Meta/Representability2Prf.lean`, `Meta/ReprPrf.lean` y `Meta/Delta0ReflectPrf.lean`); en ellos
+`∨` y `¬` son los de Lean. MEDIDO: hoy la llevan 6 de los 120 módulos (`Minimal/Axioms.lean`, `Meta/Hilbert.lean`,
+`Meta/HilbertSeq.lean`, `Meta/Representability2Prf.lean`, `Meta/ReprPrf.lean` y `Meta/Delta0ReflectPrf.lean`;
+✏️ 2026‑11‑09, ADR‑262: decía «de los 119», la cuenta de ADR‑258, antes de que ADR‑259 añadiera
+`Meta/ListIndAdmisible.lean`); en ellos
 la trampa sigue, y allí los conectivos de Lean se escriben por nombre (`And`, `Or`). `⇒ ⇔ ≐ ∀. ∃. ⊥ ⊤ #` siguen
 globales: no chocan con ninguna notación de Lean. ✏️ ADR‑260: `≤` y `∈`, los objeto de RPP (`le` e `In`), están en su
 propio espacio, `ROBINSON_PlusPlus.Minimal.Axioms.Objeto`, y no en `ROBINSON_PlusPlus.Minimal.Axioms`, que casi todo

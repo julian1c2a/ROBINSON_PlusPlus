@@ -1,7 +1,9 @@
 # `cuarentena/` — ✅ **VACÍA** (2026-08-23)
 
-**Last updated:** 2026‑09‑10h — los **7 reflectores** y **D3** cerrados: la sección «Lo que queda»
-ya no queda nada. (previo 2026-08-23 — repatriación COMPLETA)
+**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): sigue vacía (`git ls-files cuarentena/`
+da sólo este README) y los sustitutos y las piezas que cita existen; lo retirado lleva su marca, los tres sondeos de
+la lección 4, su etiqueta, y Prov va en texto plano. Antes, 2026‑09‑10h — los **7 reflectores** y **D3** cerrados: la
+sección «Lo que queda» ya no queda nada. (previo 2026-08-23 — repatriación COMPLETA)
 **Autor:** Julián Calderón Almendros
 
 > ## Los 31 módulos han vuelto. Este directorio ya no contiene código.
@@ -32,21 +34,21 @@ Sus teoremas eran **formalmente correctos** pero se habían demostrado sobre una
 | paso 6 · `CodeTreeReflect`, `LineWFEfqPrf` | 3 |
 | paso 7 · `InAxiomsCodePrf` + cascada final | **0** ✅ |
 
-**Todo con el footprint sancionado** (`[propext, choice, Quot.sound, prf_axiomsCodeT_eq]`), sobre la
+**Todo con el footprint sancionado** (`[propext, choice, Quot.sound, prf_axiomsCodeT_eq]`, el de entonces: su axioma del proyecto, el ancla, se retiró con ADR‑026), sobre la
 teoría **reparada**, y **sin cambiar ningún enunciado público**.
 
 ## Las tres sub‑familias, y cómo se sustituyó cada una
 
 | familia | sustituto |
 |---|---|
-| `prf_tc_cons'` | **`pcc_dot_cons`** — la misma ecuación, pero **dentro de `Prov`**. Moldes: `pcc_rw_dot_cons_un` (unario, `Prf`), `pcc_rw_dot_cons_nthc` (binario, `PrfH`), vía **`pcc_rw_imp`** |
-| `prf_tc_form` | `prf_tc_form_numeral` (net‑0) + **conversión en la FRONTERA** (`pcc_to_formCode_imp`), porque el lado derecho está fijado por `D3DottedPrf` y **es el objetivo de D3** |
-| KIT `prf_tc_nul`/`_un`/`_bin` | `pcc_dot_nul`/`_un`/`_bin` — **por composición de `pcc_dot_cons`, sin inducción nueva** |
+| `prf_tc_cons'` (retirado) | **`pcc_dot_cons`** — la misma ecuación, pero **dentro de Prov**. Moldes: `pcc_rw_dot_cons_un` (unario, `Prf`), `pcc_rw_dot_cons_nthc` (binario, `PrfH`), vía **`pcc_rw_imp`** |
+| `prf_tc_form` (retirado) | `prf_tc_form_numeral` (net‑0) + **conversión en la FRONTERA** (`pcc_to_formCode_imp`), porque el lado derecho está fijado por `D3DottedPrf` y **es el objetivo de D3** |
+| KIT `prf_tc_nul`/`prf_tc_un`/`prf_tc_bin` (retirados) | `pcc_dot_nul`/`pcc_dot_un`/`pcc_dot_bin` — **por composición de `pcc_dot_cons`, sin inducción nueva** |
 
 ## Las lecciones que deja (material del libro)
 
 1. **El transporte cambia de NIVEL, no de nombre.** Lo que era una igualdad de **código** (fuera de
-   `Prov`) pasa a ser una reescritura **interna** (dentro). No es un reemplazo textual: cada sitio
+   Prov) pasa a ser una reescritura **interna** (dentro). No es un reemplazo textual: cada sitio
    debe aportar su código‑contexto y su ecuación de `substfc`.
 2. **Antes de sustituir un puente, comprobar si el lema lo NECESITABA.** Varias invariancias
    `substtc` sólo lo usaban de atajo: `formCode φ` y `listFormCodeM L` son **cerrados**, y su
@@ -54,9 +56,9 @@ teoría **reparada**, y **sin cambiar ningún enunciado público**.
 3. **Los pasos componen.** `pcc_eq_symm_code_internal`, que el KIT necesitaba, volvió con
    `BdAllIntroPrf` en el paso 3. Hacerlos en orden de cascada dejó cada herramienta a mano justo
    cuando hacía falta.
-4. **Medir antes de comprometerse.** Las tres familias se midieron en `sondeos/` (`CarcPayoff`,
-   `TcFormPayoff`, `KitPayoff`) **antes** de tocar producción. Ninguna medición falló, y una
-   (`prf_tc_form`, retirado el 2026‑08‑18) cambió la estrategia por completo.
+4. **Medir antes de comprometerse.** Las tres familias se midieron en `sondeos/`
+   (`CarcPayoff`, `TcFormPayoff`, `KitPayoff`, archivados con ADR‑141 en `archivo/sondeos-2026-10`) **antes** de tocar
+   producción. Ninguna medición falló, y una (`prf_tc_form`, retirado el 2026‑08‑18) cambió la estrategia por completo.
 
 ## ▶ Lo que queda, y no está aquí
 

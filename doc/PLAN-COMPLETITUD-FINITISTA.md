@@ -1,6 +1,14 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Last updated:** 2026-10-05 (D7 ejecutada (ADR‑129 de RPP): notas fechadas en el banner, §7, §7.5, §7.2, §7.4 y §7.3, y el resultado medido al final de §7.3; antes, 2026-09-27, notas fechadas de ADR‑110: bajo el banner de la vía W, en §6.3 y en §7; antes, 2026-09-18 12:30) · **Autor:** Julián Calderón Almendros *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](../DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-10-05 (D7 ejecutada (ADR‑129 de RPP): notas fechadas en el banner, §7, §7.5, §7.2, §7.4 y §7.3, y el resultado medido al final de §7.3; antes, 2026-09-27, notas fechadas de ADR‑110: bajo el banner de la vía W, en §6.3 y en §7; antes, 2026-09-18 12:30) · **Autor:** Julián Calderón Almendros *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+
+> 🗄️ **HISTÓRICO** (✏️ 2026‑11‑09, [ADR‑262](../DECISIONS.md)): el plan del 2026‑09‑14 para una completitud y un
+> Herbrand finitistas en FOL, con sus notas de ejecución fechadas hasta el 2026‑10‑12; sus dos objetivos están cerrados
+> (abajo). Los footprints que da el banner coinciden hoy con sus filas de `check-footprints.bash` (`derives0_soundness`,
+> `completeness₀`, `derives0_complete_iff`, `lindenbaum_lemma₀`, `henkin_completion₀`, `hauptsatz₀`, `herbrand₀` y
+> `derives0_consistent_fin`); los nombres del cuerpo son los de cuando se escribió (la capa ₀ lleva hoy su subíndice:
+> ADR‑105 y ADR‑109), y sus cifras, las de su fecha. Lo de abajo es registro; lo vigente, `../FOL/AXIOMS.md` §4 (lo no
+> constructivo de FOL) y `../FOL/REFERENCE.md`.
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -1492,7 +1500,7 @@ Lo de arriba queda como registro. Compilado (FOL 58 jobs, RPP 129) y MEDIDO:
   `evalTerm_updateCsts` (antes `[propext, Quot.sound]`). En RPP lo pierden **44** filas
   (lo llevaban 226 de 229; hoy, 182 de 233; la puerta de ADR‑122 decía hasta 48), entre ellas `v_ancla` y
   `MN_codingAxioms`. No lo pierden los titulares de Gödel, la solidez ni Tarski: su `Classical.choice` es el de la
-  solidez clásica (`prf_sound`, el axioma `p3`), no el de `String`. ✏️ *(2026‑10‑05, [ADR‑131](DECISIONS.md))*: la causa era una INFERENCIA, y es falsa: MEDIDO (`sondeos/ChoiceFrontera.lean`), 168 de las 182 filas con `Classical.choice` no pasan por `prf_sound`; 158 lo reciben sólo de dos cancelaciones de lift (`SubstArith.substTerm_liftLiftLift` y `…LiftLiftLift`), entre ellas `goedel_first_prf`, `goedel_second_prf` y `prf_tarski`.
+  solidez clásica (`prf_sound`, el axioma `p3`), no el de `String`. ✏️ *(2026‑10‑05, [ADR‑131](DECISIONS.md))*: la causa era una INFERENCIA, y es falsa: MEDIDO (`sondeos/ChoiceFrontera.lean`), 168 de las 182 filas con `Classical.choice` no pasan por `prf_sound`; 158 lo reciben sólo de dos cancelaciones de lift (`SubstArith.substTerm_liftLiftLift` y `…LiftLiftLift`), entre ellas `goedel_first_prf`, `goedel_second_prf` y `prf_tarski`. ✏️ *(2026‑11‑09, [ADR‑262](../DECISIONS.md))*: y desde ADR‑189 (2026‑10‑21) esas dos cancelaciones van sin `omega` y los titulares de la clase (i), sin `Classical.choice`: hoy `goedel_first_prf`, `goedel_second_prf` y `prf_tarski` son `[propext, Quot.sound]` (`check-footprints.bash`).
 * **Fuera de los dos repos**: PeanoRF (bloqueado, sólo lectura) depende de `../FOL` y `../ROBINSON_PlusPlus` por
   ruta y dejará de compilar contra el FOL nuevo hasta que se adapte; no se toca.
 

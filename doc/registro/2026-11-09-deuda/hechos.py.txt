@@ -1,0 +1,185 @@
+"""Los HECHOS de cada cita muerta de [B] (RPP y FOL): para el lote de la deuda de documentación (2026-11-09).
+
+Por cada clave muerta (la de b-citas.awk), de la historia de git de los dos repos (HEAD y etiquetas, como [B]):
+  · si el proyecto la DECLARÓ alguna vez (una línea de declaración añadida o quitada en un diff de un .lean), en qué
+    repo, cuándo apareció por primera vez y en qué commit DESAPARECIÓ la última vez (con su asunto, que suele nombrar
+    el ADR);
+  · si es un nombre de sondeo (declarado en un sondeo del árbol o archivado) — entonces [B] la absuelve si la línea
+    nombra el sondeo;
+  · nombres VIVOS parecidos (los del índice que la contienen o la terminan), como pista de un renombre (NO es un hecho:
+    el editor lo comprueba);
+y por cada ruta muerta (B2): el commit que borró ese fichero (si lo hubo) y las etiquetas que lo guardan.
+Salida: hechos.tsv (clave · clase · citas por documento · historia · pistas) y hechos.md (lo mismo, legible).
+Uso: py -3.15 hechos.py"""
+import io, re, subprocess, collections, os
+
+S = os.path.dirname(os.path.abspath(__file__))
+REPOS = {'RPP': 'E:/dropbox/github/lean4/ROBINSON_PlusPlus', 'FOL': 'E:/dropbox/github/lean4/FOL'}
+DECL = re.compile(r"^[+-][ \t]*(?:@\[[^\]]*\][ \t]*)*(?:(?:private|protected|noncomputable|partial|unsafe|nonrec|scoped|local)[ \t]+)*"
+                  r"(?:theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class)[ \t]+([^\s:({\[]+)")
+
+def git(repo, *args):
+    return subprocess.run(['git', '-C', REPOS[repo]] + list(args), capture_output=True).stdout.decode('utf-8', 'replace')
+
+# 1. las citas
+citas = collections.defaultdict(lambda: collections.Counter())   # (clase, clave) -> Counter(repo:doc)
+for repo, fich in (('RPP', 'citas-ROBINSON_PlusPlus.txt'), ('FOL', 'citas-FOL.txt')):
+    for l in io.open(os.path.join(S, fich), encoding='utf-8', errors='replace'):
+        c = l.rstrip('\n').split('|')
+        if len(c) < 4 or c[0] not in ('B', 'B2'):
+            continue
+        doc = re.sub(r':[0-9]+$', '', c[3])
+        citas[(c[0], c[1])][repo + ':' + doc] += 1
+
+# 2. la historia de las declaraciones: por nombre (entero y último componente), sus eventos en orden cronológico
+eventos = collections.defaultdict(list)   # nombre -> [(fecha, repo, commit, asunto, signo)]
+for repo in REPOS:
+    salida = subprocess.run(['git', '-C', REPOS[repo], 'log', 'HEAD', '--tags', '-p', '--reverse',
+                             '--format=@@C %h %ad %s', '--date=short', '--', '*.lean'], capture_output=True).stdout
+    cur = None
+    mas, menos = set(), set()
+    def cierra():
+        if cur is None:
+            return
+        for n in menos - mas:
+            eventos[n].append(cur + ('-',))
+        for n in mas - menos:
+            eventos[n].append(cur + ('+',))
+        for n in mas & menos:
+            eventos[n].append(cur + ('~',))
+    for raw in salida.split(b'\n'):
+        l = raw.decode('utf-8', 'replace')
+        if l.startswith('@@C '):
+            cierra()
+            p = l.split(' ', 3)
+            cur = (p[2], repo, p[1], p[3] if len(p) > 3 else '')
+            mas, menos = set(), set()
+            continue
+        if l.startswith('+++') or l.startswith('---'):
+            continue
+        m = DECL.match(l)
+        if m:
+            n = m.group(1).rstrip('.')
+            n = re.sub(r'\.\{.*$', '', n)
+            for k in {n, n.split('.')[-1]}:
+                (mas if l[0] == '+' else menos).add(k)
+    cierra()
+
+# 3. lo vivo hoy (el índice) para las pistas
+vivos = []
+for repo, ind in (('RPP', 'doc/indice.tsv'), ('FOL', 'doc/indice.tsv')):
+    p = os.path.join(REPOS[repo], ind)
+    if os.path.exists(p):
+        for l in io.open(p, encoding='utf-8', errors='replace'):
+            n = l.split('\t')[0]
+            if n and not n.startswith('#'):
+                vivos.append(n)
+ultimos = collections.defaultdict(list)
+for n in vivos:
+    ultimos[n.split('.')[-1]].append(n)
+
+# 4. los sondeos (del árbol y archivados): nombre -> sondeos
+sond = collections.defaultdict(set)
+RPP = REPOS['RPP']
+for f in sorted(os.listdir(os.path.join(RPP, 'sondeos'))):
+    if f.endswith('.lean'):
+        for l in io.open(os.path.join(RPP, 'sondeos', f), encoding='utf-8', errors='replace'):
+            m = DECL.match('+' + l)
+            if m:
+                n = m.group(1)
+                sond[n].add('sondeos/' + f); sond[n.split('.')[-1]].add('sondeos/' + f)
+arch = 'archivo/sondeos-2026-10'
+for f in git('RPP', 'ls-tree', '-r', '--name-only', arch, '--', 'sondeos/').split('\n'):
+    if f.endswith('.lean') and f.count('/') == 1:
+        for l in git('RPP', 'show', arch + ':' + f).split('\n'):
+            m = DECL.match('+' + l)
+            if m:
+                n = m.group(1)
+                sond[n].add(arch + ':' + f); sond[n.split('.')[-1]].add(arch + ':' + f)
+
+# 2b. los MÓDULOS y directorios que tuvo cada repo: los .lean borrados (HEAD y etiquetas), con el commit que los borró
+borrados = {}   # ruta relativa (sin .lean) -> (repo, commit, fecha, asunto)
+for repo in REPOS:
+    cur = None
+    for l in git(repo, 'log', 'HEAD', '--tags', '--diff-filter=D', '--name-only', '--format=@@C %h %ad %s',
+                 '--date=short', '--', '*.lean').split('\n'):
+        if l.startswith('@@C '):
+            p = l.split(' ', 3); cur = (repo, p[1], p[2], p[3] if len(p) > 3 else '')
+        elif l.strip() and cur and l.endswith('.lean'):
+            r = l[:-5]
+            if r not in borrados:      # (git log va del más nuevo al más viejo: la primera es la última baja)
+                borrados[r] = cur
+vivos_lean = set()
+for repo in REPOS:
+    for l in git(repo, 'ls-files', '*.lean').split('\n'):
+        if l.endswith('.lean'):
+            vivos_lean.add(l[:-5])
+
+def modulo(k):
+    """¿Fue `k` un módulo (A.B.C ↔ A/B/C.lean) o un directorio de .lean? Devuelve la frase, o ''."""
+    kk = k.rstrip('.*/').replace('.', '/')
+    hits = [(r, v) for r, v in borrados.items() if r == kk or r.endswith('/' + kk)]
+    if hits:
+        r, v = sorted(hits, key=lambda x: x[1][2])[-1]
+        return 'fue el MÓDULO %s.lean (%s), borrado el %s en %s %s: «%s»' % (r, v[0], v[2], v[0], v[1], v[3][:100])
+    dirs = [(r, v) for r, v in borrados.items() if ('/' + r + '/').find('/' + kk + '/') >= 0]
+    if dirs:
+        r, v = sorted(dirs, key=lambda x: x[1][2])[-1]
+        vivo = any(('/' + x + '/').find('/' + kk + '/') >= 0 for x in vivos_lean)
+        return 'fue un DIRECTORIO/librería de .lean (p. ej. %s.lean, %s, borrado el %s en %s: «%s»)%s' % (
+            r, v[0], v[2], v[1], v[3][:90], '; hoy QUEDAN .lean bajo un directorio con ese nombre' if vivo else '')
+    return ''
+
+def historia(k):
+    ev = eventos.get(k) or eventos.get(k.split('.')[-1]) or []
+    if not ev:
+        mo = modulo(k)
+        if mo:
+            return mo
+        return 'NUNCA declarado en un .lean de RPP ni de FOL (HEAD y etiquetas), ni fue un módulo: notación de la prosa, una abreviatura o un nombre de fuera'
+    alta = next((e for e in ev if e[4] in '+~'), ev[0])
+    bajas = [e for e in ev if e[4] == '-']
+    s = 'declarado en %s desde %s (%s)' % (alta[1], alta[0], alta[2])
+    if bajas:
+        b = bajas[-1]
+        s += '; desaparece la última vez el %s en %s %s: «%s»' % (b[0], b[1], b[2], b[3][:110])
+    else:
+        s += '; sin una baja limpia (renombrado en el mismo commit, o vive con otro espacio)'
+    return s
+
+def pistas(k):
+    u = k.split('.')[-1].rstrip("'_*")
+    if len(u) < 4:
+        return ''
+    c = ultimos.get(u, [])[:3]
+    if not c:
+        c = [n for n in vivos if n.split('.')[-1].startswith(u) or n.split('.')[-1].endswith(u)][:3]
+    return ', '.join(c)
+
+def ruta(k):
+    p = k.split(':', 1)[-1].replace('*', '')
+    for repo in ('RPP', 'FOL'):
+        for cand in (p, p[4:] if p.startswith('FOL/') and repo == 'FOL' else None):
+            if not cand:
+                continue
+            o = git(repo, 'log', '--all', '--diff-filter=D', '--format=%h %ad %s', '--date=short', '-1', '--', cand,
+                    '*/' + cand).strip()
+            if o:
+                return '%s: borrado en %s' % (repo, o[:140])
+    return 'no encuentro su borrado (¿nunca existió con esa ruta, o es relativa a otro directorio?)'
+
+with io.open(os.path.join(S, 'hechos.tsv'), 'w', encoding='utf-8', newline='\n') as t, \
+     io.open(os.path.join(S, 'hechos.md'), 'w', encoding='utf-8', newline='\n') as m:
+    t.write('clase\tclave\tcitas\tdocumentos\thistoria\tsondeos\tpistas_vivas\n')
+    m.write('# Los hechos de cada cita muerta de [B] (RPP y FOL), 2026-11-09\n\n'
+            'Generado por hechos.py de la historia de git (HEAD y etiquetas). La «historia» es un HECHO medido; las\n'
+            '«pistas» son nombres vivos parecidos, NO un hecho: comprobar antes de usarlas.\n\n')
+    for (cl, k), cnt in sorted(citas.items(), key=lambda x: (-sum(x[1].values()), x[0])):
+        docs = ', '.join('%s×%d' % (d, n) for d, n in cnt.most_common())
+        h = historia(k) if cl == 'B' else ruta(k)
+        so = ', '.join(sorted(sond.get(k, set()) | sond.get(k.split('.')[-1], set()))) if cl == 'B' else ''
+        pi = pistas(k) if cl == 'B' else ''
+        t.write('\t'.join([cl, k, str(sum(cnt.values())), docs, h, so, pi]) + '\n')
+        m.write('- **%s** `%s` — %d citas (%s). %s.%s%s\n' % (cl, k, sum(cnt.values()), docs, h,
+                (' Declarado en un sondeo: ' + so + '.') if so else '', (' Pistas vivas: ' + pi + '.') if pi else ''))
+print('claves:', len(citas))

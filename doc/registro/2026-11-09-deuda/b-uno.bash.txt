@@ -1,0 +1,24 @@
+#!/bin/bash
+# b-uno.bash REPO DOC [DOC…] — las citas muertas que [B] ve HOY en esos documentos, en segundos: el MISMO núcleo
+# (b-citas.awk del repo) con las entradas que volcó volcar-citas.bash (vivos, entorno de Lean, sondeos, módulos, rutas,
+# historia de git). REPO es RPP o FOL; DOC, la ruta relativa a la raíz de ese repo (p. ej. doc/REFERENCE-Full.md).
+# Imprime una línea por cita muerta: «fichero:línea · clase · clave · cita», y al final el total por documento.
+# ⚠️ Las entradas se volcaron una vez (2026-11-09): mide los DOCUMENTOS que cambias, no el código (que no cambia).
+export PATH="/usr/bin:/bin:$PATH"
+S=/d/msys64/tmp/claude/d75c25be1c300eb1/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/deuda
+case "$1" in
+  RPP) R=/e/dropbox/github/lean4/ROBINSON_PlusPlus; E=$S/entradas-ROBINSON_PlusPlus ;;
+  FOL) R=/e/dropbox/github/lean4/FOL; E=$S/entradas-FOL ;;
+  *) echo "uso: bash b-uno.bash RPP|FOL DOC [DOC…]"; exit 2 ;;
+esac
+shift
+T=$(mktemp -d)
+for d in "$@"; do
+  [ -f "$R/$d" ] || { echo "no existe: $R/$d"; rm -rf "$T"; exit 2; }
+  mkdir -p "$T/$(dirname "$d")"; tr -d '\r' < "$R/$d" > "$T/$d"
+done
+( cd "$T" && LC_ALL=C awk -f "$R/b-citas.awk" "$E/vivos" "$E/env" "$E/sond" "$E/mod" "$E/rut" "$E/hist" "$@" ) \
+  | LC_ALL=C awk -F'|' '$1 == "V" { print "⚠️ VALLA O COMENTARIO ABIERTO en " $2 " (el resto del documento NO se ha mirado)"; next }
+      { print $4 " · " $1 " · " $2 " · " $3; d = $4; sub(/:[0-9]+$/, "", d); n[d]++ }
+      END { for (k in n) print "TOTAL " k ": " n[k] " citas muertas" }'
+rm -rf "$T"

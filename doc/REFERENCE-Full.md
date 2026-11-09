@@ -3,22 +3,24 @@
 > 🗑️🗑️ **2026‑10‑02 · CASI TODO LO QUE DESCRIBE ESTE NODO SE RETIRÓ** ([ADR‑115](../DECISIONS.md)).
 > De los 11 módulos de `Full/` quedan **3**: `Induction` (sin sus teoremas sobre `⊢`: queda `primAxioms`,
 > las longitudes del censo, los lemas de sustitución e `inductionFormula`), «Numerals» (la definición de
-> `numeral`) y `PrimeFactor` (ℕ pura, intacto). Los otros ocho, el `axiom ax_induction_prim`,
-> `ax_list_induction` y el TFA objeto (`tfa_numeral`), hoy retirados, eran teoremas o postulados **sobre `⊢`**, y la capa
-> se retiró porque sus postulados eran falsos. Lo que sigue es **registro**.
+> `numeral`) y `PrimeFactor` (ℕ pura, intacto; retirado del build después, con ADR‑161). Los otros ocho,
+> el `axiom ax_induction_prim`, `ax_list_induction` y `tfa_numeral` (el TFA objeto), hoy retirados, eran teoremas
+> o postulados **sobre `⊢`**, y la capa se retiró porque sus postulados eran falsos. Lo que sigue es **registro**.
 > ✏️ *2026‑10‑21 ([ADR‑190](../DECISIONS.md), T76)*: hoy queda **uno**, `Induction`. «PrimeFactor» salió del build con
 > ADR‑161 y «Numerals», cuyo `numeral` era una copia de `Meta.Godel.numeral` (hoy el único fuera de `Minimal`), con ADR‑190.
+> ✏️ *2026‑11‑09 ([ADR‑262](../DECISIONS.md))*: lo retirado con ADR‑115 se recupera de la etiqueta `pre-adr115`
+> (ADR‑116 §6), y «PrimeFactor», de `archivo/fuera-del-cono-2026-10-18:ROBINSON_PlusPlus/Full/PrimeFactor.lean`.
 
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5).
 > Índice raíz: [REFERENCE.md](../REFERENCE.md).
 > **Nodos relacionados:** [Núcleo](REFERENCE-Kernel.md) (axiomas), [Aritmética](REFERENCE-Arithmetic.md)
 > (bloques que estos teoremas derivan/generalizan), [Incompletitud](REFERENCE-Incompleteness.md)
-> (`numeral` + `ax_induction` alimentan el verificador y la regla `ind`). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+> (`numeral` + `ax_induction` (retirado) alimentan el verificador y la regla `ind`; ✏️ 2026‑11‑09 (ADR‑262): hoy `ind` es el constructor `Prf.ind`, sobre `Full.inductionFormula`). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > **Ficheros `.lean`:** `ROBINSON_PlusPlus/Full/*.lean` (ver [directorio](../ROBINSON_PlusPlus/Full/)).
 
 **Contenido:** inducción general a nivel objeto (`ax_induction`/`inductionFormula`), inducción fuerte 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 derivada, puente `numeral` + homomorfismo, acotados, divisibilidad/división, primos y **TFA completo**
-(`tfa_numeral`). **Last updated:** 2026-09-10h · Lean v4.31.0.
+(`tfa_numeral`, retirado). **Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): cada cita de lo retirado lleva su marca (ADR‑115, ADR‑161, ADR‑190), y lo que se da por presente está comprobado (hoy `Full/` es sólo `Full/Induction.lean`, y `axioms` tiene 120 fórmulas). Antes, 2026-09-10h · Lean v4.31.0.
 
 ---
 
@@ -27,15 +29,17 @@ derivada, puente `numeral` + homomorfismo, acotados, divisibilidad/división, pr
 ### 3.14 `Full/` — Inducción general, representabilidad y TFA (Eje 4)
 
 **Namespace**: `ROBINSON_PlusPlus.Full`
-**Status**: ✅ Fragmento aritmético + listas de Minimal derivado; **TFA completo**
+**Status**: ✅ Fragmento aritmético + listas de Minimal derivado; **TFA completo** (✏️ 2026‑11‑09, ADR‑262: el del 2026‑06‑12; hoy no queda nada de eso: ver la cabecera)
 **@importance**: `high`
 **@axiom_system**: `Full` (inducción general como axioma object-level + meta-axiomas)
 **Last updated**: 2026-06-12
-**Módulos** (11): `Induction`, `Mod2`, `Lists`, `StrongInduction`, «Numerals», `Bounded`, `Divisibility`, `Division`, `PrimeFactor`, `Primality`, `Factorization`.
+**Módulos** (11): `Induction` y diez más, hoy retirados —`Mod2`, `Lists`, `StrongInduction`, `Bounded`, `Divisibility`, `Division`, `PrimeFactor`, `Primality`, `Factorization` y «Numerals»—: ocho con ADR‑115, «PrimeFactor» con ADR‑161 y «Numerals» con ADR‑190.
 
 > **Nota histórica**: `Intermediate/Induction.lean` (prototipo de inducción meta, Eje 3) fue **eliminado 2026-06-11**: el sistema con Φ finito es el caso particular de Full con inducción general, sin valor técnico añadido. Toda la inducción vive en `Full/`.
 
 #### `Full/Induction.lean` — inducción general object-level
+
+> ✏️ 2026‑11‑09 ([ADR‑262](../DECISIONS.md)): el bloque de abajo es el módulo del 2026‑09‑10h. De sus declaraciones existen hoy sólo `primAxioms`, `primAxioms_len`, `primAxioms_subset`, `inductionFormula`, `substFormula_succ_lift_gen` y `step_reduce` (con los demás lemas de sustitución y las longitudes del censo: `doc/indice.tsv`, módulo `ROBINSON_PlusPlus.Full.Induction`). Se retiraron con la capa ⊢ (ADR‑115): `prim_to_axioms`, `axp`, `ax_induction_prim`, `ax_induction`, `induction_object_prim` y `induction_object` —y con ellos los siete teoremas …_thm_prim—; los lemas re‑expuestos ya no están en el módulo. La inducción de hoy es la regla `Prf.ind` de `Meta/Hilbert.lean`, sobre `inductionFormula`.
 
 ```lean
 -- §0bis · el andamio de certificación (ADR-023, 2026-09-10h)
@@ -65,11 +69,11 @@ theorem lt_trichotomy_thm_prim: primAxioms ⊢ ax19_lt_trichotomy
 --   zero_or_succ_ax, zero_add, succ_add, zero_mul, succ_mul, add_comm_ax, mul_comm_ax
 ```
 
-⚠️ **`lt_succ_of_lt` es el caso que no sale por debilitamiento**: consume la hipótesis **en el
+⚠️ **`lt_succ_of_lt` (retirado) es el caso que no sale por debilitamiento**: consume la hipótesis **en el
 contexto**, y ahí el debilitamiento va en la dirección contraria. Se **internaliza** la implicación
 sobre `primAxioms`, se debilita **la implicación**, y se aplica `mp`.
 
-#### `Full/Mod2.lean` — ax24 (y `ax21`, que resultó ser PRIMITIVO)
+#### `Full/Mod2.lean` (retirado, ADR‑115) — ax24 (y `ax21`, que resultó ser PRIMITIVO)
 
 ```lean
 -- 🏁 2026-09-10h: era `axiom`. Hoy es TEOREMA (6 → 5 axiomas de Lean).
@@ -82,19 +86,19 @@ theorem mod2_of_even_thm : axioms ⊢ ax24_mod2_of_even  -- ax24, derivado de ve
 ```
 
 ⚠️⚠️ **Aquí vivía una CIRCULARIDAD, y sólo se vio al retirar el postulado.** El diseño de
-2026‑06‑11 decía a la vez que *«de `ax_mod2_alternation` salen `ax21` y `ax24` por inducción»* y que 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-*«`ax_mod2_alternation` es derivable de `ax21 + ax16`»*. Lean lo aceptaba **porque el círculo pasaba 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+2026‑06‑11 decía a la vez que *«de `ax_mod2_alternation` [retirado] salen `ax21` y `ax24` por inducción»* y que 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+*«`ax_mod2_alternation` [retirado] es derivable de `ax21 + ax16`»*. Lean lo aceptaba **porque el círculo pasaba 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 por un `axiom`**. Medido cuál es el primitivo —`ax16 + ax17` admiten un modelo con `mod2 2̄ = 2̄`—:
 **`ax21`**. ⇒ el censo pasa a **24 + 10**. Ver el addendum de [ADR‑023](../DECISIONS.md).
 
-Hallazgo: `ax16`+`ax17` dejan `mod2` subdeterminado (modelos con `mod2(σn)≥2`); `ax_mod2_alternation` lo cierra. Conservativo respecto a Minimal. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+Hallazgo: `ax16`+`ax17` dejan `mod2` subdeterminado (modelos con `mod2(σn)≥2`); `ax_mod2_alternation` (retirado) lo cierra. Conservativo respecto a Minimal. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
-#### `Full/Lists.lean` — ax_C3, ax_L3 (inducción estructural sobre listas)
+#### `Full/Lists.lean` (retirado, ADR‑115) — ax_C3, ax_L3 (inducción estructural sobre listas)
 
-🏁 **Certificados sobre `primAxioms`** desde 2026‑09‑10h: `concat_assoc_prim` y `in_concat_prim`,
-con **cero cambios de axioma** porque `ax_list_induction` ya era genérico en `Γ`. Las firmas 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-`axioms ⊢` (`concat_assoc_thm`, `in_concat_thm`, y los dos *pointwise* que consume
-`Meta/ProofChain.lean`) se conservan por `prim_to_axioms`. Los cuatro helpers de congruencia son
+🏁 **Certificados sobre `primAxioms`** desde 2026‑09‑10h: `concat_assoc_prim` y `in_concat_prim` (retirados),
+con **cero cambios de axioma** porque `ax_list_induction` (retirado) ya era genérico en `Γ`. Las firmas 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+`axioms ⊢` (`concat_assoc_thm`, `in_concat_thm`, hoy retirados, y los dos *pointwise* que consume
+`Meta/ProofChain.lean`) se conservan por `prim_to_axioms` (retirado). Los cuatro helpers de congruencia son
 **genéricos en `Γ`**: no citan ningún axioma.
 
 ```lean
@@ -132,7 +136,7 @@ theorem division_numeral (n d) (hd : 0 < d) :
 theorem isPrime_numeral (p) (hp2 : 2 ≤ p) (hpd : ∀ a, a∣p → a=1∨a=p) : IsPrime (numeral p)
 ```
 
-#### `Full/PrimeFactor.lean` — teoría de números META (ℕ pura, sin Mathlib) + TFA
+#### `Full/PrimeFactor.lean` (retirado, ADR‑161) — teoría de números META (ℕ pura, sin Mathlib) + TFA
 
 > 🗑️ **2026‑10‑18 (ADR‑161): retirado del build.** Nada suyo estaba en el cono de los titulares (el paso 3 de ADR‑139,
 > aprobado); se recupera de la etiqueta `archivo/fuera-del-cono-2026-10-18`. Lo de abajo es REGISTRO.
@@ -147,7 +151,7 @@ theorem euclid (hp : IsPrimeNat p) : p ∣ a*b → p∣a ∨ p∣b
 theorem count_unique / factorization_perm_unique : dos factorizaciones del mismo n son permutaciones
 ```
 
-#### `Full/Factorization.lean` — TFA transferido al object
+#### `Full/Factorization.lean` (retirado, ADR‑115) — TFA transferido al object
 
 ```lean
 def toTerm : List Nat → Term                                   -- lista de pares (numeral p, one)
@@ -157,9 +161,9 @@ theorem tfa_numeral (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p)
     ∧ (∀ qs, (∀ q∈qs, IsPrimeNat q) → natProd qs = n → ps.Perm qs)      -- UNICIDAD (ℕ)
 ```
 
-**TFA completo** (existencia object ∧ unicidad ℕ), autocontenido sin Mathlib/Peano. El `ax_p_tfa` de Block8 queda como forma *idealizada* (membership object + testigo object, no discharge constructivo por el "Muro 1"); `tfa_numeral` es la realización equivalente para todos los usos reales. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+**TFA completo** (existencia object ∧ unicidad ℕ), autocontenido sin Mathlib/Peano. El `ax_p_tfa` (retirado el 2026‑09‑12) de Block8 queda como forma *idealizada* (membership object + testigo object, no discharge constructivo por el "Muro 1"); `tfa_numeral` (retirado con ADR‑115) es la realización equivalente para todos los usos reales. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
-**Axiomas extra de Full**: **`ax_induction_prim`** y `ax_list_induction` — **dos**. (`ax_induction` es hoy **teorema**; `ax_mod2_alternation` fue **retirado** el 2026‑09‑10h.) **Estado del fragmento de Minimal en Full**: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅ + TFA ✅.
+**Axiomas extra de Full**: **`ax_induction_prim` (retirado)** y `ax_list_induction` (retirado) — **dos**. (`ax_induction`, retirado con ADR‑115, era entonces **teorema**; `ax_mod2_alternation` fue **retirado** el 2026‑09‑10h.) **Estado del fragmento de Minimal en Full**: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅ + TFA ✅ (✏️ 2026‑11‑09, ADR‑262: el de entonces; hoy no queda ninguno de esos teoremas ni de los dos axiomas extra).
 
 ---
 
@@ -170,10 +174,10 @@ theorem tfa_numeral (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p)
 > símbolo de función no la deriva ningún esquema de inducción — sin ella el símbolo no significa
 > nada. El censo separa las dos clases y **mide** cuántos quedan.
 
-`Minimal` tiene `axioms = coreAxioms ++ codingAxioms` (`axioms_eq`, por `rfl`), medido con
+`Minimal` tiene `axioms = coreAxioms ++ codingAxioms` (por `rfl`, en `axioms_eq`, retirado con ADR‑117), medido con
 `#eval ·.length`: **34 + 107 = 141** (hasta ADR‑117, 2026‑10‑04: esa lista es hoy `axiomsBase`, y `axioms` =
-`axiomsBase ++ [ax_axiomsCodeT_def]` —`axioms_split`; `axioms_eq`, retirado— = **142**, con el ancla diagonal,
-que no entra en el censo. Lo comprueba el núcleo, `axioms_len`/`axiomsBase_len`: evaluar `axioms` no acabaría).
+`axiomsBase ++ [ax_axiomsCodeT_def]` —`axioms_split`; `axioms_eq`, retirado — = **142**, con el ancla diagonal,
+que no entra en el censo; ✏️ 2026‑11‑09 (ADR‑262): **120** desde ADR‑192, los 119 de la base —34 + 85— y el ancla. Lo comprueba el núcleo, `axioms_len`/`axiomsBase_len`: evaluar `axioms` no acabaría).
 
 #### (a) Los **85** `codingAxioms` (✏️ 107 hasta ADR‑192) — **extensión definicional, irreducibles por diseño**
 
@@ -190,7 +194,7 @@ del censo.
 | **DERIVABLES CON INDUCCIÓN** | **10** | ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax24, ax_C3, ax_L3 | consecuencias de las ecuaciones definitorias **+ inducción** ⇒ **deben ser teoremas en `Full`** |
 
 ⚠️⚠️ **Corregido el 2026‑09‑10h: era 23 + 11, con `ax21` en la columna equivocada.** Su «derivación»
-en `Full/Mod2.lean` usaba `ax_mod2_alternation`, y **ése se deriva de `ax21`** ⇒ **círculo en 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+en `Full/Mod2.lean` (retirado) usaba `ax_mod2_alternation` (retirado), y **ése se deriva de `ax21`** ⇒ **círculo en 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 contenido**, invisible mientras la alternancia fue un `axiom`. Medido cuál es el primitivo:
 **`ax21`** — `ax16 + ax17` **no** fijan el rango de `mod2` (un modelo con `mod2 2̄ = 2̄` los
 satisface). ⇒ la alternancia es el **teorema**, y el postulado **se retiró**: **6 → 5** `axiom` de
@@ -202,16 +206,16 @@ Lean. Detalle en el addendum de [ADR‑023](../DECISIONS.md).
 
 | axioma | teorema en `Full` | fichero |
 |---|---|---|
-| ax6 `add_comm` | `add_comm_thm` | `Full/Induction.lean` |
-| **ax7 `add_assoc`** | 🆕 **`add_assoc_thm`** | `Full/Induction.lean` |
-| ax10 `mul_comm` | `mul_comm_thm` | `Full/Induction.lean` |
-| **ax11 `mul_assoc`** | 🆕 **`mul_assoc_thm`** | `Full/Induction.lean` |
-| **ax12 `mul_distrib`** | 🆕 **`mul_distrib_thm`** | `Full/Induction.lean` |
-| ax18 `lt_irrefl` | `lt_irrefl_thm` | `Full/Induction.lean` |
-| ax19 `lt_trichotomy` | `lt_trichotomy_thm` | `Full/Induction.lean` |
-| ax24 `mod2_of_even` | `mod2_of_even_thm` | `Full/Mod2.lean` |
-| ax_C3 `concat_assoc` | `concat_assoc_thm` | `Full/Lists.lean` |
-| ax_L3 `in_concat` | `in_concat_thm` | `Full/Lists.lean` |
+| `ax6_add_comm` | `add_comm_thm` (retirado) | `Full/Induction.lean` |
+| **`ax7_add_assoc`** | 🆕 **`add_assoc_thm`** (retirado) | `Full/Induction.lean` |
+| `ax10_mul_comm` | `mul_comm_thm` (retirado) | `Full/Induction.lean` |
+| **`ax11_mul_assoc`** | 🆕 **`mul_assoc_thm`** (retirado) | `Full/Induction.lean` |
+| **`ax12_mul_distrib`** | 🆕 **`mul_distrib_thm`** (retirado) | `Full/Induction.lean` |
+| `ax18_lt_irrefl` | `lt_irrefl_thm` (retirado) | `Full/Induction.lean` |
+| `ax19_lt_trichotomy` | `lt_trichotomy_thm` (retirado) | `Full/Induction.lean` |
+| `ax24_mod2_of_even` | `mod2_of_even_thm` (retirado) | `Full/Mod2.lean` (retirado) |
+| `ax_C3_concat_assoc` | `concat_assoc_thm` (retirado) | `Full/Lists.lean` (retirado) |
+| `ax_L3_in_concat` | `in_concat_thm` (retirado) | `Full/Lists.lean` (retirado) |
 
 ⭐ **La «obstrucción» de ax7/ax11/ax12 era FALSA.** `Full/Induction.lean` llevaba una NOTA —tres
 sesiones— diciendo que el empaquetado `∀³` vía `gen` triple «topa con el ajuste de niveles
@@ -219,7 +223,7 @@ sesiones— diciendo que el empaquetado `∀³` vía `gen` triple «topa con el 
 los dos `gen`, el hueco del parámetro exterior es
 `substTerm (0+1) ṡ (liftTerm 0 (liftTerm 0 a))`, y eso **ya tenía lema desde siempre** —
 **`FOL.substTerm_liftLift`** (`FOL/Theorems/Eq.lean`)—, que devuelve exactamente `liftTerm 0 a`,
-que es lo que `add_assoc_ax a b` produce. Era **un lema ausente del `simp set`**: cuatro líneas
+que es lo que `add_assoc_ax a b` (renombrado con ADR‑023 `add_assoc_ax_prim`, retirado con ADR‑115) produce. Era **un lema ausente del `simp set`**: cuatro líneas
 por axioma. Es otra vez [[feedback-medir-la-forma]]: *una obstrucción medida pero no probada puede
 simplemente ser falsa*.
 
@@ -231,7 +235,7 @@ empaquetados compilaron con él, y el lema es **FALSO** (la sustitución en `c+1
 
 #### (d) ⛔ LO QUE EL CENSO **NO** CIERRA — y es lo sustantivo
 
-Los once teoremas se enuncian **`axioms ⊢ axN`**, y `axN ∈ axioms`. ⇒ el enunciado es
+Los once teoremas se enuncian **axioms ⊢ axN**, y axN ∈ axioms. ⇒ el enunciado es
 **trivialmente cierto por `ax`**: el tipo **no certifica** la redundancia, sólo la prueba lo hace.
 Medido (grep sobre `Full/`): **ninguna de las once pruebas cita su propio axioma** — pero **nada lo
 impide**, y una edición futura podría cortocircuitar cualquiera sin que nada rompa.
@@ -248,7 +252,7 @@ theorem add_comm_thm : primAxioms ⊢ ax6_add_comm := …    -- ⬜ el enunciado
 
 | | qué se hace | ¿mueve la frontera? |
 |---|---|---|
-| **(A) CERTIFICAR** | añadir `primAxioms ⊆ axioms` y probar `primAxioms ⊢ axN` | ⛔ **NO.** `axioms` queda intacta ⇒ `axiomsCodeT`, `provCodeC'` y `G` no se enteran |
+| **(A) CERTIFICAR** | añadir `primAxioms ⊆ axioms` y probar primAxioms ⊢ axN | ⛔ **NO.** `axioms` queda intacta ⇒ `axiomsCodeT`, `provCodeC'` y `G` no se enteran |
 | **(B) ESTRECHAR** | **quitar** los 11 de `axioms` | ✅ SÍ — y por eso **no se hace** |
 
 ⇒ **(A) está decidida y parcialmente ejecutada.** ⭐ Y sale barata por dos hallazgos:
@@ -258,10 +262,10 @@ cita uno de los 11 derivables ⇒ **no hay circularidad**, la migración es mec�
 
 🏁🏁 **HECHO: 9 de los 11 CERTIFICADOS** (2026‑09‑10h).
 
-1. `primAxioms` (los 23) + `primAxioms_len` + `primAxioms_subset` + `prim_to_axioms` + `axp`
+1. `primAxioms` (los 23) + `primAxioms_len` + `primAxioms_subset` + `prim_to_axioms` + `axp` (los dos últimos, retirados)
    (`Full/Induction.lean` §0bis).
-2. **ax_C3 y ax_L3** (`concat_assoc_prim`, `in_concat_prim`) — con **cero cambios de axioma**,
-   porque `ax_list_induction` ya era genérico en `Γ`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+2. **ax_C3 y ax_L3** (`concat_assoc_prim`, `in_concat_prim`, retirados) — con **cero cambios de axioma**,
+   porque `ax_list_induction` (retirado) ya era genérico en `Γ`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 3. 🏁 **RATIFICADO por el propietario** el mismo día, el movimiento del esquema de inducción:
 
    ```lean
@@ -273,18 +277,18 @@ cita uno de los 11 derivables ⇒ **no hay circularidad**, la migración es mec�
 
    **No añade un axioma: lo MUEVE** ⇒ los `axiom` de Lean **siguen siendo 6**.
 4. Con eso, `Full/Induction.lean` migrado entero (**35 declaraciones**) ⇒ **ax6, ax7, ax10, ax11,
-   ax12, ax18, ax19 CERTIFICADOS** (`*_thm_prim`), y las firmas `axioms ⊢` de siempre re‑expuestas
+   ax12, ax18, ax19 CERTIFICADOS** (`*_thm_prim`, retirados), y las firmas `axioms ⊢` de siempre re‑expuestas
    por debilitamiento para los diez lemas que consumen otros módulos.
 
-⚠️ **Un caso no salió por debilitamiento, y enseña la regla**: `lt_succ_of_lt` toma la hipótesis
+⚠️ **Un caso no salió por debilitamiento, y enseña la regla**: `lt_succ_of_lt` (retirado) toma la hipótesis
 **en el contexto**, y ahí el debilitamiento va **en la dirección contraria**. Se interna la
 implicación sobre `primAxioms`, se **debilita la implicación**, y se aplica `mp`. ⇒ *un lema que
 consume el contexto no se debilita: se internaliza primero.*
 
-⬜ **Los 2 que faltan (ax21, ax24) piden una SEGUNDA sanción, y no se ha pedido.** Se derivan en
-`Full/Mod2.lean`, que pasa por **`ax_mod2_alternation`** —otro `axiom` **sobre `axioms`**, misma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-situación que tenía `ax_induction`— y por dos teoremas de `Block1` (`teo_1_3`, `teo_2_9`). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-⚠️ Y hay una pregunta previa: `ax_mod2_alternation` está documentado como *«teorema en sistemas con 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+⬜ **Los 2 que faltan (ax21, ax24) piden una SEGUNDA sanción, y no se ha pedido.** (✏️ 2026‑11‑09, ADR‑262: superado el mismo día, en (b) y (c) de arriba —`ax21` es primitivo y la alternancia, teorema—; y luego, todo retirado con ADR‑115.) Se derivan en
+`Full/Mod2.lean` (retirado), que pasa por **`ax_mod2_alternation` (retirado)** —otro `axiom` **sobre `axioms`**, misma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+situación que tenía `ax_induction` (retirado)— y por dos teoremas de `Block1`, `teo_1_3` y `teo_2_9` (retirados). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+⚠️ Y hay una pregunta previa: `ax_mod2_alternation` (retirado) está documentado como *«teorema en sistemas con 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 inducción»*; si lo es, lo correcto no es **moverlo** sino **derivarlo**, y entonces el inventario
 bajaría de **6 a 5**. **Medir antes de prometer.**
 

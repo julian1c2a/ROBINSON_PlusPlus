@@ -1,6 +1,6 @@
 # Frente Gödel — Nivel D real: aritmetización de D1–D3
 
-**Last updated:** 2026-06-14 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, 2026-06-14 *(✏️ 2026‑10‑31, T24, ADR‑233: la marca que no tenía, con la fecha de su última revisión real —su último commit con diez líneas nuevas o más—, no la de hoy)*
 
 **Created:** 2026-06-13 · **Author:** Julián Calderón Almendros
 **Status (2026-06-24):** 🟢 muy avanzado — **Gödel I real + D1 real (⊢ y finitaria `Prf`) + D2 real ⊢ COMPLETOS**; **teorema de deducción finitario** y **regla de confinamiento ∀ `qconf`** integrados; **fix de solidez FOL** (axioma De Bruijn falso → teorema). **En curso:** Gödel II finitario (`goedel_second_prf : ConsistentH → ¬ Prf Con'`) — bloqueado en el **lema de Barendregt** (composición subst–subst niveles mixtos) → inducción de listas en `Prf` (`Prf.listInd`) → `d2_prf`/`d3_prf`. 47 módulos, 60 jobs, 0 sorrys. (El plan por fases de abajo es la hoja de ruta original; ver [NEXT-STEPS.md](NEXT-STEPS.md)/[CHANGELOG.md](CHANGELOG.md) para el detalle vivo.)
@@ -10,6 +10,13 @@
 > contra el árbol. La capa `⊢` y las meta‑reglas de FOL se retiraron (ADR‑115), `gen` no es la ω‑regla (ADR‑027), los
 > puentes `prfI_to_derives` y `prf_to_derives` y `consistentH_of_omega` ya no existen, y `Prf` tiene además `ind`,
 > `qconf` y `listInd`. La teoría de los titulares y lo que se supone hoy, en [AXIOMS.md](AXIOMS.md) §0.
+> *(✏️ 2026‑11‑09, [ADR‑262](DECISIONS.md): lo que el plan perseguía está demostrado —D1 `repr_pos'_prf`, D2 `d2_prf`,
+> D3 `d3_prf_real` y Gödel II, `goedel_second_prf` y sin hipótesis `goedel_II`—. De los módulos que cita,
+> `Meta/StepArith.lean` y `Meta/Necessitation.lean` (retirados con la capa `⊢`, ADR‑115),
+> `Meta/CodeDistinct.lean` (archivado, ADR‑161) y `Meta/CodeArith.lean` (borrado, ADR‑190) ya no están en el árbol;
+> los dos últimos, en `archivo/fuera-del-cono-2026-10-18`. Y el «detalle vivo» que la línea de estado manda a `CHANGELOG.md` ya no está allí
+> (congelado desde ADR‑142): el registro es [DECISIONS.md](DECISIONS.md), y el estado, [GODEL-STATUS.md](GODEL-STATUS.md)
+> y [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §1.)*
 
 Este documento especifica el plan para convertir las condiciones de
 demostrabilidad de Hilbert-Bernays-Löb **D1, D2, D3** de *meta-axiomas* (estado

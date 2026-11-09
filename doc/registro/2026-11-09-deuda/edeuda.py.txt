@@ -1,0 +1,35 @@
+"""ADR-262: saca de E_DEUDA (check-doc-sync.bash de RPP y de FOL) los documentos saldados en el lote, dejando en su sitio
+una línea de comentario «# DOC — SALDADA el 2026-11-09 (ADR-262…): …», como las anteriores. Sólo los que se dicen aquí.
+Uso: py -3.15 edeuda.py [--seco]"""
+import io, sys
+seco = '--seco' in sys.argv
+N = 'revisado contra el árbol, con su [B] a cero si está en la lista de [B]'
+H = 'revisado como HISTÓRICO: su cabecera y sus notas posteriores, comprobadas; el cuerpo es registro de su fecha'
+RPP = {'REFERENCE.md': N, 'AXIOMS.md': N, 'doc/REFERENCE-Arithmetic.md': N, 'doc/REFERENCE-Full.md': N,
+       'doc/REFERENCE-Incompleteness.md': N, 'doc/REFERENCE-Kernel.md': N, 'cuarentena/README.md': N, 'AI-GUIDE.md': N,
+       'NAMING-CONVENTIONS.md': N,
+       'CHANGELOG.md': H, 'DISCUSIONES.md': H, 'doc/AUDITORIA-2026-09-11.md': H, 'doc/AUDITORIA-FOL-2026-09-12.md': H,
+       'doc/FEEDBACK-PARA-EL-LIBRO.md': H, 'GODEL-D3-TRACKED-DESIGN.md': H, 'GODEL-D-ARITHMETIZATION.md': H,
+       'MINIMAL-AXIOMS.md': H, 'PLAN-FRENTE-A.md': H, 'PLAN-NEGVERIFIER.md': H, 'PLANNING.md': H, 'PLAN-SORTES.md': H,
+       'Sobre_el_libro.md': H, 'THOUGHTS.md': H, 'TuplasFuncionesYListas.md': H, 'doc/PLAN-COMPLETITUD-FINITISTA.md': H,
+       'ESCALANDO_EL_PROYECTO.md': H}
+FOL = {'THOUGHTS.md': H, 'auditoria/constructividad-2026-09-27/README.md': H, 'AI-GUIDE.md': N, 'NAMING-CONVENTIONS.md': N,
+       'PLANNING.md': H, 'STARTING_FOL.md': H, 'TuplasFuncionesYListas.md': H, 'cuarentena/README.md': N}
+for repo, tabla, adr in (('E:/dropbox/github/lean4/ROBINSON_PlusPlus/check-doc-sync.bash', RPP, 'ADR-262'),
+                         ('E:/dropbox/github/lean4/FOL/check-doc-sync.bash', FOL, 'ADR-262 de RPP')):
+    t = io.open(repo, encoding='utf-8', newline='').read()
+    nl = '\r\n' if '\r\n' in t else '\n'
+    L = t.split(nl)
+    i0 = next(i for i, l in enumerate(L) if l.startswith("read -r -d '' E_DEUDA <<"))
+    i1 = next(i for i in range(i0 + 1, len(L)) if L[i] == 'EOF')
+    hechos = set()
+    for i in range(i0 + 1, i1):
+        d = L[i].strip()
+        if d in tabla:
+            L[i] = '# %s — SALDADA el 2026-11-09 (%s): %s.' % (d, adr, tabla[d])
+            hechos.add(d)
+    falta = set(tabla) - hechos
+    quedan = [L[i] for i in range(i0 + 1, i1) if L[i].strip() and not L[i].startswith('#')]
+    print(repo.split('/')[-2], ': saldados', len(hechos), '· no encontrados', sorted(falta), '· quedan', quedan)
+    if not seco and not falta:
+        io.open(repo, 'w', encoding='utf-8', newline='').write(nl.join(L))

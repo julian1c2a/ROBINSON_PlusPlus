@@ -1,7 +1,11 @@
 # Changelog
 
 > 🗄️ **CONGELADO** (2026‑10‑16, [ADR‑142](DECISIONS.md), T54): este registro se detiene en ADR‑113. El registro de cambios es
-> [`DECISIONS.md`](DECISIONS.md) (y `git log`); todo lo de abajo es historia, con su fecha.
+> [`DECISIONS.md`](DECISIONS.md) (y `git log`); todo lo de abajo es historia, con su fecha. *(✏️ 2026‑11‑09,
+> [ADR‑262](DECISIONS.md): el «estado autoritativo» del bloque de abajo es el del 2026‑09‑09; el de hoy, el banner de
+> [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md), la fuente única desde ADR‑142.)*
+
+**Last updated:** 2026-11-09 — revisado como HISTÓRICO ([ADR‑262](DECISIONS.md)): la cabecera y las notas posteriores a la marca anterior, comprobadas contra el árbol; el cuerpo es registro de su fecha y no se ha re‑medido. Antes, ninguna en la cabecera: [E] leía la primera del documento, la de la cabecera original (2026-07-24, la Ruta 1a), que las entradas del 2026‑08‑21 al 2026‑09‑28, escritas encima, dejaron a mitad del cuerpo.
 
 > ## ⚠️ ESTADO REAL — auditoría 2026-09-09 23:30
 >

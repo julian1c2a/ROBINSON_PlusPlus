@@ -1,0 +1,31 @@
+# Revisión ADVERSARIAL del lote de deuda de documentación (2026-11-09, ADR‑262 de RPP)
+
+Un editor acaba de corregir unos documentos siguiendo `REGLAS.md` (léelo: es lo que se le pidió). Tú eres su
+revisor, de SÓLO LECTURA: no editas nada, no ejecutas `lake` ni `check-doc-sync.bash`, no escribes en git.
+La experiencia de este proyecto: en un lote así, una revisión adversarial encontró 30 defectos en 37 correcciones, y
+otra 38 en ~485 afirmaciones; los peores eran correcciones que REPETÍAN el error que corregían, historia INVENTADA al
+generalizar, y ámbitos perdidos («0 `axiom`» es cierto en el build, no en `cuarentena/librerias-retiradas/`).
+
+Lo que miras: el DIFF del editor, `git -C REPO diff -- DOC` (sólo las líneas añadidas o cambiadas). Para cada una:
+1. ¿Es CIERTO lo que añade? Cada «retirado/retirada (ADR‑NNN)», «renombrado a `X`», «archivado en `ETIQUETA`», cada
+   nombre nuevo, cada cifra, cada afirmación del presente: compruébalo con una orden (`git log -S`, `git show`,
+   `git ls-tree -r --name-only ETIQUETA`, `grep` en `doc/indice.tsv`, en el código o en DECISIONS.md /
+   doc/historia/DECISIONS-001-130.md). El ADR tiene que ser el que RETIRÓ eso (no otro), y la cosa tiene que estar
+   retirada de verdad (no viva con otro espacio de nombres: `grep -c NOMBRE doc/indice.tsv`).
+2. ¿Cambia el SENTIDO? Una frase de historia que pasa a presente, o al revés; un «hoy» que ya no es hoy; un texto
+   plano que pierde una referencia que el lector necesitaba; una afirmación que el editor «suavizó» y ahora es falsa.
+3. ¿Se borró contenido? (Las reglas lo prohíben: una cita se arregla, no se quita con su frase.)
+4. ¿La marca de cabecera (`**Last updated:**`) dice la verdad de lo que se revisó? (Clase (N): el cuerpo entero contra
+   el árbol; clase (H): cabecera y notas posteriores; si el editor no hizo eso, la marca miente.)
+5. Los otros controles (REGLAS §4): una cita por número de línea nueva en un documento de referencia, una cifra vieja
+   nueva en las 100 primeras líneas, una fila de tabla rota (columnas de más o de menos: cuenta los `|`), una valla de
+   código o un comentario HTML sin cerrar.
+Y una pasada de lo que el editor NO tocó y debía: con `bash $DEUDA/b-uno.bash REPO DOC`, ¿quedan citas muertas que él
+dice arregladas?
+
+Tu informe (tu última respuesta): una lista de DEFECTOS, cada uno con: fichero:línea (la de hoy), el texto exacto,
+por qué es un defecto, la ORDEN que lo demuestra y su salida (resumida), y el arreglo propuesto (texto exacto). Sólo
+defectos que demostraste; las sospechas sin demostrar, aparte y rotuladas «sin comprobar». Si no encuentras nada en
+un fichero, dilo con las comprobaciones que hiciste (cuántas líneas miraste, qué órdenes).
+$DEUDA = D:/msys64/tmp/claude/d75c25be1c300eb1/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/deuda
+(en Git Bash: /d/msys64/tmp/claude/d75c25be1c300eb1/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/deuda).
