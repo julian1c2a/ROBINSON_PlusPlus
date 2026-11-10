@@ -1,0 +1,37 @@
+modulos: 121
+usuarios (sin comentarios), fuera de ChainPrf: ['BoundedInPrf', 'ChainOkBoundedPrf', 'CodeWitnessPrf', 'EvalListPrf', 'EvalNthcPrf', 'RunFnBoundedPrf', 'SubstfcWitnessPrf']
+  ChainPrf               11
+  BoundedInPrf           2
+  ChainOkBoundedPrf      3
+  CodeWitnessPrf         2
+  EvalListPrf            1
+  EvalNthcPrf            1
+  RunFnBoundedPrf        2
+  SubstfcWitnessPrf      1
+Axioms                 cierre   2 · arrastra usuarios: []
+Hilbert                cierre   4 · arrastra usuarios: []
+HilbertDeduction       cierre   5 · arrastra usuarios: []
+ReprPrf                cierre  12 · arrastra usuarios: []
+ArithPrf               cierre  13 · arrastra usuarios: []
+ChainPrf               cierre  14 · arrastra usuarios: ['ChainPrf']
+NatArithPrf            cierre  16 · arrastra usuarios: ['ChainPrf']
+NatOrderPrf            cierre  17 · arrastra usuarios: ['ChainPrf']
+NatMulPrf              cierre  18 · arrastra usuarios: ['ChainPrf']
+CantorMonoPrf          cierre  19 · arrastra usuarios: ['ChainPrf']
+StrongInductionPrf     cierre  20 · arrastra usuarios: ['ChainPrf']
+Div2ParityPrf          cierre  21 · arrastra usuarios: ['ChainPrf']
+CodeWitnessPrf         cierre  20 · arrastra usuarios: ['ChainPrf', 'BoundedInPrf', 'CodeWitnessPrf']
+declaraciones de ChainPrf: 52
+NatArithPrf          importa ChainPrf directo: True  usa de ChainPrf: ['PrfH_eq_trans', 'PrfH_iff_mp', 'PrfH_iff_mpr', 'PrfH_leibniz_subst']
+NatOrderPrf          importa ChainPrf directo: False usa de ChainPrf: ['PrfH_eq_symm', 'PrfH_eq_trans', 'PrfH_iff_mp', 'PrfH_leibniz_subst', 'PrfH_lt_subst1', 'PrfH_lt_subst2', 'PrfH_or_elim']
+NatMulPrf            importa ChainPrf directo: False usa de ChainPrf: ['PrfH_eq_symm', 'PrfH_eq_trans', 'PrfH_iff_mp', 'PrfH_leibniz_subst', 'PrfH_lt_subst2', 'PrfH_or_elim']
+CantorMonoPrf        importa ChainPrf directo: False usa de ChainPrf: ['PrfH_eq_symm', 'PrfH_lt_subst2', 'PrfH_or_elim']
+StrongInductionPrf   importa ChainPrf directo: False usa de ChainPrf: ['PrfH_eq_symm', 'PrfH_eq_trans', 'PrfH_iff_mp', 'PrfH_leibniz_subst', 'PrfH_or_elim', 'PrfH_spec']
+Div2ParityPrf        importa ChainPrf directo: False usa de ChainPrf: ['PrfH_eq_symm', 'PrfH_eq_trans', 'PrfH_iff_mp', 'PrfH_leibniz_subst', 'PrfH_lt_subst1', 'PrfH_lt_subst2', 'PrfH_or_elim']
+ArithPrf             importa ChainPrf directo: False usa de ChainPrf: []
+ListIndAdmisible     importa ChainPrf directo: True  usa de ChainPrf: ['PrfH_congr_cons_head', 'PrfH_eq_symm', 'PrfH_eq_trans', 'PrfH_leibniz_subst', 'PrfH_lt_subst2', 'PrfH_or_elim', 'PrfH_spec']
+CodeWitnessPrf       importa ChainPrf directo: True  usa de ChainPrf: ['PrfH_and_elim_left', 'PrfH_and_elim_right', 'PrfH_and_intro', 'PrfH_congr_cons_head', 'PrfH_congr_cons_tail', 'PrfH_congr_liftc', 'PrfH_eq_symm', 'PrfH_eq_trans', 'PrfH_leibniz_subst', 'PrfH_lt_subst1', 'PrfH_lt_subst2', 'PrfH_or_elim', 'PrfH_spec', 'prf_list_induction']
+cierre de ChainPrf: 13 · modulos con ChainPrf en su cierre: 101
+ListIndAdmisible usa de CodeWitnessPrf (175 declaraciones): ['consOk', 'prf_consOk_cons']
+ListIndAdmisible usa de BoundedInPrf (19 declaraciones): ['prf_zero_or_eq_succ_pred']
+consOk en ROBINSON_PlusPlus.Meta.CodeWitnessPrf · importa: ['ArithPrf', 'BoundedInPrf', 'ChainPrf', 'Godel', 'Hilbert', 'HilbertDeduction', 'NatArithPrf', 'NatOrderPrf', 'ReprPrf']

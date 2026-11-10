@@ -1,0 +1,60 @@
+"""A9, paso 0 (medida textual, no del elaborador): el corte de ChainPrf que necesita ListIndAdmisible."""
+import os, re
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+P = 'ROBINSON_PlusPlus.Meta.'
+imps, src = {}, {}
+for root, _, fs in os.walk(R + 'ROBINSON_PlusPlus'):
+    for f in fs:
+        if f.endswith('.lean'):
+            p = os.path.join(root, f).replace(os.sep, '/')
+            m = p[len(R):-5].replace('/', '.')
+            t = open(p, encoding='utf-8').read()
+            src[m] = t
+            imps[m] = [l.split()[1] for l in t.splitlines() if l.startswith('import ')]
+def clos(m, seen=None):
+    seen = set() if seen is None else seen
+    for i in imps.get(m, []):
+        if i not in seen and i.startswith('ROBINSON'):
+            seen.add(i); clos(i, seen)
+    return seen
+print('modulos:', len(imps))
+# quitar comentarios para contar usos de verdad
+def sin_coment(t):
+    t = re.sub(r'/-.*?-/', ' ', t, flags=re.S)
+    return re.sub(r'--[^\n]*', ' ', t)
+users = sorted(m for m in imps if re.search(r'\bprf_list_induction\b', sin_coment(src[m]))
+               and m != P + 'ChainPrf' and m != P + 'ListIndAdmisible')
+print('usuarios (sin comentarios), fuera de ChainPrf:', [u.split('.')[-1] for u in users])
+for u in [P + 'ChainPrf'] + users:
+    n = len(re.findall(r'\bprf_list_induction\b', sin_coment(src[u])))
+    print('  %-22s %d' % (u.split('.')[-1], n))
+L = P + 'ListIndAdmisible'
+todos = [P + 'ChainPrf'] + users
+for i in imps[L]:
+    if not i.startswith('ROBINSON'):
+        continue
+    c = clos(i) | {i}
+    print('%-22s cierre %3d · arrastra usuarios: %s' % (i.split('.')[-1], len(c), [u.split('.')[-1] for u in todos if u in c]))
+# nombres declarados en ChainPrf
+decl = re.findall(r'^(?:private\s+)?(?:noncomputable\s+)?(?:theorem|lemma|def|abbrev)\s+([A-Za-z_][\w\'.]*)',
+                  sin_coment(src[P + 'ChainPrf']), flags=re.M)
+print('declaraciones de ChainPrf:', len(decl))
+arit = ['NatArithPrf', 'NatOrderPrf', 'NatMulPrf', 'CantorMonoPrf', 'StrongInductionPrf', 'Div2ParityPrf', 'ArithPrf']
+usados = {}
+for a in arit + ['ListIndAdmisible', 'CodeWitnessPrf']:
+    t = sin_coment(src[P + a])
+    u = sorted(d for d in decl if re.search(r'\b' + re.escape(d.split('.')[-1]) + r'\b', t))
+    usados[a] = u
+    print('%-20s importa ChainPrf directo: %-5s usa de ChainPrf: %s' % (a, (P + 'ChainPrf') in imps[P + a], u))
+print('cierre de ChainPrf:', len(clos(P + 'ChainPrf')), '· modulos con ChainPrf en su cierre:',
+      sum(1 for m in imps if P + 'ChainPrf' in clos(m)))
+# lo que ListIndAdmisible toma de los dos usuarios que importa (CodeWitnessPrf, y BoundedInPrf por él)
+LA = sin_coment(src[L])
+for m in ['CodeWitnessPrf', 'BoundedInPrf']:
+    d = re.findall(r'^(?:private\s+)?(?:noncomputable\s+)?(?:theorem|lemma|def|abbrev)\s+([A-Za-z_][\w\']*)',
+                   sin_coment(src[P + m]), flags=re.M)
+    print('ListIndAdmisible usa de %s (%d declaraciones): %s' % (m, len(d), sorted(x for x in d if re.search(r'\b' + re.escape(x) + r'\b', LA))))
+# consOk: dónde se declara y qué importa ese módulo
+for m, t in src.items():
+    if re.search(r'^(?:theorem|def|abbrev)\s+consOk\b', t, flags=re.M):
+        print('consOk en', m, '· importa:', [x.split('.')[-1] for x in imps[m]])

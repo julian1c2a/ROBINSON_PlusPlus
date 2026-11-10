@@ -1,0 +1,13 @@
+ADR-264 (2026-11-10): las medidas del plan de A7, A9, B1 y D1 (doc/PLAN-A7-A9-B1-D1.md).
+
+  a9corte.py.txt        el corte de ChainPrf que necesita A9, medido sobre el TEXTO de los .lean (sin comentarios),
+                        no con el elaborador: los usuarios de prf_list_induction y cuántos usos tiene cada uno; qué
+                        imports de Meta/ListIndAdmisible.lean arrastran a ChainPrf o a otros usuarios; qué toma de
+                        ChainPrf la cadena aritmética; qué toma ListIndAdmisible de CodeWitnessPrf y de BoundedInPrf; y
+                        cuántos ficheros tienen a ChainPrf en su cierre de imports.
+                        Se ejecuta con: PYTHONIOENCODING=utf-8 py -3.15 a9corte.py (la ruta del repositorio, dentro).
+  a9corte-salida.txt    su salida, sobre RPP 8b2bb98 (2026-11-10). En ChainPrf cuenta 11: los 9 usos, la declaración
+                        y el export. «modulos: 121» son los ficheros .lean bajo ROBINSON_PlusPlus/ (DEPENDENCIES.md cuenta
+                        120 módulos activos).
+
+El paso 0 de A9 (doc/PLAN-A7-A9-B1-D1.md §3) rehace esta medida con el elaborador: la de aquí es textual y sólo orienta.

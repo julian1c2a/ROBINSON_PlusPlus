@@ -1,6 +1,7 @@
 # Las auditorías del proyecto: qué hubo, en qué estado están y qué queda
 
-**Last updated:** 2026-11-09 — creado con [ADR‑263](../DECISIONS.md): el índice de las auditorías de RPP y FOL, con el
+**Last updated:** 2026-11-10 — [ADR‑264](../DECISIONS.md): A7, A9, B1 y D1 remiten a su plan, `doc/PLAN-A7-A9-B1-D1.md`.
+Antes, 2026-11-09 — creado con [ADR‑263](../DECISIONS.md): el índice de las auditorías de RPP y FOL, con el
 estado de sus hallazgos medido en `doc/control/hallazgos.tsv`, y lo que queda de todas ellas.
 **Autor:** Julián Calderón Almendros
 
@@ -50,21 +51,21 @@ dejaron al propietario; lo aprobado que no se ha ejecutado; residuos medidos que
 | A4 | Gentzen | T69; ADR‑140, ADR‑244, ADR‑259 | fuera de RPP, en su propio repositorio; medidos los primeros pasos (la forma de los 120 axiomas; `listInd` admisible desde `ind`, en el build) | cuándo empieza: el propietario (`doc/GENTZEN-ALCANCE.md`) |
 | A5 | La versión de Lean | T42; ADR‑176, ADR‑181, ADR‑236 | el par en v4.35.0, la última estable (la vigilancia semanal, hoy); el arreglo de lean4#15822 llega con v4.37 | subir cuando haya estable, con `update-toolchain.bash`; al llegar a v4.37, revisar `sondeos/IteSimboloNucleo.lean` y la receta de ADR‑130 |
 | A6 | El token de la CI caduca el 2027‑01‑26 | ADR‑216 | la CI de FOL avisa a 30 días | renovarlo en GitHub: el propietario |
-| A7 | Tres mejoras del núcleo de `[B]` | ADR‑262 §7 | propuestas: «se RETIRÓ» y «**BORRARON**» no casan como marcador (locale C, la negrita), y las tácticas del proyecto no se indexan | un commit SOLO (ADR‑167), si el propietario lo aprueba; quitaría la mayoría de los falsos positivos de C1 |
+| A7 | Tres mejoras del núcleo de `[B]` | ADR‑262 §7 | propuestas: «se RETIRÓ» y «**BORRARON**» no casan como marcador (locale C, la negrita), y las tácticas del proyecto no se indexan | un commit SOLO (ADR‑167), si el propietario lo aprueba; quitaría parte de los falsos positivos de C1. El plan: `doc/PLAN-A7-A9-B1-D1.md` §2 (ADR‑264) |
 | A8 | La regla «DEBE `export`» de la guía de FOL (§17) | ADR‑262 (la revisión de AI‑GUIDE de FOL) | la cumplen 6 de los 70 módulos de FOL; en RPP se enmendó (ADR‑206: opcional) | enmendarla como en RPP, o cumplirla: el propietario |
-| A9 | Los usuarios de `prf_list_induction` (D2 entre ellos) podrían ir por `prf_list_induction_sin`, sin `Prf.listInd` | ADR‑259 §4 | no se ha hecho: cambiaría lo que usa la prueba de un titular | el propietario |
+| A9 | Los usuarios de `prf_list_induction` (D2 entre ellos) podrían ir por `prf_list_induction_sin`, sin `Prf.listInd` | ADR‑259 §4 | no se ha hecho: cambiaría lo que usa la prueba de un titular; y hay un ciclo de imports (ADR‑264) | el propietario; el plan: `doc/PLAN-A7-A9-B1-D1.md` §3 |
 | A10 | La ω‑consistencia «honesta», definida y demostrada con el modelo | RUT‑15 (auditoría del suelo), descartado al agrupar: «no es suelo y va contra una decisión escrita» | descartado | sólo si el propietario lo reabre |
 | A11 | La tabla de reglas del verificador como dato de Lean | L5‑04; ADR‑254 §1 | descartado, con condición | se reabre si algún día cambian las reglas de `Prf` |
 | **B** | **Aprobado y sin ejecutar** | | | |
-| B1 | Las capas DENTRO de RPP: un manifiesto módulo→capa, un control de la dirección de los imports y contratos generados | ADR‑139 paso 3, aprobado en ADR‑140 §1; NEXT‑STEPS («Pendiente además de Rosser») | no hay manifiesto ni control (lo que sí está: `DEPENDENCIES.md` generado, ADR‑238, y el contrato de los titulares, T07) | diseñarlo en un ADR: el propietario decide cuándo |
+| B1 | Las capas DENTRO de RPP: un manifiesto módulo→capa, un control de la dirección de los imports y contratos generados | ADR‑139 paso 3, aprobado en ADR‑140 §1; NEXT‑STEPS («Pendiente además de Rosser») | no hay manifiesto ni control (lo que sí está: `DEPENDENCIES.md` generado, ADR‑238, y el contrato de los titulares, T07) | diseñarlo en un ADR: el propietario decide cuándo; el plan: `doc/PLAN-A7-A9-B1-D1.md` §4 (ADR‑264) |
 | B2 | PeanoRF: importar `FOL.Calculus.*` en vez de llevar copias | ADR‑218 | su repositorio sigue BLOQUEADO (2026‑10‑01) | cuando se desbloquee |
 | **C** | **Residuos medidos (no son deuda)** | | | |
-| C1 | `[B]`: 10 citas en RPP y 29 en FOL | ADR‑262 §6 | falsos positivos, cada uno con su razón en `doc/registro/2026-11-09-deuda/LEEME.txt` | caerían casi todos con A7 |
+| C1 | `[B]`: 10 citas en RPP y 29 en FOL | ADR‑262 §6 | falsos positivos, cada uno con su razón en `doc/registro/2026-11-09-deuda/LEEME.txt` | con A7 caerían, ESTIMACIÓN, 2 o 3 en RPP y 8 o 10 en FOL (`doc/PLAN-A7-A9-B1-D1.md` §2, ADR‑264) |
 | C2 | Citas de ejemplo y de historia en documentos que no están en la lista de `[B]` (AI‑GUIDE 38, NAMING‑CONVENTIONS 129 en RPP y 168 en FOL, los históricos) | ADR‑262 §7 | fuera del universo de `[B]` por diseño | ninguno |
 | C3 | 241 de las 1399 declaraciones de FOL y TheoryFramework que nadie usa | FOL0912:B‑5; ADR‑254 §4 | medidas y etiquetadas en `doc/control/fol-sin-uso.tsv`, sin borrar (decisión del propietario) | la CI las vuelve a medir en cada push |
 | C4 | Los pasos clásicos (`p3`) que construyen las pruebas de algunos titulares | TEOREMAS §1; AXIOMS §0.3 | medidos (los cuatro de T75e, entre otros); no es un defecto: `Prf` es clásico | ninguno, salvo que se quiera la variante sin `p3` (ADR‑140 §3) |
 | **D** | **Preguntas abiertas (investigación, opcional)** | | | |
-| D1 | Qué separa los cinco enunciados semánticos de DNS y de ¬¬EM; si la compacidad implica Markov para las ecuaciones diofánticas, como la completitud; si KSst es estrictamente más fuerte que WKS sin Markov; si WLEM + ¬¬EM bastan para los cinco | T71; `../FOL/auditoria/t71-semanticos-2026-10-29/README.md` («Lo que queda abierto») | abiertas; hay esbozos sin compilar | si se quiere seguir con la matemática inversa de FOL |
+| D1 | Qué separa los cinco enunciados semánticos de DNS y de ¬¬EM; si la compacidad implica Markov para las ecuaciones diofánticas, como la completitud; si KSst es estrictamente más fuerte que WKS sin Markov; si WLEM + ¬¬EM bastan para los cinco | T71; `../FOL/auditoria/t71-semanticos-2026-10-29/README.md` («Lo que queda abierto») | abiertas; hay esbozos sin compilar | si se quiere seguir con la matemática inversa de FOL; el plan: `doc/PLAN-A7-A9-B1-D1.md` §5 (ADR‑264) |
 
 **Véase también:** `doc/control/hallazgos.tsv` (cada hallazgo, con su estado), NEXT‑STEPS («Lo que queda»), ADR‑241 (el
 registro y `[R]`), ADR‑254 (las cuatro propuestas decididas), ADR‑262 (la deuda de documentación).
