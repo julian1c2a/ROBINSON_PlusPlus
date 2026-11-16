@@ -24,7 +24,7 @@ son anteriores a la reparación (registro); §3.24–§3.68, la construcción �
 el frente `substfc`, D3 y su ensamblaje—, cada una con su fecha; §3.69–§3.80, el lado semántico (ADR‑120 en
 adelante; §3.80, el puente de FOL, ADR‑195). Rosser, Löb y los corolarios de Gödel II, en las cabeceras de sus módulos y en TEOREMAS §1.
 
-**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): las 484 citas muertas de [B], a cero
+**Last updated:** 2026-11-16 — [ADR‑265](../DECISIONS.md): «C3e», una etiqueta de tarea, en texto plano (el núcleo nuevo de [B] la vio: la absolvía el «faltan» de la oración anterior, a través de la negrita). Antes, 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): las 484 citas muertas de [B], a cero
 (cada nombre retirado o archivado, con su rótulo y la decisión que lo retiró; las notaciones, en texto plano; las
 abreviaturas, con el nombre entero), las 28 cifras viejas de [A2], marcadas como de su fecha, los módulos retirados de
 §3.15–§3.26 rotulados y los bloques de código de los vivos con una nota de lo que cambió, y §3.69–§3.80, contrastados con
@@ -4197,7 +4197,7 @@ tiene que cuantificar el nivel, y los casos `atom`/`eq` bajan a `liftsc`/`liftc`
 
 > 🔑 **A5 —«generalizar `hasWitF` / la familia `liftc` más allá del nivel `zero`»— no es una
 > mejora opcional: es PRERREQUISITO de `pcc_eval_liftfc`, y por tanto de los cuatro tags que
-> faltan.** Llevaba catalogada como generalización suelta en el árbol de tareas (`C3e`, antes
+> faltan.** Llevaba catalogada como generalización suelta en el árbol de tareas (C3e, antes
 > C3d); está en la ruta crítica.
 
 ⚠️ Es la misma clase de error de plan que §3.48.1: **una tarea colocada en el árbol por su

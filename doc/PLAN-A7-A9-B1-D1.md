@@ -1,8 +1,9 @@
 # El plan de A7, A9, B1 y D1
 
-**Last updated:** 2026-11-10 — creado con [ADR‑264](../DECISIONS.md): el estudio y el plan de cuatro filas de
+**Last updated:** 2026-11-16 — [ADR‑265](../DECISIONS.md): las decisiones del propietario (§0) y **A7, hecho** (§2).
+Antes, 2026-11-10 — creado con [ADR‑264](../DECISIONS.md): el estudio y el plan de cuatro filas de
 `doc/AUDITORIAS.md` §2 (el núcleo de `[B]`, `prf_list_induction` sin `listInd`, las capas dentro de RPP y las preguntas
-de T71). PROPUESTO: nada ejecutado; faltan tres decisiones del propietario (§0).
+de T71).
 **Autor:** Julián Calderón Almendros
 
 > **Qué es esto.** El propietario (2026‑11‑10): «Estoy interesado en A7, A9, B1 y D1. Haz un pequeño estudio/plan para
@@ -11,12 +12,12 @@ de T71). PROPUESTO: nada ejecutado; faltan tres decisiones del propietario (§0)
 > herramienta y su salida, en `doc/registro/2026-11-10-plan/`). Lo ESTIMADO lo dice. Los IDs (A7, A9, B1, D1) son los
 > de `doc/AUDITORIAS.md` §2.
 
-## 0 · Lo que falta decidir (el propietario)
+## 0 · Lo que decidió el propietario (2026‑11‑16, ADR‑265)
 
-1. **A7:** ¿entra el cuarto cambio (§2, paso 1.d): que `[B]` dé por vivo el nombre ENTERO de una constante de Lean que el
-   proyecto no declaró nunca (`if_neg`, `of_decide_eq_false`)?
-2. **B1:** ¿cuántas capas (§4: nueve, una por familia, o menos), y los titulares juntos o separados por clase (i)/(ii)?
-3. **D1:** ¿sólo las dos primeras preguntas (§5), dejando escritas las otras dos como problemas abiertos?
+1. **A7:** SÍ al cuarto cambio (§2, paso 1.d): `[B]` da por vivo el nombre ENTERO de una constante de Lean que el
+   proyecto no declaró nunca (`if_neg`, `of_decide_eq_false`). Hecho (§2).
+2. **B1:** las NUEVE capas de §4, y los titulares SEPARADOS por clase.
+3. **D1:** sólo las preguntas 1 y 2 (§5); la 3 y la 4 quedan escritas como problemas abiertos.
 
 ## 1 · El orden propuesto
 
@@ -29,6 +30,11 @@ de T71). PROPUESTO: nada ejecutado; faltan tres decisiones del propietario (§0)
 | 5 | **D1** (las preguntas 1 y 2) | independiente, en FOL; puede ir en paralelo con lo anterior |
 
 ## 2 · A7 — tres mejoras del núcleo de `[B]` (y una cuarta, a decidir)
+
+> ✅ **HECHO el 2026‑11‑16** ([ADR‑265](../DECISIONS.md)), con el cuarto cambio. MEDIDO: `[B]`, de 10 citas muertas a 7
+> en RPP y de 29 a 17 en FOL; la estimación del paso 2 era 7 y 19. La revisión adversarial del paso 4 encontró un
+> agujero (una oración que acaba en negrita no cortaba el marcador), arreglado antes del commit; y el núcleo arreglado
+> vio dos citas muertas que ese agujero absolvía. Lo que aquí sigue es el plan tal como se escribió.
 
 **Lo medido.**
 * `marcado()` (`b-citas.awk`, desde la línea 200) pasa el segmento por `tolower` y busca un marcador de estado

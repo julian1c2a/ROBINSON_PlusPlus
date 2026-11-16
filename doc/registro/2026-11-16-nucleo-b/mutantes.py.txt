@@ -1,0 +1,42 @@
+"""Los mutantes de A7 (ADR-265): cada uno deshace UNA pieza del núcleo nuevo; el autotest tiene que verlo (DISTINTO)."""
+import io, os, subprocess, sys
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+S = os.path.dirname(os.path.abspath(__file__))
+src = io.open(R + 'b-citas.awk', encoding='utf-8', newline='').read()
+M = {
+ 'acentos': [('  gsub(/\\303\\201/, "\\303\\241", t); gsub(/\\303\\211/, "\\303\\251", t); gsub(/\\303\\215/, "\\303\\255", t)\n'
+              '  gsub(/\\303\\223/, "\\303\\263", t); gsub(/\\303\\232/, "\\303\\272", t); gsub(/\\303\\221/, "\\303\\261", t)\n'
+              '  gsub(/\\303\\234/, "\\303\\274", t)\n', '')],
+ 'asteriscos': [('  gsub(/\\*/, " ", t)\n', '')],
+ 'baja→tolower': [('seg = baja(substr(lb, a, GI - a))', 'seg = substr(lb, a, GI - a)'),
+                  ('seg = baja(substr(lb, GF + 1, e - GF))', 'seg = substr(lb, GF + 1, e - GF)'),
+                  ('seg = limpia(seg); off = 0', 'seg = limpia(tolower(seg)); off = 0')],
+ 'baja tras el corte': [('seg = baja(substr(lb, a, GI - a))', 'seg = substr(lb, a, GI - a)'),
+                        ('seg = baja(substr(lb, GF + 1, e - GF))', 'seg = substr(lb, GF + 1, e - GF)'),
+                        ('seg = limpia(seg); off = 0', 'seg = limpia(baja(seg)); off = 0')],
+ 'se +': [('|se +(borr|', '|se (borr|')],
+ 'NEGADO': [('(no|nunca|ni|tampoco)( +[^ ]+)?( +[^ ]+)? +"', '(no|nunca|ni|tampoco)( [^ ]+)?( [^ ]+)? "')],
+ 'HACERFALTA': [('|hubiera +hecho) +falta"', '|hubiera hecho) falta"')],
+ 'NOMBRE': [('estas)( +[0-9]+)?( +[^ ]+)? +"', 'estas)( [0-9]+)?( [^ ]+)? "')],
+ 'sin entero': [('  if ((t in entero) || (t in orden)) return 1\n', '  if (t in orden) return 1\n')],
+ 'sin orden': [('  if ((t in entero) || (t in orden)) return 1\n', '  if (t in entero) return 1\n')],
+ 'antes de hist': [('  if ((t in hist) || (t in histdir) || soloproy) return 0\n', ''),
+                   ('  if ((t in entero) || (t in orden)) return 1\n',
+                    '  if ((t in entero) || (t in orden)) return 1\n  if ((t in hist) || (t in histdir) || soloproy) return 0\n')],
+}
+awk = sys.argv[1] if len(sys.argv) > 1 else 'awk'
+for nombre, pares in M.items():
+    t = src
+    for v, n in pares:
+        c = t.count(v)
+        if v.startswith('seg = limpia('):
+            assert c == 2, (nombre, c)
+        else:
+            assert c == 1, (nombre, c, v[:40])
+        t = t.replace(v, n)
+    f = os.path.join(S, 'mutante.awk')
+    io.open(f, 'w', encoding='utf-8', newline='').write(t)
+    r = subprocess.run(['bash', S.replace('\\', '/') + '/../plan/autotest.bash', f.replace('\\', '/'), R + 'b-control.bash'],
+                       capture_output=True, text=True, encoding='utf-8', env=dict(os.environ, AWK=awk), cwd=R)
+    out = r.stdout.strip().splitlines()
+    print('%-14s %s  %s' % (nombre, out[0] if out else '¿?', ' '.join(l for l in out[1:] if l[:1] in '<>')))

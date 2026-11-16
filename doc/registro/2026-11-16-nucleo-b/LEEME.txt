@@ -1,0 +1,24 @@
+ADR-265 (2026-11-16): A7, el núcleo de [B] (b-citas.awk, b-control.bash, scripts/VolcarEntorno.lean de RPP y de FOL).
+
+  autotest.bash.txt     el autotest de [B] SOLO (las líneas de b-control.bash hasta B_AUTO_ESP), con el awk que se pida:
+                        AWK=awk|mawk bash autotest.bash NÚCLEO.awk b-control.bash, desde la raíz de RPP. Dice «AUTOTEST
+                        IGUAL» o el diff con lo esperado. mawk, el de la CI, desde WSL (/usr/bin/mawk, 1.3.4).
+  mutantes.py.txt       los once mutantes: cada uno deshace UNA pieza del núcleo nuevo (los acentos, los *, baja, baja
+                        tras el corte, «se +», NEGADO, HACERFALTA, NOMBRE, sin `entero`, sin `orden`, y el cuarto cambio
+                        antes de HIST) y corre el autotest (busca autotest.bash en ../plan/ del scratchpad de la sesión:
+                        cámbiese la ruta). mutantes-salida.txt: los once, DISTINTO, cada uno con su caso.
+  volcar.bash.txt       la salida entera de b-citas.awk y sus entradas, de RPP y de FOL, con el gancho temporal de
+                        doc/registro/2026-11-09-deuda/volcar-citas.bash.txt, pero restaurando b-control.bash desde una
+                        COPIA (aquel lo hacía con git checkout, que se habría llevado los cambios sin commit).
+  ds.bash.txt           check-doc-sync.bash con el lake de elan delante del PATH (ELAN=no, sin él: así se vio fallar el
+                        volcado de FOL, con el lake de v4.36 que hoy va delante en el PATH de Git Bash).
+  riesgo.bash.txt       el riesgo del cuarto cambio: los nombres de constructor de la historia de los dos repos (que HIST
+                        no recoge) cruzados con las constantes de Lean en la raíz. riesgo-salida.txt: 131 constructores,
+                        1966 constantes en la raíz, NINGUNO en común.
+
+Las citas muertas que quedan, con el núcleo nuevo y los dos arreglos de este push:
+  RPP (7)  «ci/**» (DECISIONS: el patrón de ramas de build.yml); Sugerencias.md x2 y sondeos/pasadas/salida/ (fuera de git
+           a propósito); #censoFrontera y #noExiste (órdenes de sondeos, que el build no carga); decodeTerm.eq_1 (un lema
+           que Lean genera a demanda), en sondeos/README.md.
+  FOL (17) «_of_» (un infijo), «DautoImplicit» (de la orden -DautoImplicit=false), «not_not_em» (lo declaró FOL y lo
+           retiró: HIST gana al homónimo de Lean) y las 14 de PeanoRF (otro repositorio).

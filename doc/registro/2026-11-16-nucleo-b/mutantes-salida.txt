@@ -1,0 +1,11 @@
+acentos        AUTOTEST DISTINTO  > B|muerto_ac
+asteriscos     AUTOTEST DISTINTO  > B|muerto_bo < B|muerto_hf < B|muerto_nb < B|muerto_pr > B|muerto_sa
+baja→tolower   AUTOTEST DISTINTO  > B|muerto_ac > B|muerto_bo < B|muerto_hf < B|muerto_nb < B|muerto_pr > B|muerto_sa
+baja tras el corte AUTOTEST DISTINTO  < B|muerto_sb > B|muerto_sa
+se +           AUTOTEST DISTINTO  > B|muerto_bo > B|muerto_sa
+NEGADO         AUTOTEST DISTINTO  < B|muerto_nb
+HACERFALTA     AUTOTEST DISTINTO  < B|muerto_hf
+NOMBRE         AUTOTEST DISTINTO  < B|muerto_pr
+sin entero     AUTOTEST DISTINTO  > B|if_neg
+sin orden      AUTOTEST DISTINTO  > B|exact?
+antes de hist  AUTOTEST DISTINTO  < B|borrada_tac < B|imp_intro

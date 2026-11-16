@@ -1,0 +1,4 @@
+nombres de constructor en la historia: 131
+constantes de Lean en la raíz: 1966
+constructores que son constantes de Lean en la raíz: 
+de ellos, FUERA de HIST (los que (d) absolvería): 

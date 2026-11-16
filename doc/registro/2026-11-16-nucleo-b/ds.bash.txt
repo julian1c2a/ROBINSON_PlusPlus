@@ -1,0 +1,12 @@
+#!/bin/bash
+# ds.bash REPO [ARGS…] — check-doc-sync.bash de REPO (ROBINSON_PlusPlus o FOL), con el lake de elan delante del PATH
+# (el de lean-toolchain); con ELAN=no, con el PATH tal cual (para ver fallar el volcado). Deja la salida en ds-REPO.txt.
+S=/d/msys64/tmp/claude/d75c25be1c300eb1/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/a7
+R=$1; shift
+[ "${ELAN:-si}" = "no" ] || export PATH=/c/Users/julia/.elan/bin:$PATH
+cd /e/dropbox/github/lean4/$R || exit 2
+bash check-doc-sync.bash "$@" > "$S/ds-$R.txt" 2>&1; rc=$?
+echo "$R rc=$rc"
+awk '/^════ \[B\]/{p=1; print; next} /^════/{p=0} p' "$S/ds-$R.txt"
+grep -E '^(✅|❌ HAY)' "$S/ds-$R.txt"
+grep -E '^  ❌' "$S/ds-$R.txt" | head -20

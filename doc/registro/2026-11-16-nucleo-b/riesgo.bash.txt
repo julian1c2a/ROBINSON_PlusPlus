@@ -1,0 +1,19 @@
+#!/bin/bash
+# riesgo.bash — el riesgo del cuarto cambio de A7 (ADR-265): un constructor que el proyecto tuvo (HIST no recoge las
+# líneas «| ctor : …», sólo las de declaración) y que se llama como una constante de Lean en la RAÍZ quedaría vivo por
+# el nombre entero. Cruza los nombres de constructor de la historia de git de RPP y de FOL con las constantes de Lean sin
+# punto del volcado del entorno, y quita los que están en HIST. Uso: bash riesgo.bash ENV HIST (los que vuelca volcar.bash).
+ENV=$1; HIST=$2
+T=$(mktemp -d)
+for g in /e/dropbox/github/lean4/ROBINSON_PlusPlus /e/dropbox/github/lean4/FOL; do
+  git -C "$g" log HEAD --tags -p --format= -- '*.lean' 2>/dev/null \
+    | LC_ALL=C grep -E '^[+-][[:space:]]*\|[[:space:]]*[A-Za-z_][A-Za-z0-9_'"'"']*[[:space:]]*[:({[]' | LC_ALL=C grep -v '=>' \
+    | LC_ALL=C sed -E 's/^[+-][[:space:]]*\|[[:space:]]*([A-Za-z_][A-Za-z0-9_'"'"']*).*/\1/'
+done | LC_ALL=C sort -u > "$T/ctors"
+LC_ALL=C awk -F'\t' '$2 == "L" && $1 !~ /[.]/ { print $1 }' "$ENV" | LC_ALL=C sort -u > "$T/raizL"
+LC_ALL=C sort -u "$HIST" > "$T/hist"
+echo "nombres de constructor en la historia: $(wc -l < "$T/ctors")"
+echo "constantes de Lean en la raíz: $(wc -l < "$T/raizL")"
+echo "constructores que son constantes de Lean en la raíz: $(LC_ALL=C comm -12 "$T/ctors" "$T/raizL" | tr '\n' ' ')"
+echo "de ellos, FUERA de HIST (los que (d) absolvería): $(LC_ALL=C comm -12 "$T/ctors" "$T/raizL" | LC_ALL=C comm -23 - "$T/hist" | tr '\n' ' ')"
+rm -rf "$T"

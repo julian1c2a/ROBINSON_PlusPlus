@@ -5,8 +5,6 @@
 # b-citas.awk vea de más sobre los documentos de la base. Se arregla en el DOCUMENTO: la cita, o un marcador de estado
 # («retirado», «archivado», «propuesto», «falta»…) a su lado, a 100 bytes o menos, en la misma celda.
 # clase	clave	documento	citas
-B	C3e	doc/REFERENCE-Incompleteness.md	1
-B	ax_mod2_alternation	AXIOMS.md	1
 B	censoFrontera	sondeos/README.md	1
 B	decodeTerm.eq_1	sondeos/README.md	1
 B	noExiste	sondeos/README.md	1

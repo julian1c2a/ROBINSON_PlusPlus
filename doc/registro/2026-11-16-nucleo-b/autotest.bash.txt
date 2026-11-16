@@ -1,0 +1,16 @@
+# el autotest de [B] solo: las líneas de b-control.bash hasta B_AUTO_SAL, con el awk que se pida ($AWK) y el núcleo $1
+# uso: AWK=gawk|mawk bash autotest.bash RUTA/b-citas.awk RUTA/b-control.bash
+NUC=$1; CTL=$2
+D=$(mktemp -d); cp "$NUC" "$D/b-citas.awk"
+n=$(grep -n '^B_AUTO_ESP=' "$CTL" | cut -d: -f1)
+sed -n "36,$((n - 1))p" "$CTL" | sed '/^for d in \$B_DOCS_LISTA/,/^B_DOCS=/d' | sed "s/awk -f b-citas.awk/${AWK:-awk} -f b-citas.awk/" > "$D/auto.bash"
+sed -n "${n}p" "$CTL" >> "$D/auto.bash"
+cat >> "$D/auto.bash" <<'EOF'
+if [ "$B_AUTO_SAL" = "$B_AUTO_ESP" ]; then echo "AUTOTEST IGUAL"; else
+  echo "AUTOTEST DISTINTO"
+  diff <(printf '%s' "$B_AUTO_ESP" | tr ';' '\n') <(printf '%s' "$B_AUTO_SAL" | tr ';' '\n')
+fi
+rm -rf "$B_AUTO"
+EOF
+( cd "$D" && bash auto.bash )
+rm -rf "$D"
