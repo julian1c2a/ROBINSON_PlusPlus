@@ -1,0 +1,45 @@
+    por clase: {'i': 12, 'ii': 6, 'iii': 16, '—': 1}
+(1) titulares en TEOREMAS §1: 35
+    Consistencia           (ii) goedel_I, goedel_II · (—) consistencia
+    DerivCondPrf           (i) d2_prf
+    GodelCorolarios        (i) prf_godel_iff_con, goedel_second_formalizado · (iii) con_indecidible
+    GodelTwoPrf            (i) goedel_first_prf, goedel_second_prf, prf_con_imp_godel, prf_godelCN_fixedpoint
+    Lob                    (i) lob
+    PremsBdAllPrf          (i) d3_prf_real
+    PuenteFOL              (ii) goedel_I_fol, goedel_II_fol · (iii) goedel_I_neg_fol, prf_completo, modelo_sin_G, goedel_I_semantico
+    Representability2Prf   (i) repr_pos'_prf
+    RigidezEstandar        (iii) prf_of_prov_de, modelo_prov_iff_de, godelCN_verdadera_de, con_verdadera_de
+    Rosser                 (i) rosser_ext · (ii) rosser
+    SolidezVerificador     (iii) goedel_I_neg, godelCN_indecidible, modelo_prov_iff, godelCN_verdadera, con_verdadera
+    TarskiPrf              (i) prf_tarski · (ii) tarski · (iii) tarski_semantico, tarski_semantico_de
+
+(2) módulos por capa: {'C0': 3, 'C1': 9, 'C2': 11, 'C3': 9, 'C4': 61, 'C5': 10, 'C6': 1, 'C7': 12, 'C8': 4} · imports: 402 · SUBEN: 11
+    C5 Consistencia         → C7 GodelTwoPrf
+    C7 GodelCorolarios      → C8 PurezaComando
+    C3 GodelTwo             → C4 PremsBdAllPrf
+    C7 Lob                  → C8 PurezaComando
+    C5 ProvFiel             → C7 RosserNegNum
+    C6 PuenteFOL            → C7 TarskiPrf
+    C3 Representability2    → C4 CodeWitnessPrf
+    C5 RigidezEstandar      → C7 RosserNumEval
+    C7 RosserNumerales      → C8 PurezaComando
+    C7 RosserPosNum         → C8 PurezaComando
+    C7 RosserW1             → C8 PurezaComando
+
+(3) módulos con titulares (i) y los módulos SEMÁNTICOS (C5) en su cierre de imports:
+    DerivCondPrf     clases i         · C5 en el cierre: ninguno
+    GodelCorolarios  clases i,iii     · C5 en el cierre: ['Consistencia', 'ModeloCodificacion', 'ModeloCodigo', 'ModeloEstandar', 'SolidezDobleNegacion', 'SolidezPrf', 'SolidezVerificador']
+    GodelTwoPrf      clases i         · C5 en el cierre: ninguno
+    Lob              clases i         · C5 en el cierre: ['Consistencia', 'ModeloCodificacion', 'ModeloCodigo', 'ModeloEstandar', 'SolidezDobleNegacion', 'SolidezPrf']
+    PremsBdAllPrf    clases i         · C5 en el cierre: ninguno
+    Representability2Prf clases i         · C5 en el cierre: ninguno
+    Rosser           clases i,ii      · C5 en el cierre: ['Consistencia', 'ModeloCodificacion', 'ModeloCodigo', 'ModeloEstandar', 'SolidezDobleNegacion', 'SolidezPrf', 'SolidezVerificador']
+    TarskiPrf        clases i,ii,iii  · C5 en el cierre: ['Consistencia', 'ModeloCodificacion', 'ModeloCodigo', 'ModeloEstandar', 'SolidezDobleNegacion', 'SolidezPrf']
+
+    módulos fuera de C5 que importan directamente uno de C5:
+      C7 GodelCorolarios    → SolidezVerificador
+      C7 RosserGuardNeg     → Consistencia
+      C7 RosserNumerales    → ModeloEstandar
+      C7 RosserPosNum       → SolidezVerificador
+      C7 RosserW1           → SolidezVerificador
+      C7 TarskiPrf          → Consistencia

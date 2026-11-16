@@ -1,0 +1,27 @@
+"""B1: ¿qué módulos usan cada titular de las clases (ii) y (iii)? (si un módulo de maquinaria usa un titular, ese
+titular no puede subir a C7 sin llevarse la maquinaria). Medida textual, sin comentarios."""
+import os, re, io
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/'
+def sc(t):
+    t = re.sub(r'/-.*?-/', ' ', t, flags=re.S)
+    return re.sub(r'--[^\n]*', ' ', t)
+src = {}
+for root, _, fs in os.walk(R):
+    for f in fs:
+        if f.endswith('.lean'):
+            p = os.path.join(root, f).replace(os.sep, '/')
+            src[p[len(R):-5]] = sc(io.open(p, encoding='utf-8').read())
+TIT = {
+ 'Meta/Consistencia': 'goedel_I goedel_II',
+ 'Meta/TarskiPrf': 'tarski tarski_semantico tarski_semantico_de',
+ 'Meta/Rosser': 'rosser',
+ 'Meta/GodelCorolarios': 'con_indecidible',
+ 'Meta/SolidezVerificador': 'goedel_I_neg godelCN_indecidible modelo_prov_iff godelCN_verdadera con_verdadera',
+ 'Meta/RigidezEstandar': 'prf_of_prov_de modelo_prov_iff_de godelCN_verdadera_de con_verdadera_de',
+ 'Meta/PuenteFOL': 'goedel_I_fol goedel_II_fol goedel_I_neg_fol prf_completo modelo_sin_G goedel_I_semantico',
+}
+for mod, ns in TIT.items():
+    for n in ns.split():
+        pat = re.compile(r"(?<![\w'])" + re.escape(n) + r"(?![\w'])")
+        us = sorted(m for m, t in src.items() if m != mod and pat.search(t))
+        print('%-22s %-22s usado en: %s' % (mod.replace('Meta/', ''), n, ', '.join(u.replace('Meta/', '') for u in us) or '—'))

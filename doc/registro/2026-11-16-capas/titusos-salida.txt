@@ -1,0 +1,22 @@
+Consistencia           goedel_I               usado en: ContratoTabla, ContratoTitulares, Lob, PuenteFOL, PurezaTitulares, SolidezVerificador
+Consistencia           goedel_II              usado en: ContratoTabla, ContratoTitulares, GodelCorolarios, PuenteFOL, Rosser
+TarskiPrf              tarski                 usado en: ContratoTabla, ContratoTitulares, PurezaTitulares
+TarskiPrf              tarski_semantico       usado en: ContratoTabla, ContratoTitulares
+TarskiPrf              tarski_semantico_de    usado en: ContratoTabla, ContratoTitulares
+Rosser                 rosser                 usado en: ContratoTabla, ContratoTitulares, PurezaTitulares
+GodelCorolarios        con_indecidible        usado en: ContratoTabla, ContratoTitulares
+SolidezVerificador     goedel_I_neg           usado en: ContratoTabla, ContratoTitulares, PuenteFOL
+SolidezVerificador     godelCN_indecidible    usado en: ContratoTabla, ContratoTitulares
+SolidezVerificador     modelo_prov_iff        usado en: ContratoTabla, ContratoTitulares, ProvFiel
+SolidezVerificador     godelCN_verdadera      usado en: ContratoTabla, ContratoTitulares
+SolidezVerificador     con_verdadera          usado en: ContratoTabla, ContratoTitulares, GodelCorolarios
+RigidezEstandar        prf_of_prov_de         usado en: ContratoTabla, ContratoTitulares, ProvFiel
+RigidezEstandar        modelo_prov_iff_de     usado en: ContratoTabla, ContratoTitulares, ProvFiel, SegundoModelo
+RigidezEstandar        godelCN_verdadera_de   usado en: ContratoTabla, ContratoTitulares, PuenteFOL
+RigidezEstandar        con_verdadera_de       usado en: ContratoTabla, ContratoTitulares
+PuenteFOL              goedel_I_fol           usado en: ContratoTabla, ContratoTitulares
+PuenteFOL              goedel_II_fol          usado en: ContratoTabla, ContratoTitulares
+PuenteFOL              goedel_I_neg_fol       usado en: ContratoTabla, ContratoTitulares
+PuenteFOL              prf_completo           usado en: ContratoTabla, ContratoTitulares
+PuenteFOL              modelo_sin_G           usado en: ContratoTabla, ContratoTitulares
+PuenteFOL              goedel_I_semantico     usado en: ContratoTabla, ContratoTitulares

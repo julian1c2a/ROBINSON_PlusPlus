@@ -1,0 +1,93 @@
+"""B1, fase 0 (ADR-264 §4, ADR-265 §1): la propuesta de capas, medida. Lee los `import` de cada módulo de RPP, la
+tabla de TEOREMAS §1 (titular, módulo, clase) y la lista PUROS de PurezaTitulares (los de la clase (i)). Imprime:
+(1) los titulares por clase y módulo; (2) con la asignación de familias de CURRENT-STATUS §4 —C0…C8, y C7 partida
+por clase—, los imports que SUBEN de capa; (3) la regla FUERTE de la clase (i): ningún módulo de C5 (la semántica) en
+el cierre de imports de un módulo con titulares (i); y qué módulo semántico entra, y por dónde. Medida textual."""
+import os, re, io, collections, sys
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+P = 'ROBINSON_PlusPlus.'
+imps = {}
+for root, _, fs in os.walk(R + 'ROBINSON_PlusPlus'):
+    for f in fs:
+        if f.endswith('.lean'):
+            p = os.path.join(root, f).replace(os.sep, '/')
+            m = p[len(R):-5].replace('/', '.')
+            if m == P + 'Meta':
+                continue
+            imps[m] = [l.split()[1] for l in io.open(p, encoding='utf-8') if l.startswith('import ') and l.split()[1].startswith(P)]
+corto = lambda m: m.replace(P + 'Meta.', '').replace(P, '')
+def clos(m, memo={}):
+    if m not in memo:
+        s = set()
+        for i in imps.get(m, []):
+            s.add(i); s |= clos(i)
+        memo[m] = s
+    return memo[m]
+
+# (1) los titulares
+T = io.open(R + 'TEOREMAS-E-HIPOTESIS.md', encoding='utf-8').read()
+tit = []
+for l in T.splitlines():
+    if not l.startswith('| **`'):
+        continue
+    celdas = l.split(' | ')
+    nombres = re.findall(r'\*\*`([^`]+)`\*\*', celdas[0])
+    mod = re.search(r'`Meta/([A-Za-z0-9]+)\.lean`', celdas[0])
+    cl = re.search(r'\*\*\((i{1,3})\)\*\*', celdas[-1])
+    if not mod:
+        continue  # (una fila de otra tabla: las hipótesis de §2)
+    for n in nombres:
+        tit.append((n, mod.group(1), cl.group(1) if cl else '—'))
+# D1, D2 y D3, de la lista PUROS de PurezaTitulares (clase (i); su fila de TEOREMAS no sigue el formato de la tabla)
+for n, m in (("repr_pos'_prf", 'Representability2Prf'), ('d2_prf', 'DerivCondPrf'), ('d3_prf_real', 'PremsBdAllPrf')):
+    tit.append((n, m, 'i'))
+print('    por clase:', dict(sorted(collections.Counter(c for _, _, c in tit).items())))
+print('(1) titulares en TEOREMAS §1:', len(tit))
+pormod = collections.defaultdict(lambda: collections.defaultdict(list))
+for n, m, c in tit:
+    pormod[m][c].append(n)
+for m in sorted(pormod):
+    print('    %-22s %s' % (m, ' · '.join('(%s) %s' % (c, ', '.join(v)) for c, v in sorted(pormod[m].items()))))
+clase_mod = {P + 'Meta.' + m: set(d) for m, d in pormod.items()}
+
+# (2) las capas: la asignación por familias, y los imports que suben
+FAM = {
+ 'C0': 'Minimal.SymLit Minimal.Axioms Full.Induction',
+ 'C1': 'Meta.Godel Meta.Provability Meta.Hilbert Meta.HilbertDeduction Meta.HilbertSeq Meta.SubstArith Meta.CheckArith Meta.ProofChain Meta.Representability',
+ 'C2': 'Meta.ReprPrf Meta.ArithPrf Meta.ChainPrf Meta.NatArithPrf Meta.NatOrderPrf Meta.NatMulPrf Meta.CantorMonoPrf '
+       'Meta.Div2ParityPrf Meta.StrongInductionPrf Meta.NumListPrf Meta.TcArithPrf',
+ 'C3': 'Meta.Representability2 Meta.Representability2Prf Meta.DerivCondPrf Meta.CodeNumeralPrf Meta.CodeNatInjPrf '
+       'Meta.Diagonal Meta.DiagonalTwo Meta.DiagonalNumeral Meta.GodelTwo',
+ 'C5': 'Meta.ModeloCodigo Meta.ModeloEstandar Meta.ModeloCodificacion Meta.SolidezPrf Meta.SolidezDobleNegacion '
+       'Meta.Consistencia Meta.SolidezVerificador Meta.RigidezEstandar Meta.ProvFiel Meta.SegundoModelo',
+ 'C6': 'Meta.PuenteFOL',
+ 'C7': 'Meta.GodelTwoPrf Meta.GodelCorolarios Meta.TarskiPrf Meta.Rosser Meta.RosserW1 Meta.RosserPosNum Meta.RosserNumerales '
+       'Meta.RosserNumEval Meta.RosserGuardNeg Meta.RosserNegLinea Meta.RosserNegNum Meta.Lob',
+ 'C8': 'Meta.PurezaComando Meta.PurezaTitulares Meta.ContratoTitulares Meta.ContratoTabla',
+}
+capa = {}
+for c, ms in FAM.items():
+    for m in ms.split():
+        assert P + m in imps, m
+        capa[P + m] = c
+for m in imps:
+    capa.setdefault(m, 'C4')
+n = lambda c: int(c[1:])
+aristas = [(a, b) for a in imps for b in imps[a]]
+sube = sorted((a, b) for a, b in aristas if n(capa[b]) > n(capa[a]))
+print('\n(2) módulos por capa:', dict(sorted(collections.Counter(capa.values()).items())), '· imports:', len(aristas), '· SUBEN:', len(sube))
+for a, b in sube:
+    print('    %s %-20s → %s %s' % (capa[a], corto(a), capa[b], corto(b)))
+
+# (3) la regla fuerte de la clase (i)
+sem = {m for m in imps if capa[m] == 'C5'}
+print('\n(3) módulos con titulares (i) y los módulos SEMÁNTICOS (C5) en su cierre de imports:')
+for m in sorted(clase_mod):
+    if 'i' in clase_mod[m] and m in imps:
+        s = sorted(corto(x) for x in clos(m) & sem)
+        print('    %-16s clases %-9s · C5 en el cierre: %s' % (corto(m), ','.join(sorted(clase_mod[m])), s or 'ninguno'))
+# por dónde entra la semántica: los módulos NO semánticos que importan DIRECTAMENTE uno semántico
+print('\n    módulos fuera de C5 que importan directamente uno de C5:')
+for a, b in aristas:
+    if capa[a] != 'C5' and b in sem and capa[a] not in ('C6', 'C8'):
+        print('      %s %-18s → %s' % (capa[a], corto(a), corto(b)))

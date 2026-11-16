@@ -1,6 +1,6 @@
 # Las auditorías del proyecto: qué hubo, en qué estado están y qué queda
 
-**Last updated:** 2026-11-16 — [ADR‑265](../DECISIONS.md): A7, hecho; C1, re‑medido; B1 y D1, con la decisión del
+**Last updated:** 2026-11-16 — [ADR‑266](../DECISIONS.md): B1, el diseño decidido. Antes, el mismo día — [ADR‑265](../DECISIONS.md): A7, hecho; C1, re‑medido; B1 y D1, con la decisión del
 propietario. Antes, 2026-11-10 — [ADR‑264](../DECISIONS.md): A7, A9, B1 y D1 remiten a su plan, `doc/PLAN-A7-A9-B1-D1.md`.
 Antes, 2026-11-09 — creado con [ADR‑263](../DECISIONS.md): el índice de las auditorías de RPP y FOL, con el
 estado de sus hallazgos medido en `doc/control/hallazgos.tsv`, y lo que queda de todas ellas.
@@ -58,7 +58,7 @@ dejaron al propietario; lo aprobado que no se ha ejecutado; residuos medidos que
 | A10 | La ω‑consistencia «honesta», definida y demostrada con el modelo | RUT‑15 (auditoría del suelo), descartado al agrupar: «no es suelo y va contra una decisión escrita» | descartado | sólo si el propietario lo reabre |
 | A11 | La tabla de reglas del verificador como dato de Lean | L5‑04; ADR‑254 §1 | descartado, con condición | se reabre si algún día cambian las reglas de `Prf` |
 | **B** | **Aprobado y sin ejecutar** | | | |
-| B1 | Las capas DENTRO de RPP: un manifiesto módulo→capa, un control de la dirección de los imports y contratos generados | ADR‑139 paso 3, aprobado en ADR‑140 §1; NEXT‑STEPS («Pendiente además de Rosser») | no hay manifiesto ni control (lo que sí está: `DEPENDENCIES.md` generado, ADR‑238, y el contrato de los titulares, T07) | el propietario decidió (2026‑11‑16, ADR‑265): las nueve capas del plan, con los titulares separados por clase; lo siguiente, la fase 0 del plan (`doc/PLAN-A7-A9-B1-D1.md` §4) |
+| B1 | Las capas DENTRO de RPP: un manifiesto módulo→capa, un control de la dirección de los imports y contratos generados | ADR‑139 paso 3, aprobado en ADR‑140 §1; NEXT‑STEPS («Pendiente además de Rosser») | no hay manifiesto ni control (lo que sí está: `DEPENDENCIES.md` generado, ADR‑238, y el contrato de los titulares, T07) | el DISEÑO, decidido (2026‑11‑16, ADR‑266): nueve capas, la clase (i) sin la semántica, todos los titulares en C7 por clase con el nombre de su módulo, los controles en C8; la ejecución, en seis pasos con su ADR cada uno (ADR‑266 §6) |
 | B2 | PeanoRF: importar `FOL.Calculus.*` en vez de llevar copias | ADR‑218 | su repositorio sigue BLOQUEADO (2026‑10‑01) | cuando se desbloquee |
 | **C** | **Residuos medidos (no son deuda)** | | | |
 | C1 | `[B]`: 7 citas en RPP y 17 en FOL (✏️ 2026‑11‑16, ADR‑265: eran 10 y 29) | ADR‑262 §6; ADR‑265 §4 | falsos positivos, cada uno con su razón en `doc/registro/2026-11-09-deuda/LEEME.txt` | ninguno: lo que quedaba de los tácticos y de los lemas de Lean cayó con A7 (MEDIDO, ADR‑265 §4) |

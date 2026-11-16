@@ -1,0 +1,20 @@
+ADR-266 (2026-11-16): B1, el diseño de las capas dentro de RPP — las medidas de la fase 0 (sobre RPP 4cddc39; por
+lectura del TEXTO de los .lean, sin comentarios, y de la tabla de TEOREMAS-E-HIPOTESIS.md §1: no con el elaborador).
+
+  capas1.py.txt / capas1-salida.txt
+      (1) los 35 titulares, con su módulo y su clase (12 de la (i), 6 de la (ii), 16 de la (iii) y `consistencia`, sin
+          clase): de TEOREMAS §1, y D1, D2 y D3 de la lista PUROS de Meta/PurezaTitulares.lean;
+      (2) la asignación de los 120 módulos a las capas por familias (CURRENT-STATUS §4; C4, D3, es lo que no se nombra)
+          y los imports que SUBEN de capa con ella: 11 de 402;
+      (3) la regla de C7.i: qué módulos con titulares de la clase (i) tienen un módulo de C5 en su cierre de imports
+          (Lob, Rosser, TarskiPrf y GodelCorolarios; GodelTwoPrf, ninguno) y por qué import entra.
+  usos.py.txt / usos-salida.txt
+      qué toma cada módulo de los que importa en los catorce imports que importan (los que suben y los que meten la
+      semántica): p. ej. PurezaComando ← Consistencia sólo por `consistencia` (su control positivo); RosserW1 ←
+      SolidezVerificador por `dec`, `cadena_buena` y `bueno_*` (ℕ y sintaxis) y `verificador_solido` (un control).
+  titusos.py.txt / titusos-salida.txt
+      qué módulos usan cada titular de las clases (ii) y (iii): si uno de maquinaria usa un titular, sube con él
+      (ProvFiel y SegundoModelo usan titulares de la (iii)).
+
+Los nombres que estas salidas dan por textuales (un uso por su nombre en el fuente) los confirma el elaborador en cada
+paso de la ejecución (ADR-266 §6).

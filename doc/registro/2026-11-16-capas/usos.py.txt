@@ -1,0 +1,19 @@
+"""B1: qué toma cada módulo de los módulos SEMÁNTICOS que importa directamente (medida textual, sin comentarios)."""
+import re, io
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/'
+def sc(t):
+    t = re.sub(r'/-.*?-/', ' ', t, flags=re.S)
+    return re.sub(r'--[^\n]*', ' ', t)
+def decls(m):
+    return re.findall(r'^(?:@\[[^\]]*\]\s*)*(?:private\s+|protected\s+|noncomputable\s+)*(?:theorem|lemma|def|abbrev|structure|inductive|class|instance)\s+([A-Za-z_][\w\'.]*)',
+                      sc(io.open(R + m + '.lean', encoding='utf-8').read()), flags=re.M)
+PARES = [('RosserW1', 'SolidezVerificador'), ('RosserPosNum', 'SolidezVerificador'), ('RosserNumerales', 'ModeloEstandar'),
+         ('RosserGuardNeg', 'Consistencia'), ('TarskiPrf', 'Consistencia'), ('GodelCorolarios', 'SolidezVerificador'),
+         ('PurezaComando', 'Consistencia'), ('RigidezEstandar', 'RosserNumEval'), ('ProvFiel', 'RosserNegNum'),
+         ('PuenteFOL', 'TarskiPrf'), ('PuenteFOL', 'RigidezEstandar'), ('Consistencia', 'GodelTwoPrf'),
+         ('GodelTwo', 'PremsBdAllPrf'), ('Representability2', 'CodeWitnessPrf')]
+for a, b in PARES:
+    t = sc(io.open(R + a + '.lean', encoding='utf-8').read())
+    d = decls(b)
+    u = sorted({x for x in d if re.search(r"(?<![\w'])" + re.escape(x.split('.')[-1]) + r"(?![\w'])", t)})
+    print('%-16s ← %-18s (%3d decl.): %s' % (a, b, len(d), u[:14] + (['…%d más' % (len(u) - 14)] if len(u) > 14 else [])))

@@ -1,6 +1,7 @@
 # El plan de A7, A9, B1 y D1
 
-**Last updated:** 2026-11-16 — [ADR‑265](../DECISIONS.md): las decisiones del propietario (§0) y **A7, hecho** (§2).
+**Last updated:** 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
+[ADR‑265](../DECISIONS.md): las decisiones del propietario (§0) y **A7, hecho** (§2).
 Antes, 2026-11-10 — creado con [ADR‑264](../DECISIONS.md): el estudio y el plan de cuatro filas de
 `doc/AUDITORIAS.md` §2 (el núcleo de `[B]`, `prf_list_induction` sin `listInd`, las capas dentro de RPP y las preguntas
 de T71).
@@ -141,6 +142,12 @@ medido; una regla menos para Gentzen (A4). Quitar `listInd` de `Prf` es otra dec
 mucho, el corte crece. **Coste:** de uno a dos días (ESTIMACIÓN).
 
 ## 4 · B1 — las capas dentro de RPP (ADR‑139 paso 3, aprobado en ADR‑140 §1)
+
+> ✅ **La fase 0 y el diseño, hechos y decididos el 2026‑11‑16** ([ADR‑266](../DECISIONS.md)): nueve capas; la clase (i)
+> no ve la semántica ni de forma transitiva (C7.i importa sólo de C0–C4); todos los titulares en C7, en la subcapa de su
+> clase, con el espacio de nombres de su módulo nuevo; los controles, en C8. MEDIDO: 11 de 402 imports suben con la
+> asignación por familias, y cuatro módulos con titulares de la (i) ven la semántica, por seis nudos. La ejecución, en
+> seis pasos (ADR‑266 §6). Lo que aquí sigue es el plan tal como se escribió.
 
 **Lo medido.** No hay manifiesto ni control. Lo que sí hay: `DEPENDENCIES.md`, generado y con `--check` en la CI
 (ADR‑238: 120 módulos activos, 402 aristas, profundidad 59, sin ciclos); las familias de `Meta/` en prosa
