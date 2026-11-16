@@ -941,8 +941,9 @@ if [ "$B_MEDIDO" = "1" ]; then
     B_FAIL=1; B_MEDIDO=0
   elif ! VOLCADO="$(cygpath -m "$B_ENV" 2>/dev/null || printf '%s' "$B_ENV")" lake env lean scripts/VolcarEntorno.lean > /dev/null 2>&1 \
        || [ "$(wc -l < "$B_ENV" | tr -d ' ')" -lt 100000 ] || ! grep -q '^ROBINSON_PlusPlus\.Meta\.Hilbert\.Prf\.listInd	P$' "$B_ENV" \
-       || ! grep -q '^Init\.Classical	M$' "$B_ENV"; then
-    echo "  ❌ NO PUDE MEDIR [B]: el volcado del entorno de Lean salió corto o sin \`Prf.listInd\` (¿el build no está hecho?)."
+       || ! grep -q '^Init\.Classical	M$' "$B_ENV" || ! grep -q '^derive_hyp	T$' "$B_ENV"; then
+    # (✏️ ADR-265: y una táctica, `derive_hyp` de FOL/Tactics.lean: el volcado de las palabras que empiezan una sintaxis)
+    echo "  ❌ NO PUDE MEDIR [B]: el volcado del entorno de Lean salió corto o sin \`Prf.listInd\` o sin la táctica \`derive_hyp\` (¿el build no está hecho, o el \`lake\` del PATH es de otra versión que la de lean-toolchain? es: $(lake --version 2>/dev/null | head -1))."
     B_FAIL=1; B_MEDIDO=0
   fi
 fi

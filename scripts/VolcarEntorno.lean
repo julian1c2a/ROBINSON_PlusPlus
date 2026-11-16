@@ -15,10 +15,11 @@ import TheoryFramework.Instances.FOLModels
 Escribe en el fichero de la variable `VOLCADO` (sin ella, en la salida estándar), una por línea, cada constante no
 interna del entorno de RPP y de FOL entero —RPP importa sólo una parte de FOL, y los documentos citan también lo
 demás— (con «P» si su módulo es del proyecto, RPP, FOL o TheoryFramework, y «L» si no), cada opción registrada (con
-«O»), cada módulo importado (con «M») y cada orden, un token del analizador que empieza por «#» (con «T»). Con eso
-`[B]` sabe qué cita de un documento nombra algo que existe: una constante de Lean (`Nat.succ`), un constructor o un
-campo del proyecto (`listInd`), un espacio de nombres (`FOL.Metamath.Semantics`), una opción (`autoImplicit`), un
-módulo de Lean (`Init.Classical`) o una orden (`#pureza_titulares`). No está en el build: necesita el build hecho, y
+«O»), cada módulo importado (con «M») y cada orden, un token del analizador que empieza por «#», y cada palabra con
+forma de identificador que empieza una sintaxis, como una táctica (con «T»; ADR‑265). Con eso `[B]` sabe qué cita de
+un documento nombra algo que existe: una constante de Lean (`Nat.succ`), un constructor o un campo del proyecto
+(`listInd`), un espacio de nombres (`FOL.Metamath.Semantics`), una opción (`autoImplicit`), un módulo de Lean
+(`Init.Classical`), una orden (`#pureza_titulares`) o una táctica (`derive_hyp`). No está en el build: necesita el build hecho, y
 lo llama `check-doc-sync.bash` con `lake env lean`. -/
 
 open Lean Elab Command
@@ -63,6 +64,18 @@ elab "#volcar_entorno" : command => do
   for t in Lean.Data.Trie.values (Lean.Parser.getTokenTable env) do
     if t.startsWith "#" then
       out := out.push s!"{t}\tT"
+  -- ✏️ ADR‑265: y las palabras con forma de IDENTIFICADOR que empiezan una sintaxis de alguna categoría (las
+  -- tácticas: `exact?`, `derive_hyp`), que no son constantes y los documentos citan. No están en la tabla de tokens:
+  -- la categoría de las tácticas no reserva sus palabras (`LeadingIdentBehavior`); están en la tabla de cada categoría
+  let esIdent (t : String) : Bool :=
+    match t.toList with
+    | c :: r => (c.isAlpha || c == '_') && r.all (fun d => d.isAlphanum || d == '_' || d == '!' || d == '?' || d == '\'')
+    | [] => false
+  for (_, cat) in (Lean.Parser.parserExtension.getState env).categories.toList do
+    for (k, _) in cat.tables.leadingTable.toList do
+      if let .str .anonymous t := k then
+        if esIdent t then
+          out := out.push s!"{t}\tT"
   let texto := "\n".intercalate out.toList ++ "\n"
   match (← IO.getEnv "VOLCADO") with
   | some ruta => IO.FS.writeFile ruta texto
