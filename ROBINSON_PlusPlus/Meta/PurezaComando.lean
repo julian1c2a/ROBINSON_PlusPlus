@@ -3,7 +3,6 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.Consistencia
 -- ✏️ 2026‑11‑05 (R2‑4‑5, ADR‑258): `Lean` a la vista. Llegaba sin pedirlo, por `FOL.Tactics`, a casi todo RPP; desde que
 -- `FOL.Theorems.Impl` ya no lo importa, sólo lo cargan los módulos que lo usan: éste (sus órdenes, `#pureza`) y lo que
 -- lo importa (`Meta/ContratoTitulares.lean` y `Meta/PurezaTitulares.lean`).
@@ -16,6 +15,11 @@ import Lean
 Rosser usan `#pureza` al final (ADR‑147), y la lista tiene que nombrar `rosser_ext`, de `Meta/Rosser.lean`: en el mismo
 fichero, la lista no podía importar Rosser sin un ciclo (lo anunció ADR‑148 §3). Aquí queda la herramienta; la lista y
 `#pureza_titulares`, en `Meta/PurezaTitulares.lean`, que importa Rosser.
+✏️ 2026‑11‑16 (ADR‑267; B1, el nudo N1 de ADR‑266): y SIN la semántica. Su autoprueba —el control positivo del
+recorrido dentro de un módulo, que necesita `consistencia`— importaba `Meta/Consistencia.lean`, y con ella cada módulo
+que usa `#pureza` (Löb, tres etapas de Rosser y los corolarios de Gödel) tenía la semántica en su cierre de imports.
+La autoprueba vive ahora al final de `Meta/PurezaTitulares.lean` (C8); aquí sólo queda la herramienta, que importa
+`Lean` y nada del proyecto: los espacios de nombres y los módulos de la semántica los nombra como `Name`, sin cargarlos.
 
 **Qué comprueba.** Para cada nombre, su cierre de dependencias no contiene ninguna constante de la SEMÁNTICA. El
 cierre se recorre por tipos y valores (`allowOpaque`), con los constructores de cada inductivo y el inductivo de cada
@@ -157,18 +161,7 @@ syntax (name := purezaDe) "#pureza " ident* " | " ident* : command
   let impuros ← stx[3].getArgs.toList.mapM resolver
   comprobar puros impuros
 
-/-! ### El recorrido DENTRO de un módulo, vigilado (ADR‑149)
-
-`#pureza` se usa al final de los módulos de Rosser sobre teoremas del MISMO fichero (ADR‑147). Este par es su control
-positivo: `mutanteLocal` sólo nombra un lema de este fichero, y ese lema llama a `consistencia`, que usa el modelo.
-Si el recorrido dejara de seguir las constantes del fichero en curso, `mutanteLocal` saldría puro y el build no
-compilaría. Visto fallar: antes del arreglo de `delProyecto`, el mismo mutante salía PURO. -/
-
-theorem auxLocalSemantico : ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH :=
-  ROBINSON_PlusPlus.Meta.Consistencia.consistencia
-
-theorem mutanteLocal : ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH := auxLocalSemantico
-
-#pureza | mutanteLocal
+-- (La autoprueba del recorrido dentro de un módulo —`mutanteLocal`, ADR‑149— está al final de
+-- `Meta/PurezaTitulares.lean` desde ADR‑267: necesita `consistencia`, y esta herramienta no importa la semántica.)
 
 end ROBINSON_PlusPlus.Meta.PurezaComando

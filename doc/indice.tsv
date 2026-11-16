@@ -2635,7 +2635,6 @@ ROBINSON_PlusPlus.Meta.PurezaComando.Recorrido.camino	campo	ROBINSON_PlusPlus.Me
 ROBINSON_PlusPlus.Meta.PurezaComando.Recorrido.mk	constructor	ROBINSON_PlusPlus.Meta.PurezaComando	Nat → Option (List Lean.Name) → ROBINSON_PlusPlus.Meta.PurezaComando.Recorrido
 ROBINSON_PlusPlus.Meta.PurezaComando.Recorrido.tamano	campo	ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.PurezaComando.Recorrido → Nat
 ROBINSON_PlusPlus.Meta.PurezaComando.aristas	def	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Environment → Lean.Name → Array Lean.Name
-ROBINSON_PlusPlus.Meta.PurezaComando.auxLocalSemantico	teorema	ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH
 ROBINSON_PlusPlus.Meta.PurezaComando.comprobar	def	ROBINSON_PlusPlus.Meta.PurezaComando	List Lean.Name → List Lean.Name → Lean.Elab.Command.CommandElabM Unit
 ROBINSON_PlusPlus.Meta.PurezaComando.delProyecto	def	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Environment → Lean.Name → Bool
 ROBINSON_PlusPlus.Meta.PurezaComando.elabPurezaDe	meta	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Elab.Command.CommandElab
@@ -2643,13 +2642,14 @@ ROBINSON_PlusPlus.Meta.PurezaComando.esModuloDelProyecto	def	ROBINSON_PlusPlus.M
 ROBINSON_PlusPlus.Meta.PurezaComando.esSemantica	def	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Environment → Lean.Name → Bool
 ROBINSON_PlusPlus.Meta.PurezaComando.moduloDe	def	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Environment → Lean.Name → Option Lean.Name
 ROBINSON_PlusPlus.Meta.PurezaComando.mostrarCamino	def	ROBINSON_PlusPlus.Meta.PurezaComando	List Lean.Name → String
-ROBINSON_PlusPlus.Meta.PurezaComando.mutanteLocal	teorema	ROBINSON_PlusPlus.Meta.PurezaComando	ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH
 ROBINSON_PlusPlus.Meta.PurezaComando.nombreUsuario	def	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Name → Lean.Name
 ROBINSON_PlusPlus.Meta.PurezaComando.proyectaSemantica	def	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Environment → Lean.Name → Option Lean.Name
 ROBINSON_PlusPlus.Meta.PurezaComando.purezaDe	meta	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.ParserDescr
 ROBINSON_PlusPlus.Meta.PurezaComando.recorrer	def	ROBINSON_PlusPlus.Meta.PurezaComando	Lean.Environment → Lean.Name → ROBINSON_PlusPlus.Meta.PurezaComando.Recorrido
 ROBINSON_PlusPlus.Meta.PurezaTitulares.IMPUROS	def	ROBINSON_PlusPlus.Meta.PurezaTitulares	List Lean.Name
 ROBINSON_PlusPlus.Meta.PurezaTitulares.PUROS	def	ROBINSON_PlusPlus.Meta.PurezaTitulares	List Lean.Name
+ROBINSON_PlusPlus.Meta.PurezaTitulares.auxLocalSemantico	teorema	ROBINSON_PlusPlus.Meta.PurezaTitulares	ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH
+ROBINSON_PlusPlus.Meta.PurezaTitulares.mutanteLocal	teorema	ROBINSON_PlusPlus.Meta.PurezaTitulares	ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH
 ROBINSON_PlusPlus.Meta.PurezaTitulares.«command#contrato_titulares»	meta	ROBINSON_PlusPlus.Meta.PurezaTitulares	Lean.ParserDescr
 ROBINSON_PlusPlus.Meta.PurezaTitulares.«command#pureza_titulares»	meta	ROBINSON_PlusPlus.Meta.PurezaTitulares	Lean.ParserDescr
 ROBINSON_PlusPlus.Meta.ReprPrf.prf_In_listFormCode	teorema	ROBINSON_PlusPlus.Meta.ReprPrf	∀ {g : Formula} {l : List Formula}, List.Mem g l → ROBINSON_PlusPlus.Meta.Hilbert.Prf (ROBINSON_PlusPlus.Minimal.Axioms.In (ROBINSON_PlusPlus.Meta.Provability.formCode g) (ROBINSON_PlusPlus.Meta.Representability.listFormCode l))

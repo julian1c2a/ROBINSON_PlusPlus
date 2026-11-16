@@ -78,6 +78,21 @@ elab "#contrato_titulares" : command =>
   ROBINSON_PlusPlus.Meta.ContratoTitulares.comprobar ROBINSON_PlusPlus.Meta.ContratoTitulares.TITULARES
     ROBINSON_PlusPlus.Meta.ContratoTabla.tabla PUROS IMPUROS
 
+/-! ### El recorrido DENTRO de un módulo, vigilado (ADR‑149; aquí desde ADR‑267, que lo saca de `PurezaComando`)
+
+`#pureza` se usa al final de los módulos de Rosser, de Löb y de los corolarios de Gödel sobre teoremas del MISMO
+fichero (ADR‑147). Este par es su control positivo: `mutanteLocal` sólo nombra un lema de este fichero, y ese lema
+llama a `consistencia`, que usa el modelo. Si el recorrido dejara de seguir las constantes del fichero en curso,
+`mutanteLocal` saldría puro y el build no compilaría. Visto fallar: antes del arreglo de `delProyecto`, el mismo
+mutante salía PURO. -/
+
+theorem auxLocalSemantico : ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH :=
+  ROBINSON_PlusPlus.Meta.Consistencia.consistencia
+
+theorem mutanteLocal : ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH := auxLocalSemantico
+
+#pureza | mutanteLocal
+
 end ROBINSON_PlusPlus.Meta.PurezaTitulares
 
 #pureza_titulares
