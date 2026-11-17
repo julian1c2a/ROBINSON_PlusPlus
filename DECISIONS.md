@@ -6479,7 +6479,9 @@ REFERENCE, TEOREMAS, PLAN‑PRUEBAS, CURRENT‑STATUS, README, `doc/REFERENCE-In
    `PuenteFOL` → `TitularesIII` (por `goedel_I_neg`) y `RigidezEstandar` → `TitularesIII` (por `gg_godelCN`).
 6. **Lo que NO se ha medido:** las huellas de las constantes que no están en el cierre de los titulares (los lemas de
    `SolidezVerificadorModelo`, los controles): las cubre el build, no una comparación de tipos. Los cinco sondeos
-   renombrados no se han vuelto a ejecutar.
+   renombrados no se han vuelto a ejecutar. Un sexto, `sondeos/RosserReflexion.lean`, de los de CONTROL que compila la CI,
+   usaba `verificador_solido` por su nombre corto (el renombre sólo mira los nombres completos): el primer run de la
+   rama salió ROJO por él; abre ahora el espacio de nombres nuevo, y los 11 sondeos de control compilan (medido en local).
 
 **Véase también:** ADR‑266 (el diseño), ADR‑267 (el paso 1), ADR‑165 (T07), ADR‑143 y ADR‑157 (T08), ADR‑191 (el
 traslado de `modelo_prov_iff` a `ProvFiel`).

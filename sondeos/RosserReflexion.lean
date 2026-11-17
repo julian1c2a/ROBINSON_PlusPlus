@@ -54,7 +54,8 @@ set_option relaxedAutoImplicit false
 
 open FOL FOL.Metamath.Semantics ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ModeloCodigo ROBINSON_PlusPlus.Meta.ModeloEstandar ROBINSON_PlusPlus.Meta.ModeloCodificacion
-open ROBINSON_PlusPlus.Meta.SolidezVerificador
+open ROBINSON_PlusPlus.Meta.SolidezVerificador ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo
+-- (✏️ 2026‑11‑17, ADR‑268: `verificador_solido` vive en `Meta/SolidezVerificadorModelo.lean`.)
 
 namespace RosserReflexion
 
