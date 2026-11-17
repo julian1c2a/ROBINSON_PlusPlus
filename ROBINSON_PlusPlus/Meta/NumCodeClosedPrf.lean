@@ -6,6 +6,9 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 import ROBINSON_PlusPlus.Meta.TcArithPrf
 import ROBINSON_PlusPlus.Meta.NatArithPrf
+-- ✏️ 2026‑11‑18 (ADR‑270): `ChainPrf` (`PrfH_congr_cons_tail`, `PrfH_congr_liftc`) llegaba por `NatArithPrf`, que ya no
+-- lo importa (A9).
+import ROBINSON_PlusPlus.Meta.ChainPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel

@@ -63,6 +63,9 @@ Public API:
     `rosser`, los dos de Gödel en FOL y los dieciséis de la (iii), que las líneas de arriba citan con su módulo de
     entonces—; los controles que nombran la semántica, en `Meta/Controles.lean`; y `Meta/Sentencia.lean`
     (`IsSentence`) y `Meta/SolidezVerificadorModelo.lean` (W1 leído en el modelo).
+  · ✏️ 2026‑11‑18 (ADR‑270, A9 y el paso 3 de B1): `prf_list_induction` (`Meta/ChainPrf.lean`) es corolario de
+    `listInd_admisible`, sin el constructor `Prf.listInd`: `ListIndAdmisible` está por debajo de `ChainPrf`. Las diez
+    reglas de `PrfH` que la aritmética tomaba de `ChainPrf`, en `Meta/ReglasPrfH.lean`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -197,6 +200,8 @@ import ROBINSON_PlusPlus.Meta.Controles
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
 -- (✏️ 2026‑11‑05, ADR‑259: `listInd` es ADMISIBLE en `Prf` —sale de `ind`—; la prueba, del sondeo de T69 al build.)
 import ROBINSON_PlusPlus.Meta.ListIndAdmisible
+-- (✏️ 2026‑11‑18, ADR‑270: las diez reglas de `PrfH` que la aritmética tomaba de `ChainPrf`.)
+import ROBINSON_PlusPlus.Meta.ReglasPrfH
 -- (✏️ 2026‑10‑19, ADR‑170, T74: `FOL.Deduction`, `FOL.Theorems.Derived`, `Impl` y `Neg`, sin nada en el cono, fuera.)
 import FOL.FOL
 import FOL.Theorems.Eq

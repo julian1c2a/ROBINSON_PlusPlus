@@ -262,7 +262,7 @@ theorem prf_substtc_var (k s n : Nat) :
     | succ m =>
       rw [Nat.add_sub_cancel]
       exact prf_eq_trans (prf_mp (prf_substtc_var_gt _ _ _) (LineWFTrackedPrf.prf_lt_numeralM hlt))
-        (prf_eq_trans (prf_congr_un (BoundedInPrf.prf_pred_succ (numeralM m))) (prf_varc_numeral m))
+        (prf_eq_trans (prf_congr_un (NatArithPrf.prf_pred_succ (numeralM m))) (prf_varc_numeral m))
   · rw [ite_eq_left rfl]
     exact prf_mp (prf_substtc_var_eq _ _ _) (prf_refl _)
   · rw [ite_eq_right (Nat.ne_of_lt hgt).symm, ite_eq_right (Nat.lt_asymm hgt)]

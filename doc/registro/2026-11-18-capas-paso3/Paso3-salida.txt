@@ -1,0 +1,174 @@
+ROBINSON_PlusPlus.Meta.ListIndAdmisible.listInd_admisible: cierre de 2213 constantes; de RPP, en 16 módulos (⛓ = `ChainPrf` en su cierre de imports):
+    ROBINSON_PlusPlus.Full.Induction (1)
+    ArithPrf (4)
+  ⛓ BoundedInPrf (3): [PrfH_eq_congr_pred, prf_pred_succ, prf_zero_or_eq_succ_pred]
+  ⛓ CantorMonoPrf (21): [cpOf, prf_add_one, prf_bot_of_le_succ_div2, prf_cantor_mono_right, prf_cons_def, prf_cons_div2, prf_le_double_cantor_of_le, prf_le_double_s_cantor, prf_le_double_self_mul_succ_all, prf_le_mod2_one, prf_le_self_mul_self_all, prf_le_zero_one, prf_lt_subst2_cm, prf_lt_succ_div2, prf_lt_succ_self_cm, prf_mul_two, prf_mul_two_add_one, prf_not_le_succ_self, prf_or_elim, prf_pair_div_mod, prf_succ_add_succ_eq]
+  ⛓ ChainPrf (10): [PrfH_congr_cons_head, PrfH_eq_symm, PrfH_eq_trans, PrfH_iff_mp, PrfH_iff_mpr, PrfH_leibniz_subst, PrfH_lt_subst1, PrfH_lt_subst2, PrfH_or_elim, PrfH_spec]
+  ⛓ CodeWitnessPrf (3): [SinWTs.consOk, SinWTs.prf_cdrc_cons, SinWTs.prf_consOk_cons]
+  ⛓ Div2ParityPrf (17): [PrfH_double_div2_of_even, PrfH_eq_congr_mod2, PrfH_eq_congr_mul2, PrfH_succ_double_of_odd, prf_div2_double, prf_eq_congr_div2, prf_eq_congr_mod2, prf_mod2_consec, prf_mod2_cpOf, prf_mod2_double, prf_mul_assoc, prf_mul_distrib, prf_mul_distrib_right, prf_mul_two_cancel, prf_mul_two_lt_mono, prf_pair_double, prf_swap_mul2]
+    Hilbert (27)
+    HilbertDeduction (22)
+  ⛓ ListIndAdmisible (27): [PrfH_consOk_of_eq, S_inst, consOk_at, consOk_succ_at, lift0_PSI, lift0_subst0, lift21, lift2_subst0, lift32, listInd_admisible, prf_allPSI_imp_all, prf_congr_mul_succ_self, prf_consOk_step, prf_consOk_succ, prf_consOk_succ_all, prf_cpOf_shift, prf_cpOf_wrap, prf_div2_add_two, prf_nil_or_consOk, prf_pair_shift, prf_pair_wrap, prf_pair_zero, prf_psi_zero, prf_strong_ind_formula, prf_succ_mul_two, subst0_lift1, subst1_lift11]
+  ⛓ NatArithPrf (13): [PrfH_eq_congr_succ, PrfH_lt_intro, norm11, prf_add_succ_left, prf_add_zero_left, prf_lt_iff, prf_lt_intro, prf_nat_induction, prf_not_lt_zero, prf_succ_inj, prf_succ_ne_zero, prf_zero_lt_succ, prf_zero_or_succ]
+  ⛓ NatMulPrf (21): [PrfH_absurd_lt, PrfH_eq_congr_mul1, prf_add_le_mono, prf_add_le_mono_left, prf_add_le_mono_right, prf_div_mod_eq, prf_eq_congr_mul1, prf_eq_congr_mul2, prf_le_add_self, prf_le_mul_succ, prf_le_self_add, prf_lt_irrefl, prf_lt_of_mul_lt_mul_right, prf_lt_trichotomy, prf_mod2_range, prf_mul_comm, prf_mul_le_mono_right, prf_mul_one, prf_mul_succ, prf_mul_zero, prf_zero_mul]
+  ⛓ NatOrderPrf (21): [PrfH_eq_congr_add1, PrfH_eq_congr_add2, PrfH_le_subst1, PrfH_le_subst2, ROBINSON_PlusPlus.Minimal.Axioms.le.eq_1, prf_add_assoc, prf_add_comm, prf_eq_congr_add1, prf_eq_congr_add2, prf_le_of_eq, prf_le_of_lt, prf_le_refl, prf_le_subst1, prf_le_subst2, prf_le_trans, prf_lt_add_succ, prf_lt_add_succ_of_lt, prf_lt_le_trans, prf_lt_trans, prf_lt_trans_swap, prf_succ_add_succ]
+    ReprPrf (14)
+  ⛓ StrongInductionPrf (13): [PSI, liftFormula_swap, liftTerm_swap, liftTerm_swap._f, liftTerm_swap._proof_1, liftTerm_swap._proof_2, liftTerm_swap._proof_3, liftTerms_swap, liftTerms_swap._f, prf_le_of_lt_succ, psi_at, psi_step_motive, substFormula_liftFormula]
+    ROBINSON_PlusPlus.Minimal.Axioms (261)
+  alcanza prf_list_induction o un constructor listInd: [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd]
+NatArithPrf usa de ChainPrf 4 constantes: [PrfH_eq_trans×5, PrfH_iff_mp×3, PrfH_iff_mpr×1, PrfH_leibniz_subst×1]
+NatOrderPrf usa de ChainPrf 7 constantes: [PrfH_eq_symm×2,
+ PrfH_eq_trans×1,
+ PrfH_iff_mp×2,
+ PrfH_leibniz_subst×4,
+ PrfH_lt_subst1×1,
+ PrfH_lt_subst2×2,
+ PrfH_or_elim×3]
+NatMulPrf usa de ChainPrf 6 constantes: [PrfH_eq_symm×2,
+ PrfH_eq_trans×2,
+ PrfH_iff_mp×1,
+ PrfH_leibniz_subst×1,
+ PrfH_lt_subst2×2,
+ PrfH_or_elim×2]
+CantorMonoPrf usa de ChainPrf 3 constantes: [PrfH_eq_symm×2, PrfH_lt_subst2×1, PrfH_or_elim×3]
+StrongInductionPrf usa de ChainPrf 6 constantes: [PrfH_eq_symm×1,
+ PrfH_eq_trans×1,
+ PrfH_iff_mp×1,
+ PrfH_leibniz_subst×1,
+ PrfH_or_elim×1,
+ PrfH_spec×4]
+Div2ParityPrf usa de ChainPrf 7 constantes: [PrfH_eq_symm×4,
+ PrfH_eq_trans×5,
+ PrfH_iff_mp×1,
+ PrfH_leibniz_subst×2,
+ PrfH_lt_subst1×2,
+ PrfH_lt_subst2×2,
+ PrfH_or_elim×1]
+ListIndAdmisible usa de ChainPrf 7 constantes: [PrfH_congr_cons_head×1,
+ PrfH_eq_symm×4,
+ PrfH_eq_trans×1,
+ PrfH_leibniz_subst×4,
+ PrfH_lt_subst2×1,
+ PrfH_or_elim×3,
+ PrfH_spec×3]
+ListIndAdmisible usa de CodeWitnessPrf 2 constantes: [SinWTs.consOk×8, SinWTs.prf_consOk_cons×1]
+ListIndAdmisible usa de BoundedInPrf 1 constantes: [prf_zero_or_eq_succ_pred×2]
+Representability2: 8 declaraciones, que dependen de 6 módulos de RPP:
+  CodeWitnessPrf (2 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.CodeWitnessPrf.HW.prf_hasWitF_real
+  Hilbert (4 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.Hilbert.Prf
+  HilbertSeq (53 usos), p. ej. proofCode' → ROBINSON_PlusPlus.Meta.HilbertSeq.Rule
+  Provability (7 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.Provability.formCode
+  Representability (2 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq
+  ROBINSON_PlusPlus.Minimal.Axioms (10 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Minimal.Axioms.hasWitF
+GodelTwo: 1 declaraciones, que dependen de 1 módulos de RPP:
+  ProofChain (1 usos), p. ej. consistencyFormula' → ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_real: cierre de 2050 constantes; de RPP, en 11 módulos (⛓ = `ChainPrf` en su cierre de imports):
+    ROBINSON_PlusPlus.Full.Induction (1)
+    ArithPrf (4)
+  ⛓ BoundedInPrf (5): [PrfH_eq_congr_pred, prf_lt_succ_helper, prf_lt_succ_split, prf_pred_succ, prf_zero_or_eq_succ_pred]
+  ⛓ ChainPrf (7): [PrfH_eq_symm, PrfH_eq_trans, PrfH_iff_mp, PrfH_iff_mpr, PrfH_leibniz_subst, PrfH_lt_subst2, PrfH_or_elim]
+  ⛓ CodeWitnessPrf (64): [ENS.CRIT_hasWit_real, SinWTs.CodeClosed, SinWTs.PrfH_congr_In_left, SinWTs.PrfH_congr_argsIn, SinWTs.PrfH_congr_isTermCodeE1, SinWTs.closed_mem_tcodes1, SinWTs.closed_mem_tcodes1._f, SinWTs.closed_mem_tcodes1.match_1, SinWTs.closed_mem_tcodes1s._f, SinWTs.closed_mem_tcodes1s.match_1, SinWTs.closed_termCodeM, SinWTs.liftTerm_objList, SinWTs.liftTerm_objList._f, SinWTs.liftTerm_objList.match_1_1, SinWTs.mem_of_getElem?, SinWTs.mem_of_getElem?._f, SinWTs.mem_of_getElem?.match_1_1, SinWTs.mem_self_tcodes1, SinWTs.mem_tcodes1s_of_mem, SinWTs.mem_tcodes1s_of_mem._f, SinWTs.mem_tcodes1s_of_mem.match_1_1, SinWTs.okE1_T, SinWTs.okE1_T._f, SinWTs.okE1_T.match_1, SinWTs.okE1_Ts._f, SinWTs.okE1_Ts.match_1, SinWTs.prf_In_objList, SinWTs.prf_In_objList._f, SinWTs.prf_In_objList.match_1_1, SinWTs.prf_argsIn_of_closed, SinWTs.prf_bdAll_numeral, SinWTs.prf_bdAll_numeral._f, SinWTs.prf_bdAll_numeral.match_1_1, SinWTs.prf_bdAll_of_bound, SinWTs.prf_congr_In_left, SinWTs.prf_congr_argsIn, SinWTs.prf_isTC1_tcodes, SinWTs.prf_isTermCodeE1_func, SinWTs.prf_isTermCodeE1_var, SinWTs.prf_lenc_objList, SinWTs.prf_lenc_objList._f, SinWTs.prf_lenc_objList.match_1_1, SinWTs.prf_lenc_termsCodeM, SinWTs.prf_lenc_termsCodeM._f, SinWTs.prf_lenc_termsCodeM.match_1_1, SinWTs.prf_nthc_c1, SinWTs.prf_nthc_c2, SinWTs.prf_nthc_objList, SinWTs.prf_nthc_objList._f, SinWTs.prf_nthc_objList.match_1_1, SinWTs.prf_nthc_termsCodeM, SinWTs.prf_nthc_termsCodeM._f, SinWTs.prf_nthc_termsCodeM.match_1_1, SinWTs.prf_orL, SinWTs.prf_orR, SinWTs.substTerm_objList, SinWTs.substTerm_objList._f, SinWTs.substTerm_objList.match_1_1, SinWTs.tcodes1, SinWTs.tcodes1._f, SinWTs.tcodes1.match_1, SinWTs.tcodes1s, SinWTs.tcodes1s._f, SinWTs.tcodes1s.match_1]
+    Hilbert (28)
+    HilbertDeduction (20)
+  ⛓ NatArithPrf (8): [PrfH_eq_congr_succ, PrfH_lt_intro, prf_lt_iff, prf_nat_induction, prf_not_lt_zero, prf_succ_inj, prf_succ_ne_zero, prf_zero_or_succ]
+    NumListPrf (4)
+    ReprPrf (17)
+    ROBINSON_PlusPlus.Minimal.Axioms (290)
+  alcanza prf_list_induction o un constructor listInd: [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd]
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_consOk_cons: cierre de 1782 constantes; de RPP, en 4 módulos (⛓ = `ChainPrf` en su cierre de imports):
+  ⛓ CodeWitnessPrf (3): [SinWTs.consOk, SinWTs.prf_cdrc_cons, SinWTs.prf_consOk_cons]
+    Hilbert (8)
+    ReprPrf (10)
+    ROBINSON_PlusPlus.Minimal.Axioms (259)
+  alcanza prf_list_induction o un constructor listInd: []
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_cdrc_cons: cierre de 1770 constantes; de RPP, en 4 módulos (⛓ = `ChainPrf` en su cierre de imports):
+  ⛓ CodeWitnessPrf (1): [SinWTs.prf_cdrc_cons]
+    Hilbert (6)
+    ReprPrf (2)
+    ROBINSON_PlusPlus.Minimal.Axioms (259)
+  alcanza prf_list_induction o un constructor listInd: []
+ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_zero_or_eq_succ_pred: cierre de 1828 constantes; de RPP, en 9 módulos (⛓ = `ChainPrf` en su cierre de imports):
+    ROBINSON_PlusPlus.Full.Induction (1)
+    ArithPrf (1)
+  ⛓ BoundedInPrf (3): [PrfH_eq_congr_pred, prf_pred_succ, prf_zero_or_eq_succ_pred]
+  ⛓ ChainPrf (3): [PrfH_eq_symm, PrfH_eq_trans, PrfH_leibniz_subst]
+    Hilbert (24)
+    HilbertDeduction (19)
+  ⛓ NatArithPrf (3): [PrfH_eq_congr_succ, prf_nat_induction, prf_zero_or_succ]
+    ReprPrf (6)
+    ROBINSON_PlusPlus.Minimal.Axioms (259)
+  alcanza prf_list_induction o un constructor listInd: [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd]
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_spec: cierre de 194 constantes; de RPP, en 3 módulos (⛓ = `ChainPrf` en su cierre de imports):
+  ⛓ ChainPrf (1): [PrfH_spec]
+    Hilbert (2)
+    HilbertDeduction (3)
+  alcanza prf_list_induction o un constructor listInd: []
+el cierre de 10 raíces en ChainPrf: 10 constantes [PrfH_congr_cons_head,
+ PrfH_eq_symm,
+ PrfH_eq_trans,
+ PrfH_iff_mp,
+ PrfH_iff_mpr,
+ PrfH_leibniz_subst,
+ PrfH_lt_subst1,
+ PrfH_lt_subst2,
+ PrfH_or_elim,
+ PrfH_spec]
+  alcanza prf_list_induction: false
+BoundedInPrf usa de ChainPrf 17 constantes: [PrfH_and_elim_left×3,
+ PrfH_and_elim_right×2,
+ PrfH_and_intro×3,
+ PrfH_congr_cons_head×1,
+ PrfH_eq_subst_in×1,
+ PrfH_eq_symm×3,
+ PrfH_eq_trans×5,
+ PrfH_iff_mp×1,
+ PrfH_in_cons_tail×1,
+ PrfH_leibniz_subst×3,
+ PrfH_lt_subst1×1,
+ PrfH_lt_subst2×3,
+ PrfH_or_elim×4,
+ norm21×2,
+ prf_in_cons_iff×1,
+ prf_list_induction×2,
+ prf_not_in_nil×1]
+NumListPrf usa de ChainPrf 0 constantes: []
+CodeWitnessPrf usa de ChainPrf 14 constantes: [PrfH_and_elim_left×10,
+ PrfH_and_elim_right×10,
+ PrfH_and_intro×4,
+ PrfH_congr_cons_head×1,
+ PrfH_congr_cons_tail×1,
+ PrfH_congr_liftc×3,
+ PrfH_eq_symm×7,
+ PrfH_eq_trans×5,
+ PrfH_leibniz_subst×12,
+ PrfH_lt_subst1×1,
+ PrfH_lt_subst2×8,
+ PrfH_or_elim×2,
+ PrfH_spec×4,
+ prf_list_induction×2]
+BoundedInPrf: 20 declaraciones, que dependen de 8 módulos de RPP:
+  ArithPrf (2 usos), p. ej. prf_lt_succ_helper → ROBINSON_PlusPlus.Meta.ArithPrf.prf_add_succ_t
+  ChainPrf (37 usos), p. ej. PrfH_eq_congr_nthc2 → ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
+  Hilbert (33 usos), p. ej. prf_eq_congr_pred → ROBINSON_PlusPlus.Meta.Hilbert.Prf
+  HilbertDeduction (65 usos), p. ej. PrfH_eq_congr_nthc2 → ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH
+  NatArithPrf (10 usos), p. ej. prf_zero_or_eq_succ_pred → ROBINSON_PlusPlus.Meta.NatArithPrf.PrfH_eq_congr_succ
+  NumListPrf (8 usos), p. ej. prf_boundedIn_head → ROBINSON_PlusPlus.Meta.NumListPrf.prf_lenc_cons
+  ReprPrf (17 usos), p. ej. PrfH_eq_congr_nthc2 → ROBINSON_PlusPlus.Meta.ReprPrf.prf_refl
+  ROBINSON_PlusPlus.Minimal.Axioms (248 usos), p. ej. liftFormula_boundedIn → ROBINSON_PlusPlus.Minimal.Axioms.lt_sym
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.HW.prf_hasWitF_real: cierre de 2106 constantes; de RPP, en 11 módulos (⛓ = `ChainPrf` en su cierre de imports):
+    ROBINSON_PlusPlus.Full.Induction (1)
+    ArithPrf (4)
+  ⛓ BoundedInPrf (5): [PrfH_eq_congr_pred, prf_lt_succ_helper, prf_lt_succ_split, prf_pred_succ, prf_zero_or_eq_succ_pred]
+  ⛓ ChainPrf (7): [PrfH_eq_symm, PrfH_eq_trans, PrfH_iff_mp, PrfH_iff_mpr, PrfH_leibniz_subst, PrfH_lt_subst2, PrfH_or_elim]
+  ⛓ CodeWitnessPrf (110): [ENS.PrfH_congr_isFormCodeE2, HW.cl_atom_real, HW.cl_bin_real, HW.cl_eq_real, HW.cl_un_real, HW.closed_formCodeM, HW.closed_mem_fcodesF, HW.closed_mem_fcodesF._f, HW.closed_mem_fcodesF.match_1_1, HW.closed_mem_tcodesF, HW.closed_mem_tcodesF._f, HW.closed_mem_tcodesF.match_1_1, HW.fcodesF, HW.fcodesF._f, HW.fcodesF.match_1, HW.lift_wF, HW.lift_wT, HW.mem_self_fcodesF, HW.node_and, HW.node_atom, HW.node_bot, HW.node_eq, HW.node_ex, HW.node_forall, HW.node_impl, HW.node_or, HW.okF, HW.okF._f, HW.okF.match_1_1, HW.okT_F, HW.okT_F._f, HW.okT_F.match_1_1, HW.prf_hasWitF_real, HW.prf_isFC1_real, HW.prf_refl', HW.prf_shapeBin_real, HW.prf_shapeNul_real, HW.prf_shapeUn_real, HW.prf_wfAll1_of_list, HW.prf_wfAll1_real, HW.prf_wfAllF_of_list, HW.prf_wfAllF_real, HW.subst_wF, HW.subst_wT, HW.tcodesF, HW.tcodesF._f, SinWTs.CodeClosed, SinWTs.PrfH_congr_In_left, SinWTs.PrfH_congr_argsIn, SinWTs.PrfH_congr_isTermCodeE1, SinWTs.closed_mem_tcodes1, SinWTs.closed_mem_tcodes1._f, SinWTs.closed_mem_tcodes1.match_1, SinWTs.closed_mem_tcodes1s, SinWTs.closed_mem_tcodes1s._f, SinWTs.closed_mem_tcodes1s.match_1, SinWTs.closed_termCodeM, SinWTs.liftTerm_objList, SinWTs.liftTerm_objList._f, SinWTs.liftTerm_objList.match_1_1, SinWTs.mem_of_getElem?, SinWTs.mem_of_getElem?._f, SinWTs.mem_of_getElem?.match_1_1, SinWTs.mem_self_tcodes1, SinWTs.mem_tcodes1s_of_mem, SinWTs.mem_tcodes1s_of_mem._f, SinWTs.mem_tcodes1s_of_mem.match_1_1, SinWTs.okE1_T, SinWTs.okE1_T._f, SinWTs.okE1_T.match_1, SinWTs.okE1_Ts, SinWTs.okE1_Ts._f, SinWTs.okE1_Ts.match_1, SinWTs.prf_In_objList, SinWTs.prf_In_objList._f, SinWTs.prf_In_objList.match_1_1, SinWTs.prf_argsIn_of_closed, SinWTs.prf_bdAll_numeral, SinWTs.prf_bdAll_numeral._f, SinWTs.prf_bdAll_numeral.match_1_1, SinWTs.prf_bdAll_of_bound, SinWTs.prf_congr_In_left, SinWTs.prf_congr_argsIn, SinWTs.prf_isTermCodeE1_func, SinWTs.prf_isTermCodeE1_var, SinWTs.prf_lenc_objList, SinWTs.prf_lenc_objList._f, SinWTs.prf_lenc_objList.match_1_1, SinWTs.prf_lenc_termsCodeM, SinWTs.prf_lenc_termsCodeM._f, SinWTs.prf_lenc_termsCodeM.match_1_1, SinWTs.prf_nthc_c1, SinWTs.prf_nthc_c2, SinWTs.prf_nthc_objList, SinWTs.prf_nthc_objList._f, SinWTs.prf_nthc_objList.match_1_1, SinWTs.prf_nthc_termsCodeM, SinWTs.prf_nthc_termsCodeM._f, SinWTs.prf_nthc_termsCodeM.match_1_1, SinWTs.prf_orL, SinWTs.prf_orR, SinWTs.substTerm_objList, SinWTs.substTerm_objList._f, SinWTs.substTerm_objList.match_1_1, SinWTs.tcodes1, SinWTs.tcodes1._f, SinWTs.tcodes1.match_1, SinWTs.tcodes1s, SinWTs.tcodes1s._f, SinWTs.tcodes1s.match_1]
+    Hilbert (28)
+    HilbertDeduction (20)
+  ⛓ NatArithPrf (8): [PrfH_eq_congr_succ, PrfH_lt_intro, prf_lt_iff, prf_nat_induction, prf_not_lt_zero, prf_succ_inj, prf_succ_ne_zero, prf_zero_or_succ]
+    NumListPrf (4)
+    ReprPrf (17)
+    ROBINSON_PlusPlus.Minimal.Axioms (300)
+  alcanza prf_list_induction o un constructor listInd: [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd]

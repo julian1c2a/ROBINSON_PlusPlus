@@ -5,6 +5,8 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ReprPrf
 import ROBINSON_PlusPlus.Meta.HilbertDeduction
+import ROBINSON_PlusPlus.Meta.ReglasPrfH
+import ROBINSON_PlusPlus.Meta.ListIndAdmisible
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
@@ -27,31 +29,28 @@ Port de los lemas de compositividad/monotonía de cadenas (`runFn_concat`,
 `chainOk_concat`, `In_mono`, …) al cálculo finitario `Prf`, usando la regla
 `Prf.listInd` (inducción de listas) vía el eliminador `prf_list_induction`.
 Son los ingredientes de `d2_prf` (concatenación de pruebas + `mp` interno).
+
+✏️ 2026‑11‑18 (ADR‑270, A9): `prf_list_induction` ya NO usa el constructor `Prf.listInd`: es corolario de
+`listInd_admisible` (`Meta/ListIndAdmisible.lean`, que este módulo importa), con el mismo nombre y el mismo enunciado.
+Ningún lema de aquí construye un paso `listInd`. Las diez reglas de `PrfH` que la aritmética necesitaba de este módulo
+(`PrfH_leibniz_subst`, `PrfH_eq_trans`, `PrfH_eq_symm`…) bajaron a `Meta/ReglasPrfH.lean`, y salen a la raíz.
 -/
 
 /-- **Eliminador de inducción de listas en `Prf`**: de `Prf (Φ[nil])` y
-    `Prf (∀h∀t (Φ[t] ⇒ Φ[cons h t]))` sale `Prf (∀L Φ[L])`. -/
+    `Prf (∀h∀t (Φ[t] ⇒ Φ[cons h t]))` sale `Prf (∀L Φ[L])`. Desde ADR‑270, SIN el constructor `Prf.listInd`: es
+    `prf_list_induction_sin`, el corolario de la admisibilidad (`Meta/ListIndAdmisible.lean`). -/
 theorem prf_list_induction (Φ : Formula)
     (base : Prf (substFormula 0 nil Φ))
     (step : Prf (Formula.forall (Formula.forall (Formula.impl (liftFormula 1 Φ)
               (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ)))))))
     : Prf (Formula.forall Φ) :=
-  prf_mp (prf_mp (Prf.listInd Φ) base) step
+  ListIndAdmisible.prf_list_induction_sin Φ base step
 
-/-! ### Helpers ecuacionales a nivel `PrfH` (para los cuerpos del `step`, que usan la IH) -/
+/-! ### Helpers ecuacionales a nivel `PrfH` (para los cuerpos del `step`, que usan la IH)
 
-/-- Leibniz en `PrfH`: de `PrfH Γ (t₁ ≐ t₂)` y `PrfH Γ A[t₁]` sale `PrfH Γ A[t₂]`. -/
-theorem PrfH_leibniz_subst {Γ : List Formula} {A : Formula} {t₁ t₂ : Term}
-    (h : PrfH Γ (t₁ =eq t₂)) (hA : PrfH Γ (substFormula 0 t₁ A)) : PrfH Γ (substFormula 0 t₂ A) :=
-  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.leibniz A t₁ t₂)) h) hA
-
-/-- Transitividad de `=eq` en `PrfH`. -/
-theorem PrfH_eq_trans {Γ : List Formula} {a b c : Term}
-    (h1 : PrfH Γ (a =eq b)) (h2 : PrfH Γ (b =eq c)) : PrfH Γ (a =eq c) := by
-  let f : Formula := Formula.eq (liftTerm 0 a) (.var 0)
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq a s := by
-    intro s; simp only [f, substFormula, substTerm, FOL.substTerm_liftTerm, ite_true]
-  exact (hS c) ▸ PrfH_leibniz_subst (A := f) h2 ((hS b) ▸ h1)
+✏️ 2026‑11‑18 (ADR‑270): `PrfH_leibniz_subst`, `PrfH_eq_trans`, `PrfH_lt_subst1` y `PrfH_lt_subst2` estaban aquí;
+con `PrfH_eq_symm`, `PrfH_iff_mp`, `PrfH_iff_mpr`, `PrfH_or_elim`, `PrfH_congr_cons_head` y `PrfH_spec`, de más abajo,
+están en `Meta/ReglasPrfH.lean`. -/
 
 /-- ⭐ Congruencia de `liftc` en el argumento código, en `PrfH`, con el nivel **implícito**.
 
@@ -68,29 +67,6 @@ theorem PrfH_congr_liftc {Γ : List Formula} {c a b : Term} (h : PrfH Γ (a =eq 
     intro s
     simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (liftc c a)) Γ)
-
-/-- ⭐ Congruencia de `<` en el 1er argumento, en `PrfH`.
-
-    ⚠️ **Bajó aquí en el dedup del 2026‑09‑09d** (ADR‑019). Estaba declarada dos veces, en
-    `Meta/BoundedInPrf.lean` y en `Meta/NatOrderPrf.lean`, **las dos exportadas a la raíz**. Y
-    el duplicado era CONSCIENTE: el docstring de `NatOrderPrf` decía «copia local: el original
-    vive en `BoundedInPrf`, que es posterior a este módulo en la cadena de imports». Esa es
-    exactamente la situación que ADR‑019 resuelve **bajando el general**, no copiándolo. -/
-theorem PrfH_lt_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a₁ =eq a₂))
-    (hlt : PrfH Γ (lt a₁ b)) : PrfH Γ (lt a₂ b) := by
-  let f : Formula := lt (.var 0) (liftTerm 0 b)
-  have hS : ∀ s : Term, substFormula 0 s f = lt s b := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
-  exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hlt)
-
-/-- ⭐ Congruencia de `<` en el 2º argumento, en `PrfH`. Misma historia que la anterior; ésta es
-    la que tenía **53 referencias cualificadas** `PrfH_lt_subst2` por el árbol. -/
-theorem PrfH_lt_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
-    (hlt : PrfH Γ (lt a b₁)) : PrfH Γ (lt a b₂) := by
-  let f : Formula := lt (liftTerm 0 a) (.var 0)
-  have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
-  exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
 
 /-- Congruencia de `cons` en la cola, en `PrfH`. -/
 theorem PrfH_congr_cons_tail {Γ : List Formula} {hd t₁ t₂ : Term}
@@ -191,22 +167,6 @@ theorem PrfH_and_elim_left {Γ : List Formula} {A B : Formula} (h : PrfH Γ (lan
 
 theorem PrfH_and_elim_right {Γ : List Formula} {A B : Formula} (h : PrfH Γ (land A B)) : PrfH Γ B :=
   PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.c3 A B)) h
-
-/-- `iff`-mp con un bicondicional **cerrado** (`Prf`) y una hipótesis `PrfH`. -/
-theorem PrfH_iff_mp {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) (ha : PrfH Γ A) :
-    PrfH Γ B :=
-  PrfH.mp Γ _ _ (prf_to_prfH (prf_and_elim_left hiff) Γ) ha
-
-theorem PrfH_iff_mpr {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) (hb : PrfH Γ B) :
-    PrfH Γ A :=
-  PrfH.mp Γ _ _ (prf_to_prfH (prf_and_elim_right hiff) Γ) hb
-
-/-- Simetría de `=eq` en `PrfH`. -/
-theorem PrfH_eq_symm {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b)) : PrfH Γ (b =eq a) := by
-  let f : Formula := Formula.eq (.var 0) (liftTerm 0 a)
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq s a := by
-    intro s; simp only [f, substFormula, substTerm, FOL.substTerm_liftTerm, ite_true]
-  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl a) Γ)
 
 /-- Congruencia de `concat` en el 2º argumento, en `PrfH`. -/
 theorem PrfH_congr_concat_left {Γ : List Formula} {u t₁ t₂ : Term} (h : PrfH Γ (t₁ =eq t₂)) :
@@ -338,20 +298,6 @@ theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (conc
 
 theorem prf_In_mono (x c c0 : Term) (h : Prf (In x c)) : Prf (In x (concat c0 c)) :=
   prf_mp (prf_In_mono_imp x c c0) h
-
-/-- Eliminación de la disyunción en `PrfH` (vía `Prfᵢ.j3` + teorema de deducción). -/
-theorem PrfH_or_elim {Γ : List Formula} {A B C : Formula} (hor : PrfH Γ (lor A B))
-    (hA : PrfH (A :: Γ) C) (hB : PrfH (B :: Γ) C) : PrfH Γ C :=
-  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.j3 A B C)) hor)
-    (deduction_aux hA A Γ rfl)) (deduction_aux hB B Γ rfl)
-
-/-- Congruencia de `cons` en la cabeza, en `PrfH`. -/
-theorem PrfH_congr_cons_head {Γ : List Formula} {hd₁ hd₂ t : Term}
-    (h : PrfH Γ (hd₁ =eq hd₂)) : PrfH Γ (cons hd₁ t =eq cons hd₂ t) := by
-  let f : Formula := Formula.eq (cons (liftTerm 0 hd₁) (liftTerm 0 t)) (cons (.var 0) (liftTerm 0 t))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (cons hd₁ t) (cons s t) := by
-    intro s; simp only [f, substFormula, cons, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
-  exact (hS hd₂) ▸ PrfH_leibniz_subst (A := f) h ((hS hd₁) ▸ prf_to_prfH (prf_refl (cons hd₁ t)) Γ)
 
 /-- `In x (cons hd t)` se descompone en `(x =eq hd) ∨ In x t` (cierre `Prf` de `ax_L2`). -/
 theorem prf_in_cons_iff (x hd t : Term) :
@@ -488,11 +434,6 @@ Los lemas `runFn_concat`/`chainOk_concat`/`chainOk_mono` generalizan el acumulad
 
 `prf_runFn_concat` valida el patrón end-to-end. `chainOk_concat`/`chainOk_mono` lo reutilizan
 (misma profundidad 2, mismos `norm32`/`norm_s`). -/
-
-/-- `∀-elim` en `PrfH` (vía `Prfᵢ.q1` + `mp`). Helper para la HI-`∀c` del `step`. -/
-theorem PrfH_spec {Γ : List Formula} {A : Formula} (h : PrfH Γ (Formula.forall A)) (t : Term) :
-    PrfH Γ (substFormula 0 t A) :=
-  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.q1 A t)) h
 
 /-- Predicado inductivo de compositividad de `runFn` con acumulador `∀` object.
     `Ψ(p) = ∀c. runFn c (p ++ s) =eq runFn (runFn c p) s` (lista `p` = `#0`). -/
@@ -766,9 +707,11 @@ export ROBINSON_PlusPlus.Meta.ChainPrf
   (prf_list_induction prf_concat_nil_right prf_In_mono prf_In_mono_imp prf_In_mono_right
    prf_In_mono_right_imp prf_concat_assoc prf_allIn_mono_imp prf_lineOk_mono_imp prf_chainOk_subst2
    prf_runFn_concat prf_chainOk_mono_imp prf_runFn_weaken prf_chainOk_concat
-   PrfH_and_intro PrfH_and_elim_left PrfH_and_elim_right PrfH_iff_mp PrfH_iff_mpr
+   PrfH_and_intro PrfH_and_elim_left PrfH_and_elim_right
+   -- ✏️ 2026‑11‑18 (ADR‑270): `PrfH_iff_mp`, `PrfH_iff_mpr`, `PrfH_lt_subst1` y `PrfH_lt_subst2` salen a la raíz desde
+   -- `Meta/ReglasPrfH.lean`, adonde bajaron.
    PrfH_chainOk_subst1 PrfH_chainOk_subst2 PrfH_allIn_subst2 PrfH_eq_subst_in PrfH_in_cons_head
    -- dedup 2026‑09‑09d (ADR‑019): bajaron aquí desde dos módulos independientes que las
    -- declaraban las dos veces. Consumidas por `CodeWitnessPrf`, `NumCodeClosedPrf`,
    -- `BoundedInPrf`, `NatOrderPrf` y toda la cola de `PrfH_lt_subst2` (59 sitios).
-   PrfH_congr_liftc PrfH_lt_subst1 PrfH_lt_subst2)
+   PrfH_congr_liftc)

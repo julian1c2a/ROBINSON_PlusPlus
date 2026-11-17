@@ -1,0 +1,306 @@
+"""B1 paso 3 (N6 con A9), ADR-270: el cambio, por anclas de texto (todo o nada).
+
+* Las diez reglas de PrfH que la aritmética y ListIndAdmisible toman de ChainPrf, a un módulo nuevo,
+  Meta/ReglasPrfH.lean (C2), con su espacio de nombres; salen a la raíz las diez.
+* consOk, prf_cdrc_cons y prf_consOk_cons (de CodeWitnessPrf.SinWTs) a NumListPrf; el bloque del predecesor
+  (prf_pred_succ, prf_eq_congr_pred, PrfH_eq_congr_pred, prf_zero_or_eq_succ_pred), de BoundedInPrf a NatArithPrf.
+* La cadena aritmética deja de importar ChainPrf; ListIndAdmisible deja ChainPrf y CodeWitnessPrf; ChainPrf importa
+  ListIndAdmisible y demuestra prf_list_induction con prf_list_induction_sin; BoundedInPrf importa ChainPrf.
+* La decodificación (SolidezVerificador.linea_listInd) y AxiomasT (PuenteFOL.prf_of_axiomasT), con listInd_admisible.
+* Los nombres cualificados, renombrados en la librería, sondeos/ y scripts/.
+"""
+import io, os, re, sys
+
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+M = R + 'ROBINSON_PlusPlus/Meta/'
+
+
+def leer(p):
+    return io.open(p, encoding='utf-8').read()
+
+
+def escribir(p, t):
+    io.open(p, 'w', encoding='utf-8', newline='\n').write(t)
+
+
+def uno(t, s, quien):
+    k = t.count(s)
+    if k != 1:
+        sys.exit(f'ANCLA {quien}: {k} apariciones de {s[:80]!r}')
+    return t.index(s)
+
+
+def cortar(t, ini, fin, quien):
+    """Corta desde la línea que empieza en `ini` hasta el final de la línea de `fin` (incluida) y la línea en blanco
+    que la siga. Devuelve (texto sin el bloque, bloque)."""
+    a = uno(t, ini, quien + '/ini')
+    b = t.index(fin, a)
+    if t.count(fin, a) < 1:
+        sys.exit(f'ANCLA {quien}/fin')
+    b = t.index('\n', b + len(fin) - 1) + 1
+    if t[b:b + 1] == '\n':
+        b += 1
+    return t[:a] + t[b:], t[a:b]
+
+
+def reemplazar(t, viejo, nuevo, quien):
+    uno(t, viejo, quien)
+    return t.replace(viejo, nuevo)
+
+
+# ── 1 · ChainPrf: las diez reglas fuera ────────────────────────────────────────────────────────────────────────
+ch = leer(M + 'ChainPrf.lean')
+bloques = []
+for ini, fin, q in [
+    ('/-- Leibniz en `PrfH`', '  exact (hS c) ▸ PrfH_leibniz_subst (A := f) h2 ((hS b) ▸ h1)', 'leibniz+trans'),
+    ('/-- ⭐ Congruencia de `<` en el 1er argumento', '  exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)', 'lt_subst'),
+    ('/-- `iff`-mp con un bicondicional', '  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl a) Γ)', 'iff+symm'),
+    ('/-- Eliminación de la disyunción en `PrfH`', '  exact (hS hd₂) ▸ PrfH_leibniz_subst (A := f) h ((hS hd₁) ▸ prf_to_prfH (prf_refl (cons hd₁ t)) Γ)', 'or+cons_head'),
+    ('/-- `∀-elim` en `PrfH`', '  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.q1 A t)) h', 'spec'),
+]:
+    ch, b = cortar(ch, ini, fin, 'ChainPrf/' + q)
+    bloques.append(b)
+diez = ['PrfH_leibniz_subst', 'PrfH_eq_trans', 'PrfH_lt_subst1', 'PrfH_lt_subst2', 'PrfH_iff_mp', 'PrfH_iff_mpr',
+        'PrfH_eq_symm', 'PrfH_or_elim', 'PrfH_congr_cons_head', 'PrfH_spec']
+cortadas = re.findall(r'^theorem (\w+)', ''.join(bloques), re.M)
+assert sorted(cortadas) == sorted(diez), cortadas
+for n in diez:
+    assert not re.search(r'^theorem ' + n + r'\b', ch, re.M), n
+
+ch = reemplazar(ch, 'import ROBINSON_PlusPlus.Meta.HilbertDeduction\n',
+                'import ROBINSON_PlusPlus.Meta.HilbertDeduction\n'
+                'import ROBINSON_PlusPlus.Meta.ReglasPrfH\n'
+                'import ROBINSON_PlusPlus.Meta.ListIndAdmisible\n', 'ChainPrf/import')
+ch = reemplazar(ch, '''Port de los lemas de compositividad/monotonía de cadenas (`runFn_concat`,
+`chainOk_concat`, `In_mono`, …) al cálculo finitario `Prf`, usando la regla
+`Prf.listInd` (inducción de listas) vía el eliminador `prf_list_induction`.
+Son los ingredientes de `d2_prf` (concatenación de pruebas + `mp` interno).
+-/''', '''Port de los lemas de compositividad/monotonía de cadenas (`runFn_concat`,
+`chainOk_concat`, `In_mono`, …) al cálculo finitario `Prf`, usando la regla
+`Prf.listInd` (inducción de listas) vía el eliminador `prf_list_induction`.
+Son los ingredientes de `d2_prf` (concatenación de pruebas + `mp` interno).
+
+✏️ 2026‑11‑18 (ADR‑270, A9): `prf_list_induction` ya NO usa el constructor `Prf.listInd`: es corolario de
+`listInd_admisible` (`Meta/ListIndAdmisible.lean`, que este módulo importa), con el mismo nombre y el mismo enunciado.
+Ningún lema de aquí construye un paso `listInd`. Las diez reglas de `PrfH` que la aritmética necesitaba de este módulo
+(`PrfH_leibniz_subst`, `PrfH_eq_trans`, `PrfH_eq_symm`…) bajaron a `Meta/ReglasPrfH.lean`, y salen a la raíz.
+-/''', 'ChainPrf/doc')
+ch = reemplazar(ch, '''/-- **Eliminador de inducción de listas en `Prf`**: de `Prf (Φ[nil])` y
+    `Prf (∀h∀t (Φ[t] ⇒ Φ[cons h t]))` sale `Prf (∀L Φ[L])`. -/''',
+                '''/-- **Eliminador de inducción de listas en `Prf`**: de `Prf (Φ[nil])` y
+    `Prf (∀h∀t (Φ[t] ⇒ Φ[cons h t]))` sale `Prf (∀L Φ[L])`. Desde ADR‑270, SIN el constructor `Prf.listInd`: es
+    `prf_list_induction_sin`, el corolario de la admisibilidad (`Meta/ListIndAdmisible.lean`). -/''', 'ChainPrf/docpli')
+ch = reemplazar(ch, '  prf_mp (prf_mp (Prf.listInd Φ) base) step\n',
+                '  ListIndAdmisible.prf_list_induction_sin Φ base step\n', 'ChainPrf/pli')
+ch = reemplazar(ch, '/-! ### Helpers ecuacionales a nivel `PrfH` (para los cuerpos del `step`, que usan la IH) -/\n',
+                '/-! ### Helpers ecuacionales a nivel `PrfH` (para los cuerpos del `step`, que usan la IH)\n\n'
+                '✏️ 2026‑11‑18 (ADR‑270): `PrfH_leibniz_subst`, `PrfH_eq_trans`, `PrfH_lt_subst1` y `PrfH_lt_subst2` estaban aquí;\n'
+                'con `PrfH_eq_symm`, `PrfH_iff_mp`, `PrfH_iff_mpr`, `PrfH_or_elim`, `PrfH_congr_cons_head` y `PrfH_spec`, de más abajo,\n'
+                'están en `Meta/ReglasPrfH.lean`. -/\n', 'ChainPrf/helpers')
+ch = reemplazar(ch, '''   PrfH_and_intro PrfH_and_elim_left PrfH_and_elim_right PrfH_iff_mp PrfH_iff_mpr
+   PrfH_chainOk_subst1''', '''   PrfH_and_intro PrfH_and_elim_left PrfH_and_elim_right
+   -- ✏️ 2026‑11‑18 (ADR‑270): `PrfH_iff_mp`, `PrfH_iff_mpr`, `PrfH_lt_subst1` y `PrfH_lt_subst2` salen a la raíz desde
+   -- `Meta/ReglasPrfH.lean`, adonde bajaron.
+   PrfH_chainOk_subst1''', 'ChainPrf/export1')
+ch = reemplazar(ch, '''   -- `BoundedInPrf`, `NatOrderPrf` y toda la cola de `PrfH_lt_subst2` (59 sitios).
+   PrfH_congr_liftc PrfH_lt_subst1 PrfH_lt_subst2)''', '''   -- `BoundedInPrf`, `NatOrderPrf` y toda la cola de `PrfH_lt_subst2` (59 sitios).
+   PrfH_congr_liftc)''', 'ChainPrf/export2')
+escribir(M + 'ChainPrf.lean', ch)
+
+# ── 2 · ReglasPrfH, nuevo ─────────────────────────────────────────────────────────────────────────────────────────
+orden = {n: i for i, n in enumerate(['PrfH_leibniz_subst', 'PrfH_eq_trans', 'PrfH_eq_symm', 'PrfH_lt_subst1',
+                                     'PrfH_lt_subst2', 'PrfH_congr_cons_head', 'PrfH_iff_mp', 'PrfH_iff_mpr',
+                                     'PrfH_or_elim', 'PrfH_spec'])}
+# cada bloque cortado, en piezas «docstring + teorema»
+piezas = {}
+for b in bloques:
+    partes = re.split(r'\n\n(?=/--|theorem )', b.strip('\n'))
+    for p in partes:
+        n = re.search(r'^theorem (\w+)', p, re.M).group(1)
+        piezas[n] = p.strip('\n')
+assert sorted(piezas) == sorted(diez)
+cuerpo = '\n\n'.join(piezas[n] for n in sorted(piezas, key=lambda n: orden[n]))
+nuevo = '''/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+import ROBINSON_PlusPlus.Meta.ReprPrf
+import ROBINSON_PlusPlus.Meta.HilbertDeduction
+
+/-!
+# `Meta/ReglasPrfH.lean` — diez reglas derivadas de `PrfH`, por debajo de la aritmética (ADR‑270)
+
+**Qué.** En `PrfH`, el cálculo con contexto del teorema de deducción: Leibniz (`PrfH_leibniz_subst`) y lo que sale de
+ella —la transitividad y la simetría de `=eq`, la congruencia de `<` en sus dos argumentos y la de `cons` en la
+cabeza—; el `⇔` con un bicondicional cerrado (`PrfH_iff_mp`, `PrfH_iff_mpr`); y la eliminación de `∨` (`PrfH_or_elim`)
+y la del `∀` (`PrfH_spec`).
+
+**Por qué aquí** (A9 y el paso 3 de B1, ADR‑270). Vivían en `Meta/ChainPrf.lean`, y eran lo ÚNICO que la cadena
+aritmética (`NatArithPrf` … `Div2ParityPrf`) y `Meta/ListIndAdmisible.lean` tomaban de él (medido con el elaborador:
+`doc/registro/2026-11-18-capas-paso3/`). Con ellas abajo, la aritmética no importa `ChainPrf`, y `ChainPrf` puede
+importar `ListIndAdmisible` y demostrar `prf_list_induction` sin el constructor `Prf.listInd`. Mismos enunciados y
+pruebas; cambia el espacio de nombres (el del módulo, NAMING‑CONVENTIONS §6). Salen a la raíz las diez (AI‑GUIDE §17:
+las usan otros módulos); antes salían cuatro, y las otras seis se usaban con `open …ChainPrf`.
+-/
+
+open ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.ReprPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+
+namespace ROBINSON_PlusPlus.Meta.ReglasPrfH
+
+''' + cuerpo + '''
+
+end ROBINSON_PlusPlus.Meta.ReglasPrfH
+
+export ROBINSON_PlusPlus.Meta.ReglasPrfH (
+  PrfH_congr_cons_head PrfH_eq_symm PrfH_eq_trans PrfH_iff_mp PrfH_iff_mpr PrfH_leibniz_subst
+  PrfH_lt_subst1 PrfH_lt_subst2 PrfH_or_elim PrfH_spec
+)
+'''
+assert not os.path.exists(M + 'ReglasPrfH.lean')
+escribir(M + 'ReglasPrfH.lean', nuevo)
+
+# ── 3 · BoundedInPrf: el bloque del predecesor, a NatArithPrf ─────────────────────────────────────────────────────
+bd = leer(M + 'BoundedInPrf.lean')
+bd, pred = cortar(bd, '/-! ### Predecesor: case-split del índice SIN `∃`',
+                  '      (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _)))', 'BoundedInPrf/pred')
+assert sorted(re.findall(r'^theorem (\w+)', pred, re.M)) == sorted(
+    ['prf_pred_succ', 'prf_eq_congr_pred', 'PrfH_eq_congr_pred', 'prf_zero_or_eq_succ_pred'])
+bd = reemplazar(bd, 'import ROBINSON_PlusPlus.Meta.NatArithPrf\n',
+                'import ROBINSON_PlusPlus.Meta.NatArithPrf\nimport ROBINSON_PlusPlus.Meta.ChainPrf\n', 'BoundedInPrf/import')
+bd = reemplazar(bd, '''  prf_boundedIn_head prf_boundedIn_tail
+  prf_pred_succ prf_eq_congr_pred PrfH_eq_congr_pred prf_zero_or_eq_succ_pred
+''', '''  prf_boundedIn_head prf_boundedIn_tail
+  -- ✏️ 2026‑11‑18 (ADR‑270): `prf_pred_succ`, `prf_eq_congr_pred`, `PrfH_eq_congr_pred` y `prf_zero_or_eq_succ_pred`
+  -- bajaron a `Meta/NatArithPrf.lean` (los necesita `Meta/ListIndAdmisible.lean`), y salen a la raíz desde allí.
+''', 'BoundedInPrf/export')
+bd = reemplazar(bd, '''/-! ### Ley de sucesor de `<` : `i < σb ⇒ i < b ∨ i = b`''',
+                '''/-! ✏️ 2026‑11‑18 (ADR‑270): aquí estaba el bloque del predecesor (`prf_pred_succ`, `prf_eq_congr_pred`,
+`PrfH_eq_congr_pred` y `prf_zero_or_eq_succ_pred`): bajó a `Meta/NatArithPrf.lean`. -/
+
+/-! ### Ley de sucesor de `<` : `i < σb ⇒ i < b ∨ i = b`''', 'BoundedInPrf/nota')
+escribir(M + 'BoundedInPrf.lean', bd)
+
+na = leer(M + 'NatArithPrf.lean')
+na = reemplazar(na, 'import ROBINSON_PlusPlus.Meta.ChainPrf\n', 'import ROBINSON_PlusPlus.Meta.ReglasPrfH\n', 'NatArith/import')
+na = reemplazar(na, 'open ROBINSON_PlusPlus.Meta.ChainPrf\n', '', 'NatArith/open')
+pred2 = pred.rstrip('\n').replace('/-! ### Predecesor: case-split del índice SIN `∃` (evita el `∃`-elim anidado bajo `PrfH`) -/',
+                                  '/-! ### Predecesor: case-split del índice SIN `∃` (evita el `∃`-elim anidado bajo `PrfH`)\n\n'
+                                  '✏️ 2026‑11‑18 (ADR‑270): de `Meta/BoundedInPrf.lean`, donde estaba; lo necesita '
+                                  '`Meta/ListIndAdmisible.lean`, que\nestá por debajo de `BoundedInPrf`. -/')
+assert pred2 != pred.rstrip('\n')
+na = reemplazar(na, '\nend ROBINSON_PlusPlus.Meta.NatArithPrf\n', '\n' + pred2 + '\n\nend ROBINSON_PlusPlus.Meta.NatArithPrf\n',
+                'NatArith/end')
+na = reemplazar(na, '''  prf_zero_lt_succ prf_succ_lt_succ_of_lt prf_lt_of_succ_lt_succ prf_not_lt_zero
+)''', '''  prf_zero_lt_succ prf_succ_lt_succ_of_lt prf_lt_of_succ_lt_succ prf_not_lt_zero
+  -- ✏️ 2026‑11‑18 (ADR‑270): de `Meta/BoundedInPrf.lean`
+  prf_pred_succ prf_eq_congr_pred PrfH_eq_congr_pred prf_zero_or_eq_succ_pred
+)''', 'NatArith/export')
+escribir(M + 'NatArithPrf.lean', na)
+
+# ── 4 · la cadena aritmética, sin `open …ChainPrf` ─────────────────────────────────────────────────────────────────
+for f in ['NatOrderPrf', 'NatMulPrf', 'CantorMonoPrf', 'StrongInductionPrf', 'Div2ParityPrf']:
+    t = leer(M + f + '.lean')
+    t = reemplazar(t, 'open ROBINSON_PlusPlus.Meta.ChainPrf\n', '', f + '/open')
+    escribir(M + f + '.lean', t)
+
+# ── 5 · CodeWitnessPrf → NumListPrf: consOk, prf_cdrc_cons, prf_consOk_cons ─────────────────────────────────────
+cw = leer(M + 'CodeWitnessPrf.lean')
+cw, cdrc = cortar(cw, 'theorem prf_cdrc_cons (h t : Term)', '  exact hh', 'CW/cdrc')
+cw, cok = cortar(cw, 'def consOk (X : Term) : Formula', 'def consOk (X : Term) : Formula := Formula.eq X (cons (carc X) (cdrc X))', 'CW/consOk')
+cw, cokc = cortar(cw, 'theorem prf_consOk_cons (a b : Term)', '    (prf_congr_cons_tail (prf_eq_symm (prf_cdrc_cons a b)))', 'CW/consOkcons')
+cw = cw.replace('SinWTs.consOk', 'NumListPrf.consOk').replace('SinWTs.prf_consOk_cons', 'NumListPrf.prf_consOk_cons')
+cw = reemplazar(cw, '  argsIn argsInBody closed_mem_tcodes1 consOk crit_junk_var0_witness1 impT isTC1 isTermCodeE1\n',
+                '  argsIn argsInBody closed_mem_tcodes1 crit_junk_var0_witness1 impT isTC1 isTermCodeE1\n', 'CW/export1')
+cw = reemplazar(cw, '  prf_consOk_cons prf_In_objList prf_isTC1_tcodes prf_isTermCodeE1_of_boundedIn\n',
+                '  prf_In_objList prf_isTC1_tcodes prf_isTermCodeE1_of_boundedIn\n'
+                '  -- ✏️ 2026‑11‑18 (ADR‑270): `consOk` y `prf_consOk_cons` (con `prf_cdrc_cons`) salen a la raíz desde\n'
+                '  -- `Meta/NumListPrf.lean`, adonde bajaron: los necesita `Meta/ListIndAdmisible.lean`.\n', 'CW/export2')
+cw = reemplazar(cw, 'def cOk (X : Term) (F : Formula) : Formula := land (consOk X) F\n',
+                '-- ✏️ 2026‑11‑18 (ADR‑270): `consOk` estaba aquí; bajó a `Meta/NumListPrf.lean` (con `prf_cdrc_cons` y\n'
+                '-- `prf_consOk_cons`), y sale a la raíz desde allí.\n'
+                'def cOk (X : Term) (F : Formula) : Formula := land (consOk X) F\n', 'CW/nota')
+escribir(M + 'CodeWitnessPrf.lean', cw)
+
+nl = leer(M + 'NumListPrf.lean')
+nl = reemplazar(nl, '\nend ROBINSON_PlusPlus.Meta.NumListPrf\n', '''
+/-! ### `cons`: la cola, y la forma `X = cons (carc X) (cdrc X)`
+
+✏️ 2026‑11‑18 (ADR‑270): de `Meta/CodeWitnessPrf.lean` (`SinWTs`), donde estaban. Los necesita
+`Meta/ListIndAdmisible.lean` (todo código no nulo es un `cons`), que está por debajo de `CodeWitnessPrf`. -/
+
+''' + cdrc.rstrip('\n') + '\n\n' + '/-- La FORMA de un `cons`: `X = cons (carc X) (cdrc X)`. -/\n' + cok.rstrip('\n') + '\n\n'
+                + cokc.rstrip('\n') + '\n\nend ROBINSON_PlusPlus.Meta.NumListPrf\n', 'NumList/end')
+nl = reemplazar(nl, '''  prf_lenc_nil prf_lenc_cons prf_nthc_zero prf_nthc_succ
+)''', '''  prf_lenc_nil prf_lenc_cons prf_nthc_zero prf_nthc_succ
+  -- ✏️ 2026‑11‑18 (ADR‑270): de `Meta/CodeWitnessPrf.lean`
+  consOk prf_cdrc_cons prf_consOk_cons
+)''', 'NumList/export')
+escribir(M + 'NumListPrf.lean', nl)
+
+# ── 6 · ListIndAdmisible: abajo de ChainPrf ───────────────────────────────────────────────────────────────────────
+li = leer(M + 'ListIndAdmisible.lean')
+li = reemplazar(li, 'import ROBINSON_PlusPlus.Meta.ChainPrf\n', 'import ROBINSON_PlusPlus.Meta.ReglasPrfH\nimport ROBINSON_PlusPlus.Meta.NumListPrf\n', 'LI/import1')
+li = reemplazar(li, 'import ROBINSON_PlusPlus.Meta.CodeWitnessPrf\n', '', 'LI/import2')
+li = reemplazar(li, 'open ROBINSON_PlusPlus.Meta.ChainPrf\n', '', 'LI/open')
+li = reemplazar(li, '''que como TEORÍA no añade nada. Y los usuarios de `prf_list_induction` (D2 entre ellos) siguen usándola: redirigirlos a
+`prf_list_induction_sin` es otro paso, que cambiaría lo que usa la prueba de un titular.
+-/''', '''que como TEORÍA no añade nada. Y los usuarios de `prf_list_induction` (D2 entre ellos) siguen usándola: redirigirlos a
+`prf_list_induction_sin` es otro paso, que cambiaría lo que usa la prueba de un titular.
+
+✏️ 2026‑11‑18 (ADR‑270, A9): ese paso, dado. El módulo está por DEBAJO de `Meta/ChainPrf.lean` —importa la cadena
+aritmética, `Meta/ReglasPrfH.lean` y `Meta/NumListPrf.lean`, no `ChainPrf` ni `CodeWitnessPrf`—, y `ChainPrf` lo
+importa y demuestra `prf_list_induction` con `prf_list_induction_sin`: ningún usuario cambia, y ninguno construye un
+paso `listInd`. La decodificación del verificador (`SolidezVerificador.linea_listInd`) y `AxiomasT`
+(`PuenteFOL.prf_of_axiomasT`) usan `listInd_admisible`.
+-/''', 'LI/doc')
+escribir(M + 'ListIndAdmisible.lean', li)
+
+# ── 7 · la decodificación y AxiomasT ───────────────────────────────────────────────────────────────────────────
+sv = leer(M + 'SolidezVerificador.lean')
+sv = reemplazar(sv, 'import ROBINSON_PlusPlus.Meta.Representability\n',
+                'import ROBINSON_PlusPlus.Meta.Representability\nimport ROBINSON_PlusPlus.Meta.ListIndAdmisible\n', 'SV/import')
+sv = reemplazar(sv, '  rw [hT.2.2]; decodifica; exact Prf.listInd _\n',
+                '  rw [hT.2.2]; decodifica; exact ListIndAdmisible.listInd_admisible _\n', 'SV/linea')
+escribir(M + 'SolidezVerificador.lean', sv)
+
+pf = leer(M + 'PuenteFOL.lean')
+pf = reemplazar(pf, '  · exact Prf.listInd A\n', '  · exact ListIndAdmisible.listInd_admisible A\n', 'PF/listInd')
+escribir(M + 'PuenteFOL.lean', pf)
+
+# ── 8 · los nombres cualificados, en todo el árbol ─────────────────────────────────────────────────────────────
+ren = {}
+for n in diez:
+    ren['ROBINSON_PlusPlus.Meta.ChainPrf.' + n] = 'ROBINSON_PlusPlus.Meta.ReglasPrfH.' + n
+for n in ['consOk', 'prf_cdrc_cons', 'prf_consOk_cons']:
+    ren['ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.' + n] = 'ROBINSON_PlusPlus.Meta.NumListPrf.' + n
+for n in ['prf_pred_succ', 'prf_eq_congr_pred', 'PrfH_eq_congr_pred', 'prf_zero_or_eq_succ_pred']:
+    ren['ROBINSON_PlusPlus.Meta.BoundedInPrf.' + n] = 'ROBINSON_PlusPlus.Meta.NatArithPrf.' + n
+cortos = {}
+for n in diez:
+    cortos['ChainPrf.' + n] = 'ReglasPrfH.' + n
+for n in ['consOk', 'prf_cdrc_cons', 'prf_consOk_cons']:
+    cortos['SinWTs.' + n] = 'NumListPrf.' + n
+for n in ['prf_pred_succ', 'prf_eq_congr_pred', 'PrfH_eq_congr_pred', 'prf_zero_or_eq_succ_pred']:
+    cortos['BoundedInPrf.' + n] = 'NatArithPrf.' + n
+toc = {}
+dirs = [R + 'ROBINSON_PlusPlus', R + 'sondeos', R + 'scripts']
+fich = [os.path.join(d, f) for d0 in dirs for d, _, fs in os.walk(d0) for f in fs if f.endswith('.lean')]
+fich = [f for f in fich if '/pasadas/' not in f.replace(os.sep, '/')]
+fich += [R + f for f in os.listdir(R) if f.startswith('check-') and f.endswith('.bash')]
+for f in fich:
+    t = leer(f)
+    t0 = t
+    for v, n in ren.items():
+        t = re.sub(re.escape(v) + r'(?![\w\'₀-₉])', n, t)
+    for v, n in cortos.items():
+        t = re.sub(r'(?<![\w.])' + re.escape(v) + r'(?![\w\'₀-₉])', n, t)
+    if t != t0:
+        escribir(f, t)
+        toc[f.replace(R, '')] = sum(t0.count(v) for v in list(ren) + list(cortos))
+for f, k in sorted(toc.items()):
+    print('renombrado', f, k)
+print('hecho')

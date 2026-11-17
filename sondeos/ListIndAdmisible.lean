@@ -87,6 +87,13 @@ comentarios). La auditoría estimaba «100–300 líneas» (ESTIMACIÓN). Compil
 RPP, con el build al día; tres ejecuciones el 2026‑11‑02).
 
 **Cómo re‑ejecutarlo:** `lake lean sondeos/ListIndAdmisible.lean` (desde la raíz de RPP).
+
+**✏️ 2026‑11‑18 (ADR‑270, A9): el build ya la usa.** `Meta/ListIndAdmisible.lean` está por debajo de
+`Meta/ChainPrf.lean`, y `prf_list_induction` es `prf_list_induction_sin`. Lo de arriba que dice «la del build sale de
+`listInd`» o «el build no puede usarla» es de antes. Y cambia UNO de los dos controles positivos: el `prf_nil_or_cons`
+del build ya no da `[prf_list_induction]` (`#induccion`: `listInd` sólo en `deduction_aux` y `PrfH_mono`, que
+reconstruyen lo que reciben; `#induccionSin`: nada); el otro, `control_con_listInd`, sigue disparando en las dos órdenes,
+y es el que dice que la medida no es ciega.
 -/
 
 open FOL

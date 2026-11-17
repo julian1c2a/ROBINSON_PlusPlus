@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.NumListPrf
 import ROBINSON_PlusPlus.Meta.NatArithPrf
+import ROBINSON_PlusPlus.Meta.ChainPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -111,48 +112,8 @@ theorem prf_boundedIn_tail (x hd t : Term) : Prf (boundedIn x t ⇒ boundedIn x 
   · exact PrfH_eq_trans
       (prf_to_prfH (prf_nthc_succ (liftTerm 0 hd) (liftTerm 0 t) (.var 0)) _) heq
 
-/-! ### Predecesor: case-split del índice SIN `∃` (evita el `∃`-elim anidado bajo `PrfH`) -/
-
-/-- `pred (σn) = n` en `Prf` (`ax26_pred_succ`). -/
-theorem prf_pred_succ (n : Term) : Prf (pred (succ n) =eq n) := by
-  have hh := prf_spec (prf_ax (show ax26_pred_succ ∈ axioms by simp [axioms])) n
-  simp [substFormula, substTerm, substTerms, pred, succ] at hh
-  exact hh
-
-/-- Congruencia de `pred` en `Prf` (Leibniz object). -/
-theorem prf_eq_congr_pred {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (pred t₁ =eq pred t₂) := by
-  let f : Formula := Formula.eq (pred (liftTerm 0 t₁)) (pred (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (pred t₁) (pred s) := by
-    intro s; simp only [f, pred, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
-  exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (pred t₁))
-
-/-- Congruencia de `pred` en `PrfH`. -/
-theorem PrfH_eq_congr_pred {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (t₁ =eq t₂)) :
-    PrfH Γ (pred t₁ =eq pred t₂) := by
-  let f : Formula := Formula.eq (pred (liftTerm 0 t₁)) (pred (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (pred t₁) (pred s) := by
-    intro s; simp only [f, pred, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
-  exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (pred t₁)) Γ)
-
-/-- **`n = 0 ∨ n = σ(pred n)`** en `Prf`. Reformulación de `prf_zero_or_succ` **sin `∃`**
-    (usando el predecesor de la teoría), para poder partir por casos un índice dentro de un
-    contexto `PrfH` sin recurrir a `PrfH_ex_elim` (doble lift). -/
-theorem prf_zero_or_eq_succ_pred (n : Term) :
-    Prf (lor (Formula.eq n zero) (Formula.eq n (succ (pred n)))) := by
-  have himp : Prf (Formula.ex (Formula.eq (liftTerm 0 n) (succ (.var 0)))
-      ⇒ Formula.eq n (succ (pred n))) := by
-    refine prf_ex_elim_imp ?_
-    show PrfH [Formula.eq (liftTerm 0 n) (succ (.var 0))]
-      (Formula.eq (liftTerm 0 n) (succ (pred (liftTerm 0 n))))
-    have hp : PrfH [Formula.eq (liftTerm 0 n) (succ (.var 0))]
-        (pred (liftTerm 0 n) =eq (.var 0)) :=
-      PrfH_eq_trans (PrfH_eq_congr_pred (prfH_hyp_self _))
-        (prf_to_prfH (prf_pred_succ (.var 0)) _)
-    exact PrfH_eq_trans (prfH_hyp_self _) (PrfH_eq_congr_succ (PrfH_eq_symm hp))
-  refine prf_mp (prf_mp (prf_mp (Prf.incl (Prfᵢ.j3 _ _ _)) (prf_zero_or_succ n)) ?_) ?_
-  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (prfH_hyp_self _))
-  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
-      (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _)))
+/-! ✏️ 2026‑11‑18 (ADR‑270): aquí estaba el bloque del predecesor (`prf_pred_succ`, `prf_eq_congr_pred`,
+`PrfH_eq_congr_pred` y `prf_zero_or_eq_succ_pred`): bajó a `Meta/NatArithPrf.lean`. -/
 
 /-! ### Ley de sucesor de `<` : `i < σb ⇒ i < b ∨ i = b`
 
@@ -380,7 +341,8 @@ export ROBINSON_PlusPlus.Meta.BoundedInPrf (
   prf_lt_subst2 PrfH_eq_congr_nthc2
   -- ⚠️ `PrfH_lt_subst1`/`_subst2` ya NO se exportan desde aquí: bajaron a `Meta/ChainPrf.lean`.
   prf_boundedIn_head prf_boundedIn_tail
-  prf_pred_succ prf_eq_congr_pred PrfH_eq_congr_pred prf_zero_or_eq_succ_pred
+  -- ✏️ 2026‑11‑18 (ADR‑270): `prf_pred_succ`, `prf_eq_congr_pred`, `PrfH_eq_congr_pred` y `prf_zero_or_eq_succ_pred`
+  -- bajaron a `Meta/NatArithPrf.lean` (los necesita `Meta/ListIndAdmisible.lean`), y salen a la raíz desde allí.
   prf_lt_succ_helper prf_lt_succ_split
   prf_boundedIn_nil prf_boundedIn_cons
   prf_boundedIn_of_In prf_In_of_boundedIn prf_In_iff_boundedIn

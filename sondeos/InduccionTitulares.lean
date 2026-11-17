@@ -97,6 +97,16 @@ pasar por `consistencia`: la estructura `Estandar` y la evaluación, no el model
 frente a las 2 918 de `tarski_semantico`, que sí lo trae). Construye `ind` fuera de las traducciones
 (`prf_nat_induction`, la aritmética de numerales del lema diagonal); `listInd`, `p3` y `qconf`, sólo dentro de ellas.
 La salida, en `doc/registro/2026-10-21-titulares/`.
+
+**✏️ 2026‑11‑18 (ADR‑270, A9): `listInd`, ya no.** `prf_list_induction` es corolario de `listInd_admisible`
+(`Meta/ListIndAdmisible.lean`, ahora por debajo de `Meta/ChainPrf.lean`), y la decodificación de W1
+(`SolidezVerificador.linea_listInd`) y `AxiomasT` (`PuenteFOL.prf_of_axiomasT`) usan la admisibilidad. Medido con la
+orden `#induccionSin` de `sondeos/ListIndAdmisible.lean` sobre los 35 titulares de T07: fuera de las traducciones,
+`deduction_aux`, `PrfH_mono` y los análisis por casos, NINGUNO construye un paso `listInd` (eran 24); en su lugar,
+`ind` (`prf_strong_ind_formula`, `prf_nat_induction`), que D2 no construía. `p3`, igual. La medida, en
+`doc/registro/2026-11-18-capas-paso3/`. Aquí, `#induccion` da para `listInd` sólo `deduction_aux` y `PrfH_mono` (que
+reconstruyen lo que reciben), y los `#camino … prf_list_induction` de abajo siguen encontrando el nombre: la regla
+derivada está en el cierre, pero ya no construye el paso.
 -/
 
 open Lean Meta Elab Command

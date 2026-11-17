@@ -6,6 +6,7 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.ModeloCodigo
 import ROBINSON_PlusPlus.Meta.CodeNatInjPrf
 import ROBINSON_PlusPlus.Meta.Representability
+import ROBINSON_PlusPlus.Meta.ListIndAdmisible
 
 /-!
 # `Meta/SolidezVerificador.lean` — 🏁🏁 W1, y Gödel I ENTERO: `⊬ G` y `⊬ ¬G`, sin hipótesis (ADR‑121)
@@ -474,7 +475,7 @@ theorem linea_ind (hT : lineWFT V 18 x) : Prf (dec (carN x)) := by
 theorem linea_qconf (hT : lineWFT V 19 x) : Prf (dec (carN x)) := by
   rw [hT.2.2]; decodifica; exact Prf.qconf _ _
 theorem linea_listInd (hT : lineWFT V 20 x) : Prf (dec (carN x)) := by
-  rw [hT.2.2]; decodifica; exact Prf.listInd _
+  rw [hT.2.2]; decodifica; exact ListIndAdmisible.listInd_admisible _
 
 theorem linea_mp {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nthN x 1 = 16) :
     Prf (dec (carN x)) := by

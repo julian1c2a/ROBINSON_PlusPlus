@@ -499,14 +499,14 @@ theorem PrfH_congr_substtsc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (
       = Formula.eq (substtsc v s a) (substtsc v s x) := by
     intro x
     simp only [f, substtsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, ite_true]
-  exact (hS b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst (A := f) h
+  exact (hS b) ▸ ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_leibniz_subst (A := f) h
     ((hS a) ▸ prf_to_prfH (prf_refl (substtsc v s a)) _)
 
 theorem PrfH_congr_hasWitArgs {Γ : List Formula} {a b : Term}
     (h : PrfH Γ (a =eq b)) (hw : PrfH Γ (hasWitArgs a)) : PrfH Γ (hasWitArgs b) := by
   have e : ∀ x : Term, substFormula 0 x (hasWitArgs (.var 0)) = hasWitArgs x := by
     intro x; simp only [substF_hasWitArgs, substTerm, ite_true]
-  exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
+  exact (e b) ▸ ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_leibniz_subst
     (A := hasWitArgs (.var 0)) h ((e a) ▸ hw)
 
 /-- La lista VACÍA tiene testigo (el vacío). -/
@@ -1500,7 +1500,7 @@ theorem PrfH_congr_hasWitF {Γ : List Formula} {a b : Term}
     (h : PrfH Γ (a =eq b)) (hw : PrfH Γ (hasWitF a)) : PrfH Γ (hasWitF b) := by
   have e : ∀ x : Term, substFormula 0 x (hasWitF (.var 0)) = hasWitF x := by
     intro x; simp only [substF_hasWitF, substTerm, ite_true]
-  exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
+  exact (e b) ▸ ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_leibniz_subst
     (A := hasWitF (.var 0)) h ((e a) ▸ hw)
 
 /-! ### Los TRES constructores que no necesitan la hipótesis de inducción

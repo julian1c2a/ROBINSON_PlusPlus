@@ -3,16 +3,11 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
--- ⚠️ 2026‑09‑10g: entró la cadena entera de D3 para que `d3` dejara de ser `axiom` y pasara a
--- teorema. Ese teorema (D3 sobre `⊢`) era el consumidor de este import y se retiró con ADR‑115.
-import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
-
-import FOL.FOL
-import FOL.Theorems.Eq
-import FOL.Theorems.Quantifiers
+-- ✏️ 2026‑11‑18 (ADR‑270, el nudo N6 de las capas de B1): importaba además `PremsBdAllPrf` (la cadena entera de D3,
+-- desde el 2026‑09‑10g, para el teorema `d3` sobre `⊢`, retirado con ADR‑115), `ReprPrf`, `Representability2` y dos
+-- de `FOL.Theorems`. Medido con el elaborador: la única declaración del módulo, `consistencyFormula'`, sólo usa
+-- `ProofChain` (`provCodeC'`). Fuera.
 import ROBINSON_PlusPlus.Meta.ProofChain
-import ROBINSON_PlusPlus.Meta.ReprPrf
-import ROBINSON_PlusPlus.Meta.Representability2
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
@@ -26,7 +21,6 @@ open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
 open ROBINSON_PlusPlus.Meta.CheckArith
-open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ProofChain
 
 namespace ROBINSON_PlusPlus.Meta.GodelTwo

@@ -3,7 +3,7 @@
 > **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
 > Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
-**Last updated:** 2026-11-17 — [ADR‑269](DECISIONS.md): el módulo de `prf_completo` (`Meta/TitularesIII.lean`, las capas de B1). Antes, 2026-11-16 — [ADR‑265](DECISIONS.md): en §1.3, `ax_mod2_alternation` lleva su marcador en su oración (el núcleo nuevo de [B] vio que lo absolvía el 🗑️ de la oración siguiente, a través de la negrita). Antes, 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): §0 al día —`listInd` admisible desde `ind` (ADR‑259), la vuelta del puente sobre las clausuras (ADR‑253), el contrato de T07 (ADR‑165), los tres titulares con `Classical.choice` (ADR‑250)—, el ancla de §1 (el 120.º, con el footprint de hoy), los «hoy» que ya no lo eran, la ruta de §3.17–§3.18, y las 100 citas muertas de [B], con su marcador o en texto plano. Antes, 2026-07-22 — **nueva §1.1: por qué la inducción de `Full/` es el mínimo teórico de Gödel II** (Q no satisface D2/D3; reparto verificado con `#print axioms`: D1 y D2 limpios, Gödel I/II usan `Full.ax_induction`+`ax_list_induction`, retirados con ADR‑115). Sin cambios en el inventario: siguen **7**. — (previo 2026-07-20) **`prf_inAxC` → `prf_axiomsCodeT_eq`** (retirado en ADR‑026; espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` (retirado) → `ax_axiomsCodeT_eq` (retirado, ADR‑115), net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.) ✏️ *2026‑10‑12 ([ADR‑134](DECISIONS.md)): registro. Hoy hay 0 `axiom` de Lean, la inducción entra por los constructores `Prf.ind` y `Prf.listInd`, y D1 y D2 no están limpios (§0, §0.3).*
+**Last updated:** 2026-11-18 — [ADR‑270](DECISIONS.md): en §0.3, la columna de `listInd` (ningún titular construye ya un paso `listInd`) y, en §0.2, D2 y `prf_list_induction`. Antes, 2026-11-17 — [ADR‑269](DECISIONS.md): el módulo de `prf_completo` (`Meta/TitularesIII.lean`, las capas de B1). Antes, 2026-11-16 — [ADR‑265](DECISIONS.md): en §1.3, `ax_mod2_alternation` lleva su marcador en su oración (el núcleo nuevo de [B] vio que lo absolvía el 🗑️ de la oración siguiente, a través de la negrita). Antes, 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): §0 al día —`listInd` admisible desde `ind` (ADR‑259), la vuelta del puente sobre las clausuras (ADR‑253), el contrato de T07 (ADR‑165), los tres titulares con `Classical.choice` (ADR‑250)—, el ancla de §1 (el 120.º, con el footprint de hoy), los «hoy» que ya no lo eran, la ruta de §3.17–§3.18, y las 100 citas muertas de [B], con su marcador o en texto plano. Antes, 2026-07-22 — **nueva §1.1: por qué la inducción de `Full/` es el mínimo teórico de Gödel II** (Q no satisface D2/D3; reparto verificado con `#print axioms`: D1 y D2 limpios, Gödel I/II usan `Full.ax_induction`+`ax_list_induction`, retirados con ADR‑115). Sin cambios en el inventario: siguen **7**. — (previo 2026-07-20) **`prf_inAxC` → `prf_axiomsCodeT_eq`** (retirado en ADR‑026; espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` (retirado) → `ax_axiomsCodeT_eq` (retirado, ADR‑115), net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.) ✏️ *2026‑10‑12 ([ADR‑134](DECISIONS.md)): registro. Hoy hay 0 `axiom` de Lean, la inducción entra por los constructores `Prf.ind` y `Prf.listInd`, y D1 y D2 no están limpios (§0, §0.3).*
 **Author:** Julián Calderón Almendros
 
 Registro autoritativo de **todas** las declaraciones `axiom` de Lean que sostienen
@@ -91,7 +91,8 @@ segundo punto, demostrado desde ADR‑259, y el cuarto sobre las clausuras, desd
   el constructor `Prf.listInd` (`Meta/ListIndAdmisible.lean`, ADR‑259; antes, el sondeo de T69, ADR‑244), sale de la
   inducción fuerte (`prf_strong_ind_formula`) y de que todo `L` es `nil` o un `::` (`prf_nil_or_consOk`), sin ningún
   paso `listInd` fuera de las traducciones (medido: ADR‑259 §3). El constructor sigue en `Prf`, y D2 sigue usando
-  `prf_list_induction` (ADR‑259 §4);
+  `prf_list_induction` (ADR‑259 §4); ✏️ 2026‑11‑18 ([ADR‑270](DECISIONS.md)): que ya no construye el paso, porque es
+  corolario de `listInd_admisible`;
 * una traducción de T_Prf al lenguaje {0, σ, +, ×} (paso posterior y opcional);
 * la VUELTA del puente con FOL, `Prf φ → DerivesSet₀ AxiomasT φ`: con instancias de los esquemas con variables libres,
   `gen` pide las clausuras universales. La IDA está desde ADR‑195 (T67, `Meta/PuenteFOL.lean`): lo que FOL deriva de
@@ -145,6 +146,12 @@ traducciones; el resto de cada frontera se clasificó leyendo el fuente). `qconf
 construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de varios módulos. ✏️ 2026‑11‑09
 ([ADR‑262](DECISIONS.md)): la tabla no cubre los 35 titulares de hoy (`TEOREMAS-E-HIPOTESIS.md` §1); de los seis del
 puente con FOL (ADR‑210, ADR‑250), el sondeo mide sólo la clase (`#modelo`), no la inducción.
+✏️ 2026‑11‑18 ([ADR‑270](DECISIONS.md), A9): **la columna de `listInd` es de antes.** `prf_list_induction` es corolario
+de `listInd_admisible`, y la decodificación de W1 (`linea_listInd`) y `AxiomasT` usan la admisibilidad; medido sobre
+los 35 titulares (la orden induccionSin de `sondeos/ListIndAdmisible.lean`, en `doc/registro/2026-11-18-capas-paso3/`):
+NINGUNO construye un paso `listInd` fuera de las traducciones, `deduction_aux`, `PrfH_mono` y los análisis por casos
+(eran 24). En su lugar construyen `ind` (`prf_strong_ind_formula`, `prf_nat_induction`), también D2, que no lo
+hacía: su fila diría hoy «sí» en `ind` y «no» en `listInd`. `p3`, igual.
 
 | titular | `ind` | `listInd` | `p3` (DNE) |
 |---|---|---|---|

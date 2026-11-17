@@ -172,7 +172,7 @@ theorem prf_of_axiomasT {φ : Formula} (h : AxiomasT φ) : Prf φ := by
   rcases h with h | ⟨A, rfl⟩ | ⟨A, rfl⟩
   · exact Prf.incl (Prfᵢ.thy φ h)
   · exact Prf.ind A
-  · exact Prf.listInd A
+  · exact ListIndAdmisible.listInd_admisible A
 
 /-- Lo que FOL deriva de `AxiomasT`, `Prf` lo demuestra. -/
 theorem prf_of_derivesSet_axiomasT {f : Formula} (h : DerivesSet₀ AxiomasT f) : Prf f :=

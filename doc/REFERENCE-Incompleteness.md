@@ -13,7 +13,7 @@
 > **Ficheros `.lean`:** la cadena `Meta/` (barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean); cuántos
 > módulos, en la línea de cifras de abajo).
 
-**Build 155 jobs · 125 módulos activos** (Minimal 2 + Meta 122 + Full 1) **+ 0 en `cuarentena/` + 48 `sondeos/`
+**Build 156 jobs · 126 módulos activos** (Minimal 2 + Meta 123 + Full 1) **+ 0 en `cuarentena/` + 48 `sondeos/`
 · 0 `axiom` de Lean · 120 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
 
 **Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de
@@ -24,7 +24,7 @@ son anteriores a la reparación (registro); §3.24–§3.68, la construcción �
 el frente `substfc`, D3 y su ensamblaje—, cada una con su fecha; §3.69–§3.80, el lado semántico (ADR‑120 en
 adelante; §3.80, el puente de FOL, ADR‑195). Rosser, Löb y los corolarios de Gödel II, en las cabeceras de sus módulos y en TEOREMAS §1.
 
-**Last updated:** 2026-11-17 — [ADR‑268](../DECISIONS.md): la línea de cifras (155 jobs, 125 módulos). Antes, 2026-11-16 — [ADR‑265](../DECISIONS.md): «C3e», una etiqueta de tarea, en texto plano (el núcleo nuevo de [B] la vio: la absolvía el «faltan» de la oración anterior, a través de la negrita). Antes, 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): las 484 citas muertas de [B], a cero
+**Last updated:** 2026-11-18 — [ADR‑270](../DECISIONS.md): la línea de cifras (156 jobs, 126 módulos). Antes, 2026-11-17 — [ADR‑268](../DECISIONS.md): la línea de cifras (155 jobs, 125 módulos). Antes, 2026-11-16 — [ADR‑265](../DECISIONS.md): «C3e», una etiqueta de tarea, en texto plano (el núcleo nuevo de [B] la vio: la absolvía el «faltan» de la oración anterior, a través de la negrita). Antes, 2026-11-09 — revisado contra el árbol ([ADR‑262](../DECISIONS.md)): las 484 citas muertas de [B], a cero
 (cada nombre retirado o archivado, con su rótulo y la decisión que lo retiró; las notaciones, en texto plano; las
 abreviaturas, con el nombre entero), las 28 cifras viejas de [A2], marcadas como de su fecha, los módulos retirados de
 §3.15–§3.26 rotulados y los bloques de código de los vivos con una nota de lo que cambió, y §3.69–§3.80, contrastados con

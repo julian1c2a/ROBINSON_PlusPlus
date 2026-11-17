@@ -1,6 +1,6 @@
 # Gentzen: el alcance, medido (T69)
 
-**Last updated:** 2026-11-05 — [ADR‑259](../DECISIONS.md): §3, la prueba de `listInd`, en el build. Antes, 2026-11-04 — [ADR‑254](../DECISIONS.md): §6, la lección de L5‑02 para el repositorio nuevo (los
+**Last updated:** 2026-11-18 — [ADR‑270](../DECISIONS.md): §3, el build ya la usa (ningún titular construye un paso `listInd`). Antes, 2026-11-05 — [ADR‑259](../DECISIONS.md): §3, la prueba de `listInd`, en el build. Antes, 2026-11-04 — [ADR‑254](../DECISIONS.md): §6, la lección de L5‑02 para el repositorio nuevo (los
 nombres de los símbolos, por índice). Antes, 2026-11-02 — creado con T69 ([ADR‑244](../DECISIONS.md)): los primeros
 pasos medibles de la auditoría (el censo de la forma de los axiomas y la admisibilidad de `listInd`), y lo que harían
 falta después.
@@ -79,7 +79,11 @@ ellos, ninguna constante nombra `listInd` (ni `p3`), y los dos controles positiv
   derivación no construye ningún paso `p3` (es intuicionista en la lógica), aunque usa axiomas que no lo son (la
   tricotomía, `ax19_lt_trichotomy`).
 * Usarla en el build pide reordenar los imports (`prf_list_induction` vive por debajo de los módulos que usa la
-  prueba): ESTIMACIÓN del agente que la escribió, uno o dos días, con su ADR. No se ha hecho.
+  prueba): ESTIMACIÓN del agente que la escribió, uno o dos días, con su ADR. No se ha hecho. ✏️ 2026‑11‑18
+  ([ADR‑270](../DECISIONS.md), A9): hecho. `prf_list_induction` es corolario de `listInd_admisible`, y la decodificación
+  del verificador y `AxiomasT` usan la admisibilidad: ningún titular construye ya un paso `listInd` fuera de las
+  traducciones (medido sobre los 35; eran 24). Para Gentzen, en las pruebas de los titulares `listInd` ya está reducida
+  a `ind`; el constructor sigue en `Prf`.
 
 ## 4 · Lo que haría falta después — ESTIMACIÓN
 

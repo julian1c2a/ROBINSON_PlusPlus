@@ -1,0 +1,60 @@
+ROBINSON_PlusPlus.Meta.ListIndAdmisible.listInd_admisible: cierre de 2213 constantes; de RPP, en 15 módulos (⛓ = `ChainPrf` en su cierre de imports):
+    ROBINSON_PlusPlus.Full.Induction (1)
+    ArithPrf (4)
+    CantorMonoPrf (21)
+    Div2ParityPrf (17)
+    Hilbert (27)
+    HilbertDeduction (22)
+    ListIndAdmisible (27)
+    NatArithPrf (16)
+    NatMulPrf (21)
+    NatOrderPrf (21)
+    NumListPrf (3)
+    ReglasPrfH (10)
+    ReprPrf (14)
+    StrongInductionPrf (13)
+    ROBINSON_PlusPlus.Minimal.Axioms (261)
+  alcanza prf_list_induction o un constructor listInd: [ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd]
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction: cierre de 2215 constantes; de RPP, en 16 módulos (⛓ = `ChainPrf` en su cierre de imports):
+    ROBINSON_PlusPlus.Full.Induction (1)
+    ArithPrf (4)
+    CantorMonoPrf (21)
+  ⛓ ChainPrf (1): [prf_list_induction]
+    Div2ParityPrf (17)
+    Hilbert (27)
+    HilbertDeduction (22)
+    ListIndAdmisible (28)
+    NatArithPrf (16)
+    NatMulPrf (21)
+    NatOrderPrf (21)
+    NumListPrf (3)
+    ReglasPrfH (10)
+    ReprPrf (14)
+    StrongInductionPrf (13)
+    ROBINSON_PlusPlus.Minimal.Axioms (261)
+  alcanza prf_list_induction o un constructor listInd: [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction,
+ ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd,
+ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd]
+NatArithPrf usa de ChainPrf 0 constantes: []
+Div2ParityPrf usa de ChainPrf 0 constantes: []
+ListIndAdmisible usa de ChainPrf 0 constantes: []
+ListIndAdmisible usa de CodeWitnessPrf 0 constantes: []
+ListIndAdmisible usa de BoundedInPrf 0 constantes: []
+ListIndAdmisible usa de ReglasPrfH 7 constantes: [PrfH_congr_cons_head×1,
+ PrfH_eq_symm×4,
+ PrfH_eq_trans×1,
+ PrfH_leibniz_subst×4,
+ PrfH_lt_subst2×1,
+ PrfH_or_elim×3,
+ PrfH_spec×3]
+ChainPrf usa de ListIndAdmisible 1 constantes: [prf_list_induction_sin×1]
+Representability2: 8 declaraciones, que dependen de 6 módulos de RPP:
+  CodeWitnessPrf (2 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.CodeWitnessPrf.HW.prf_hasWitF_real
+  Hilbert (4 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.Hilbert.Prf
+  HilbertSeq (53 usos), p. ej. proofCode' → ROBINSON_PlusPlus.Meta.HilbertSeq.Rule
+  Provability (7 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.Provability.formCode
+  Representability (2 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq
+  ROBINSON_PlusPlus.Minimal.Axioms (10 usos), p. ej. prf_hasWitF_fc → ROBINSON_PlusPlus.Minimal.Axioms.hasWitF
+GodelTwo: 1 declaraciones, que dependen de 1 módulos de RPP:
+  ProofChain (1 usos), p. ej. consistencyFormula' → ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'

@@ -1,0 +1,39 @@
+"""A9 (ADR-270): compara las dos ejecuciones de Induccion35 (antes y después del cambio). Por titular, la frontera de
+cada regla FUERA de los recorridos (la de `#induccionSin`), sin los análisis por casos —`casesOn`, `match_` y
+`prf_chainOk_track`, que nombran `Rule.listInd` en un `match` sin construir ningún paso—. Las tres últimas filas de la
+salida de Induccion35 no son titulares (`prf_list_induction`, `linea_listInd`, `cadena_buena`).
+Uso, desde el directorio del registro: py -3 induccion_compara.py.txt"""
+import re, io, collections
+
+
+def leer(p):
+    t = io.open(p, encoding='utf-8').read()
+    res = {}
+    for blk in re.split(r'\n(?=\S+: cierre cortado)', t):
+        m = re.search(r'(ROBINSON_PlusPlus\.Meta\.[\w\.\']+): cierre cortado de (\d+)', blk)
+        if not m:
+            continue
+        n = m.group(1).replace('ROBINSON_PlusPlus.Meta.', '')
+        fila = {}
+        for k in ['ind', 'listInd', 'p3']:
+            r = re.search(r'\n  ' + k + r': constructores en el cierre cortado \[(.*?)\] · frontera fuera de los recorridos \[(.*?)\]', blk, re.S)
+            fr = [x.strip().replace('ROBINSON_PlusPlus.Meta.', '') for x in r.group(2).replace('\n', ' ').split(',') if x.strip()]
+            fila[k] = sorted(x for x in fr if not re.search(r'casesOn|match_|prf_chainOk_track', x))
+        res[n] = fila
+    return res
+
+
+a = leer('induccion35-antes.txt')
+d = leer('induccion35-despues.txt')
+tit = list(a)[:35]
+assert len(tit) == 35 and list(d)[:35] == tit
+for k in ['listInd', 'ind', 'p3']:
+    c = collections.Counter(x for n in tit for x in a[n][k])
+    print(f'{k}: antes, {sum(1 for n in tit if a[n][k])} de 35 titulares con frontera; por constante {dict(c)}')
+    c = collections.Counter(x for n in tit for x in d[n][k])
+    print(f'{k}: después, {sum(1 for n in tit if d[n][k])} de 35; por constante {dict(c)}')
+print('\nlos titulares cuya frontera cambia:')
+for n in tit:
+    for k in ['listInd', 'ind', 'p3']:
+        if a[n][k] != d[n][k]:
+            print(f'  {k:7} {n}: {a[n][k]} → {d[n][k]}')

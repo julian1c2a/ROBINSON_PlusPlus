@@ -308,7 +308,7 @@ theorem PrfH_congr_hasWit {Γ : List Formula} {a b : Term}
     (h : PrfH Γ (a =eq b)) (hw : PrfH Γ (hasWit a)) : PrfH Γ (hasWit b) := by
   have e : ∀ s : Term, substFormula 0 s (hasWit (.var 0)) = hasWit s := by
     intro s; simp only [substF_hasWit, substTerm, ite_true]
-  exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
+  exact (e b) ▸ ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_leibniz_subst
     (A := hasWit (.var 0)) h ((e a) ▸ hw)
 
 /-! ## §9 · EL PASO INDUCTIVO — ensamblaje `∃`-elim / `∃`-intro

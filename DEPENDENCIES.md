@@ -1,6 +1,6 @@
 # Diagrama de Dependencias — ROBINSON_PlusPlus
 
-**Last updated:** 2026-11-17 — GENERADO por `python3 gen-dependencies.py` desde las líneas `import`; no se edita a mano.
+**Last updated:** 2026-11-18 — GENERADO por `python3 gen-dependencies.py` desde las líneas `import`; no se edita a mano.
 **Autor**: Julián Calderón Almendros
 
 > ⚠️ Este fichero se **calcula** (T30, ADR‑238). Para actualizarlo: `python3 gen-dependencies.py`; para comprobar
@@ -10,11 +10,11 @@
 
 ## Cifras
 
-* **125 módulos activos** (Minimal 2 + Meta 122 + Full 1), **427 aristas** `import` entre ellos, profundidad máxima **55**. Sin ciclos.
+* **126 módulos activos** (Minimal 2 + Meta 123 + Full 1), **431 aristas** `import` entre ellos, profundidad máxima **58**. Sin ciclos.
 * 1 `lean_lib`, `ROBINSON_PlusPlus`, con `globs := #[.andSubmodules …]`: el build compila el barril
   y TODO su directorio (T15, ADR‑163). Que todo módulo esté además en el cierre de imports del barril lo comprueba [L]
   de `check-doc-sync.bash`, y la cifra de módulos activos de arriba la compara [A] con la suya.
-* Imports externos de FOL, el único `require`: `FOL.Canonical0` (1), `FOL.DecEq` (1), `FOL.Derives1` (1), `FOL.FOL` (18), `FOL.Lift0` (3), `FOL.Semantics` (2), `FOL.Sentence` (1), `FOL.SymLit` (1), `FOL.Theorems.Eq` (15), `FOL.Theorems.Quantifiers` (9) —entre paréntesis, cuántos módulos lo importan directamente; los barriles, aparte—. De fuera de FOL: `Lean` (1).
+* Imports externos de FOL, el único `require`: `FOL.Canonical0` (1), `FOL.DecEq` (1), `FOL.Derives1` (1), `FOL.FOL` (17), `FOL.Lift0` (3), `FOL.Semantics` (2), `FOL.Sentence` (1), `FOL.SymLit` (1), `FOL.Theorems.Eq` (14), `FOL.Theorems.Quantifiers` (8) —entre paréntesis, cuántos módulos lo importan directamente; los barriles, aparte—. De fuera de FOL: `Lean` (1).
 
 ## Por niveles (camino de imports más largo hasta una raíz)
 
@@ -25,55 +25,58 @@
 * **4** — `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.SubstArith`
 * **5** — `Meta.CheckArith`
 * **6** — `Meta.ProofChain`
-* **7** — `Meta.Representability`
+* **7** — `Meta.GodelTwo`, `Meta.Representability`
 * **8** — `Meta.Diagonal`, `Meta.ReprPrf`
-* **9** — `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.NumListPrf`
+* **9** — `Meta.ArithPrf`, `Meta.NumListPrf`, `Meta.ReglasPrfH`
 * **10** — `Meta.NatArithPrf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf`
-* **11** — `Meta.BoundedInPrf`, `Meta.NatOrderPrf`, `Meta.NumCodeClosedPrf`
-* **12** — `Meta.CodeWitnessPrf`, `Meta.NatMulPrf`, `Meta.RunFnBoundedPrf`
-* **13** — `Meta.CantorMonoPrf`, `Meta.ChainOkBoundedPrf`, `Meta.Representability2`
-* **14** — `Meta.DiagonalTwo`, `Meta.LineWFConsPrf`, `Meta.StrongInductionPrf`
+* **11** — `Meta.NatOrderPrf`
+* **12** — `Meta.NatMulPrf`
+* **13** — `Meta.CantorMonoPrf`
+* **14** — `Meta.StrongInductionPrf`
 * **15** — `Meta.Div2ParityPrf`
 * **16** — `Meta.CodeNumeralPrf`, `Meta.ListIndAdmisible`
-* **17** — `Meta.CodeNatInjPrf`, `Meta.DiagonalNumeral`, `Meta.Representability2Prf`, `Meta.SolidezPrf`
-* **18** — `Meta.DerivCondPrf`, `Meta.ModeloCodigo`
-* **19** — `Meta.ModeloEstandar`, `Meta.RosserNumerales`, `Meta.Sentencia`, `Meta.Sigma1Prf`, `Meta.SolidezDobleNegacion`, `Meta.SolidezVerificador`
-* **20** — `Meta.HasWitTcFnPrf`, `Meta.ModeloCodificacion`, `Meta.PuenteFOL`, `Meta.RosserPosNum`, `Meta.RosserW1`, `Meta.Sigma1CorePrf`
-* **21** — `Meta.Consistencia`, `Meta.ExIntroCodePrf`, `Meta.LineWFCases`, `Meta.SubstfcWitnessPrf`
-* **22** — `Meta.ListEtaPrf`, `Meta.SolidezVerificadorModelo`, `Meta.TrackedCorePrf`
-* **23** — `Meta.ForallElimCodePrf`, `Meta.Sigma1AtomPrf`
-* **24** — `Meta.MpCodePrf`
-* **25** — `Meta.EvalArithPrf`
-* **26** — `Meta.EvalMulPrf`
-* **27** — `Meta.DotConsPrf`
-* **28** — `Meta.EvalListPrf`
-* **29** — `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`
-* **30** — `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`
-* **31** — `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.PropCodePrf`
-* **32** — `Meta.D3DottedPrf`
-* **33** — `Meta.D3InDotPrf`
-* **34** — `Meta.BdAllIntroPrf`, `Meta.InAxiomsCodePrf`
-* **35** — `Meta.LineWFTrackedPrf`
-* **36** — `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.LineWFThyPrf`, `Meta.RosserNumEval`
-* **37** — `Meta.CodeCtorKit`, `Meta.LineWFGuardPrf`, `Meta.RosserGuardNeg`
-* **38** — `Meta.CodeTreeReflect`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFEfqPrf`, `Meta.RosserNegLinea`
-* **39** — `Meta.EvalLiftcPrf`, `Meta.LineWFPropPrf`, `Meta.SubstfcCodePrf`, `Meta.TrackedAtomsPrf`
-* **40** — `Meta.D3ChainDotPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTrackedPrf`, `Meta.LineWFAssemblePrf`
-* **41** — `Meta.EvalSubstfcPrf`, `Meta.HasWitFTrackedPrf`, `Meta.PremsOfTagPrf`
-* **42** — `Meta.EvalLiftfcPrf`, `Meta.RosserNegNum`
-* **43** — `Meta.LiftfcWitnessPrf`
-* **44** — `Meta.SubstTreeReflect`
-* **45** — `Meta.PremsOfDotPrf`
-* **46** — `Meta.D3BodyPrf`
-* **47** — `Meta.PremsBdAllPrf`
-* **48** — `Meta.GodelTwo`
-* **49** — `Meta.GodelTwoPrf`, `Meta.RigidezEstandar`
-* **50** — `Meta.GodelCorolarios`, `Meta.ProvFiel`, `Meta.TarskiPrf`
-* **51** — `Meta.Lob`, `Meta.Rosser`
-* **52** — `Meta.TitularesII`
-* **53** — `Meta.TitularesIII`
-* **54** — `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.SegundoModelo`
-* **55** — `Meta.PurezaTitulares`
+* **17** — `Meta.ChainPrf`, `Meta.CodeNatInjPrf`, `Meta.SolidezPrf`
+* **18** — `Meta.BoundedInPrf`, `Meta.ModeloCodigo`, `Meta.NumCodeClosedPrf`
+* **19** — `Meta.CodeWitnessPrf`, `Meta.ModeloEstandar`, `Meta.RunFnBoundedPrf`, `Meta.SolidezDobleNegacion`, `Meta.SolidezVerificador`
+* **20** — `Meta.ChainOkBoundedPrf`, `Meta.ModeloCodificacion`, `Meta.Representability2`, `Meta.RosserNumerales`, `Meta.RosserW1`
+* **21** — `Meta.DiagonalTwo`, `Meta.LineWFConsPrf`, `Meta.Representability2Prf`
+* **22** — `Meta.Consistencia`, `Meta.DerivCondPrf`, `Meta.DiagonalNumeral`, `Meta.RosserPosNum`
+* **23** — `Meta.Sentencia`, `Meta.Sigma1Prf`, `Meta.SolidezVerificadorModelo`
+* **24** — `Meta.HasWitTcFnPrf`, `Meta.PuenteFOL`, `Meta.Sigma1CorePrf`
+* **25** — `Meta.ExIntroCodePrf`, `Meta.LineWFCases`, `Meta.SubstfcWitnessPrf`
+* **26** — `Meta.ListEtaPrf`, `Meta.TrackedCorePrf`
+* **27** — `Meta.ForallElimCodePrf`, `Meta.Sigma1AtomPrf`
+* **28** — `Meta.MpCodePrf`
+* **29** — `Meta.EvalArithPrf`
+* **30** — `Meta.EvalMulPrf`
+* **31** — `Meta.DotConsPrf`
+* **32** — `Meta.EvalListPrf`
+* **33** — `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`
+* **34** — `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`
+* **35** — `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.PropCodePrf`
+* **36** — `Meta.D3DottedPrf`
+* **37** — `Meta.D3InDotPrf`
+* **38** — `Meta.BdAllIntroPrf`, `Meta.InAxiomsCodePrf`
+* **39** — `Meta.LineWFTrackedPrf`
+* **40** — `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.LineWFThyPrf`, `Meta.RosserNumEval`
+* **41** — `Meta.CodeCtorKit`, `Meta.LineWFGuardPrf`, `Meta.RigidezEstandar`, `Meta.RosserGuardNeg`
+* **42** — `Meta.CodeTreeReflect`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFEfqPrf`, `Meta.RosserNegLinea`
+* **43** — `Meta.EvalLiftcPrf`, `Meta.LineWFPropPrf`, `Meta.SubstfcCodePrf`, `Meta.TrackedAtomsPrf`
+* **44** — `Meta.D3ChainDotPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTrackedPrf`, `Meta.LineWFAssemblePrf`
+* **45** — `Meta.EvalSubstfcPrf`, `Meta.HasWitFTrackedPrf`, `Meta.PremsOfTagPrf`
+* **46** — `Meta.EvalLiftfcPrf`, `Meta.RosserNegNum`
+* **47** — `Meta.LiftfcWitnessPrf`, `Meta.ProvFiel`
+* **48** — `Meta.SubstTreeReflect`
+* **49** — `Meta.PremsOfDotPrf`
+* **50** — `Meta.D3BodyPrf`
+* **51** — `Meta.PremsBdAllPrf`
+* **52** — `Meta.GodelTwoPrf`
+* **53** — `Meta.GodelCorolarios`, `Meta.TarskiPrf`
+* **54** — `Meta.Lob`, `Meta.Rosser`
+* **55** — `Meta.TitularesII`
+* **56** — `Meta.TitularesIII`
+* **57** — `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.SegundoModelo`
+* **58** — `Meta.PurezaTitulares`
 
 ## Grafo
 
@@ -87,11 +90,14 @@ graph BT
     Meta_ArithPrf["Meta.ArithPrf"] --> Meta_SubstArith["Meta.SubstArith"]
     Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
     Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"] --> Meta_PropCodePrf["Meta.PropCodePrf"]
+    Meta_BoundedInPrf["Meta.BoundedInPrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
     Meta_BoundedInPrf["Meta.BoundedInPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
     Meta_BoundedInPrf["Meta.BoundedInPrf"] --> Meta_NumListPrf["Meta.NumListPrf"]
     Meta_CantorMonoPrf["Meta.CantorMonoPrf"] --> Meta_NatMulPrf["Meta.NatMulPrf"]
     Meta_ChainOkBoundedPrf["Meta.ChainOkBoundedPrf"] --> Meta_RunFnBoundedPrf["Meta.RunFnBoundedPrf"]
     Meta_ChainPrf["Meta.ChainPrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_ChainPrf["Meta.ChainPrf"] --> Meta_ListIndAdmisible["Meta.ListIndAdmisible"]
+    Meta_ChainPrf["Meta.ChainPrf"] --> Meta_ReglasPrfH["Meta.ReglasPrfH"]
     Meta_ChainPrf["Meta.ChainPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
     Meta_CheckArith["Meta.CheckArith"] --> Meta_SubstArith["Meta.SubstArith"]
     Meta_CodeCtorKit["Meta.CodeCtorKit"] --> Meta_LineWFSchemaPrf["Meta.LineWFSchemaPrf"]
@@ -239,10 +245,7 @@ graph BT
     Meta_Godel["Meta.Godel"] --> Minimal_Axioms["Minimal.Axioms"]
     Meta_GodelCorolarios["Meta.GodelCorolarios"] --> Meta_GodelTwoPrf["Meta.GodelTwoPrf"]
     Meta_GodelCorolarios["Meta.GodelCorolarios"] --> Meta_PurezaComando["Meta.PurezaComando"]
-    Meta_GodelTwo["Meta.GodelTwo"] --> Meta_PremsBdAllPrf["Meta.PremsBdAllPrf"]
     Meta_GodelTwo["Meta.GodelTwo"] --> Meta_ProofChain["Meta.ProofChain"]
-    Meta_GodelTwo["Meta.GodelTwo"] --> Meta_ReprPrf["Meta.ReprPrf"]
-    Meta_GodelTwo["Meta.GodelTwo"] --> Meta_Representability2["Meta.Representability2"]
     Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
     Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
     Meta_GodelTwoPrf["Meta.GodelTwoPrf"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
@@ -329,14 +332,14 @@ graph BT
     Meta_ListEtaPrf["Meta.ListEtaPrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_ArithPrf["Meta.ArithPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_CantorMonoPrf["Meta.CantorMonoPrf"]
-    Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_ChainPrf["Meta.ChainPrf"]
-    Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_Div2ParityPrf["Meta.Div2ParityPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_Hilbert["Meta.Hilbert"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_NatMulPrf["Meta.NatMulPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_NatOrderPrf["Meta.NatOrderPrf"]
+    Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_NumListPrf["Meta.NumListPrf"]
+    Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_ReglasPrfH["Meta.ReglasPrfH"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_ReprPrf["Meta.ReprPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Meta_StrongInductionPrf["Meta.StrongInductionPrf"]
     Meta_ListIndAdmisible["Meta.ListIndAdmisible"] --> Minimal_Axioms["Minimal.Axioms"]
@@ -349,9 +352,10 @@ graph BT
     Meta_MpCodePrf["Meta.MpCodePrf"] --> Meta_ForallElimCodePrf["Meta.ForallElimCodePrf"]
     Meta_MpCodePrf["Meta.MpCodePrf"] --> Meta_SubstfcWitnessPrf["Meta.SubstfcWitnessPrf"]
     Meta_NatArithPrf["Meta.NatArithPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
-    Meta_NatArithPrf["Meta.NatArithPrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
+    Meta_NatArithPrf["Meta.NatArithPrf"] --> Meta_ReglasPrfH["Meta.ReglasPrfH"]
     Meta_NatMulPrf["Meta.NatMulPrf"] --> Meta_NatOrderPrf["Meta.NatOrderPrf"]
     Meta_NatOrderPrf["Meta.NatOrderPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
+    Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"] --> Meta_ChainPrf["Meta.ChainPrf"]
     Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
     Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"] --> Meta_SubstCodeOpenPrf["Meta.SubstCodeOpenPrf"]
     Meta_NumCodeClosedPrf["Meta.NumCodeClosedPrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
@@ -384,6 +388,8 @@ graph BT
     Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
     Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_TitularesII["Meta.TitularesII"]
     Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_TitularesIII["Meta.TitularesIII"]
+    Meta_ReglasPrfH["Meta.ReglasPrfH"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
+    Meta_ReglasPrfH["Meta.ReglasPrfH"] --> Meta_ReprPrf["Meta.ReprPrf"]
     Meta_ReprPrf["Meta.ReprPrf"] --> Meta_Hilbert["Meta.Hilbert"]
     Meta_ReprPrf["Meta.ReprPrf"] --> Meta_ProofChain["Meta.ProofChain"]
     Meta_ReprPrf["Meta.ReprPrf"] --> Meta_Representability["Meta.Representability"]
@@ -447,6 +453,7 @@ graph BT
     Meta_SolidezPrf["Meta.SolidezPrf"] --> Meta_Hilbert["Meta.Hilbert"]
     Meta_SolidezPrf["Meta.SolidezPrf"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
     Meta_SolidezVerificador["Meta.SolidezVerificador"] --> Meta_CodeNatInjPrf["Meta.CodeNatInjPrf"]
+    Meta_SolidezVerificador["Meta.SolidezVerificador"] --> Meta_ListIndAdmisible["Meta.ListIndAdmisible"]
     Meta_SolidezVerificador["Meta.SolidezVerificador"] --> Meta_ModeloCodigo["Meta.ModeloCodigo"]
     Meta_SolidezVerificador["Meta.SolidezVerificador"] --> Meta_Representability["Meta.Representability"]
     Meta_SolidezVerificadorModelo["Meta.SolidezVerificadorModelo"] --> Meta_Consistencia["Meta.Consistencia"]
@@ -522,126 +529,127 @@ graph BT
 | `Meta.Godel` | 2 | `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.CodeWitnessPrf`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.Provability`, `Meta.SubstfcCodePrf` |
 | `Meta.Hilbert` | 3 | `Full.Induction`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.CodeWitnessPrf`, `Meta.Diagonal`, `Meta.EvalLiftcPrf`, `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.ListIndAdmisible`, `Meta.ReprPrf`, `Meta.Representability`, `Meta.SolidezPrf`, `Meta.SubstfcCodePrf` |
 | `Meta.Provability` | 3 | `Meta.Godel`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Quantifiers` | `Meta.EvalLiftcPrf`, `Meta.HilbertSeq`, `Meta.LiftcCodePrf`, `Meta.LineWFCases`, `Meta.SubstArith`, `Meta.SubstfcCodePrf` |
-| `Meta.HilbertDeduction` | 4 | `Meta.Hilbert` | `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.LiftcCodePrf`, `Meta.ListIndAdmisible`, `Meta.PuenteFOL`, `Meta.SolidezPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.HilbertDeduction` | 4 | `Meta.Hilbert` | `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.LiftcCodePrf`, `Meta.ListIndAdmisible`, `Meta.PuenteFOL`, `Meta.ReglasPrfH`, `Meta.SolidezPrf`, `Meta.SubstfcCodePrf` |
 | `Meta.HilbertSeq` | 4 | `Meta.Godel`, `Meta.Hilbert`, `Meta.Provability` · externo: `FOL.DecEq`, `FOL.FOL` | `Meta.Representability` |
 | `Meta.SubstArith` | 4 | `Meta.Provability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ArithPrf`, `Meta.CheckArith`, `Meta.Representability`, `Meta.SubstfcWitnessPrf` |
 | `Meta.CheckArith` | 5 | `Meta.SubstArith` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ProofChain`, `Meta.Representability` |
 | `Meta.ProofChain` | 6 | `Full.Induction`, `Meta.CheckArith`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwo`, `Meta.ReprPrf`, `Meta.Representability`, `Meta.Representability2` |
+| `Meta.GodelTwo` | 7 | `Meta.ProofChain` | `Meta.GodelTwoPrf`, `Meta.RigidezEstandar` |
 | `Meta.Representability` | 7 | `Full.Induction`, `Meta.CheckArith`, `Meta.Hilbert`, `Meta.HilbertSeq`, `Meta.ProofChain`, `Meta.SubstArith`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.Diagonal`, `Meta.ReprPrf`, `Meta.Representability2`, `Meta.SolidezVerificador`, `Meta.TcArithPrf` |
 | `Meta.Diagonal` | 8 | `Meta.Hilbert`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalTwo` |
-| `Meta.ReprPrf` | 8 | `Meta.Hilbert`, `Meta.ProofChain`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.CodeNumeralPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.GodelTwo`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFCases`, `Meta.ListIndAdmisible`, `Meta.NumListPrf`, `Meta.Representability2`, `Meta.SubstfcCodePrf` |
+| `Meta.ReprPrf` | 8 | `Meta.Hilbert`, `Meta.ProofChain`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.CodeNumeralPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFCases`, `Meta.ListIndAdmisible`, `Meta.NumListPrf`, `Meta.ReglasPrfH`, `Meta.Representability2`, `Meta.SubstfcCodePrf` |
 | `Meta.ArithPrf` | 9 | `Full.Induction`, `Meta.ReprPrf`, `Meta.SubstArith` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.ListIndAdmisible`, `Meta.NatArithPrf`, `Meta.Representability2Prf`, `Meta.SubstCodeOpenPrf`, `Meta.SubstfcCodePrf`, `Meta.TcArithPrf` |
-| `Meta.ChainPrf` | 9 | `Meta.HilbertDeduction`, `Meta.ReprPrf` | `Meta.CodeWitnessPrf`, `Meta.DerivCondPrf`, `Meta.EvalLiftcPrf`, `Meta.LiftcCodePrf`, `Meta.ListIndAdmisible`, `Meta.NatArithPrf` |
-| `Meta.NumListPrf` | 9 | `Meta.ReprPrf` | `Meta.BoundedInPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalListPrf`, `Meta.HasWitTcFnPrf`, `Meta.RosserNumerales` |
-| `Meta.NatArithPrf` | 10 | `Meta.ArithPrf`, `Meta.ChainPrf` | `Meta.BoundedInPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.ListIndAdmisible`, `Meta.NatOrderPrf`, `Meta.NumCodeClosedPrf` |
+| `Meta.NumListPrf` | 9 | `Meta.ReprPrf` | `Meta.BoundedInPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalListPrf`, `Meta.HasWitTcFnPrf`, `Meta.ListIndAdmisible`, `Meta.RosserNumerales` |
+| `Meta.ReglasPrfH` | 9 | `Meta.HilbertDeduction`, `Meta.ReprPrf` | `Meta.ChainPrf`, `Meta.ListIndAdmisible`, `Meta.NatArithPrf` |
+| `Meta.NatArithPrf` | 10 | `Meta.ArithPrf`, `Meta.ReglasPrfH` | `Meta.BoundedInPrf`, `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.ListIndAdmisible`, `Meta.NatOrderPrf`, `Meta.NumCodeClosedPrf` |
 | `Meta.SubstCodeOpenPrf` | 10 | `Meta.ArithPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstfcCodePrf` |
 | `Meta.TcArithPrf` | 10 | `Meta.ArithPrf`, `Meta.Representability` | `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Representability2Prf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1CorePrf`, `Meta.SubstfcCodePrf` |
-| `Meta.BoundedInPrf` | 11 | `Meta.NatArithPrf`, `Meta.NumListPrf` | `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.LineWFTrackedPrf`, `Meta.RosserNumEval`, `Meta.RunFnBoundedPrf`, `Meta.SubstfcWitnessPrf` |
 | `Meta.NatOrderPrf` | 11 | `Meta.NatArithPrf` | `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.ListIndAdmisible`, `Meta.NatMulPrf` |
-| `Meta.NumCodeClosedPrf` | 11 | `Meta.NatArithPrf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.RosserNumEval`, `Meta.SubstfcCodePrf`, `Meta.SubstfcWitnessPrf` |
-| `Meta.CodeWitnessPrf` | 12 | `Meta.ArithPrf`, `Meta.BoundedInPrf`, `Meta.ChainPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.ReprPrf` | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf`, `Meta.ListIndAdmisible`, `Meta.Representability2`, `Meta.RosserNumerales` |
 | `Meta.NatMulPrf` | 12 | `Meta.NatOrderPrf` | `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.EvalMulPrf`, `Meta.ListIndAdmisible` |
-| `Meta.RunFnBoundedPrf` | 12 | `Meta.BoundedInPrf` | `Meta.ChainOkBoundedPrf`, `Meta.EvalRunFnPrf` |
 | `Meta.CantorMonoPrf` | 13 | `Meta.NatMulPrf` | `Meta.Div2ParityPrf`, `Meta.DotConsPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.ListIndAdmisible`, `Meta.StrongInductionPrf`, `Meta.SubstfcWitnessPrf` |
-| `Meta.ChainOkBoundedPrf` | 13 | `Meta.RunFnBoundedPrf` | `Meta.D3ChainDotPrf`, `Meta.LineWFConsPrf` |
-| `Meta.Representability2` | 13 | `Meta.CodeWitnessPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.Representability2Prf` |
-| `Meta.DiagonalTwo` | 14 | `Meta.Diagonal`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalNumeral`, `Meta.GodelTwoPrf` |
-| `Meta.LineWFConsPrf` | 14 | `Meta.ChainOkBoundedPrf` | `Meta.EvalCarcNthcPrf` |
 | `Meta.StrongInductionPrf` | 14 | `Meta.CantorMonoPrf` | `Meta.Div2ParityPrf`, `Meta.EvalLiftcPrf`, `Meta.ListIndAdmisible`, `Meta.SubstfcWitnessPrf` |
 | `Meta.Div2ParityPrf` | 15 | `Meta.CantorMonoPrf`, `Meta.NatMulPrf`, `Meta.StrongInductionPrf` | `Meta.CodeNumeralPrf`, `Meta.DotConsPrf`, `Meta.ListIndAdmisible` |
 | `Meta.CodeNumeralPrf` | 16 | `Meta.Div2ParityPrf`, `Meta.ReprPrf` | `Meta.CodeNatInjPrf`, `Meta.DiagonalNumeral`, `Meta.GodelTwoPrf`, `Meta.ModeloCodigo`, `Meta.Representability2Prf`, `Meta.RosserNumerales`, `Meta.Sigma1CorePrf`, `Meta.SolidezPrf` |
-| `Meta.ListIndAdmisible` | 16 | `Meta.ArithPrf`, `Meta.CantorMonoPrf`, `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.Div2ParityPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.NatArithPrf`, `Meta.NatMulPrf`, `Meta.NatOrderPrf`, `Meta.ReprPrf`, `Meta.StrongInductionPrf`, `Minimal.Axioms` · externo: `FOL.Lift0`, `FOL.Theorems.Quantifiers` | — |
+| `Meta.ListIndAdmisible` | 16 | `Meta.ArithPrf`, `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.NatArithPrf`, `Meta.NatMulPrf`, `Meta.NatOrderPrf`, `Meta.NumListPrf`, `Meta.ReglasPrfH`, `Meta.ReprPrf`, `Meta.StrongInductionPrf`, `Minimal.Axioms` · externo: `FOL.Lift0`, `FOL.Theorems.Quantifiers` | `Meta.ChainPrf`, `Meta.SolidezVerificador` |
+| `Meta.ChainPrf` | 17 | `Meta.HilbertDeduction`, `Meta.ListIndAdmisible`, `Meta.ReglasPrfH`, `Meta.ReprPrf` | `Meta.BoundedInPrf`, `Meta.CodeWitnessPrf`, `Meta.DerivCondPrf`, `Meta.EvalLiftcPrf`, `Meta.LiftcCodePrf`, `Meta.NumCodeClosedPrf` |
 | `Meta.CodeNatInjPrf` | 17 | `Meta.CodeNumeralPrf` | `Meta.ModeloCodigo`, `Meta.SolidezVerificador` |
-| `Meta.DiagonalNumeral` | 17 | `Meta.CodeNumeralPrf`, `Meta.DiagonalTwo` | `Meta.GodelTwoPrf`, `Meta.Sentencia` |
-| `Meta.Representability2Prf` | 17 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.Representability2`, `Meta.TcArithPrf` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.Consistencia`, `Meta.DerivCondPrf`, `Meta.GodelTwoPrf`, `Meta.InAxiomsCodePrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum` |
 | `Meta.SolidezPrf` | 17 | `Meta.CodeNumeralPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction` · externo: `FOL.Semantics` | `Meta.Consistencia`, `Meta.SolidezDobleNegacion` |
-| `Meta.DerivCondPrf` | 18 | `Meta.ChainPrf`, `Meta.Representability2Prf` | `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.ExIntroCodePrf`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.Sentencia`, `Meta.Sigma1Prf`, `Meta.SubstfcCodePrf` |
+| `Meta.BoundedInPrf` | 18 | `Meta.ChainPrf`, `Meta.NatArithPrf`, `Meta.NumListPrf` | `Meta.CodeWitnessPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.LineWFTrackedPrf`, `Meta.RosserNumEval`, `Meta.RunFnBoundedPrf`, `Meta.SubstfcWitnessPrf` |
 | `Meta.ModeloCodigo` | 18 | `Meta.CodeNatInjPrf`, `Meta.CodeNumeralPrf` | `Meta.ModeloEstandar`, `Meta.RosserNumerales`, `Meta.SolidezDobleNegacion`, `Meta.SolidezVerificador` |
+| `Meta.NumCodeClosedPrf` | 18 | `Meta.ChainPrf`, `Meta.NatArithPrf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.RosserNumEval`, `Meta.SubstfcCodePrf`, `Meta.SubstfcWitnessPrf` |
+| `Meta.CodeWitnessPrf` | 19 | `Meta.ArithPrf`, `Meta.BoundedInPrf`, `Meta.ChainPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.ReprPrf` | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf`, `Meta.Representability2`, `Meta.RosserNumerales` |
 | `Meta.ModeloEstandar` | 19 | `Meta.ModeloCodigo` · externo: `FOL.Semantics` | `Meta.ModeloCodificacion` |
-| `Meta.RosserNumerales` | 19 | `Meta.CodeNumeralPrf`, `Meta.CodeWitnessPrf`, `Meta.ModeloCodigo`, `Meta.NumListPrf`, `Meta.PurezaComando` | `Meta.RosserNumEval` |
-| `Meta.Sentencia` | 19 | `Meta.DerivCondPrf`, `Meta.DiagonalNumeral` · externo: `FOL.Lift0` | `Meta.PuenteFOL`, `Meta.TarskiPrf` |
-| `Meta.Sigma1Prf` | 19 | `Meta.DerivCondPrf` | `Meta.EvalLiftcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1CorePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.RunFnBoundedPrf` | 19 | `Meta.BoundedInPrf` | `Meta.ChainOkBoundedPrf`, `Meta.EvalRunFnPrf` |
 | `Meta.SolidezDobleNegacion` | 19 | `Meta.ModeloCodigo`, `Meta.SolidezPrf` | `Meta.Consistencia`, `Meta.RigidezEstandar` |
-| `Meta.SolidezVerificador` | 19 | `Meta.CodeNatInjPrf`, `Meta.ModeloCodigo`, `Meta.Representability` | `Meta.RosserPosNum`, `Meta.RosserW1`, `Meta.SolidezVerificadorModelo` |
-| `Meta.HasWitTcFnPrf` | 20 | `Meta.CodeWitnessPrf`, `Meta.NatArithPrf`, `Meta.NumListPrf`, `Meta.Sigma1Prf` | `Meta.RosserNegLinea`, `Meta.SubstfcWitnessPrf`, `Meta.TrackedCorePrf` |
+| `Meta.SolidezVerificador` | 19 | `Meta.CodeNatInjPrf`, `Meta.ListIndAdmisible`, `Meta.ModeloCodigo`, `Meta.Representability` | `Meta.RosserPosNum`, `Meta.RosserW1`, `Meta.SolidezVerificadorModelo` |
+| `Meta.ChainOkBoundedPrf` | 20 | `Meta.RunFnBoundedPrf` | `Meta.D3ChainDotPrf`, `Meta.LineWFConsPrf` |
 | `Meta.ModeloCodificacion` | 20 | `Meta.ModeloEstandar` | `Meta.Consistencia`, `Meta.RigidezEstandar` |
-| `Meta.PuenteFOL` | 20 | `Meta.HilbertDeduction`, `Meta.Sentencia` · externo: `FOL.Canonical0`, `FOL.Derives1`, `FOL.Sentence` | `Meta.ContratoTitulares`, `Meta.TitularesII` |
-| `Meta.RosserPosNum` | 20 | `Meta.PurezaComando`, `Meta.Representability2Prf`, `Meta.SolidezVerificador` | `Meta.RosserNegNum` |
+| `Meta.Representability2` | 20 | `Meta.CodeWitnessPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalTwo`, `Meta.Representability2Prf` |
+| `Meta.RosserNumerales` | 20 | `Meta.CodeNumeralPrf`, `Meta.CodeWitnessPrf`, `Meta.ModeloCodigo`, `Meta.NumListPrf`, `Meta.PurezaComando` | `Meta.RosserNumEval` |
 | `Meta.RosserW1` | 20 | `Meta.PurezaComando`, `Meta.SolidezVerificador` | `Meta.RosserNegNum` |
-| `Meta.Sigma1CorePrf` | 20 | `Meta.CodeNumeralPrf`, `Meta.Sigma1Prf`, `Meta.TcArithPrf` | `Meta.EvalLiftcPrf`, `Meta.ExIntroCodePrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFCases` |
-| `Meta.Consistencia` | 21 | `Meta.ModeloCodificacion`, `Meta.Representability2Prf`, `Meta.SolidezDobleNegacion`, `Meta.SolidezPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.ProvFiel`, `Meta.PurezaTitulares`, `Meta.SolidezVerificadorModelo`, `Meta.TitularesII` |
-| `Meta.ExIntroCodePrf` | 21 | `Meta.DerivCondPrf`, `Meta.Sigma1CorePrf` | `Meta.EvalLtPrf`, `Meta.ForallElimCodePrf`, `Meta.TrackedCorePrf` |
-| `Meta.LineWFCases` | 21 | `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1CorePrf`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf` |
-| `Meta.SubstfcWitnessPrf` | 21 | `Meta.BoundedInPrf`, `Meta.CantorMonoPrf`, `Meta.HasWitTcFnPrf`, `Meta.NumCodeClosedPrf`, `Meta.StrongInductionPrf`, `Meta.SubstArith` | `Meta.D3ChainDotPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LineWFGuardPrf`, `Meta.ListEtaPrf`, `Meta.MpCodePrf`, `Meta.RosserNegLinea`, `Meta.TrackedAtomsPrf` |
-| `Meta.ListEtaPrf` | 22 | `Meta.SubstfcWitnessPrf` | `Meta.PremsOfTagPrf` |
-| `Meta.SolidezVerificadorModelo` | 22 | `Meta.Consistencia`, `Meta.SolidezVerificador` | `Meta.TitularesIII` |
-| `Meta.TrackedCorePrf` | 22 | `Meta.ExIntroCodePrf`, `Meta.HasWitTcFnPrf` | `Meta.EvalLiftcPrf`, `Meta.ForallElimCodePrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1AtomPrf` |
-| `Meta.ForallElimCodePrf` | 23 | `Meta.ExIntroCodePrf`, `Meta.TrackedCorePrf` | `Meta.EvalSubstfcPrf`, `Meta.MpCodePrf` |
-| `Meta.Sigma1AtomPrf` | 23 | `Meta.TcArithPrf`, `Meta.TrackedCorePrf` | `Meta.EvalArithPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
-| `Meta.MpCodePrf` | 24 | `Meta.ForallElimCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
-| `Meta.EvalArithPrf` | 25 | `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Sigma1AtomPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalListPrf`, `Meta.EvalMulPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
-| `Meta.EvalMulPrf` | 26 | `Meta.EvalArithPrf`, `Meta.NatMulPrf` | `Meta.DotConsPrf` |
-| `Meta.DotConsPrf` | 27 | `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.EvalMulPrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalListPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
-| `Meta.EvalListPrf` | 28 | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.NumListPrf` | `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.LineWFTrackedPrf` |
-| `Meta.EvalLtPrf` | 29 | `Meta.EvalListPrf`, `Meta.ExIntroCodePrf` | `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
-| `Meta.EvalRunFnPrf` | 29 | `Meta.EvalListPrf`, `Meta.RunFnBoundedPrf` | `Meta.EvalLiftcPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf` |
-| `Meta.EvalBoundedPrf` | 30 | `Meta.EvalLtPrf` | `Meta.Delta0ReflectPrf`, `Meta.LineWFTrackedPrf`, `Meta.PropCodePrf` |
-| `Meta.EvalNthcPrf` | 30 | `Meta.DotConsPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf` | `Meta.EvalCarcNthcPrf` |
-| `Meta.Delta0ReflectPrf` | 31 | `Meta.EvalBoundedPrf` | `Meta.D3DottedPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf` |
-| `Meta.EvalCarcNthcPrf` | 31 | `Meta.EvalNthcPrf`, `Meta.LineWFConsPrf` | `Meta.D3InDotPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
-| `Meta.PropCodePrf` | 31 | `Meta.EvalBoundedPrf` | `Meta.BdAllIntroPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf` |
-| `Meta.D3DottedPrf` | 32 | `Meta.Delta0ReflectPrf` | `Meta.D3ChainDotPrf`, `Meta.D3InDotPrf` |
-| `Meta.D3InDotPrf` | 33 | `Meta.D3DottedPrf`, `Meta.EvalCarcNthcPrf` | `Meta.BdAllIntroPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.TrackedAtomsPrf` |
-| `Meta.BdAllIntroPrf` | 34 | `Meta.D3InDotPrf`, `Meta.PropCodePrf` | `Meta.D3ChainDotPrf`, `Meta.LineWFTrackedPrf`, `Meta.TrackedAtomsPrf` |
-| `Meta.InAxiomsCodePrf` | 34 | `Meta.D3InDotPrf`, `Meta.EvalCarcNthcPrf`, `Meta.MpCodePrf`, `Meta.Representability2Prf`, `Meta.Sigma1CorePrf` | `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LineWFThyPrf`, `Meta.TrackedAtomsPrf` |
-| `Meta.LineWFTrackedPrf` | 35 | `Meta.BdAllIntroPrf`, `Meta.BoundedInPrf`, `Meta.D3InDotPrf`, `Meta.EvalBoundedPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalListPrf`, `Meta.MpCodePrf`, `Meta.Sigma1AtomPrf` | `Meta.CodeCtorKit`, `Meta.LiftcCodePrf`, `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.LineWFThyPrf`, `Meta.RosserNumEval`, `Meta.TrackedAtomsPrf` |
-| `Meta.LineWFMpPrf` | 36 | `Meta.LineWFTrackedPrf` | `Meta.LineWFAssemblePrf` |
-| `Meta.LineWFSchemaPrf` | 36 | `Meta.LineWFTrackedPrf` | `Meta.CodeCtorKit`, `Meta.LineWFGuardPrf`, `Meta.PremsOfTagPrf` |
-| `Meta.LineWFThyPrf` | 36 | `Meta.InAxiomsCodePrf`, `Meta.LineWFTrackedPrf` | `Meta.LineWFAssemblePrf` |
-| `Meta.RosserNumEval` | 36 | `Meta.BoundedInPrf`, `Meta.LineWFTrackedPrf`, `Meta.NumCodeClosedPrf`, `Meta.RosserNumerales` | `Meta.RigidezEstandar`, `Meta.RosserGuardNeg` |
-| `Meta.CodeCtorKit` | 37 | `Meta.LineWFSchemaPrf`, `Meta.LineWFTrackedPrf` | `Meta.CodeTreeReflect`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFEfqPrf`, `Meta.SubstfcCodePrf` |
-| `Meta.LineWFGuardPrf` | 37 | `Meta.CodeWitnessPrf`, `Meta.Delta0ReflectPrf`, `Meta.LineWFSchemaPrf`, `Meta.SubstfcWitnessPrf` | `Meta.HasWitTrackedPrf` |
-| `Meta.RosserGuardNeg` | 37 | `Meta.RosserNumEval` | `Meta.RosserNegLinea` |
-| `Meta.CodeTreeReflect` | 38 | `Meta.CodeCtorKit` | `Meta.LineWFPropPrf`, `Meta.SubstTreeReflect`, `Meta.TrackedAtomsPrf` |
-| `Meta.EvalPredPrf` | 38 | `Meta.BoundedInPrf`, `Meta.CodeCtorKit`, `Meta.DerivCondPrf`, `Meta.EvalArithPrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Sigma1AtomPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalSubsttcPrf` |
-| `Meta.LiftcCodePrf` | 38 | `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.CodeCtorKit`, `Meta.CodeWitnessPrf`, `Meta.Delta0ReflectPrf`, `Meta.DerivCondPrf`, `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LineWFTrackedPrf`, `Meta.MpCodePrf`, `Meta.NatArithPrf`, `Meta.NumCodeClosedPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1Prf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf`, `Meta.TrackedCorePrf` | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTrackedPrf`, `Meta.SubstfcCodePrf`, `Meta.TrackedAtomsPrf` |
-| `Meta.LineWFEfqPrf` | 38 | `Meta.CodeCtorKit` | `Meta.LineWFAssemblePrf` |
-| `Meta.RosserNegLinea` | 38 | `Meta.HasWitTcFnPrf`, `Meta.Representability2Prf`, `Meta.RosserGuardNeg`, `Meta.SubstfcWitnessPrf` | `Meta.RosserNegNum` |
-| `Meta.EvalLiftcPrf` | 39 | `Meta.ArithPrf`, `Meta.BoundedInPrf`, `Meta.CantorMonoPrf`, `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.DerivCondPrf`, `Meta.EvalRunFnPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LiftcCodePrf`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.NumListPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1CorePrf`, `Meta.Sigma1Prf`, `Meta.StrongInductionPrf`, `Meta.TrackedCorePrf` | `Meta.EvalLiftfcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf` |
-| `Meta.LineWFPropPrf` | 39 | `Meta.CodeTreeReflect` | `Meta.LineWFAssemblePrf` |
-| `Meta.SubstfcCodePrf` | 39 | `Meta.ArithPrf`, `Meta.CodeCtorKit`, `Meta.DerivCondPrf`, `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLtPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LiftcCodePrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1Prf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf` | `Meta.EvalSubstfcPrf` |
-| `Meta.TrackedAtomsPrf` | 39 | `Meta.BdAllIntroPrf`, `Meta.CodeTreeReflect`, `Meta.D3InDotPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcWitnessPrf` | `Meta.D3ChainDotPrf`, `Meta.HasWitTrackedPrf` |
-| `Meta.D3ChainDotPrf` | 40 | `Meta.BdAllIntroPrf`, `Meta.ChainOkBoundedPrf`, `Meta.D3DottedPrf`, `Meta.SubstfcWitnessPrf`, `Meta.TrackedAtomsPrf` | `Meta.D3BodyPrf` |
-| `Meta.EvalSubsttcPrf` | 40 | `Meta.CantorMonoPrf`, `Meta.CodeWitnessPrf`, `Meta.D3InDotPrf`, `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.PropCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.EvalSubstfcPrf` |
-| `Meta.HasWitTrackedPrf` | 40 | `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf`, `Meta.TrackedAtomsPrf` | `Meta.HasWitFTrackedPrf` |
-| `Meta.LineWFAssemblePrf` | 40 | `Meta.LineWFEfqPrf`, `Meta.LineWFMpPrf`, `Meta.LineWFPropPrf`, `Meta.LineWFThyPrf` | `Meta.PremsOfTagPrf`, `Meta.SubstTreeReflect` |
-| `Meta.EvalSubstfcPrf` | 41 | `Meta.CantorMonoPrf`, `Meta.CodeWitnessPrf`, `Meta.D3InDotPrf`, `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalSubsttcPrf`, `Meta.ForallElimCodePrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.PropCodePrf`, `Meta.SubstfcCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.EvalLiftfcPrf`, `Meta.SubstTreeReflect` |
-| `Meta.HasWitFTrackedPrf` | 41 | `Meta.HasWitTrackedPrf` | `Meta.SubstTreeReflect` |
-| `Meta.PremsOfTagPrf` | 41 | `Meta.LineWFAssemblePrf`, `Meta.LineWFSchemaPrf`, `Meta.ListEtaPrf` | `Meta.PremsOfDotPrf`, `Meta.RosserNegNum` |
-| `Meta.EvalLiftfcPrf` | 42 | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf` | `Meta.LiftfcWitnessPrf`, `Meta.SubstTreeReflect` |
-| `Meta.RosserNegNum` | 42 | `Meta.PremsOfTagPrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum`, `Meta.RosserW1` | `Meta.Controles`, `Meta.ProvFiel`, `Meta.Rosser` |
-| `Meta.LiftfcWitnessPrf` | 43 | `Meta.EvalLiftfcPrf` | `Meta.SubstTreeReflect` |
-| `Meta.SubstTreeReflect` | 44 | `Meta.CodeTreeReflect`, `Meta.EvalLiftfcPrf`, `Meta.EvalSubstfcPrf`, `Meta.HasWitFTrackedPrf`, `Meta.LiftfcWitnessPrf`, `Meta.LineWFAssemblePrf` | `Meta.D3BodyPrf`, `Meta.PremsOfDotPrf` |
-| `Meta.PremsOfDotPrf` | 45 | `Meta.PremsOfTagPrf`, `Meta.SubstTreeReflect` | `Meta.D3BodyPrf` |
-| `Meta.D3BodyPrf` | 46 | `Meta.D3ChainDotPrf`, `Meta.PremsOfDotPrf`, `Meta.SubstTreeReflect` | `Meta.PremsBdAllPrf` |
-| `Meta.PremsBdAllPrf` | 47 | `Meta.D3BodyPrf` | `Meta.GodelTwo`, `Meta.GodelTwoPrf` |
-| `Meta.GodelTwo` | 48 | `Meta.PremsBdAllPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf`, `Meta.RigidezEstandar` |
-| `Meta.GodelTwoPrf` | 49 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.DerivCondPrf`, `Meta.DiagonalNumeral`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.LineWFCases`, `Meta.PremsBdAllPrf`, `Meta.ReprPrf`, `Meta.Representability2Prf`, `Meta.TcArithPrf` | `Meta.GodelCorolarios`, `Meta.TarskiPrf` |
-| `Meta.RigidezEstandar` | 49 | `Meta.GodelTwo`, `Meta.ModeloCodificacion`, `Meta.RosserNumEval`, `Meta.SolidezDobleNegacion` | `Meta.ContratoTitulares`, `Meta.ProvFiel` |
-| `Meta.GodelCorolarios` | 50 | `Meta.GodelTwoPrf`, `Meta.PurezaComando` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares`, `Meta.TitularesIII` |
-| `Meta.ProvFiel` | 50 | `Meta.Consistencia`, `Meta.RigidezEstandar`, `Meta.RosserNegNum` | `Meta.ContratoTitulares`, `Meta.TitularesIII` |
-| `Meta.TarskiPrf` | 50 | `Meta.GodelTwoPrf`, `Meta.Sentencia` · externo: `FOL.Lift0` | `Meta.ContratoTitulares`, `Meta.Lob`, `Meta.PurezaTitulares`, `Meta.Rosser`, `Meta.TitularesII`, `Meta.TitularesIII` |
-| `Meta.Lob` | 51 | `Meta.PurezaComando`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares` |
-| `Meta.Rosser` | 51 | `Meta.RosserNegNum`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares`, `Meta.TitularesII` |
-| `Meta.TitularesII` | 52 | `Meta.Consistencia`, `Meta.PuenteFOL`, `Meta.Rosser`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.TitularesIII` |
-| `Meta.TitularesIII` | 53 | `Meta.GodelCorolarios`, `Meta.ProvFiel`, `Meta.SolidezVerificadorModelo`, `Meta.TarskiPrf`, `Meta.TitularesII` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.SegundoModelo` |
-| `Meta.ContratoTitulares` | 54 | `Meta.Consistencia`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.ProvFiel`, `Meta.PuenteFOL`, `Meta.PurezaComando`, `Meta.RigidezEstandar`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
-| `Meta.Controles` | 54 | `Meta.Consistencia`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.RosserNegNum`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
-| `Meta.SegundoModelo` | 54 | `Meta.TitularesIII` | — |
-| `Meta.PurezaTitulares` | 55 | `Meta.Consistencia`, `Meta.ContratoTabla`, `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | — |
+| `Meta.DiagonalTwo` | 21 | `Meta.Diagonal`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DiagonalNumeral`, `Meta.GodelTwoPrf` |
+| `Meta.LineWFConsPrf` | 21 | `Meta.ChainOkBoundedPrf` | `Meta.EvalCarcNthcPrf` |
+| `Meta.Representability2Prf` | 21 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.Representability2`, `Meta.TcArithPrf` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.Consistencia`, `Meta.DerivCondPrf`, `Meta.GodelTwoPrf`, `Meta.InAxiomsCodePrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum` |
+| `Meta.Consistencia` | 22 | `Meta.ModeloCodificacion`, `Meta.Representability2Prf`, `Meta.SolidezDobleNegacion`, `Meta.SolidezPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.ProvFiel`, `Meta.PurezaTitulares`, `Meta.SolidezVerificadorModelo`, `Meta.TitularesII` |
+| `Meta.DerivCondPrf` | 22 | `Meta.ChainPrf`, `Meta.Representability2Prf` | `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.ExIntroCodePrf`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.Sentencia`, `Meta.Sigma1Prf`, `Meta.SubstfcCodePrf` |
+| `Meta.DiagonalNumeral` | 22 | `Meta.CodeNumeralPrf`, `Meta.DiagonalTwo` | `Meta.GodelTwoPrf`, `Meta.Sentencia` |
+| `Meta.RosserPosNum` | 22 | `Meta.PurezaComando`, `Meta.Representability2Prf`, `Meta.SolidezVerificador` | `Meta.RosserNegNum` |
+| `Meta.Sentencia` | 23 | `Meta.DerivCondPrf`, `Meta.DiagonalNumeral` · externo: `FOL.Lift0` | `Meta.PuenteFOL`, `Meta.TarskiPrf` |
+| `Meta.Sigma1Prf` | 23 | `Meta.DerivCondPrf` | `Meta.EvalLiftcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1CorePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.SolidezVerificadorModelo` | 23 | `Meta.Consistencia`, `Meta.SolidezVerificador` | `Meta.TitularesIII` |
+| `Meta.HasWitTcFnPrf` | 24 | `Meta.CodeWitnessPrf`, `Meta.NatArithPrf`, `Meta.NumListPrf`, `Meta.Sigma1Prf` | `Meta.RosserNegLinea`, `Meta.SubstfcWitnessPrf`, `Meta.TrackedCorePrf` |
+| `Meta.PuenteFOL` | 24 | `Meta.HilbertDeduction`, `Meta.Sentencia` · externo: `FOL.Canonical0`, `FOL.Derives1`, `FOL.Sentence` | `Meta.ContratoTitulares`, `Meta.TitularesII` |
+| `Meta.Sigma1CorePrf` | 24 | `Meta.CodeNumeralPrf`, `Meta.Sigma1Prf`, `Meta.TcArithPrf` | `Meta.EvalLiftcPrf`, `Meta.ExIntroCodePrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFCases` |
+| `Meta.ExIntroCodePrf` | 25 | `Meta.DerivCondPrf`, `Meta.Sigma1CorePrf` | `Meta.EvalLtPrf`, `Meta.ForallElimCodePrf`, `Meta.TrackedCorePrf` |
+| `Meta.LineWFCases` | 25 | `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1CorePrf`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf` |
+| `Meta.SubstfcWitnessPrf` | 25 | `Meta.BoundedInPrf`, `Meta.CantorMonoPrf`, `Meta.HasWitTcFnPrf`, `Meta.NumCodeClosedPrf`, `Meta.StrongInductionPrf`, `Meta.SubstArith` | `Meta.D3ChainDotPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LineWFGuardPrf`, `Meta.ListEtaPrf`, `Meta.MpCodePrf`, `Meta.RosserNegLinea`, `Meta.TrackedAtomsPrf` |
+| `Meta.ListEtaPrf` | 26 | `Meta.SubstfcWitnessPrf` | `Meta.PremsOfTagPrf` |
+| `Meta.TrackedCorePrf` | 26 | `Meta.ExIntroCodePrf`, `Meta.HasWitTcFnPrf` | `Meta.EvalLiftcPrf`, `Meta.ForallElimCodePrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1AtomPrf` |
+| `Meta.ForallElimCodePrf` | 27 | `Meta.ExIntroCodePrf`, `Meta.TrackedCorePrf` | `Meta.EvalSubstfcPrf`, `Meta.MpCodePrf` |
+| `Meta.Sigma1AtomPrf` | 27 | `Meta.TcArithPrf`, `Meta.TrackedCorePrf` | `Meta.EvalArithPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.MpCodePrf` | 28 | `Meta.ForallElimCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalPredPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalArithPrf` | 29 | `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Sigma1AtomPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalListPrf`, `Meta.EvalMulPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalMulPrf` | 30 | `Meta.EvalArithPrf`, `Meta.NatMulPrf` | `Meta.DotConsPrf` |
+| `Meta.DotConsPrf` | 31 | `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.EvalMulPrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalListPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalListPrf` | 32 | `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.NumListPrf` | `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.LineWFTrackedPrf` |
+| `Meta.EvalLtPrf` | 33 | `Meta.EvalListPrf`, `Meta.ExIntroCodePrf` | `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf` |
+| `Meta.EvalRunFnPrf` | 33 | `Meta.EvalListPrf`, `Meta.RunFnBoundedPrf` | `Meta.EvalLiftcPrf`, `Meta.EvalNthcPrf`, `Meta.LiftcCodePrf` |
+| `Meta.EvalBoundedPrf` | 34 | `Meta.EvalLtPrf` | `Meta.Delta0ReflectPrf`, `Meta.LineWFTrackedPrf`, `Meta.PropCodePrf` |
+| `Meta.EvalNthcPrf` | 34 | `Meta.DotConsPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf` | `Meta.EvalCarcNthcPrf` |
+| `Meta.Delta0ReflectPrf` | 35 | `Meta.EvalBoundedPrf` | `Meta.D3DottedPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf` |
+| `Meta.EvalCarcNthcPrf` | 35 | `Meta.EvalNthcPrf`, `Meta.LineWFConsPrf` | `Meta.D3InDotPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.PropCodePrf` | 35 | `Meta.EvalBoundedPrf` | `Meta.BdAllIntroPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf` |
+| `Meta.D3DottedPrf` | 36 | `Meta.Delta0ReflectPrf` | `Meta.D3ChainDotPrf`, `Meta.D3InDotPrf` |
+| `Meta.D3InDotPrf` | 37 | `Meta.D3DottedPrf`, `Meta.EvalCarcNthcPrf` | `Meta.BdAllIntroPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.BdAllIntroPrf` | 38 | `Meta.D3InDotPrf`, `Meta.PropCodePrf` | `Meta.D3ChainDotPrf`, `Meta.LineWFTrackedPrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.InAxiomsCodePrf` | 38 | `Meta.D3InDotPrf`, `Meta.EvalCarcNthcPrf`, `Meta.MpCodePrf`, `Meta.Representability2Prf`, `Meta.Sigma1CorePrf` | `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LineWFThyPrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.LineWFTrackedPrf` | 39 | `Meta.BdAllIntroPrf`, `Meta.BoundedInPrf`, `Meta.D3InDotPrf`, `Meta.EvalBoundedPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalListPrf`, `Meta.MpCodePrf`, `Meta.Sigma1AtomPrf` | `Meta.CodeCtorKit`, `Meta.LiftcCodePrf`, `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.LineWFThyPrf`, `Meta.RosserNumEval`, `Meta.TrackedAtomsPrf` |
+| `Meta.LineWFMpPrf` | 40 | `Meta.LineWFTrackedPrf` | `Meta.LineWFAssemblePrf` |
+| `Meta.LineWFSchemaPrf` | 40 | `Meta.LineWFTrackedPrf` | `Meta.CodeCtorKit`, `Meta.LineWFGuardPrf`, `Meta.PremsOfTagPrf` |
+| `Meta.LineWFThyPrf` | 40 | `Meta.InAxiomsCodePrf`, `Meta.LineWFTrackedPrf` | `Meta.LineWFAssemblePrf` |
+| `Meta.RosserNumEval` | 40 | `Meta.BoundedInPrf`, `Meta.LineWFTrackedPrf`, `Meta.NumCodeClosedPrf`, `Meta.RosserNumerales` | `Meta.RigidezEstandar`, `Meta.RosserGuardNeg` |
+| `Meta.CodeCtorKit` | 41 | `Meta.LineWFSchemaPrf`, `Meta.LineWFTrackedPrf` | `Meta.CodeTreeReflect`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFEfqPrf`, `Meta.SubstfcCodePrf` |
+| `Meta.LineWFGuardPrf` | 41 | `Meta.CodeWitnessPrf`, `Meta.Delta0ReflectPrf`, `Meta.LineWFSchemaPrf`, `Meta.SubstfcWitnessPrf` | `Meta.HasWitTrackedPrf` |
+| `Meta.RigidezEstandar` | 41 | `Meta.GodelTwo`, `Meta.ModeloCodificacion`, `Meta.RosserNumEval`, `Meta.SolidezDobleNegacion` | `Meta.ContratoTitulares`, `Meta.ProvFiel` |
+| `Meta.RosserGuardNeg` | 41 | `Meta.RosserNumEval` | `Meta.RosserNegLinea` |
+| `Meta.CodeTreeReflect` | 42 | `Meta.CodeCtorKit` | `Meta.LineWFPropPrf`, `Meta.SubstTreeReflect`, `Meta.TrackedAtomsPrf` |
+| `Meta.EvalPredPrf` | 42 | `Meta.BoundedInPrf`, `Meta.CodeCtorKit`, `Meta.DerivCondPrf`, `Meta.EvalArithPrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Sigma1AtomPrf`, `Meta.SubstCodeOpenPrf` | `Meta.EvalSubsttcPrf` |
+| `Meta.LiftcCodePrf` | 42 | `Meta.ArithPrf`, `Meta.ChainPrf`, `Meta.CodeCtorKit`, `Meta.CodeWitnessPrf`, `Meta.Delta0ReflectPrf`, `Meta.DerivCondPrf`, `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LineWFTrackedPrf`, `Meta.MpCodePrf`, `Meta.NatArithPrf`, `Meta.NumCodeClosedPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1Prf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf`, `Meta.TrackedCorePrf` | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.HasWitTrackedPrf`, `Meta.SubstfcCodePrf`, `Meta.TrackedAtomsPrf` |
+| `Meta.LineWFEfqPrf` | 42 | `Meta.CodeCtorKit` | `Meta.LineWFAssemblePrf` |
+| `Meta.RosserNegLinea` | 42 | `Meta.HasWitTcFnPrf`, `Meta.Representability2Prf`, `Meta.RosserGuardNeg`, `Meta.SubstfcWitnessPrf` | `Meta.RosserNegNum` |
+| `Meta.EvalLiftcPrf` | 43 | `Meta.ArithPrf`, `Meta.BoundedInPrf`, `Meta.CantorMonoPrf`, `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.DerivCondPrf`, `Meta.EvalRunFnPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LiftcCodePrf`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.NumListPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1CorePrf`, `Meta.Sigma1Prf`, `Meta.StrongInductionPrf`, `Meta.TrackedCorePrf` | `Meta.EvalLiftfcPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf` |
+| `Meta.LineWFPropPrf` | 43 | `Meta.CodeTreeReflect` | `Meta.LineWFAssemblePrf` |
+| `Meta.SubstfcCodePrf` | 43 | `Meta.ArithPrf`, `Meta.CodeCtorKit`, `Meta.DerivCondPrf`, `Meta.DotConsPrf`, `Meta.EvalArithPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLtPrf`, `Meta.Godel`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.LiftcCodePrf`, `Meta.MpCodePrf`, `Meta.NumCodeClosedPrf`, `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1AtomPrf`, `Meta.Sigma1Prf`, `Meta.SubstCodeOpenPrf`, `Meta.TcArithPrf` | `Meta.EvalSubstfcPrf` |
+| `Meta.TrackedAtomsPrf` | 43 | `Meta.BdAllIntroPrf`, `Meta.CodeTreeReflect`, `Meta.D3InDotPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcWitnessPrf` | `Meta.D3ChainDotPrf`, `Meta.HasWitTrackedPrf` |
+| `Meta.D3ChainDotPrf` | 44 | `Meta.BdAllIntroPrf`, `Meta.ChainOkBoundedPrf`, `Meta.D3DottedPrf`, `Meta.SubstfcWitnessPrf`, `Meta.TrackedAtomsPrf` | `Meta.D3BodyPrf` |
+| `Meta.EvalSubsttcPrf` | 44 | `Meta.CantorMonoPrf`, `Meta.CodeWitnessPrf`, `Meta.D3InDotPrf`, `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.PropCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.EvalSubstfcPrf` |
+| `Meta.HasWitTrackedPrf` | 44 | `Meta.LiftcCodePrf`, `Meta.LineWFGuardPrf`, `Meta.TrackedAtomsPrf` | `Meta.HasWitFTrackedPrf` |
+| `Meta.LineWFAssemblePrf` | 44 | `Meta.LineWFEfqPrf`, `Meta.LineWFMpPrf`, `Meta.LineWFPropPrf`, `Meta.LineWFThyPrf` | `Meta.PremsOfTagPrf`, `Meta.SubstTreeReflect` |
+| `Meta.EvalSubstfcPrf` | 45 | `Meta.CantorMonoPrf`, `Meta.CodeWitnessPrf`, `Meta.D3InDotPrf`, `Meta.Delta0ReflectPrf`, `Meta.EvalCarcNthcPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalSubsttcPrf`, `Meta.ForallElimCodePrf`, `Meta.InAxiomsCodePrf`, `Meta.LiftcCodePrf`, `Meta.PropCodePrf`, `Meta.SubstfcCodePrf`, `Meta.SubstfcWitnessPrf` | `Meta.EvalLiftfcPrf`, `Meta.SubstTreeReflect` |
+| `Meta.HasWitFTrackedPrf` | 45 | `Meta.HasWitTrackedPrf` | `Meta.SubstTreeReflect` |
+| `Meta.PremsOfTagPrf` | 45 | `Meta.LineWFAssemblePrf`, `Meta.LineWFSchemaPrf`, `Meta.ListEtaPrf` | `Meta.PremsOfDotPrf`, `Meta.RosserNegNum` |
+| `Meta.EvalLiftfcPrf` | 46 | `Meta.EvalLiftcPrf`, `Meta.EvalSubstfcPrf` | `Meta.LiftfcWitnessPrf`, `Meta.SubstTreeReflect` |
+| `Meta.RosserNegNum` | 46 | `Meta.PremsOfTagPrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum`, `Meta.RosserW1` | `Meta.Controles`, `Meta.ProvFiel`, `Meta.Rosser` |
+| `Meta.LiftfcWitnessPrf` | 47 | `Meta.EvalLiftfcPrf` | `Meta.SubstTreeReflect` |
+| `Meta.ProvFiel` | 47 | `Meta.Consistencia`, `Meta.RigidezEstandar`, `Meta.RosserNegNum` | `Meta.ContratoTitulares`, `Meta.TitularesIII` |
+| `Meta.SubstTreeReflect` | 48 | `Meta.CodeTreeReflect`, `Meta.EvalLiftfcPrf`, `Meta.EvalSubstfcPrf`, `Meta.HasWitFTrackedPrf`, `Meta.LiftfcWitnessPrf`, `Meta.LineWFAssemblePrf` | `Meta.D3BodyPrf`, `Meta.PremsOfDotPrf` |
+| `Meta.PremsOfDotPrf` | 49 | `Meta.PremsOfTagPrf`, `Meta.SubstTreeReflect` | `Meta.D3BodyPrf` |
+| `Meta.D3BodyPrf` | 50 | `Meta.D3ChainDotPrf`, `Meta.PremsOfDotPrf`, `Meta.SubstTreeReflect` | `Meta.PremsBdAllPrf` |
+| `Meta.PremsBdAllPrf` | 51 | `Meta.D3BodyPrf` | `Meta.GodelTwoPrf` |
+| `Meta.GodelTwoPrf` | 52 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.DerivCondPrf`, `Meta.DiagonalNumeral`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.LineWFCases`, `Meta.PremsBdAllPrf`, `Meta.ReprPrf`, `Meta.Representability2Prf`, `Meta.TcArithPrf` | `Meta.GodelCorolarios`, `Meta.TarskiPrf` |
+| `Meta.GodelCorolarios` | 53 | `Meta.GodelTwoPrf`, `Meta.PurezaComando` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares`, `Meta.TitularesIII` |
+| `Meta.TarskiPrf` | 53 | `Meta.GodelTwoPrf`, `Meta.Sentencia` · externo: `FOL.Lift0` | `Meta.ContratoTitulares`, `Meta.Lob`, `Meta.PurezaTitulares`, `Meta.Rosser`, `Meta.TitularesII`, `Meta.TitularesIII` |
+| `Meta.Lob` | 54 | `Meta.PurezaComando`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares` |
+| `Meta.Rosser` | 54 | `Meta.RosserNegNum`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares`, `Meta.TitularesII` |
+| `Meta.TitularesII` | 55 | `Meta.Consistencia`, `Meta.PuenteFOL`, `Meta.Rosser`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.TitularesIII` |
+| `Meta.TitularesIII` | 56 | `Meta.GodelCorolarios`, `Meta.ProvFiel`, `Meta.SolidezVerificadorModelo`, `Meta.TarskiPrf`, `Meta.TitularesII` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.SegundoModelo` |
+| `Meta.ContratoTitulares` | 57 | `Meta.Consistencia`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.ProvFiel`, `Meta.PuenteFOL`, `Meta.PurezaComando`, `Meta.RigidezEstandar`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
+| `Meta.Controles` | 57 | `Meta.Consistencia`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.RosserNegNum`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
+| `Meta.SegundoModelo` | 57 | `Meta.TitularesIII` | — |
+| `Meta.PurezaTitulares` | 58 | `Meta.Consistencia`, `Meta.ContratoTabla`, `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | — |
 
 ## Barriles
 
 * `ROBINSON_PlusPlus.lean` importa 6: `Minimal.Axioms`, `Meta`, `Full.Induction`; externos: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers`.
-* `ROBINSON_PlusPlus/Meta.lean` importa 124: `Meta.Godel`, `Meta.Provability`, `Meta.HasWitTcFnPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.SubstArith`, `Meta.CheckArith`, `Meta.Representability`, `Meta.Diagonal`, `Meta.ProofChain`, `Meta.Representability2`, `Meta.ReprPrf`, `Meta.ArithPrf`, `Meta.Representability2Prf`, `Meta.ChainPrf`, `Meta.DerivCondPrf`, `Meta.Sigma1Prf`, `Meta.TcArithPrf`, `Meta.NumListPrf`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.NatMulPrf`, `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.CodeNumeralPrf`, `Meta.DiagonalNumeral`, `Meta.Sigma1CorePrf`, `Meta.EvalArithPrf`, `Meta.EvalMulPrf`, `Meta.ExIntroCodePrf`, `Meta.ForallElimCodePrf`, `Meta.LineWFCases`, `Meta.MpCodePrf`, `Meta.Sigma1AtomPrf`, `Meta.TrackedCorePrf`, `Meta.StrongInductionPrf`, `Meta.BoundedInPrf`, `Meta.RunFnBoundedPrf`, `Meta.ChainOkBoundedPrf`, `Meta.SubstCodeOpenPrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstfcWitnessPrf`, `Meta.ListEtaPrf`, `Meta.PremsOfTagPrf`, `Meta.PremsOfDotPrf`, `Meta.DotConsPrf`, `Meta.EvalListPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`, `Meta.Delta0ReflectPrf`, `Meta.D3DottedPrf`, `Meta.PropCodePrf`, `Meta.EvalCarcNthcPrf`, `Meta.D3InDotPrf`, `Meta.BdAllIntroPrf`, `Meta.LineWFTrackedPrf`, `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.CodeCtorKit`, `Meta.EvalPredPrf`, `Meta.CodeWitnessPrf`, `Meta.CodeNatInjPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf`, `Meta.EvalLiftcPrf`, `Meta.LineWFEfqPrf`, `Meta.CodeTreeReflect`, `Meta.LineWFPropPrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFThyPrf`, `Meta.LineWFAssemblePrf`, `Meta.LineWFConsPrf`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.EvalSubsttcPrf`, `Meta.LineWFGuardPrf`, `Meta.EvalSubstfcPrf`, `Meta.D3ChainDotPrf`, `Meta.TrackedAtomsPrf`, `Meta.HasWitTrackedPrf`, `Meta.HasWitFTrackedPrf`, `Meta.SubstTreeReflect`, `Meta.EvalLiftfcPrf`, `Meta.LiftfcWitnessPrf`, `Meta.D3BodyPrf`, `Meta.PremsBdAllPrf`, `Meta.GodelTwoPrf`, `Meta.ModeloCodigo`, `Meta.ModeloEstandar`, `Meta.ModeloCodificacion`, `Meta.SolidezPrf`, `Meta.SolidezDobleNegacion`, `Meta.Consistencia`, `Meta.TarskiPrf`, `Meta.SolidezVerificador`, `Meta.PurezaComando`, `Meta.RosserW1`, `Meta.RosserPosNum`, `Meta.RosserNumerales`, `Meta.RosserNumEval`, `Meta.RosserGuardNeg`, `Meta.RosserNegLinea`, `Meta.RosserNegNum`, `Meta.Rosser`, `Meta.Lob`, `Meta.GodelCorolarios`, `Meta.RigidezEstandar`, `Meta.ProvFiel`, `Meta.SegundoModelo`, `Meta.PuenteFOL`, `Meta.Sentencia`, `Meta.SolidezVerificadorModelo`, `Meta.TitularesII`, `Meta.TitularesIII`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.ListIndAdmisible`, `Full.Induction`; externos: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers`.
+* `ROBINSON_PlusPlus/Meta.lean` importa 125: `Meta.Godel`, `Meta.Provability`, `Meta.HasWitTcFnPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.HilbertSeq`, `Meta.SubstArith`, `Meta.CheckArith`, `Meta.Representability`, `Meta.Diagonal`, `Meta.ProofChain`, `Meta.Representability2`, `Meta.ReprPrf`, `Meta.ArithPrf`, `Meta.Representability2Prf`, `Meta.ChainPrf`, `Meta.DerivCondPrf`, `Meta.Sigma1Prf`, `Meta.TcArithPrf`, `Meta.NumListPrf`, `Meta.NatArithPrf`, `Meta.NatOrderPrf`, `Meta.NatMulPrf`, `Meta.CantorMonoPrf`, `Meta.Div2ParityPrf`, `Meta.CodeNumeralPrf`, `Meta.DiagonalNumeral`, `Meta.Sigma1CorePrf`, `Meta.EvalArithPrf`, `Meta.EvalMulPrf`, `Meta.ExIntroCodePrf`, `Meta.ForallElimCodePrf`, `Meta.LineWFCases`, `Meta.MpCodePrf`, `Meta.Sigma1AtomPrf`, `Meta.TrackedCorePrf`, `Meta.StrongInductionPrf`, `Meta.BoundedInPrf`, `Meta.RunFnBoundedPrf`, `Meta.ChainOkBoundedPrf`, `Meta.SubstCodeOpenPrf`, `Meta.NumCodeClosedPrf`, `Meta.SubstfcWitnessPrf`, `Meta.ListEtaPrf`, `Meta.PremsOfTagPrf`, `Meta.PremsOfDotPrf`, `Meta.DotConsPrf`, `Meta.EvalListPrf`, `Meta.EvalLtPrf`, `Meta.EvalRunFnPrf`, `Meta.EvalBoundedPrf`, `Meta.EvalNthcPrf`, `Meta.Delta0ReflectPrf`, `Meta.D3DottedPrf`, `Meta.PropCodePrf`, `Meta.EvalCarcNthcPrf`, `Meta.D3InDotPrf`, `Meta.BdAllIntroPrf`, `Meta.LineWFTrackedPrf`, `Meta.LineWFMpPrf`, `Meta.LineWFSchemaPrf`, `Meta.CodeCtorKit`, `Meta.EvalPredPrf`, `Meta.CodeWitnessPrf`, `Meta.CodeNatInjPrf`, `Meta.LiftcCodePrf`, `Meta.SubstfcCodePrf`, `Meta.EvalLiftcPrf`, `Meta.LineWFEfqPrf`, `Meta.CodeTreeReflect`, `Meta.LineWFPropPrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFThyPrf`, `Meta.LineWFAssemblePrf`, `Meta.LineWFConsPrf`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.EvalSubsttcPrf`, `Meta.LineWFGuardPrf`, `Meta.EvalSubstfcPrf`, `Meta.D3ChainDotPrf`, `Meta.TrackedAtomsPrf`, `Meta.HasWitTrackedPrf`, `Meta.HasWitFTrackedPrf`, `Meta.SubstTreeReflect`, `Meta.EvalLiftfcPrf`, `Meta.LiftfcWitnessPrf`, `Meta.D3BodyPrf`, `Meta.PremsBdAllPrf`, `Meta.GodelTwoPrf`, `Meta.ModeloCodigo`, `Meta.ModeloEstandar`, `Meta.ModeloCodificacion`, `Meta.SolidezPrf`, `Meta.SolidezDobleNegacion`, `Meta.Consistencia`, `Meta.TarskiPrf`, `Meta.SolidezVerificador`, `Meta.PurezaComando`, `Meta.RosserW1`, `Meta.RosserPosNum`, `Meta.RosserNumerales`, `Meta.RosserNumEval`, `Meta.RosserGuardNeg`, `Meta.RosserNegLinea`, `Meta.RosserNegNum`, `Meta.Rosser`, `Meta.Lob`, `Meta.GodelCorolarios`, `Meta.RigidezEstandar`, `Meta.ProvFiel`, `Meta.SegundoModelo`, `Meta.PuenteFOL`, `Meta.Sentencia`, `Meta.SolidezVerificadorModelo`, `Meta.TitularesII`, `Meta.TitularesIII`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.ListIndAdmisible`, `Meta.ReglasPrfH`, `Full.Induction`; externos: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers`.
 

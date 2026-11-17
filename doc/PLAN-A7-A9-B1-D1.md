@@ -1,6 +1,6 @@
 # El plan de A7, A9, B1 y D1
 
-**Last updated:** 2026-11-17 — [ADR‑269](../DECISIONS.md): B1, el paso 4 (§4), y la numeración de los pasos de ADR‑268, corregida. Antes, el mismo día — [ADR‑268](../DECISIONS.md): B1, los pasos 2 y 3 (§4). Antes, 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
+**Last updated:** 2026-11-18 — [ADR‑270](../DECISIONS.md): A9, hecho (§3), con el paso 3 de B1 (§4). Antes, 2026-11-17 — [ADR‑269](../DECISIONS.md): B1, el paso 4 (§4), y la numeración de los pasos de ADR‑268, corregida. Antes, el mismo día — [ADR‑268](../DECISIONS.md): B1, los pasos 2 y 3 (§4). Antes, 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
 [ADR‑265](../DECISIONS.md): las decisiones del propietario (§0) y **A7, hecho** (§2).
 Antes, 2026-11-10 — creado con [ADR‑264](../DECISIONS.md): el estudio y el plan de cuatro filas de
 `doc/AUDITORIAS.md` §2 (el núcleo de `[B]`, `prf_list_induction` sin `listInd`, las capas dentro de RPP y las preguntas
@@ -82,6 +82,14 @@ portabilidad (mawk en la CI y gawk en local: mawk retrocede con las ventanas de 
 
 ## 3 · A9 — que ningún titular construya pasos `Prf.listInd`
 
+> ✅ **HECHO el 2026‑11‑18** ([ADR‑270](../DECISIONS.md)), por la vía limpia, con el paso 3 de B1. MEDIDO: ningún
+> titular construye un paso `listInd` fuera de las traducciones, `deduction_aux`, `PrfH_mono` y los análisis por casos
+> (eran 24 de 35); a cambio construyen `ind`, también D2. Lo medido con el elaborador corrigió el corte por lectura:
+> además de `consOk` y `prf_consOk_cons` bajan `prf_cdrc_cons`, y con `prf_zero_or_eq_succ_pred` su bloque
+> (`prf_pred_succ`, `prf_eq_congr_pred`, `PrfH_eq_congr_pred`). Los diez `PrfH_*`, a `Meta/ReglasPrfH.lean`, con su
+> espacio de nombres; `linea_listInd` y `AxiomasT` usan la admisibilidad (el paso 0 pedía medir si podía la primera).
+> El contrato (T07), idéntico. Lo que aquí sigue es el plan tal como se escribió.
+
 **Lo medido.**
 * `prf_list_induction` (`Meta/ChainPrf.lean`) envuelve el constructor `Prf.listInd`. Sus usos: **21 en 8 módulos** —
   `ChainPrf` 9, `BoundedInPrf` 2, `ChainOkBoundedPrf` 3, `CodeWitnessPrf` 2, `EvalListPrf` 1, `EvalNthcPrf` 1,
@@ -153,6 +161,9 @@ mucho, el corte crece. **Coste:** de uno a dos días (ESTIMACIÓN).
 > ✏️ El mismo día (ADR‑269): el paso 4 (N3 y N4), hecho: todos los titulares de las clases (ii) y (iii) en C7, y C5 y
 > C6 sin titulares; los imports que suben, de 5 a 2 (los de N6). ADR‑268 se llamó «pasos 2 y 3», pero por la
 > numeración de ADR‑266 §6 hizo el 2 (N2), N5 y parte del 4 (N3): queda el 3, N6 con A9, y el 5 y el 6.
+> ✏️ 2026‑11‑18 (ADR‑270): el paso 3, hecho (N6 con A9): **ningún import sube de capa**. `GodelTwo` importa sólo
+> `ProofChain`; `CodeWitnessPrf` (los testigos de las guardas) va a C3, y `BoundedInPrf`, `ListIndAdmisible` y
+> `ReglasPrfH`, a C2 (sus imports ya lo permitían; la asignación por familias los dejaba en C4). Quedan el 5 y el 6.
 
 **Lo medido.** No hay manifiesto ni control. Lo que sí hay: `DEPENDENCIES.md`, generado y con `--check` en la CI
 (ADR‑238: 120 módulos activos, 402 aristas, profundidad 59, sin ciclos); las familias de `Meta/` en prosa

@@ -10,14 +10,14 @@ import ROBINSON_PlusPlus.Meta.Hilbert
 import ROBINSON_PlusPlus.Meta.HilbertDeduction
 import ROBINSON_PlusPlus.Meta.ReprPrf
 import ROBINSON_PlusPlus.Meta.ArithPrf
-import ROBINSON_PlusPlus.Meta.ChainPrf
+import ROBINSON_PlusPlus.Meta.ReglasPrfH
+import ROBINSON_PlusPlus.Meta.NumListPrf
 import ROBINSON_PlusPlus.Meta.NatArithPrf
 import ROBINSON_PlusPlus.Meta.NatOrderPrf
 import ROBINSON_PlusPlus.Meta.NatMulPrf
 import ROBINSON_PlusPlus.Meta.CantorMonoPrf
 import ROBINSON_PlusPlus.Meta.StrongInductionPrf
 import ROBINSON_PlusPlus.Meta.Div2ParityPrf
-import ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 
 /-!
 # `Meta/ListIndAdmisible.lean` — la inducción de LISTAS es ADMISIBLE en `Prf`: sale de la ordinaria, sin `listInd`
@@ -46,6 +46,12 @@ inducción construye la prueba: ningún paso `listInd` ni `p3` fuera de las trad
 la teoría codificada, el ancla y `G` (L5‑04, ADR‑254: la tabla de reglas, sólo si cambian las reglas). Lo que dice es
 que como TEORÍA no añade nada. Y los usuarios de `prf_list_induction` (D2 entre ellos) siguen usándola: redirigirlos a
 `prf_list_induction_sin` es otro paso, que cambiaría lo que usa la prueba de un titular.
+
+✏️ 2026‑11‑18 (ADR‑270, A9): ese paso, dado. El módulo está por DEBAJO de `Meta/ChainPrf.lean` —importa la cadena
+aritmética, `Meta/ReglasPrfH.lean` y `Meta/NumListPrf.lean`, no `ChainPrf` ni `CodeWitnessPrf`—, y `ChainPrf` lo
+importa y demuestra `prf_list_induction` con `prf_list_induction_sin`: ningún usuario cambia, y ninguno construye un
+paso `listInd`. La decodificación del verificador (`SolidezVerificador.linea_listInd`) y `AxiomasT`
+(`PuenteFOL.prf_of_axiomasT`) usan `listInd_admisible`.
 -/
 
 open FOL
@@ -54,7 +60,6 @@ open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.ArithPrf
-open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.NatOrderPrf
 open ROBINSON_PlusPlus.Meta.NatMulPrf

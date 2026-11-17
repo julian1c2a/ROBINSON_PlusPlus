@@ -1,0 +1,143 @@
+import ROBINSON_PlusPlus
+/-! B1 (ADR-266), paso 3 (N6 con A9), medida DESPUÉS del cambio (ADR-270), con el elaborador. Fuera del árbol:
+`lake env lean .lake/tmp/Paso3.lean` desde la raíz de RPP.
+
+* `#cierre_mod x`: el cierre (tipos y valores, `allowOpaque`) de `x`, sólo constantes de RPP, por módulo; marca con
+  ⛓ los módulos que tienen `ChainPrf` en su cierre de IMPORTS (o son `ChainPrf`): lo que haya en ellos tiene que bajar
+  (o su módulo dejar de importar `ChainPrf`) para que `ChainPrf` pueda importar el módulo de `x`. Y si el cierre
+  alcanza `prf_list_induction` o un constructor `listInd`.
+* `#usa_de M T`: las constantes del módulo `T` que nombran DIRECTAMENTE (tipo o valor) las declaraciones del módulo `M`.
+* `#cierre_en T | x y …`: el cierre de `{x, y, …}` restringido a las constantes del módulo `T`, y si alguna alcanza
+  `prf_list_induction`.
+* `#deps_modulos M`: de qué módulos de RPP dependen DIRECTAMENTE las declaraciones de `M` (como en el paso 2). -/
+open Lean Elab Command
+
+namespace Paso3
+
+def modDe (env : Environment) (n : Name) : Option Name := do
+  let i ← env.getModuleIdxFor? n
+  env.header.moduleNames[i.toNat]?
+
+def directas (env : Environment) (n : Name) : Array Name := Id.run do
+  let some ci := env.find? n | return #[]
+  let mut s := ci.type.getUsedConstants
+  if let some v := ci.value? (allowOpaque := true) then s := s ++ v.getUsedConstants
+  return s
+
+partial def cierre (env : Environment) (raices : Array Name) : NameSet := Id.run do
+  let mut vis : NameSet := {}
+  let mut pila := raices
+  while h : pila.size > 0 do
+    let n := pila[pila.size - 1]
+    pila := pila.pop
+    if vis.contains n then continue
+    vis := vis.insert n
+    for d in directas env n do
+      if !vis.contains d then pila := pila.push d
+  return vis
+
+/-- El cierre de IMPORTS de un módulo (sin él). -/
+partial def importsDe (env : Environment) (m : Name) : NameSet := Id.run do
+  let mut vis : NameSet := {}
+  let mut pila : Array Name := #[m]
+  while h : pila.size > 0 do
+    let x := pila[pila.size - 1]
+    pila := pila.pop
+    let some i := env.getModuleIdx? x | continue
+    let some md := env.header.moduleData[i.toNat]? | continue
+    for im in md.imports do
+      if !vis.contains im.module then
+        vis := vis.insert im.module
+        pila := pila.push im.module
+  return vis
+
+def chain : Name := `ROBINSON_PlusPlus.Meta.ChainPrf
+def pli : Name := `ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+def listIndCs : List Name := [``ROBINSON_PlusPlus.Meta.Hilbert.Prf.listInd,
+  ``ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH.listInd, ``ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.listInd]
+
+def corto (m : Name) : String := (m.replacePrefix `ROBINSON_PlusPlus.Meta Name.anonymous).toString
+
+elab "#cierre_mod " x:ident : command => do
+  let env ← getEnv
+  let raiz := x.getId
+  unless env.contains raiz do throwError "no existe {raiz}"
+  let cie := cierre env #[raiz]
+  let mut porMod : Std.HashMap Name (Array Name) := {}
+  for n in cie.toList do
+    if let some md := modDe env n then
+      if (`ROBINSON_PlusPlus).isPrefixOf md then
+        porMod := porMod.insert md (((porMod.get? md).getD #[]).push n)
+  let filas := porMod.toArray.qsort (fun a b => a.1.toString < b.1.toString)
+  let mut lineas : Array String := #[]
+  for (md, ns) in filas do
+    let mala := md == chain || (importsDe env md).contains chain
+    if mala then
+      let ord := (ns.map fun n => (n.replacePrefix md Name.anonymous).toString).qsort (· < ·)
+      lineas := lineas.push s!"  ⛓ {corto md} ({ns.size}): {ord.toList}"
+    else
+      lineas := lineas.push s!"    {corto md} ({ns.size})"
+  let toca := (pli :: listIndCs).filter cie.contains
+  logInfo m!"{raiz}: cierre de {cie.size} constantes; de RPP, en {filas.size} módulos (⛓ = `ChainPrf` en su cierre de imports):\n{"\n".intercalate lineas.toList}\n  alcanza prf_list_induction o un constructor listInd: {toca}"
+
+elab "#usa_de " m:ident t:ident : command => do
+  let env ← getEnv
+  let some im := env.getModuleIdx? m.getId | throwError "no existe el módulo {m.getId}"
+  let some it := env.getModuleIdx? t.getId | throwError "no existe el módulo {t.getId}"
+  let mut usos : Std.HashMap Name Nat := {}
+  for (n, _) in env.constants.toList do
+    unless env.getModuleIdxFor? n == some im do continue
+    for d in (directas env n).toList.eraseDups do
+      if env.getModuleIdxFor? d == some it then
+        usos := usos.insert d ((usos.getD d 0) + 1)
+  let filas := usos.toArray.qsort (fun a b => a.1.toString < b.1.toString)
+  let lineas := filas.toList.map fun (d, k) => s!"{(d.replacePrefix t.getId Name.anonymous)}×{k}"
+  logInfo m!"{corto m.getId} usa de {corto t.getId} {filas.size} constantes: {lineas}"
+
+elab "#cierre_en " t:ident " | " xs:ident* : command => do
+  let env ← getEnv
+  let some it := env.getModuleIdx? t.getId | throwError "no existe el módulo {t.getId}"
+  let raices := xs.map (·.getId)
+  for r in raices do unless env.contains r do throwError "no existe {r}"
+  let cie := cierre env raices
+  let ns := cie.toList.filter (fun n => env.getModuleIdxFor? n == some it)
+  let ord := (ns.toArray.map fun n => (n.replacePrefix t.getId Name.anonymous).toString).qsort (· < ·)
+  logInfo m!"el cierre de {raices.size} raíces en {corto t.getId}: {ord.size} constantes {ord.toList}\n  alcanza prf_list_induction: {cie.contains pli}"
+
+elab "#deps_modulos " m:ident : command => do
+  let env ← getEnv
+  let mod := m.getId
+  let some idx := env.getModuleIdx? mod | throwError "no existe el módulo {mod}"
+  let mut porMod : Std.HashMap Name (Array String) := {}
+  let mut n0 : Nat := 0
+  for (n, _) in env.constants.toList do
+    if n.isInternal then continue
+    unless env.getModuleIdxFor? n == some idx do continue
+    n0 := n0 + 1
+    for d in directas env n do
+      if let some md := modDe env d then
+        if md != mod && ((`ROBINSON_PlusPlus).isPrefixOf md) then
+          let ej := s!"{(n.replacePrefix mod Name.anonymous)} → {d}"
+          porMod := porMod.insert md (((porMod.get? md).getD #[]).push ej)
+  let filas := porMod.toArray.qsort (fun a b => a.1.toString < b.1.toString)
+  let lineas := filas.toList.map fun (md, ejs) => s!"  {corto md} ({ejs.size} usos), p. ej. {ejs[0]!}"
+  logInfo m!"{corto mod}: {n0} declaraciones, que dependen de {filas.size} módulos de RPP:\n{"\n".intercalate lineas}"
+
+end Paso3
+
+/-! ## A9 · (a) el cierre de la admisibilidad, por módulo: ya ningún módulo con ⛓ -/
+#cierre_mod ROBINSON_PlusPlus.Meta.ListIndAdmisible.listInd_admisible
+#cierre_mod ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+
+/-! ## A9 · (b) la cadena aritmética y la admisibilidad ya no toman nada de `ChainPrf`, `CodeWitnessPrf` ni `BoundedInPrf` -/
+#usa_de ROBINSON_PlusPlus.Meta.NatArithPrf ROBINSON_PlusPlus.Meta.ChainPrf
+#usa_de ROBINSON_PlusPlus.Meta.Div2ParityPrf ROBINSON_PlusPlus.Meta.ChainPrf
+#usa_de ROBINSON_PlusPlus.Meta.ListIndAdmisible ROBINSON_PlusPlus.Meta.ChainPrf
+#usa_de ROBINSON_PlusPlus.Meta.ListIndAdmisible ROBINSON_PlusPlus.Meta.CodeWitnessPrf
+#usa_de ROBINSON_PlusPlus.Meta.ListIndAdmisible ROBINSON_PlusPlus.Meta.BoundedInPrf
+#usa_de ROBINSON_PlusPlus.Meta.ListIndAdmisible ROBINSON_PlusPlus.Meta.ReglasPrfH
+#usa_de ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.ListIndAdmisible
+
+/-! ## N6 · `Representability2` y `GodelTwo` -/
+#deps_modulos ROBINSON_PlusPlus.Meta.Representability2
+#deps_modulos ROBINSON_PlusPlus.Meta.GodelTwo

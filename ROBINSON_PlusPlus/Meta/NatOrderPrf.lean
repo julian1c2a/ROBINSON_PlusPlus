@@ -17,7 +17,6 @@ open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
-open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.NatArithPrf
 
 namespace ROBINSON_PlusPlus.Meta.NatOrderPrf

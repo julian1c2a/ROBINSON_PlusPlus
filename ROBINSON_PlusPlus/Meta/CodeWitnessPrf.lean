@@ -88,12 +88,6 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
 theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prfᵢ.j1 A B)
 theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prfᵢ.j2 A B)
 
-theorem prf_cdrc_cons (h t : Term) : Prf (cdrc (cons h t) =eq t) := by
-  have hax : Prf ax_cdrc := prf_ax (by simp [axioms])
-  have hh := prf_spec (prf_spec hax h) t
-  simp [substFormula, substTerm, substTerms, cdrc, cons, FOL.substTerm_liftTerm] at hh
-  exact hh
-
 theorem prf_congr_lenc {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (lenc t₁ =eq lenc t₂) := by
   let f : Formula := Formula.eq (lenc (liftTerm 0 t₁)) (lenc (.var 0))
   have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (lenc t₁) (lenc s) := by
@@ -140,7 +134,8 @@ theorem prf_congr_nthc_lst {w₁ w₂ : Term} (i : Term) (h : Prf (w₁ =eq w₂
     ((hS w₂) ▸ PrfH_leibniz_subst (A := f) (prf_to_prfH h [])
       ((hS w₁) ▸ prf_to_prfH (prf_refl (nthc w₁ i)) [])) rfl
 
-def consOk (X : Term) : Formula := Formula.eq X (cons (carc X) (cdrc X))
+-- ✏️ 2026‑11‑18 (ADR‑270): `consOk` estaba aquí; bajó a `Meta/NumListPrf.lean` (con `prf_cdrc_cons` y
+-- `prf_consOk_cons`), y sale a la raíz desde allí.
 def cOk (X : Term) (F : Formula) : Formula := land (consOk X) F
 
 def varOkT (X : Term) : Formula :=
@@ -265,10 +260,6 @@ theorem prf_shape_strengthens (X C : Term) (k n : Nat)
     PrfH_leibniz_subst (A := f) (PrfH_eq_symm (prfH_hyp_self (Formula.eq X C))) hbase
   rw [hS] at hres
   exact hres
-
-theorem prf_consOk_cons (a b : Term) : Prf (consOk (cons a b)) :=
-  prf_eq_trans (prf_congr_cons_head (prf_eq_symm (prf_carc_cons a b)))
-    (prf_congr_cons_tail (prf_eq_symm (prf_cdrc_cons a b)))
 
 theorem prf_lenc_c1 (a : Term) : Prf (lenc (cons a nil) =eq numeralM 1) :=
   prf_eq_trans (prf_lenc_cons a nil) (prf_eq_congr_succ prf_lenc_nil)
@@ -1548,24 +1539,24 @@ en producción — señal de que se volverán a necesitar. Son las que prueban q
 /-- `shapeUn`/`shapeBin` en la forma con `consOk` (variantes que consume el fortalecimiento). -/
 theorem prf_shapeUn_str' (X : Term) (k : Nat) :
     Prf (Formula.impl (shapeUn X k)
-      (land (SinWTs.consOk X) (land (Formula.eq (carc X) (numeralM k))
+      (land (NumListPrf.consOk X) (land (Formula.eq (carc X) (numeralM k))
                                     (Formula.eq (lenc X) (numeralM 2))))) :=
   SinWTs.prf_shape_strengthens X _ k 2 (prf_carc_cons _ _)
-    (SinWTs.prf_lenc_c2 _ _) (SinWTs.prf_consOk_cons _ _)
+    (SinWTs.prf_lenc_c2 _ _) (NumListPrf.prf_consOk_cons _ _)
 
 theorem prf_shapeBin_str' (X : Term) (k : Nat) :
     Prf (Formula.impl (shapeBin X k)
-      (land (SinWTs.consOk X) (land (Formula.eq (carc X) (numeralM k))
+      (land (NumListPrf.consOk X) (land (Formula.eq (carc X) (numeralM k))
                                     (Formula.eq (lenc X) (numeralM 3))))) :=
   SinWTs.prf_shape_strengthens X _ k 3 (prf_carc_cons _ _)
-    (SinWTs.prf_lenc_c3 _ _ _) (SinWTs.prf_consOk_cons _ _)
+    (SinWTs.prf_lenc_c3 _ _ _) (NumListPrf.prf_consOk_cons _ _)
 
 theorem prf_shapeNul_str (X : Term) (k : Nat) :
     Prf (Formula.impl (shapeNul X k)
-      (land (SinWTs.consOk X) (land (Formula.eq (carc X) (numeralM k))
+      (land (NumListPrf.consOk X) (land (Formula.eq (carc X) (numeralM k))
                                     (Formula.eq (lenc X) (numeralM 1))))) :=
   SinWTs.prf_shape_strengthens X _ k 1 (prf_carc_cons _ _)
-    (SinWTs.prf_lenc_c1 _) (SinWTs.prf_consOk_cons _ _)
+    (SinWTs.prf_lenc_c1 _) (NumListPrf.prf_consOk_cons _ _)
 
 /-- Functorialidad de `lor` en las DOS ramas. -/
 theorem lor_map {A A' B B' : Formula} (hA : Prf (A ⇒ A')) (hB : Prf (B ⇒ B')) :
@@ -2183,10 +2174,12 @@ end ROBINSON_PlusPlus.Meta.CodeWitnessPrf
     canonico; las copias de `ENS` se han retirado en la misma pasada. -/
 
 export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs (
-  argsIn argsInBody closed_mem_tcodes1 consOk crit_junk_var0_witness1 impT isTC1 isTermCodeE1
+  argsIn argsInBody closed_mem_tcodes1 crit_junk_var0_witness1 impT isTC1 isTermCodeE1
   liftF_argsIn liftF_isTermCodeE1 liftF_wfAll1 liftTerm_objList mem_tcodes1s_of_mem
   prf_argsIn_head prf_argsIn_of_closed prf_argsIn_tail prf_congr_In_left
-  prf_consOk_cons prf_In_objList prf_isTC1_tcodes prf_isTermCodeE1_of_boundedIn
+  prf_In_objList prf_isTC1_tcodes prf_isTermCodeE1_of_boundedIn
+  -- ✏️ 2026‑11‑18 (ADR‑270): `consOk` y `prf_consOk_cons` (con `prf_cdrc_cons`) salen a la raíz desde
+  -- `Meta/NumListPrf.lean`, adonde bajaron: los necesita `Meta/ListIndAdmisible.lean`.
   prf_isTermCodeE1_of_In prf_lenc_termsCodeM prf_nthc_termsCodeM prf_or_elim_imp prf_orL
   prf_orR PrfH_congr_argsIn PrfH_congr_In_left PrfH_congr_lenc
   -- ⚠️ `PrfH_congr_liftc` ya NO se exporta desde aquí: bajó a `Meta/ChainPrf.lean`, que lo

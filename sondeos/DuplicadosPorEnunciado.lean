@@ -10,6 +10,9 @@ SIGUEN siendo el mismo enunciado con dos nombres (los tres `rfl` cierran, `[prop
 cierto es la frase del HALLAZGO 1 «ADEMAS estan LOS CUATRO en su bloque `export`»: hoy ninguno de los cuatro está en un
 `export` de `Meta/CodeWitnessPrf.lean` (se nombran por su espacio de nombres, `SinWTs.`/`ENS.`); del HALLAZGO 2,
 `prf_eq_congr_lenc` sí está en el de `Meta/RunFnBoundedPrf.lean`.
+
+✏️ 2026‑11‑18 (ADR‑270): `consOk` ya no es `SinWTs.consOk`: bajó a `Meta/NumListPrf.lean`, y los dos enunciados de abajo
+lo citan por su nombre nuevo.
 -/
 import ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 import ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
@@ -42,12 +45,12 @@ example : True := by
     LITERALMENTE, sin puente ninguno. Eso es lo que hace redundante a uno de los dos. -/
 theorem shapeUn_str'_es_redundante (X : Term) (k : Nat) :
     Prf (Formula.impl (SinWTs.shapeUn X k)
-      (land (SinWTs.consOk X) (land (carc X =eq numeralM k) (lenc X =eq numeralM 2)))) :=
+      (land (ROBINSON_PlusPlus.Meta.NumListPrf.consOk X) (land (carc X =eq numeralM k) (lenc X =eq numeralM 2)))) :=
   ENS.prf_shapeUn_str' X k
 
 theorem shapeUn_str_es_el_mismo (X : Term) (k : Nat) :
     Prf (Formula.impl (SinWTs.shapeUn X k)
-      (land (SinWTs.consOk X) (land (carc X =eq numeralM k) (lenc X =eq numeralM 2)))) :=
+      (land (ROBINSON_PlusPlus.Meta.NumListPrf.consOk X) (land (carc X =eq numeralM k) (lenc X =eq numeralM 2)))) :=
   SinWTs.prf_shapeUn_str X k
 
 /-! ## HALLAZGO 2 · un tercer redundante, este contra OTRO modulo de produccion:

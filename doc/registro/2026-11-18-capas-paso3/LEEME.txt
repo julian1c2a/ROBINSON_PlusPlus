@@ -1,0 +1,44 @@
+ADR-270 (2026-11-18): B1, el paso 3 de las capas de ADR-266 (N6 con A9: prf_list_induction sin Prf.listInd).
+
+Las herramientas Lean se ejecutan con `lake env lean X.lean` desde la raíz de RPP, con el .lean fuera del árbol de la
+librería (p. ej. en .lake/tmp/); los .py, con `py -3` (capas4 y paso3 llevan la ruta de RPP escrita dentro;
+induccion_compara, desde este directorio).
+
+ANTES (sobre RPP 36c0994, con el elaborador):
+  Paso3.lean.txt / Paso3-salida.txt   (a) `#cierre_mod`: el cierre de listInd_admisible por módulo, marcando (⛓) los
+                                      módulos con ChainPrf en su cierre de imports: lo que tiene que bajar; (b) `#usa_de`:
+                                      lo que la cadena aritmética y ListIndAdmisible toman de ChainPrf, CodeWitnessPrf y
+                                      BoundedInPrf, declaración a declaración; (c) `#cierre_en` / `#cierre_mod` de cada
+                                      pieza que baja (y que ninguna alcanza prf_list_induction); N6: `#deps_modulos` de
+                                      Representability2 y GodelTwo, y el cierre de CRIT_hasWit_real y prf_hasWitF_real.
+                                      ⚠️ Miden el árbol de ANTES: después, los nombres de ChainPrf.PrfH_* ya no existen.
+  Induccion35.lean.txt / induccion35-antes.txt
+                                      la orden `#induccionSin` de sondeos/ListIndAdmisible.lean (copiada) sobre los 35
+                                      titulares de T07 (TITULARES, Meta/ContratoTitulares.lean) y tres constantes más
+                                      (prf_list_induction, linea_listInd, cadena_buena): la línea de base.
+
+EL CAMBIO:
+  paso3.py.txt   mueve los bloques (por anclas de texto, todo o nada): las diez reglas de PrfH de ChainPrf a un módulo
+                 nuevo, Meta/ReglasPrfH.lean; consOk, prf_cdrc_cons y prf_consOk_cons de CodeWitnessPrf a NumListPrf; el
+                 bloque del predecesor de BoundedInPrf a NatArithPrf; cambia los imports y los `open` (la cadena
+                 aritmética y ListIndAdmisible sin ChainPrf; ChainPrf importa ListIndAdmisible y demuestra
+                 prf_list_induction con prf_list_induction_sin); linea_listInd y prf_of_axiomasT con listInd_admisible;
+                 y renombra los nombres completos en la librería, sondeos/ (sin pasadas/), scripts/ y los check-*.bash.
+                 Después, a mano: GodelTwo con sólo el import de ProofChain (y sin el `open` de Hilbert, que ya no ve);
+                 NumCodeClosedPrf importa ChainPrf (lo recibía por NatArithPrf: lo vio el build); el barril; y en
+                 sondeos/DuplicadosPorEnunciado.lean el nombre completo de consOk (su espacio de nombres no es el de RPP:
+                 el corto `NumListPrf.consOk` no resolvía).
+  ⚠️ sondeos/AlcanceT62.lean, uno de los 16 sondeos que nombran algo de lo que cambia y que se volvieron a compilar,
+     ESCRIBE su salida en doc/registro/2026-10-16-t62-alcance/: se restauró con git (es la medida de su fecha).
+
+DESPUÉS:
+  Paso3Despues.lean.txt / -salida.txt el cierre de listInd_admisible, las mismas 2213 constantes y ninguna en un módulo con
+                                      ChainPrf en su cierre de imports; lo que se toma de ChainPrf, CodeWitnessPrf y
+                                      BoundedInPrf, nada; ChainPrf toma de ListIndAdmisible sólo prf_list_induction_sin;
+                                      GodelTwo depende sólo de ProofChain.
+  induccion35-despues.txt             la misma orden, tras el cambio.
+  induccion_compara.py.txt / -salida  las dos ejecuciones, por titular: listInd fuera de los recorridos y de los
+                                      análisis por casos, de 24 de 35 a 0; ind, de 33 a 34 (D2); p3, igual.
+  capas4.py.txt / capas4-salida.txt   la asignación de capas (medida textual de los import), con CodeWitnessPrf en C3 y
+                                      BoundedInPrf, ListIndAdmisible y ReglasPrfH en C2: ningún import sube; la regla de
+                                      C7.i se cumple; los 35 titulares, por la capa de su módulo, como en el paso 4.
