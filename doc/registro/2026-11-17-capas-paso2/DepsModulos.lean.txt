@@ -1,0 +1,49 @@
+import ROBINSON_PlusPlus
+/-! B1 (ADR-266), medida para los pasos 2 y 3: de qué MÓDULOS dependen DIRECTAMENTE (tipo y valor) las declaraciones de
+un módulo, quitando las que se van a mover. Así se sabe qué imports necesita lo que se queda. Fuera del árbol:
+`lake env lean .lake/tmp/DepsModulos.lean`. -/
+open Lean Elab Command
+
+def modDe (env : Environment) (n : Name) : Option Name := do
+  let i ← env.getModuleIdxFor? n
+  env.header.moduleNames[i.toNat]?
+
+def usadas (env : Environment) (n : Name) : Array Name := Id.run do
+  let some ci := env.find? n | return #[]
+  let mut s := ci.type.getUsedConstants
+  if let some v := ci.value? (allowOpaque := true) then s := s ++ v.getUsedConstants
+  return s
+
+/-- `#deps_modulos M | x y …`: los módulos del proyecto de los que dependen las declaraciones de `M` salvo `x y …`
+    (por su nombre corto), con un ejemplo de cada uno. -/
+elab "#deps_modulos " m:ident " | " xs:ident* : command => do
+  let env ← getEnv
+  let mod := m.getId
+  let some idx := env.getModuleIdx? mod | throwError "no existe el módulo {mod}"
+  let fuera : NameSet := xs.foldl (fun s x => s.insert x.getId) {}
+  let mut porMod : Std.HashMap Name (Array String) := {}
+  let mut n0 : Nat := 0
+  for (n, _) in env.constants.toList do
+    if n.isInternal then continue
+    unless env.getModuleIdxFor? n == some idx do continue
+    if fuera.contains (n.replacePrefix mod Name.anonymous) then continue
+    n0 := n0 + 1
+    for d in usadas env n do
+      if let some md := modDe env d then
+        if md != mod && ((`ROBINSON_PlusPlus).isPrefixOf md) then
+          let ej := s!"{(n.replacePrefix mod Name.anonymous)} → {d}"
+          porMod := porMod.insert md (((porMod.get? md).getD #[]).push ej)
+  let filas := porMod.toArray.qsort (fun a b => a.1.toString < b.1.toString)
+  let lineas := filas.toList.map fun (md, ejs) => s!"  {md} ({ejs.size} usos), p. ej. {ejs[0]!}"
+  logInfo m!"{mod} sin {fuera.toList.length} declaraciones: {n0} declaraciones, que dependen de {filas.size} módulos del proyecto:\n{"\n".intercalate lineas}"
+
+#deps_modulos ROBINSON_PlusPlus.Meta.SolidezVerificador | bueno_V₀ con_verdadera ev_provCodeC' gg_godelCN godelCN_indecidible godelCN_verdadera goedel_I_neg prf_of_prov verificador_solido modelo_prov_iff
+#deps_modulos ROBINSON_PlusPlus.Meta.TarskiPrf | tarski tarski_semantico tarski_semantico_de
+#deps_modulos ROBINSON_PlusPlus.Meta.RosserW1 |
+#deps_modulos ROBINSON_PlusPlus.Meta.RosserPosNum |
+#deps_modulos ROBINSON_PlusPlus.Meta.RosserNumerales |
+#deps_modulos ROBINSON_PlusPlus.Meta.RosserNumEval |
+#deps_modulos ROBINSON_PlusPlus.Meta.RosserGuardNeg | control_exacta control_exactaF
+#deps_modulos ROBINSON_PlusPlus.Meta.RosserNegLinea |
+#deps_modulos ROBINSON_PlusPlus.Meta.RosserNegNum |
+#deps_modulos ROBINSON_PlusPlus.Meta.ModeloCodigo |

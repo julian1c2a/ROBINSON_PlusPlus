@@ -1,0 +1,24 @@
+ADR-268 (2026-11-17): B1, los pasos 2 y 3 de las capas de ADR-266 (N2, N3 y N5).
+
+ANTES (sobre RPP 0d4c293, con el elaborador; se ejecutan con `lake env lean X.lean` desde la raíz de RPP, con el .lean
+fuera del árbol de la librería, p. ej. en .lake/tmp/, que lake env exige dentro de la raíz):
+  ClasificaModulos.lean.txt / -salida.txt   cada declaración de 16 módulos, PURA o IMPURA con el criterio de T08 (el
+                                            recorrido de Meta/PurezaComando.lean); de las impuras, por dónde.
+  DepsModulos.lean.txt / -salida.txt        de qué módulos dependen DIRECTAMENTE las declaraciones de un módulo, quitando
+                                            las que se van: los imports que necesita lo que se queda.
+  Corte.lean.txt / -salida.txt              para cada corte: lo que se queda y usa algo que se va (tendría que irse) y
+                                            de qué módulos depende lo que se va (los imports del módulo nuevo).
+  ⚠️ Las tres miden el árbol de ANTES del cambio: después, esos nombres ya no existen donde dicen.
+
+EL CAMBIO:
+  paso2.py.txt     mueve los bloques de declaraciones (por anclas de texto, todo o nada), crea los cinco módulos
+                   nuevos, toca el barril y renombra en el árbol (la librería, sondeos/, scripts/ y los tres check-*.bash)
+                   lo que cambia de espacio de nombres. Después, a mano: `FOL.Metamath.Semantics` fuera de los open de
+                   SolidezVerificador (ya no lo importa), dos imports en RigidezEstandar (SolidezVerificadorModelo y,
+                   provisional, TitularesIII), `prf_of_prov` calificado en ProvFiel, y la tabla del contrato regenerada
+                   con scripts/ContratoGenerar.lean.
+
+DESPUÉS:
+  capas2.py.txt / -salida.txt   la asignación de capas con los módulos nuevos (medida textual de los import): 5 imports
+                                que suben (de 6), y la regla de C7.i: ningún módulo de C5 ni de C6 en el cierre de los
+                                módulos de la clase (i) ni en los de D1, D2 y D3.

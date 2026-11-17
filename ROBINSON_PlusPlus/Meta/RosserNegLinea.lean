@@ -564,20 +564,6 @@ theorem control_neg_lineWF_zero : Prf (neg (lineWF (numeralM 0))) :=
     rw [nthN_zero_l] at h
     exact absurd h.1 (by rw [lenN_zero]; decide)
 
-/-- ✅ **…y sólo donde la línea es mala**: donde es buena en ℕ, `Prf` no la refuta, por la solidez en `MNV V₀` (la doble‑negada, ADR‑191: lo verdadero con `P` no se refuta).
-    Nombra la semántica: es el control positivo del `#pureza`. -/
-theorem control_exacta (x : Nat) (h : lineWFN Vax x) : ¬ Prf (neg (lineWF (numeralM x))) := by
-  intro hp
-  have hs := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
-    hp (fun _ => 0)
-  apply hs
-  apply (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ _).1 rfl
-  have e := ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM (V := codeNatList axioms) (fun _ => 0) x
-  simp only [lineWF, FOL.Metamath.Semantics.evalFormula, FOL.Metamath.Semantics.evalTerms, e,
-    ROBINSON_PlusPlus.Meta.ModeloEstandar.MN_lineWF, ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo]
-  exact h
-
 end ROBINSON_PlusPlus.Meta.RosserNegLinea
 
 #print axioms ROBINSON_PlusPlus.Meta.RosserNegLinea.lineWF_decide
@@ -589,7 +575,9 @@ end ROBINSON_PlusPlus.Meta.RosserNegLinea
 
 /-! T08 en el módulo (ADR‑147): lo de esta etapa no nombra la semántica; `control_exacta`, que usa la solidez en el
     modelo, sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.RosserNegLinea.lineWF_decide ROBINSON_PlusPlus.Meta.RosserNegLinea.prf_neg_lineWF
   ROBINSON_PlusPlus.Meta.RosserNegLinea.prf_not_In_axiomsCodeT ROBINSON_PlusPlus.Meta.RosserNegLinea.refT
   ROBINSON_PlusPlus.Meta.RosserNegLinea.mism ROBINSON_PlusPlus.Meta.RosserNegLinea.control_neg_lineWF_zero
-  | ROBINSON_PlusPlus.Meta.RosserNegLinea.control_exacta
+  |

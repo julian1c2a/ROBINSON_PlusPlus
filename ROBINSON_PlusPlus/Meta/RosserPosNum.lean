@@ -186,6 +186,8 @@ end ROBINSON_PlusPlus.Meta.RosserPosNum
 /-! T08 en el módulo (ADR‑147): lo de esta etapa no nombra la semántica; `prf_of_prov`, W1 leído en el modelo, sí
     (✏️ ADR‑191: era `modelo_prov_iff`, que se mudó a `Meta/ProvFiel.lean`, después de este módulo). Si un paso de aquí
     pasara por el modelo, el build fallaría en este módulo. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.RosserPosNum.prf_proofCode'_numeral ROBINSON_PlusPlus.Meta.RosserPosNum.posNum
   ROBINSON_PlusPlus.Meta.RosserPosNum.repr_pos_num
-  | ROBINSON_PlusPlus.Meta.SolidezVerificador.prf_of_prov
+  |

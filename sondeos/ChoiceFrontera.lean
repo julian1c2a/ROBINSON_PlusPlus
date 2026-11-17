@@ -138,7 +138,7 @@ end ChoiceFrontera
 #frontera ROBINSON_PlusPlus.Meta.Consistencia.consistencia
 #frontera ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
 #frontera ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
-#frontera ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
+#frontera ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg
 #frontera ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
-#frontera ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
+#frontera ROBINSON_PlusPlus.Meta.TitularesII.tarski
 #censoFrontera

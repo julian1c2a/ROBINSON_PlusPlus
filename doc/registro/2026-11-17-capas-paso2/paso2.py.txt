@@ -1,0 +1,296 @@
+"""B1, pasos 2 y 3 (ADR-268): N2, N3 y N5 de ADR-266. Mueve bloques de declaraciones entre módulos, crea los cinco
+módulos nuevos y renombra en el árbol lo que cambia de espacio de nombres. Todo o nada: comprueba cada ancla antes de
+escribir. Uso: py -3.15 paso2.py (desde cualquier sitio)."""
+import io, os, re, sys
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+M = R + 'ROBINSON_PlusPlus/Meta/'
+P = 'ROBINSON_PlusPlus.Meta.'
+
+def lee(p):
+    t = io.open(p, encoding='utf-8', newline='').read()
+    nl = '\r\n' if '\r\n' in t else '\n'
+    return t.replace('\r\n', '\n'), nl
+
+src = {}   # módulo → [texto LF, nl]
+def mod(m):
+    if m not in src:
+        src[m] = list(lee(M + m + '.lean'))
+    return src[m]
+
+def corta(m, ini, fin, unica=True):
+    """quita de `m` las líneas desde la primera que EMPIEZA por `ini` hasta la anterior a la primera, después, que
+    empieza por `fin`; devuelve el texto quitado (con su salto final). Con `unica`, `ini` tiene que salir una vez."""
+    t = mod(m)[0]
+    ls = t.split('\n')
+    a = [i for i, l in enumerate(ls) if l.startswith(ini)]
+    assert (len(a) == 1) if unica else a, (m, ini, len(a))
+    a = a[0]
+    b = [i for i, l in enumerate(ls) if i > a and l.startswith(fin)]
+    assert b, (m, fin)
+    b = b[0]
+    bloque = '\n'.join(ls[a:b]) + '\n'
+    mod(m)[0] = '\n'.join(ls[:a] + ls[b:])
+    return bloque
+
+def cambia(m, viejo, nuevo, n=1):
+    t = mod(m)[0]
+    assert t.count(viejo) == n, (m, viejo[:60], t.count(viejo))
+    mod(m)[0] = t.replace(viejo, nuevo)
+
+def quita_linea(m, linea):
+    cambia(m, '\n' + linea + '\n', '\n')
+
+NOTA_PUREZA = ('-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en\n'
+               '-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)\n')
+def pureza_sin_control(m, linea_control):
+    cambia(m, '\n  | ' + linea_control + '\n', '\n  |\n')
+    t = mod(m)[0]
+    k = t.index('\n#pureza ')
+    mod(m)[0] = t[:k + 1] + NOTA_PUREZA + t[k + 1:]
+
+# ───────────── los bloques ─────────────
+# SolidezVerificador: la lectura en el modelo (C5) y los titulares de la (iii) (C7.iii)
+SVM = corta('SolidezVerificador', '/-- `V₀`, el valor de `axiomsCodeT` en el modelo, es `Bueno`',
+            'open ROBINSON_PlusPlus.Meta.SolidezDobleNegacion in')
+T3_SV = corta('SolidezVerificador', 'open ROBINSON_PlusPlus.Meta.SolidezDobleNegacion in',
+              'end ROBINSON_PlusPlus.Meta.SolidezVerificador', unica=False)
+for n in ('verificador_solido', 'goedel_I_neg', 'godelCN_indecidible', 'godelCN_verdadera', 'con_verdadera'):
+    quita_linea('SolidezVerificador', '#print axioms ROBINSON_PlusPlus.Meta.SolidezVerificador.' + n)
+cambia('SolidezVerificador', 'import ROBINSON_PlusPlus.Meta.Consistencia\n',
+       'import ROBINSON_PlusPlus.Meta.ModeloCodigo\nimport ROBINSON_PlusPlus.Meta.CodeNatInjPrf\n')
+cambia('SolidezVerificador', '\nopen ROBINSON_PlusPlus.Meta.ModeloEstandar ROBINSON_PlusPlus.Meta.ModeloCodificacion\n', '\n')
+
+# TarskiPrf: tarski (ii), Tarski semántico (iii), y lo de las sentencias (C3)
+TII_TP = corta('TarskiPrf', '/-- 🏁 **TARSKI**, sin hipótesis', '/-! ## §5 · El mentiroso es una SENTENCIA')
+S_a = corta('TarskiPrf', 'def IsSentence (φ : Formula)', 'theorem liftFormula_neg')
+S_b = corta('TarskiPrf', 'theorem liftTerm_one_diagTerm', 'theorem diagBeta_lift1')
+S_c = corta('TarskiPrf', "/-- `godelPred' = ¬ provFormulaC'`", '/-! ## §6 · Control negativo')
+T3_TP = corta('TarskiPrf', '/-! ## §7 · TARSKI SEMÁNTICO', 'end ROBINSON_PlusPlus.Meta.TarskiPrf')
+for n in ('tarski', 'tarski_semantico_de', 'tarski_semantico', 'godelCN_isSentence'):
+    quita_linea('TarskiPrf', '#print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.' + n)
+cambia('TarskiPrf', 'import ROBINSON_PlusPlus.Meta.Consistencia\n', 'import ROBINSON_PlusPlus.Meta.Sentencia\n')
+cambia('TarskiPrf', 'open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf\n',
+       'open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf ROBINSON_PlusPlus.Meta.Sentencia\n')
+
+# Rosser: rosser (ii) y sus dos controles (C8)
+TII_RO = corta('Rosser', '/-- 🏁 **ROSSER para T, sin hipótesis**', '/-! ## §6 · Los controles')
+C8_RO_a = corta('Rosser', '/-- ✅ La hipótesis puede VALER en una extensión NO sólida', '/-- ¬Con es una sentencia')
+C8_RO_b = corta('Rosser', '/-- ✅ Y allí Rosser vale, por el titular', 'end ROBINSON_PlusPlus.Meta.Rosser')
+quita_linea('Rosser', '#print axioms ROBINSON_PlusPlus.Meta.Rosser.rosser')
+pureza_sin_control('Rosser', 'ROBINSON_PlusPlus.Meta.Rosser.rosser ROBINSON_PlusPlus.Meta.Rosser.control_neg_con')
+cambia('Rosser', 'open ROBINSON_PlusPlus.Meta.RosserPosNum ROBINSON_PlusPlus.Meta.RosserNegNum\n',
+       'open ROBINSON_PlusPlus.Meta.RosserPosNum ROBINSON_PlusPlus.Meta.RosserNegNum ROBINSON_PlusPlus.Meta.Sentencia\n')
+
+# Lob: sus dos controles (C8)
+C8_LO = corta('Lob', '/-- ✅ La hipótesis puede FALLAR: T no demuestra su reflexión para ⊥', '/-- ✅ Y puede VALER: para un teorema')
+pureza_sin_control('Lob', 'ROBINSON_PlusPlus.Meta.Lob.control_reflexion_bot ROBINSON_PlusPlus.Meta.Lob.control_reflexion_godel')
+
+# GodelCorolarios: con_indecidible (iii)
+T3_GC = corta('GodelCorolarios', "/-- 🏁 **`Con'` es INDECIDIBLE**", 'end ROBINSON_PlusPlus.Meta.GodelCorolarios')
+quita_linea('GodelCorolarios', '#print axioms ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible')
+pureza_sin_control('GodelCorolarios', 'ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible')
+cambia('GodelCorolarios', 'import ROBINSON_PlusPlus.Meta.SolidezVerificador\n', 'import ROBINSON_PlusPlus.Meta.GodelTwoPrf\n')
+
+# las etapas de Rosser: sus controles (C8)
+C8_RG = corta('RosserGuardNeg', '/-- ✅ **…y sólo donde la guarda es falsa**', 'end ROBINSON_PlusPlus.Meta.RosserGuardNeg')
+pureza_sin_control('RosserGuardNeg', 'ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exacta ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exactaF')
+quita_linea('RosserGuardNeg', 'import ROBINSON_PlusPlus.Meta.Consistencia')
+C8_RL = corta('RosserNegLinea', '/-- ✅ **…y sólo donde la línea es mala**', 'end ROBINSON_PlusPlus.Meta.RosserNegLinea')
+pureza_sin_control('RosserNegLinea', 'ROBINSON_PlusPlus.Meta.RosserNegLinea.control_exacta')
+C8_RN = corta('RosserNegNum', '/-- ✅ **…y sólo donde no hay prueba**', 'end ROBINSON_PlusPlus.Meta.RosserNegNum')
+pureza_sin_control('RosserNegNum', 'ROBINSON_PlusPlus.Meta.RosserNegNum.control_exacta ROBINSON_PlusPlus.Meta.RosserNegNum.control_falla')
+pureza_sin_control('RosserW1', 'ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido')
+pureza_sin_control('RosserPosNum', 'ROBINSON_PlusPlus.Meta.SolidezVerificador.prf_of_prov')
+pureza_sin_control('RosserNumerales', 'ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM')
+cambia('RosserNumerales', 'import ROBINSON_PlusPlus.Meta.ModeloEstandar\n', 'import ROBINSON_PlusPlus.Meta.ModeloCodigo\n')
+pureza_sin_control('RosserNumEval', 'ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM')
+
+# los usuarios
+cambia('PuenteFOL', 'import ROBINSON_PlusPlus.Meta.TarskiPrf\n',
+       'import ROBINSON_PlusPlus.Meta.Sentencia\nimport ROBINSON_PlusPlus.Meta.TitularesIII\n')
+cambia('ProvFiel', 'import ROBINSON_PlusPlus.Meta.RigidezEstandar\n',
+       'import ROBINSON_PlusPlus.Meta.RigidezEstandar\nimport ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo\n')
+cambia('PurezaTitulares', 'import ROBINSON_PlusPlus.Meta.GodelCorolarios\n',
+       'import ROBINSON_PlusPlus.Meta.GodelCorolarios\nimport ROBINSON_PlusPlus.Meta.TitularesII\n'
+       'import ROBINSON_PlusPlus.Meta.TitularesIII\nimport ROBINSON_PlusPlus.Meta.Controles\n')
+cambia('ContratoTitulares', 'import ROBINSON_PlusPlus.Meta.PuenteFOL\n',
+       'import ROBINSON_PlusPlus.Meta.PuenteFOL\nimport ROBINSON_PlusPlus.Meta.TitularesII\nimport ROBINSON_PlusPlus.Meta.TitularesIII\n')
+
+# ───────────── los módulos nuevos ─────────────
+CAB = '/-\nCopyright (c) 2026. All rights reserved.\nAuthor: Julián Calderón Almendros\nLicense: MIT\n-/\n'
+SO = 'set_option autoImplicit false\nset_option relaxedAutoImplicit false\n'
+def opens_de(m):
+    """las líneas `open …` de nivel superior de un módulo (antes de su `namespace`)"""
+    t = mod(m)[0]
+    cab = t[:t.index('\nnamespace ROBINSON_PlusPlus.Meta.' + m + '\n')]
+    return ''.join(l + '\n' for l in cab.split('\n') if l.startswith('open ') and not l.endswith(' in'))
+
+nuevos = {}
+nuevos['Sentencia'] = (CAB +
+ 'import ROBINSON_PlusPlus.Meta.DiagonalNumeral\nimport ROBINSON_PlusPlus.Meta.DerivCondPrf\nimport FOL.Lift0\n\n'
+ '/-!\n# `Meta/Sentencia.lean` — qué es una SENTENCIA, y que `G` lo es (C3; ADR‑268)\n\n'
+ '`IsSentence φ` (`liftFormula 0 φ = φ`: `φ` no tiene variables libres) y `godelCN_isSentence` (T12, ADR‑187), con los\n'
+ "lemas de lift de `godelPred'` y `godelBeta'` que la prueban. Vivían en `Meta/TarskiPrf.lean` (C7.i); bajan a la capa\n"
+ 'del punto fijo (C3 de ADR‑266) porque los usan el enunciado de `rosser_ext`, el puente con FOL (C6, que los importaba\n'
+ 'de `TarskiPrf`: hacia arriba, el nudo N5 de ADR‑266) y Tarski. Mismos enunciados y pruebas; cambia el espacio de\n'
+ 'nombres, que es el de este fichero (NAMING‑CONVENTIONS §6).\n-/\n\n' + SO + '\n'
+ 'open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel ROBINSON_PlusPlus.Meta.Hilbert\n'
+ 'open ROBINSON_PlusPlus.Meta.Diagonal ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.DiagonalTwo\n'
+ 'open ROBINSON_PlusPlus.Meta.ProofChain\n\n'
+ 'namespace ROBINSON_PlusPlus.Meta.Sentencia\n\n' + S_a + S_b + '\n' + S_c +
+ 'end ROBINSON_PlusPlus.Meta.Sentencia\n\n#print axioms ROBINSON_PlusPlus.Meta.Sentencia.godelCN_isSentence\n')
+
+nuevos['SolidezVerificadorModelo'] = (CAB +
+ 'import ROBINSON_PlusPlus.Meta.SolidezVerificador\nimport ROBINSON_PlusPlus.Meta.Consistencia\n\n'
+ "/-!\n# `Meta/SolidezVerificadorModelo.lean` — W1 leído en el modelo: lo que `MNV V₀` acepta como prueba es teorema (C5; ADR‑268)\n\n"
+ "`bueno_V₀` (el ÚNICO paso de W1 por el modelo: `V₀` es el código de los 120, `V₀_eq_codigo`), `verificador_solido`\n"
+ "(W1), `ev_provCodeC'` y `prf_of_prov` (lo que el modelo cree demostrable, lo es). Vivían al final de\n"
+ '`Meta/SolidezVerificador.lean`, cuyo resto —el decodificador y W1 sin el modelo, `cadena_buena`— no nombra la\n'
+ 'semántica: aquel módulo baja a C4 (el espejo en ℕ) y esto queda en C5 (el nudo N2 de ADR‑266). Mismos enunciados y\n'
+ 'pruebas; cambia el espacio de nombres, que es el de este fichero (NAMING‑CONVENTIONS §6).\n-/\n\n' + SO + '\n'
+ + opens_de('SolidezVerificador') +
+ 'open ROBINSON_PlusPlus.Meta.ModeloEstandar ROBINSON_PlusPlus.Meta.ModeloCodificacion\n'
+ 'open ROBINSON_PlusPlus.Meta.SolidezVerificador\n\n'
+ 'namespace ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo\n\n' + SVM +
+ 'end ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo\n\n'
+ '#print axioms ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo.verificador_solido\n')
+
+nuevos['TitularesII'] = (CAB +
+ 'import ROBINSON_PlusPlus.Meta.TarskiPrf\nimport ROBINSON_PlusPlus.Meta.Rosser\nimport ROBINSON_PlusPlus.Meta.Consistencia\n\n'
+ '/-!\n# `Meta/TitularesII.lean` — los titulares de la clase (ii): usan el modelo SÓLO a través de `consistencia` (C7.ii; ADR‑268)\n\n'
+ 'Las capas de ADR‑266: todos los titulares en C7, separados por clase. Aquí, por ahora, `tarski` (de\n'
+ '`Meta/TarskiPrf.lean`) y `rosser` (de `Meta/Rosser.lean`), los dos sin hipótesis porque `consistencia` descarga la de\n'
+ 'su versión sintáctica (`prf_tarski`, `rosser_ext`, de la clase (i)). Vendrán en el paso 4 de ADR‑266 `goedel_I` y\n'
+ '`goedel_II` (de `Meta/Consistencia.lean`) y los dos de Gödel en FOL (de `Meta/PuenteFOL.lean`). Mismos enunciados y\n'
+ 'pruebas; el espacio de nombres es el de este fichero (NAMING‑CONVENTIONS §6).\n-/\n\n' + SO + '\n'
+ 'namespace ROBINSON_PlusPlus.Meta.TitularesII\n\n'
+ 'section Tarski\n' + opens_de('TarskiPrf') + 'open ROBINSON_PlusPlus.Meta.TarskiPrf\n\n' + TII_TP + 'end Tarski\n\n'
+ 'section Rosser\n' + opens_de('Rosser') + 'open ROBINSON_PlusPlus.Meta.Rosser\n\n' + TII_RO + 'end Rosser\n\n'
+ 'end ROBINSON_PlusPlus.Meta.TitularesII\n\n'
+ '#print axioms ROBINSON_PlusPlus.Meta.TitularesII.tarski\n#print axioms ROBINSON_PlusPlus.Meta.TitularesII.rosser\n')
+
+nuevos['TitularesIII'] = (CAB +
+ 'import ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo\nimport ROBINSON_PlusPlus.Meta.TarskiPrf\n'
+ 'import ROBINSON_PlusPlus.Meta.GodelCorolarios\n\n'
+ '/-!\n# `Meta/TitularesIII.lean` — los titulares de la clase (iii): usan la verdad en el modelo (C7.iii; ADR‑268)\n\n'
+ 'Las capas de ADR‑266: todos los titulares en C7, separados por clase. Aquí, por ahora, los de\n'
+ '`Meta/SolidezVerificador.lean` —`goedel_I_neg` (`⊬ ¬G`), `godelCN_indecidible`, `godelCN_verdadera` y\n'
+ "`con_verdadera`, con sus dos lemas `gg_godelCN` y `clas_godelCN`—, los dos de Tarski semántico (de\n"
+ '`Meta/TarskiPrf.lean`) y `con_indecidible` (de `Meta/GodelCorolarios.lean`). Vendrán en el paso 4 de ADR‑266 los de\n'
+ '`Meta/RigidezEstandar.lean`, `Meta/ProvFiel.lean` y `Meta/PuenteFOL.lean`. Mismos enunciados y pruebas; el espacio de\n'
+ 'nombres es el de este fichero (NAMING‑CONVENTIONS §6).\n-/\n\n' + SO + '\n'
+ 'namespace ROBINSON_PlusPlus.Meta.TitularesIII\n\n'
+ 'section SolidezVerificador\n' + opens_de('SolidezVerificador') +
+ 'open ROBINSON_PlusPlus.Meta.ModeloEstandar ROBINSON_PlusPlus.Meta.ModeloCodificacion\n'
+ 'open ROBINSON_PlusPlus.Meta.SolidezVerificador ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo\n\n' + T3_SV +
+ 'end SolidezVerificador\n\n'
+ 'section Tarski\n' + opens_de('TarskiPrf') + 'open ROBINSON_PlusPlus.Meta.TarskiPrf\n\n' + T3_TP + 'end Tarski\n\n'
+ 'section Corolarios\n' + opens_de('GodelCorolarios') + 'open ROBINSON_PlusPlus.Meta.GodelCorolarios\n\n' + T3_GC +
+ 'end Corolarios\n\n'
+ 'end ROBINSON_PlusPlus.Meta.TitularesIII\n\n' +
+ ''.join('#print axioms ROBINSON_PlusPlus.Meta.TitularesIII.%s\n' % n for n in
+         ('goedel_I_neg', 'godelCN_indecidible', 'godelCN_verdadera', 'con_verdadera', 'tarski_semantico_de',
+          'tarski_semantico', 'con_indecidible')))
+
+def seccion(ns, origen, bloques):
+    return ('namespace %s\n' % ns + opens_de(origen) + 'open ROBINSON_PlusPlus.Meta.%s\n\n' % origen + bloques +
+            'end %s\n\n' % ns)
+nuevos['Controles'] = (CAB +
+ 'import ROBINSON_PlusPlus.Meta.TitularesII\nimport ROBINSON_PlusPlus.Meta.TitularesIII\nimport ROBINSON_PlusPlus.Meta.Lob\n'
+ 'import ROBINSON_PlusPlus.Meta.RosserNegNum\nimport ROBINSON_PlusPlus.Meta.Consistencia\nimport ROBINSON_PlusPlus.Meta.PurezaComando\n\n'
+ '/-!\n# `Meta/Controles.lean` — los controles que nombran la semántica, fuera de los módulos de titulares (C8; ADR‑268)\n\n'
+ 'Las capas de ADR‑266 (decisión del propietario): los controles van a C8. Aquí, los que vivían en los módulos de las\n'
+ 'etapas de Rosser, de Rosser y de Löb y USAN el modelo —los de «la hipótesis no es vacía»: donde la condición vale en ℕ,\n'
+ '`Prf` no la refuta, por la solidez en `MNV V₀`—, cada uno en un espacio de nombres con el nombre de su módulo de\n'
+ 'origen (`Controles.RosserGuardNeg.control_exacta`…); y, al final, los controles POSITIVOS de los `#pureza` de esos\n'
+ 'módulos: lo que TIENE que nombrar la semántica para que el criterio no esté ciego. En sus módulos queda cada\n'
+ '`#pureza` con sus puros. Mismos enunciados y pruebas.\n-/\n\n' + SO + '\n'
+ 'namespace ROBINSON_PlusPlus.Meta.Controles\n\n' +
+ seccion('RosserGuardNeg', 'RosserGuardNeg', C8_RG) + seccion('RosserNegLinea', 'RosserNegLinea', C8_RL) +
+ seccion('RosserNegNum', 'RosserNegNum', C8_RN) + seccion('Rosser', 'Rosser', C8_RO_a + C8_RO_b) +
+ seccion('Lob', 'Lob', C8_LO) +
+ 'end ROBINSON_PlusPlus.Meta.Controles\n\n'
+ '/-! T08 (ADR‑147, ADR‑268): los controles POSITIVOS de los `#pureza` de `RosserW1`, `RosserPosNum`,\n'
+ '`RosserNumerales`, `RosserNumEval`, `RosserGuardNeg`, `RosserNegLinea`, `RosserNegNum`, `Rosser`, `Lob` y\n'
+ '`GodelCorolarios`: cada uno TIENE que nombrar la semántica. -/\n'
+ '#pureza |\n'
+ '  ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo.verificador_solido\n'
+ '  ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo.prf_of_prov\n'
+ '  ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM\n'
+ '  ROBINSON_PlusPlus.Meta.Controles.RosserGuardNeg.control_exacta ROBINSON_PlusPlus.Meta.Controles.RosserGuardNeg.control_exactaF\n'
+ '  ROBINSON_PlusPlus.Meta.Controles.RosserNegLinea.control_exacta\n'
+ '  ROBINSON_PlusPlus.Meta.Controles.RosserNegNum.control_exacta ROBINSON_PlusPlus.Meta.Controles.RosserNegNum.control_falla\n'
+ '  ROBINSON_PlusPlus.Meta.TitularesII.rosser ROBINSON_PlusPlus.Meta.Controles.Rosser.control_neg_con\n'
+ '  ROBINSON_PlusPlus.Meta.Controles.Lob.control_reflexion_bot ROBINSON_PlusPlus.Meta.Controles.Lob.control_reflexion_godel\n'
+ '  ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible\n')
+
+# el barril
+b, bnl = lee(R + 'ROBINSON_PlusPlus/Meta.lean')
+viejo = 'import ROBINSON_PlusPlus.Meta.PurezaTitulares\n'
+assert b.count(viejo) == 1
+b = b.replace(viejo, 'import ROBINSON_PlusPlus.Meta.Sentencia\nimport ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo\n'
+              'import ROBINSON_PlusPlus.Meta.TitularesII\nimport ROBINSON_PlusPlus.Meta.TitularesIII\n'
+              'import ROBINSON_PlusPlus.Meta.Controles\n' + viejo)
+
+# ───────────── los nombres que cambian (en todo el árbol) ─────────────
+REN = {}
+for n in ('tarski',):
+    REN['TarskiPrf.' + n] = 'TitularesII.' + n
+for n in ('tarski_semantico', 'tarski_semantico_de'):
+    REN['TarskiPrf.' + n] = 'TitularesIII.' + n
+for n in ('IsSentence', 'liftTerm_one_diagTerm', "godelPred'_lift2", "godelBeta'_lift1", 'godelCN_isSentence'):
+    REN['TarskiPrf.' + n] = 'Sentencia.' + n
+REN['Rosser.rosser'] = 'TitularesII.rosser'
+for n in ('consistente_neg_con', 'control_neg_con'):
+    REN['Rosser.' + n] = 'Controles.Rosser.' + n
+for n in ('control_reflexion_bot', 'control_reflexion_godel'):
+    REN['Lob.' + n] = 'Controles.Lob.' + n
+REN['GodelCorolarios.con_indecidible'] = 'TitularesIII.con_indecidible'
+for n in ('bueno_V₀', 'verificador_solido', "ev_provCodeC'", 'prf_of_prov'):
+    REN['SolidezVerificador.' + n] = 'SolidezVerificadorModelo.' + n
+for n in ('gg_godelCN', 'clas_godelCN', 'goedel_I_neg', 'godelCN_indecidible', 'godelCN_verdadera', 'con_verdadera'):
+    REN['SolidezVerificador.' + n] = 'TitularesIII.' + n
+for n in ('control_exacta', 'control_exactaF'):
+    REN['RosserGuardNeg.' + n] = 'Controles.RosserGuardNeg.' + n
+REN['RosserNegLinea.control_exacta'] = 'Controles.RosserNegLinea.control_exacta'
+for n in ('control_exacta', 'control_falla'):
+    REN['RosserNegNum.' + n] = 'Controles.RosserNegNum.' + n
+# el patrón: el nombre COMPLETO, sin nada de identificador ni a la izquierda ni a la derecha
+PAT = re.compile(r"(?<![\w.'])ROBINSON_PlusPlus\.Meta\.(" + '|'.join(re.escape(k) for k in sorted(REN, key=len, reverse=True)) +
+                 r")(?![\w'₀-₉])")
+def renombra(t):
+    return PAT.sub(lambda m: 'ROBINSON_PlusPlus.Meta.' + REN[m.group(1)], t)
+
+if '--seco' in sys.argv:
+    for k, v in nuevos.items():
+        print('=====', k, len(v.split('\n')), 'líneas')
+    sys.exit(0)
+
+# escribir: los módulos tocados, los nuevos y el barril, con el renombre aplicado
+cuentas = {}
+for m, (t, nl) in src.items():
+    t2 = renombra(t)
+    io.open(M + m + '.lean', 'w', encoding='utf-8', newline='').write(t2.replace('\n', nl))
+for m, t in nuevos.items():
+    assert not os.path.exists(M + m + '.lean'), m
+    io.open(M + m + '.lean', 'w', encoding='utf-8', newline='').write(renombra(t))
+io.open(R + 'ROBINSON_PlusPlus/Meta.lean', 'w', encoding='utf-8', newline='').write(b.replace('\n', bnl))
+# el renombre en el resto del árbol: Lean de la librería, sondeos y scripts; los scripts de control (no los .md)
+otros = []
+for raiz in ('ROBINSON_PlusPlus', 'sondeos', 'scripts'):
+    for d, _, fs in os.walk(R + raiz):
+        for f in fs:
+            if f.endswith('.lean'):
+                otros.append(os.path.join(d, f).replace(os.sep, '/'))
+otros += [R + 'check-footprints.bash', R + 'check-choice.bash', R + 'check-doc-sync.bash']
+for p in otros:
+    t, nl = lee(p)
+    t2 = renombra(t)
+    if t2 != t:
+        n = len(PAT.findall(t))
+        cuentas[p[len(R):]] = n
+        io.open(p, 'w', encoding='utf-8', newline='').write(t2.replace('\n', nl))
+print('módulos nuevos:', ', '.join(nuevos))
+print('renombres fuera de los módulos tocados:')
+for p, n in sorted(cuentas.items()):
+    print('  %4d  %s' % (n, p))

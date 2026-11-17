@@ -272,26 +272,26 @@ end InduccionTitulares
 #induccion ROBINSON_PlusPlus.Meta.Consistencia.consistencia
 #induccion ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
 #induccion ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
-#induccion ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg
 #induccion ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
-#induccion ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
-#induccion ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
+#induccion ROBINSON_PlusPlus.Meta.TitularesII.tarski
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico
 -- ✏️ 2026‑10‑18 (ADR‑157): los dos titulares de Rosser.
 #induccion ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
-#induccion ROBINSON_PlusPlus.Meta.Rosser.rosser
+#induccion ROBINSON_PlusPlus.Meta.TitularesII.rosser
 -- ✏️ 2026‑10‑18 (ADR‑159): Löb.
 #induccion ROBINSON_PlusPlus.Meta.Lob.lob
 -- ✏️ 2026‑10‑18 (ADR‑162): los corolarios de T78.
 #induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
 #induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
-#induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible
 -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
 #induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
 #induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
 #induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
 #induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
-#induccion ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico_de
 
 /-! ### Por dónde: un camino por VALORES del titular a cada constante de su frontera -/
 
@@ -306,7 +306,7 @@ end InduccionTitulares
 #camino ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
 #camino ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
 #camino ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
-#camino ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind
+#camino ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind
 -- ✏️ 2026‑10‑18 (ADR‑157): por dónde llegan los de Rosser a `ind`, a `listInd` y a la decodificación de `p3`.
 #camino ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
 #camino ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
@@ -320,7 +320,7 @@ end InduccionTitulares
 #usuarios ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
 #usuarios ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
 #camino ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left
-#camino ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+#camino ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
 
 /-! ### ¿Qué usa del MODELO cada titular? (T09: las tres clases) -/
 
@@ -335,29 +335,29 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.Consistencia.consistencia
 #modelo ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
 #modelo ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
-#modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
-#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
-#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible
-#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera
-#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera
+#modelo ROBINSON_PlusPlus.Meta.TitularesII.tarski
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_indecidible
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera
 #modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff
-#modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico
 -- ✏️ 2026‑10‑18 (ADR‑157): los dos titulares de Rosser.
 #modelo ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
-#modelo ROBINSON_PlusPlus.Meta.Rosser.rosser
+#modelo ROBINSON_PlusPlus.Meta.TitularesII.rosser
 -- ✏️ 2026‑10‑18 (ADR‑159): Löb.
 #modelo ROBINSON_PlusPlus.Meta.Lob.lob
 -- ✏️ 2026‑10‑18 (ADR‑162): los corolarios de T78.
 #modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
 #modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
-#modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible
 -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
-#modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico_de
 -- ✏️ 2026‑10‑28 (ADR‑210): los tres sintácticos del puente con FOL.
 #modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
 #modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol

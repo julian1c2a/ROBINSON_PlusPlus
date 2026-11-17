@@ -184,6 +184,11 @@ import ROBINSON_PlusPlus.Meta.RigidezEstandar
 import ROBINSON_PlusPlus.Meta.ProvFiel
 import ROBINSON_PlusPlus.Meta.SegundoModelo
 import ROBINSON_PlusPlus.Meta.PuenteFOL
+import ROBINSON_PlusPlus.Meta.Sentencia
+import ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo
+import ROBINSON_PlusPlus.Meta.TitularesII
+import ROBINSON_PlusPlus.Meta.TitularesIII
+import ROBINSON_PlusPlus.Meta.Controles
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
 -- (✏️ 2026‑11‑05, ADR‑259: `listInd` es ADMISIBLE en `Prf` —sale de `ind`—; la prueba, del sondeo de T69 al build.)
 import ROBINSON_PlusPlus.Meta.ListIndAdmisible

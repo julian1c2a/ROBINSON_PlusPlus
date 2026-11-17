@@ -1,0 +1,38 @@
+import ROBINSON_PlusPlus
+/-! B1 (ADR-266), medida para los pasos 2 y 4: cada declaración de unos módulos, PURA o IMPURA con el criterio de T08
+(el recorrido de `Meta/PurezaComando.lean`: su cierre nombra o no la semántica). Lo puro de un módulo de C5 o de C7
+puede bajar de capa sin llevarse la semántica. Fuera del árbol: `lake env lean .lake/tmp/ClasificaModulos.lean`. -/
+open Lean Elab Command ROBINSON_PlusPlus.Meta.PurezaComando
+
+elab "#clasifica_modulo " m:ident : command => do
+  let env ← getEnv
+  let mod := m.getId
+  let some idx := env.getModuleIdx? mod | throwError "no existe el módulo {mod}"
+  let mut puros : Array Name := #[]
+  let mut impuros : Array String := #[]
+  for (n, _) in env.constants.toList do
+    if n.isInternal then continue
+    if env.getModuleIdxFor? n == some idx then
+      let r := recorrer env n
+      match r.camino with
+      | none => puros := puros.push n
+      | some ruta => impuros := impuros.push s!"{nombreUsuario n} (por {mostrarCamino (ruta.drop 1 |>.take 2)})"
+  let corto (n : Name) : String := (n.replacePrefix mod Name.anonymous).toString
+  logInfo m!"{mod}: {puros.size} PUROS, {impuros.size} IMPUROS\n  PUROS: {", ".intercalate (puros.qsort (·.toString < ·.toString) |>.toList.map corto)}\n  IMPUROS:\n    {"\n    ".intercalate (impuros.qsort (· < ·)).toList}"
+
+#clasifica_modulo ROBINSON_PlusPlus.Meta.SolidezVerificador
+#clasifica_modulo ROBINSON_PlusPlus.Meta.Consistencia
+#clasifica_modulo ROBINSON_PlusPlus.Meta.RigidezEstandar
+#clasifica_modulo ROBINSON_PlusPlus.Meta.TarskiPrf
+#clasifica_modulo ROBINSON_PlusPlus.Meta.GodelCorolarios
+#clasifica_modulo ROBINSON_PlusPlus.Meta.Rosser
+#clasifica_modulo ROBINSON_PlusPlus.Meta.PuenteFOL
+#clasifica_modulo ROBINSON_PlusPlus.Meta.ModeloEstandar
+#clasifica_modulo ROBINSON_PlusPlus.Meta.ModeloCodificacion
+#clasifica_modulo ROBINSON_PlusPlus.Meta.ProvFiel
+#clasifica_modulo ROBINSON_PlusPlus.Meta.SegundoModelo
+#clasifica_modulo ROBINSON_PlusPlus.Meta.Lob
+#clasifica_modulo ROBINSON_PlusPlus.Meta.RosserW1
+#clasifica_modulo ROBINSON_PlusPlus.Meta.RosserPosNum
+#clasifica_modulo ROBINSON_PlusPlus.Meta.RosserNumerales
+#clasifica_modulo ROBINSON_PlusPlus.Meta.RosserGuardNeg

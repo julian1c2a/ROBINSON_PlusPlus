@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.RosserNegNum
 import ROBINSON_PlusPlus.Meta.RigidezEstandar
+import ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo
 
 /-!
 # `Meta/ProvFiel.lean` — `Prov` es FIEL, sin lógica clásica: la vuelta de `modelo_prov_iff` (ADR‑191)
@@ -80,7 +81,7 @@ theorem prov_de_proofN {φ : Formula} {m : Nat} (h : ProofN m (codeNat φ)) (v :
 theorem modelo_prov_iff (φ : Formula) (v : Nat → Nat) :
     evalFormula (MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔
       Prf φ :=
-  ⟨prf_of_prov φ v, fun h => by
+  ⟨ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo.prf_of_prov φ v, fun h => by
     obtain ⟨m, hm⟩ := ROBINSON_PlusPlus.Meta.ProvFiel.proofN_of_prf h
     exact prov_de_proofN hm v⟩
 

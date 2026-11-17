@@ -1,0 +1,66 @@
+import ROBINSON_PlusPlus
+/-! B1 (ADR-266), pasos 2 y 3: ¿se puede sacar de un módulo este conjunto de declaraciones? (a) lo que se QUEDA y
+depende de lo que se va (tendría que irse también); (b) los módulos de los que depende lo que se va (los imports del
+módulo nuevo). Fuera del árbol: `lake env lean .lake/tmp/Corte.lean`. -/
+open Lean Elab Command
+
+def modDe (env : Environment) (n : Name) : Option Name := do
+  let i ← env.getModuleIdxFor? n
+  env.header.moduleNames[i.toNat]?
+
+def usadas (env : Environment) (n : Name) : Array Name := Id.run do
+  let some ci := env.find? n | return #[]
+  let mut s := ci.type.getUsedConstants
+  if let some v := ci.value? (allowOpaque := true) then s := s ++ v.getUsedConstants
+  return s
+
+/-- el nombre «de usuario» de una constante auxiliar (`f.eq_1`, `f._proof_1`, `f.match_1` → `f`) -/
+def raiz (n : Name) : Name := Id.run do
+  let mut m := n
+  while m.isInternal || (match m with | .str _ s => s.startsWith "eq_" || s.startsWith "match_" || s == "eq_def" || s.startsWith "_" | _ => false) do
+    m := m.getPrefix
+  return m
+
+elab "#corte " m:ident " | " xs:ident* : command => do
+  let env ← getEnv
+  let mod := m.getId
+  let some idx := env.getModuleIdx? mod | throwError "no existe el módulo {mod}"
+  -- las que se van: por su nombre completo (pueden ser de otro espacio de nombres)
+  let vanNames : Array Name := xs.map (fun x => `ROBINSON_PlusPlus.Meta ++ x.getId)
+  for v in vanNames do unless env.contains v do throwError "no existe {v}"
+  let van : NameSet := vanNames.foldl (·.insert ·) {}
+  let mut quedanMal : Array String := #[]
+  let mut modsVan : Std.HashMap Name Nat := {}
+  for (n, _) in env.constants.toList do
+    unless env.getModuleIdxFor? n == some idx do continue
+    let r := raiz n
+    let seVa := van.contains r
+    for d in usadas env n do
+      let rd := raiz d
+      if !seVa && van.contains rd && !n.isInternal then
+        quedanMal := quedanMal.push s!"{n} usa {rd}"
+      if seVa then
+        if let some md := modDe env d then
+          if (`ROBINSON_PlusPlus).isPrefixOf md || (`FOL).isPrefixOf md then
+            modsVan := modsVan.insert md ((modsVan.getD md 0) + 1)
+  let mods := modsVan.toArray.qsort (fun a b => a.1.toString < b.1.toString)
+  logInfo m!"{mod} — se van {vanNames.size}.\n  (a) lo que se QUEDA y usa algo que se va: {if quedanMal.isEmpty then "nada" else "\n    " ++ "\n    ".intercalate quedanMal.toList}\n  (b) lo que se va depende de: {", ".intercalate (mods.toList.map fun (md, k) => s!"{md} ({k})")}"
+
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.SolidezVerificador | SolidezVerificador.bueno_V₀ SolidezVerificador.verificador_solido SolidezVerificador.ev_provCodeC' SolidezVerificador.prf_of_prov SolidezVerificador.gg_godelCN SolidezVerificador.clas_godelCN SolidezVerificador.goedel_I_neg SolidezVerificador.godelCN_indecidible SolidezVerificador.godelCN_verdadera SolidezVerificador.con_verdadera
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.TarskiPrf | TarskiPrf.tarski TarskiPrf.tarski_semantico TarskiPrf.tarski_semantico_de TarskiPrf.IsSentence TarskiPrf.godelCN_isSentence
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.TarskiPrf | TarskiPrf.IsSentence TarskiPrf.godelCN_isSentence
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.Rosser | Rosser.rosser Rosser.consistente_neg_con Rosser.control_neg_con
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.Lob | Lob.control_reflexion_bot Lob.control_reflexion_godel
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.GodelCorolarios | GodelCorolarios.con_indecidible
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.RosserGuardNeg | RosserGuardNeg.control_exacta RosserGuardNeg.control_exactaF
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.RosserNegLinea | RosserNegLinea.control_exacta
+open ROBINSON_PlusPlus.Meta in
+#corte ROBINSON_PlusPlus.Meta.RosserNegNum | RosserNegNum.control_exacta RosserNegNum.control_falla

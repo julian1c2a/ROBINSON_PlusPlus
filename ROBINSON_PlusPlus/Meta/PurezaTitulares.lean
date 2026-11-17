@@ -9,6 +9,9 @@ import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.Rosser
 import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.GodelCorolarios
+import ROBINSON_PlusPlus.Meta.TitularesII
+import ROBINSON_PlusPlus.Meta.TitularesIII
+import ROBINSON_PlusPlus.Meta.Controles
 import ROBINSON_PlusPlus.Meta.ContratoTitulares
 import ROBINSON_PlusPlus.Meta.ContratoTabla
 
@@ -67,8 +70,8 @@ def PUROS : List Name := [
 /-- Los controles positivos: llaman a `consistencia`, así que su cierre TIENE que nombrar la semántica. -/
 def IMPUROS : List Name := [
   ``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I,
-  ``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski,
-  ``ROBINSON_PlusPlus.Meta.Rosser.rosser]
+  ``ROBINSON_PlusPlus.Meta.TitularesII.tarski,
+  ``ROBINSON_PlusPlus.Meta.TitularesII.rosser]
 
 /-- `#pureza_titulares`: el control, sobre `PUROS` e `IMPUROS`. -/
 elab "#pureza_titulares" : command => ROBINSON_PlusPlus.Meta.PurezaComando.comprobar PUROS IMPUROS

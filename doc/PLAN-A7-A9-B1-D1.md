@@ -1,6 +1,6 @@
 # El plan de A7, A9, B1 y D1
 
-**Last updated:** 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
+**Last updated:** 2026-11-17 — [ADR‑268](../DECISIONS.md): B1, los pasos 2 y 3 (§4). Antes, 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
 [ADR‑265](../DECISIONS.md): las decisiones del propietario (§0) y **A7, hecho** (§2).
 Antes, 2026-11-10 — creado con [ADR‑264](../DECISIONS.md): el estudio y el plan de cuatro filas de
 `doc/AUDITORIAS.md` §2 (el núcleo de `[B]`, `prf_list_induction` sin `listInd`, las capas dentro de RPP y las preguntas
@@ -148,6 +148,8 @@ mucho, el corte crece. **Coste:** de uno a dos días (ESTIMACIÓN).
 > clase, con el espacio de nombres de su módulo nuevo; los controles, en C8. MEDIDO: 11 de 402 imports suben con la
 > asignación por familias, y cuatro módulos con titulares de la (i) ven la semántica, por seis nudos. La ejecución, en
 > seis pasos (ADR‑266 §6). Lo que aquí sigue es el plan tal como se escribió.
+> ✏️ 2026‑11‑17: el paso 1 (ADR‑267) y los pasos 2 y 3 (ADR‑268), hechos: la regla de C7.i se cumple; los imports que
+> suben, de 11 a 5 (dos provisionales hasta el paso 4).
 
 **Lo medido.** No hay manifiesto ni control. Lo que sí hay: `DEPENDENCIES.md`, generado y con `--check` en la CI
 (ADR‑238: 120 módulos activos, 402 aristas, profundidad 59, sin ciclos); las familias de `Meta/` en prosa

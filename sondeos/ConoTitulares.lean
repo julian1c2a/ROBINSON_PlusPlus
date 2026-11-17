@@ -163,28 +163,28 @@ def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.Consistencia.consistencia, "—"),
   (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I, "ii"),
   (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, "ii"),
-  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski, "ii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesII.tarski, "ii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_indecidible, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera, "iii"),
   (``ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff, "iii"),
-  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico, "iii"),
   -- ✏️ 2026‑10‑18 (ADR‑160): los tres titulares nuevos de ADR‑157 y ADR‑159.
   (``ROBINSON_PlusPlus.Meta.Rosser.rosser_ext, "i"),
-  (``ROBINSON_PlusPlus.Meta.Rosser.rosser, "ii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesII.rosser, "ii"),
   (``ROBINSON_PlusPlus.Meta.Lob.lob, "i"),
   -- ✏️ 2026‑10‑19 (T74): los tres corolarios de T78, titulares desde ADR‑164.
   (``ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con, "i"),
   (``ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado, "i"),
-  (``ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible, "iii"),
   -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
   (``ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de, "iii"),
   (``ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de, "iii"),
   (``ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de, "iii"),
   (``ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de, "iii"),
   -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
-  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de, "iii")]
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico_de, "iii")]
 
 /-- ¿Es de ELABORACIÓN? Su tipo, quitados los `∀`, tiene la cabeza en `Lean.*` o en `IO`: sintaxis, macros,
     tácticas, elaboradores. -/

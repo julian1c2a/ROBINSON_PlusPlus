@@ -72,7 +72,7 @@ theorem hI_refutable :
     simp only [In, cons, nil, zero, in_sym, cons_sym, zero_sym, evalFormula, evalTerm, evalTerms, MN_mem, MN_cons, MN_zero]
     exact (memN_consN 0 0 0).2 (Or.inl rfl)
   have hp : Prf (In (.var 0) (cons zero nil)) :=
-    ROBINSON_PlusPlus.Meta.SolidezVerificador.prf_of_prov _ (fun _ => 0) (h0 hm)
+    ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo.prf_of_prov _ (fun _ => 0) (h0 hm)
   have h1 := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN hp (fun _ => 1)
   simp only [In, cons, nil, zero, in_sym, cons_sym, zero_sym, evalFormula, evalTerm, evalTerms, MN_mem, MN_cons, MN_zero] at h1
   rcases (memN_consN 1 0 0).1 h1 with h | h

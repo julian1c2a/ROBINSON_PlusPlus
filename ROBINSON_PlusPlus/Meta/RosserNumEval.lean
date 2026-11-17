@@ -522,6 +522,8 @@ end ROBINSON_PlusPlus.Meta.RosserNumEval
 
 /-! T08 en el módulo (ADR‑147): lo de esta etapa no nombra la semántica; `ev_numeralM`, el valor de un numeral en el
     modelo, sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.RosserNumEval.codT_liftcN ROBINSON_PlusPlus.Meta.RosserNumEval.codF_liftfcN
   ROBINSON_PlusPlus.Meta.RosserNumEval.codF_substfcN ROBINSON_PlusPlus.Meta.RosserNumEval.codT_of_hasWitN
   ROBINSON_PlusPlus.Meta.RosserNumEval.codF_of_hasWitFN ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substtc_numeral
@@ -529,4 +531,4 @@ end ROBINSON_PlusPlus.Meta.RosserNumEval
   ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_numeral ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_guarda
   ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftfc_guarda ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_codeNat
   ROBINSON_PlusPlus.Meta.RosserNumEval.guardas_satisfacibles
-  | ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM
+  |

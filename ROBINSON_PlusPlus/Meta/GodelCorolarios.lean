@@ -3,11 +3,13 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.SolidezVerificador
+import ROBINSON_PlusPlus.Meta.GodelTwoPrf
 import ROBINSON_PlusPlus.Meta.PurezaComando
 
 /-!
 # `Meta/GodelCorolarios.lean` — los corolarios de libro de Gödel II (T78, ADR‑162)
+
+✏️ 2026‑11‑17 (ADR‑268, las capas de B1): `con_indecidible` está en `Meta/TitularesIII.lean`.
 
 **Qué.** Tres resultados clásicos que faltaban, con D1–D3 y el punto fijo de `G`:
 
@@ -74,35 +76,17 @@ theorem goedel_second_formalizado : Prf (consistencyFormula' ⇒ neg (provCodeC'
 theorem goedel_second_de_formalizado (hcon : ConsistentH) : ¬ Prf consistencyFormula' :=
   fun hC => hcon (prf_mp (prf_mp goedel_second_formalizado hC) (repr_pos'_prf hC))
 
-/-- 🏁 **`Con'` es INDECIDIBLE**: `goedel_II`, y `¬ Prf ¬Con'` porque `Con'` es verdadera en `MNV V₀` y `Prf` es
-    sólida. Clase (iii): la consistencia sola no basta (T+¬Con es consistente y demuestra ¬Con'). Desde ADR‑191, por la
-    solidez doble‑negada: `Con'` es `¬Prov(⌜⊥⌝)`, tiene `P`, y lo verdadero con `P` no se refuta (`no_refuta`). -/
-theorem con_indecidible : And (¬ Prf consistencyFormula') (¬ Prf (neg consistencyFormula')) := by
-  refine ⟨ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, ?_⟩
-  have e : ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-      (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' Formula.bottom) =
-      ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-        ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC' := by
-    rw [ROBINSON_PlusPlus.Meta.ProofChain.provCodeC', ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas_subst]
-  have hP : (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-      consistencyFormula').1 = true := by
-    rw [consistencyFormula', neg]
-    simp only [ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.clas, e]
-    rfl
-  exact ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.no_refuta ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
-    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada hP
-    (fun _ => 0) (ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera (fun _ => 0))
-
 end ROBINSON_PlusPlus.Meta.GodelCorolarios
 
 #print axioms ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_imp_con
 #print axioms ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
 #print axioms ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
-#print axioms ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
 
 /-! T08 en el módulo: los corolarios sintácticos no nombran la semántica; `con_indecidible`, que usa la verdad en
     `MNV V₀`, sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_imp_con ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
   ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
   ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_de_formalizado
-  | ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
+  |

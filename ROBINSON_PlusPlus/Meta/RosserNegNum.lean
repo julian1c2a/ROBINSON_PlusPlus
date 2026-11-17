@@ -244,26 +244,6 @@ theorem negNum_formCode {φ : Formula} (h : ¬ Prf φ) (m : Nat) :
 theorem control_negNum_vacia (y : Nat) : Prf (neg (PfF (numeralM 0) (numeralM y))) :=
   negNum (not_proofN_zero y)
 
-/-- ✅ **…y sólo donde no hay prueba**: donde `ProofN` vale, `Prf` no refuta `PfF`, por la solidez en `MNV V₀` (la doble‑negada, ADR‑191: lo verdadero con `P` no se refuta). -/
-theorem control_exacta {m y : Nat} (h : ProofN m y) : ¬ Prf (neg (PfF (numeralM m) (numeralM y))) := by
-  intro hp
-  have hs := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
-    hp (fun _ => 0)
-  apply hs
-  apply (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ _).1 rfl
-  have em := ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM (V := codeNatList axioms) (fun _ => 0) m
-  have ey := ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM (V := codeNatList axioms) (fun _ => 0) y
-  simp only [PfF, land, chainOk, In, runFn, nil, zero, FOL.Metamath.Semantics.evalFormula,
-    FOL.Metamath.Semantics.evalTerm, FOL.Metamath.Semantics.evalTerms, ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo,
-    em, ey, ROBINSON_PlusPlus.Meta.ModeloEstandar.MN_chainOk, ROBINSON_PlusPlus.Meta.ModeloEstandar.MN_runFn]
-  exact h
-
-/-- ✅ La hipótesis puede fallar: la prueba de un axioma ES una prueba, y `Prf` no la refuta. -/
-theorem control_falla {a : Formula} (ha : List.Mem a axioms) :
-    ¬ Prf (neg (PfF (numeralM (consN (lineaThy a) 0)) (numeralM (codeNat a)))) :=
-  control_exacta (proofN_axioma ha)
-
 end ROBINSON_PlusPlus.Meta.RosserNegNum
 
 #print axioms ROBINSON_PlusPlus.Meta.RosserNegNum.chainOkN_decide
@@ -274,8 +254,10 @@ end ROBINSON_PlusPlus.Meta.RosserNegNum
 
 /-! T08 en el módulo (ADR‑147): lo de esta etapa no nombra la semántica; los dos controles que usan la solidez en el
     modelo, sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.RosserNegNum.chainOkN_decide ROBINSON_PlusPlus.Meta.RosserNegNum.proofN_decide
   ROBINSON_PlusPlus.Meta.RosserNegNum.negNum ROBINSON_PlusPlus.Meta.RosserNegNum.negNum'
   ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formula ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formCode
   ROBINSON_PlusPlus.Meta.RosserNegNum.control_negNum_vacia
-  | ROBINSON_PlusPlus.Meta.RosserNegNum.control_exacta ROBINSON_PlusPlus.Meta.RosserNegNum.control_falla
+  |

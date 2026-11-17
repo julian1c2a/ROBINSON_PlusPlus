@@ -9,6 +9,8 @@ import ROBINSON_PlusPlus.Meta.PurezaComando
 /-!
 # `Meta/Lob.lean` — 🏁 LÖB: si T demuestra Prov⌜φ⌝ ⇒ φ, demuestra φ (ADR‑140, T70, ADR‑159)
 
+✏️ 2026‑11‑17 (ADR‑268, las capas de B1): los dos controles que usan la consistencia están en `Meta/Controles.lean`.
+
 **Qué.** `lob φ : Prf (provCodeC' φ ⇒ φ) → Prf φ`, y su forma completa, `lob_iff`: T demuestra la reflexión
 Prov⌜φ⌝ ⇒ φ exactamente para sus teoremas. Es el segundo consumidor de D1–D3, tras Gödel II.
 
@@ -97,14 +99,6 @@ theorem lob_iff (φ : Formula) : Prf (provCodeC' φ ⇒ φ) ↔ Prf φ :=
 theorem goedel_second_de_lob (hcon : ConsistentH) : ¬ Prf ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
   fun hC => hcon (lob Formula.bottom hC)
 
-/-- ✅ La hipótesis puede FALLAR: T no demuestra su reflexión para ⊥ (con `consistencia`; es Gödel II). -/
-theorem control_reflexion_bot : ¬ Prf (provCodeC' Formula.bottom ⇒ Formula.bottom) :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.consistencia (lob Formula.bottom h)
-
-/-- ✅ Ni para la sentencia de Gödel: T no demuestra Prov⌜G⌝ ⇒ G (Löb y Gödel I). -/
-theorem control_reflexion_godel : ¬ Prf (provCodeC' godelCN ⇒ godelCN) :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (lob godelCN h)
-
 /-- ✅ Y puede VALER: para un teorema, la reflexión es teorema (la dirección fácil de `lob_iff`). -/
 theorem control_reflexion_teorema :
     Prf (provCodeC' (Formula.bottom ⇒ Formula.bottom) ⇒ (Formula.bottom ⇒ Formula.bottom)) :=
@@ -119,6 +113,8 @@ end ROBINSON_PlusPlus.Meta.Lob
 
 /-! T08 en el módulo: Löb no nombra la semántica; los dos controles que descargan la consistencia con
     `consistencia` (directamente, o por `goedel_I`), sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.Lob.prf_lob_fix ROBINSON_PlusPlus.Meta.Lob.lob ROBINSON_PlusPlus.Meta.Lob.lob_iff
   ROBINSON_PlusPlus.Meta.Lob.goedel_second_de_lob ROBINSON_PlusPlus.Meta.Lob.control_reflexion_teorema
-  | ROBINSON_PlusPlus.Meta.Lob.control_reflexion_bot ROBINSON_PlusPlus.Meta.Lob.control_reflexion_godel
+  |

@@ -115,13 +115,13 @@ def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.Consistencia.consistencia, "—"),
   (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I, "ii"),
   (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, "ii"),
-  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski, "ii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesII.tarski, "ii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_indecidible, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera, "iii"),
   (``ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff, "iii"),
-  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico, "iii")]
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico, "iii")]
 
 /-- ¿Es de ELABORACIÓN? Su tipo, quitados los `∀`, tiene la cabeza en `Lean.*` o en `IO`: sintaxis, macros,
     tácticas, elaboradores. -/

@@ -1,0 +1,16 @@
+módulos por capa: {'C0': 4, 'C1': 9, 'C2': 11, 'C3': 10, 'C4': 70, 'C5': 7, 'C6': 1, 'C7i': 5, 'C7ii': 1, 'C7iii': 3, 'C8': 4} · imports: 426 · SUBEN: 5
+    C5    Consistencia           → C7i   GodelTwoPrf
+    C3    GodelTwo               → C4    PremsBdAllPrf
+    C6    PuenteFOL              → C7iii TitularesIII
+    C3    Representability2      → C4    CodeWitnessPrf
+    C5    RigidezEstandar        → C7iii TitularesIII
+
+la regla de C7.i: módulos de C5 o C6 en el cierre de imports de cada módulo de C7.i (y de D1, D2 y D3):
+    DerivCondPrf           ninguno
+    GodelCorolarios        ninguno
+    GodelTwoPrf            ninguno
+    Lob                    ninguno
+    PremsBdAllPrf          ninguno
+    Representability2Prf   ninguno
+    Rosser                 ninguno
+    TarskiPrf              ninguno

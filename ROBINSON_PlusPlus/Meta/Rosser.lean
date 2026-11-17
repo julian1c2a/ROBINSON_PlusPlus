@@ -9,6 +9,8 @@ import ROBINSON_PlusPlus.Meta.TarskiPrf
 /-!
 # `Meta/Rosser.lean` — 🏁 ROSSER, para toda extensión finita T+E, por REDUCCIÓN a T (ADR‑144, ADR‑145, ADR‑157)
 
+✏️ 2026‑11‑17 (ADR‑268, las capas de B1): `rosser` está en `Meta/TitularesII.lean`, y los dos controles de T+¬Con, en `Meta/Controles.lean`.
+
 **Qué.** `rosser_ext E hE hcon : ¬ PrfH E (R E) ∧ ¬ PrfH E ¬(R E)`: si T+E es consistente, su sentencia de Rosser es
 indecidible en T+E. Y el corolario para la propia T, sin hipótesis: `rosser : ¬ Prf R ∧ ¬ Prf ¬R`, con `consistencia`.
 
@@ -44,7 +46,7 @@ open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel ROBINSON_
 open ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.TarskiPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
-open ROBINSON_PlusPlus.Meta.RosserPosNum ROBINSON_PlusPlus.Meta.RosserNegNum
+open ROBINSON_PlusPlus.Meta.RosserPosNum ROBINSON_PlusPlus.Meta.RosserNegNum ROBINSON_PlusPlus.Meta.Sentencia
 
 namespace ROBINSON_PlusPlus.Meta.Rosser
 
@@ -361,12 +363,6 @@ theorem rosser_ext (E : List Formula) (_hE : ∀ φ, List.Mem φ E → IsSentenc
     And (¬ PrfH E (R E)) (¬ PrfH E (neg (R E))) :=
   rosser_red E hcon
 
-/-- 🏁 **ROSSER para T, sin hipótesis** (con `consistencia`): ni `R []` ni `¬R []` son teoremas. -/
-theorem rosser : And (¬ Prf (R [])) (¬ Prf (neg (R []))) := by
-  have h := rosser_ext [] (fun _ hm => nomatch hm)
-    (fun hb => ROBINSON_PlusPlus.Meta.Consistencia.consistencia (prfH_nil_to_prf hb rfl))
-  exact ⟨fun hp => h.1 (prf_to_prfH hp []), fun hp => h.2 (prf_to_prfH hp [])⟩
-
 /-! ## §6 · Los controles (CRI‑02, ADR‑144 §3) -/
 
 /-- ✅ La hipótesis puede FALLAR: T+[⊥] es inconsistente… -/
@@ -377,32 +373,10 @@ theorem inconsistente_bottom : PrfH [Formula.bottom] Formula.bottom :=
 theorem control_bottom : PrfH [Formula.bottom] (R [Formula.bottom]) :=
   PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _)) inconsistente_bottom
 
-/-- ✅ La hipótesis puede VALER en una extensión NO sólida: T+¬Con es consistente (por Gödel II y la deducción), y
-    demuestra ¬Con, FALSA en el modelo (`con_verdadera`). -/
-theorem consistente_neg_con :
-    ¬ PrfH [neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula'] Formula.bottom := by
-  intro h
-  have hnn : Prf (neg (neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula')) :=
-    (prfH_iff_prf_impChain _ _).1 h
-  exact ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
-    (Prf.mp _ _ (Prf.p3 ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula') hnn)
-
 /-- ¬Con es una sentencia: T+¬Con es un miembro de la familia de `rosser_ext`. -/
 theorem negCon_isSentence : IsSentence (neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula') := by
   unfold IsSentence ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'
   rfl
-
-/-- ✅ Y allí Rosser vale, por el titular: con E = [¬Con] las dos hipótesis de `rosser_ext` valen a la vez, y la
-    sentencia de Rosser de T+¬Con es indecidible en T+¬Con, donde la solidez no puede sustituir a la consistencia. -/
-theorem control_neg_con :
-    And (¬ PrfH [neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula']
-        (R [neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula']))
-      (¬ PrfH [neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula']
-        (neg (R [neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula']))) :=
-  rosser_ext _ (fun φ h => by
-      cases h with
-      | head => exact negCon_isSentence
-      | tail _ h' => cases h') consistente_neg_con
 
 end ROBINSON_PlusPlus.Meta.Rosser
 
@@ -413,12 +387,13 @@ end ROBINSON_PlusPlus.Meta.Rosser
 #print axioms ROBINSON_PlusPlus.Meta.Rosser.R_isSentence
 #print axioms ROBINSON_PlusPlus.Meta.Rosser.rosser_red
 #print axioms ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
-#print axioms ROBINSON_PlusPlus.Meta.Rosser.rosser
 
 /-! T08 en el módulo (ADR‑147): lo de Rosser no nombra la semántica; `rosser`, que descarga la hipótesis con
     `consistencia`, y el control de T+¬Con, que pasa por `goedel_II`, sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.Rosser.prfH_iff_prf_impChain ROBINSON_PlusPlus.Meta.Rosser.formCode_impChain
   ROBINSON_PlusPlus.Meta.Rosser.posNumE ROBINSON_PlusPlus.Meta.Rosser.negNumE
   ROBINSON_PlusPlus.Meta.Rosser.R_isSentence ROBINSON_PlusPlus.Meta.Rosser.rosser_red
   ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ROBINSON_PlusPlus.Meta.Rosser.control_bottom
-  | ROBINSON_PlusPlus.Meta.Rosser.rosser ROBINSON_PlusPlus.Meta.Rosser.control_neg_con
+  |

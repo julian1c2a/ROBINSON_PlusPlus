@@ -1,0 +1,31 @@
+﻿ROBINSON_PlusPlus.Meta.SolidezVerificador — se van 10.
+  (a) lo que se QUEDA y usa algo que se va: nada
+  (b) lo que se va depende de: FOL.FOL (23), FOL.Semantics (17), ROBINSON_PlusPlus.Meta.Consistencia (6), ROBINSON_PlusPlus.Meta.Diagonal (1), ROBINSON_PlusPlus.Meta.DiagonalNumeral (11), ROBINSON_PlusPlus.Meta.DiagonalTwo (3), ROBINSON_PlusPlus.Meta.Godel (1), ROBINSON_PlusPlus.Meta.GodelTwo (1), ROBINSON_PlusPlus.Meta.GodelTwoPrf (3), ROBINSON_PlusPlus.Meta.Hilbert (9), ROBINSON_PlusPlus.Meta.ModeloCodigo (30), ROBINSON_PlusPlus.Meta.ModeloEstandar (10), ROBINSON_PlusPlus.Meta.ProofChain (11), ROBINSON_PlusPlus.Meta.Provability (2), ROBINSON_PlusPlus.Meta.Representability (1), ROBINSON_PlusPlus.Meta.Representability2Prf (2), ROBINSON_PlusPlus.Meta.SolidezDobleNegacion (21), ROBINSON_PlusPlus.Meta.SolidezVerificador (18), ROBINSON_PlusPlus.Minimal.Axioms (6)
+ROBINSON_PlusPlus.Meta.TarskiPrf — se van 5.
+  (a) lo que se QUEDA y usa algo que se va: 
+    ROBINSON_PlusPlus.Meta.TarskiPrf.liar_isSentence usa ROBINSON_PlusPlus.Meta.TarskiPrf.IsSentence
+    ROBINSON_PlusPlus.Meta.TarskiPrf.liar_isSentence usa ROBINSON_PlusPlus.Meta.TarskiPrf.IsSentence
+  (b) lo que se va depende de: FOL.FOL (26), FOL.Lift0 (1), FOL.Semantics (8), ROBINSON_PlusPlus.Meta.Consistencia (2), ROBINSON_PlusPlus.Meta.DerivCondPrf (1), ROBINSON_PlusPlus.Meta.Diagonal (1), ROBINSON_PlusPlus.Meta.DiagonalNumeral (4), ROBINSON_PlusPlus.Meta.DiagonalTwo (1), ROBINSON_PlusPlus.Meta.Godel (6), ROBINSON_PlusPlus.Meta.GodelTwoPrf (1), ROBINSON_PlusPlus.Meta.Hilbert (2), ROBINSON_PlusPlus.Meta.ModeloCodigo (2), ROBINSON_PlusPlus.Meta.ModeloEstandar (2), ROBINSON_PlusPlus.Meta.ReprPrf (1), ROBINSON_PlusPlus.Meta.SolidezDobleNegacion (2), ROBINSON_PlusPlus.Meta.SolidezPrf (2), ROBINSON_PlusPlus.Meta.TarskiPrf (13), ROBINSON_PlusPlus.Minimal.Axioms (6)
+ROBINSON_PlusPlus.Meta.TarskiPrf — se van 2.
+  (a) lo que se QUEDA y usa algo que se va: 
+    ROBINSON_PlusPlus.Meta.TarskiPrf.liar_isSentence usa ROBINSON_PlusPlus.Meta.TarskiPrf.IsSentence
+    ROBINSON_PlusPlus.Meta.TarskiPrf.liar_isSentence usa ROBINSON_PlusPlus.Meta.TarskiPrf.IsSentence
+  (b) lo que se va depende de: FOL.FOL (9), FOL.Lift0 (1), ROBINSON_PlusPlus.Meta.DerivCondPrf (1), ROBINSON_PlusPlus.Meta.DiagonalNumeral (3), ROBINSON_PlusPlus.Meta.DiagonalTwo (1), ROBINSON_PlusPlus.Meta.Godel (1), ROBINSON_PlusPlus.Meta.TarskiPrf (3), ROBINSON_PlusPlus.Minimal.Axioms (1)
+ROBINSON_PlusPlus.Meta.Rosser — se van 3.
+  (a) lo que se QUEDA y usa algo que se va: nada
+  (b) lo que se va depende de: FOL.FOL (18), ROBINSON_PlusPlus.Meta.Consistencia (2), ROBINSON_PlusPlus.Meta.GodelTwo (4), ROBINSON_PlusPlus.Meta.Hilbert (5), ROBINSON_PlusPlus.Meta.HilbertDeduction (6), ROBINSON_PlusPlus.Meta.Rosser (10), ROBINSON_PlusPlus.Meta.TarskiPrf (2)
+ROBINSON_PlusPlus.Meta.Lob — se van 2.
+  (a) lo que se QUEDA y usa algo que se va: nada
+  (b) lo que se va depende de: FOL.FOL (6), ROBINSON_PlusPlus.Meta.Consistencia (2), ROBINSON_PlusPlus.Meta.DiagonalNumeral (2), ROBINSON_PlusPlus.Meta.Hilbert (4), ROBINSON_PlusPlus.Meta.Lob (2), ROBINSON_PlusPlus.Meta.ProofChain (4)
+ROBINSON_PlusPlus.Meta.GodelCorolarios — se van 1.
+  (a) lo que se QUEDA y usa algo que se va: nada
+  (b) lo que se va depende de: FOL.FOL (7), ROBINSON_PlusPlus.Meta.ChainPrf (1), ROBINSON_PlusPlus.Meta.Consistencia (2), ROBINSON_PlusPlus.Meta.GodelCorolarios (1), ROBINSON_PlusPlus.Meta.GodelTwo (2), ROBINSON_PlusPlus.Meta.Hilbert (2), ROBINSON_PlusPlus.Meta.ModeloCodigo (1), ROBINSON_PlusPlus.Meta.ModeloEstandar (1), ROBINSON_PlusPlus.Meta.ProofChain (2), ROBINSON_PlusPlus.Meta.Provability (1), ROBINSON_PlusPlus.Meta.Representability2Prf (1), ROBINSON_PlusPlus.Meta.SolidezDobleNegacion (5), ROBINSON_PlusPlus.Meta.SolidezVerificador (1)
+ROBINSON_PlusPlus.Meta.RosserGuardNeg — se van 2.
+  (a) lo que se QUEDA y usa algo que se va: nada
+  (b) lo que se va depende de: FOL.FOL (4), FOL.Semantics (4), ROBINSON_PlusPlus.Meta.Consistencia (2), ROBINSON_PlusPlus.Meta.Hilbert (4), ROBINSON_PlusPlus.Meta.ModeloCodigo (6), ROBINSON_PlusPlus.Meta.ModeloEstandar (6), ROBINSON_PlusPlus.Meta.SolidezDobleNegacion (12), ROBINSON_PlusPlus.Minimal.Axioms (8)
+ROBINSON_PlusPlus.Meta.RosserNegLinea — se van 1.
+  (a) lo que se QUEDA y usa algo que se va: nada
+  (b) lo que se va depende de: FOL.FOL (6), FOL.Semantics (6), ROBINSON_PlusPlus.Meta.Consistencia (2), ROBINSON_PlusPlus.Meta.Hilbert (2), ROBINSON_PlusPlus.Meta.ModeloCodigo (4), ROBINSON_PlusPlus.Meta.ModeloEstandar (2), ROBINSON_PlusPlus.Meta.RosserNegLinea (2), ROBINSON_PlusPlus.Meta.SolidezDobleNegacion (6), ROBINSON_PlusPlus.Minimal.Axioms (5)
+ROBINSON_PlusPlus.Meta.RosserNegNum — se van 2.
+  (a) lo que se QUEDA y usa algo que se va: nada
+  (b) lo que se va depende de: FOL.FOL (11), FOL.Semantics (7), ROBINSON_PlusPlus.Meta.Consistencia (2), ROBINSON_PlusPlus.Meta.Hilbert (3), ROBINSON_PlusPlus.Meta.ModeloCodigo (4), ROBINSON_PlusPlus.Meta.ModeloEstandar (2), ROBINSON_PlusPlus.Meta.RosserNegNum (1), ROBINSON_PlusPlus.Meta.RosserPosNum (3), ROBINSON_PlusPlus.Meta.RosserW1 (5), ROBINSON_PlusPlus.Meta.SolidezDobleNegacion (6), ROBINSON_PlusPlus.Minimal.Axioms (12)

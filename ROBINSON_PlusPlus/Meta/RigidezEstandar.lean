@@ -4,6 +4,10 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
+import ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo
+import ROBINSON_PlusPlus.Meta.TitularesIII
+-- (✏️ 2026‑11‑17, ADR‑268: `TitularesIII` por `gg_godelCN` y `clas_godelCN`, que usa `godelCN_verdadera_de`: un
+-- import hacia ARRIBA, C5 → C7.iii, provisional hasta el paso 4 de ADR‑266, que sube los titulares de este módulo.)
 import ROBINSON_PlusPlus.Meta.RosserNumEval
 
 /-!
@@ -976,8 +980,8 @@ theorem godelCN_verdadera_de (hM : Estandar M) (v : Nat → Nat) :
     evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
   (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
     ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ v).2.2
-    ROBINSON_PlusPlus.Meta.SolidezVerificador.clas_godelCN
-    (ROBINSON_PlusPlus.Meta.SolidezVerificador.gg_godelCN
+    ROBINSON_PlusPlus.Meta.TitularesIII.clas_godelCN
+    (ROBINSON_PlusPlus.Meta.TitularesIII.gg_godelCN
       (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de hM) (fun v' hp => prf_of_prov_de hM _ v' hp) v)
 
 /-- 🏁 **E10: `Con` es VERDADERA en todo modelo estándar.** -/

@@ -6,7 +6,7 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 import ROBINSON_PlusPlus.Meta.NumListPrf
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
-import ROBINSON_PlusPlus.Meta.ModeloEstandar
+import ROBINSON_PlusPlus.Meta.ModeloCodigo
 import ROBINSON_PlusPlus.Meta.PurezaComando
 
 /-!
@@ -273,6 +273,8 @@ end ROBINSON_PlusPlus.Meta.RosserNumerales
 
 /-! T08 en el módulo (ADR‑147, con el recorrido de ADR‑149): lo de esta etapa no nombra la semántica; `ev_numeralM`, el
     valor de un numeral en el modelo, sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.RosserNumerales.prf_numeral_cons ROBINSON_PlusPlus.Meta.RosserNumerales.prf_carc_numeral
   ROBINSON_PlusPlus.Meta.RosserNumerales.prf_cdrc_numeral ROBINSON_PlusPlus.Meta.RosserNumerales.prf_lenc_numeral
   ROBINSON_PlusPlus.Meta.RosserNumerales.prf_nthc_numeral ROBINSON_PlusPlus.Meta.RosserNumerales.prf_implc_numeral
@@ -280,4 +282,4 @@ end ROBINSON_PlusPlus.Meta.RosserNumerales
   ROBINSON_PlusPlus.Meta.RosserNumerales.prf_concat_numeral ROBINSON_PlusPlus.Meta.RosserNumerales.prf_runFn_numeral
   ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_runFn ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_runFn
   ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_decide
-  | ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM
+  |

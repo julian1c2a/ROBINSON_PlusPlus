@@ -4,7 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.GodelTwoPrf
-import ROBINSON_PlusPlus.Meta.Consistencia
+import ROBINSON_PlusPlus.Meta.Sentencia
 -- (2026‑10‑19, T74: el único `import` de los módulos de FOL sin nada en el cono que se queda. Lo piden
 -- `diagBeta_lift1`, `liar_isSentence` y, en `Meta/Rosser.lean`, `R_isSentence`, que reescriben con
 -- `FOL.Lift0.liftFormula_subst` y `FOL.Lift0.liftFormula_lift`; las tres están FUERA del cono de los titulares.)
@@ -12,6 +12,8 @@ import FOL.Lift0
 
 /-!
 # `Meta/TarskiPrf.lean` — 🏁 TARSKI: la verdad no es definible en la teoría (ADR‑121)
+
+✏️ 2026‑11‑17 (ADR‑268, las capas de B1): `tarski` está en `Meta/TitularesII.lean`; `tarski_semantico` y `tarski_semantico_de`, en `Meta/TitularesIII.lean`; `IsSentence` y `godelCN_isSentence`, en `Meta/Sentencia.lean`. Aquí queda la parte de la clase (i), sin la semántica.
 
 * `prf_diagonal (P)` — **el lema diagonal para un predicado ARBITRARIO**: `selfAppN (diagBeta P)` es punto fijo de
   `P`. La composición de sustituciones que hacía falta es una línea de FOL, `FOL.subst_subst_lift_gen`, con la
@@ -42,7 +44,7 @@ set_option relaxedAutoImplicit false
 
 open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.Diagonal
-open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf
+open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf ROBINSON_PlusPlus.Meta.Sentencia
 
 namespace ROBINSON_PlusPlus.Meta.TarskiPrf
 
@@ -96,19 +98,9 @@ theorem prf_tarski (Tr : Formula) :
     Prf (neg (substFormula 0 (numeral (codeNat (liar Tr))) Tr ⇔ liar Tr)) :=
   prf_neg_iff_of_iff_neg (prf_liar Tr)
 
-/-- 🏁 **TARSKI**, sin hipótesis (`consistencia`, ADR‑120): ninguna `Tr` define la verdad en la teoría —`Tr(⌜L⌝) ⇔ L`
-    no es teorema en su propio mentiroso `L`—. -/
-theorem tarski (Tr : Formula) :
-    ¬ Prf (substFormula 0 (numeral (codeNat (liar Tr))) Tr ⇔ liar Tr) :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.consistencia (prf_mp (prf_tarski Tr) h)
-
 /-! ## §5 · El mentiroso es una SENTENCIA (la invariancia por lift, la noción de `axioms_lift_eq`) -/
-def IsSentence (φ : Formula) : Prop := liftFormula 0 φ = φ
-
 theorem liftFormula_neg (c : Nat) (A : Formula) :
     liftFormula c (neg A) = neg (liftFormula c A) := rfl
-theorem liftTerm_one_diagTerm : liftTerm 1 diagTerm = diagTerm := rfl
-
 theorem diagBeta_lift1 {P : Formula} (hP : liftFormula 1 P = P) :
     liftFormula 1 (diagBeta P) = diagBeta P := by
   rw [diagBeta, FOL.Lift0.liftFormula_subst _ 0 1 (Nat.zero_le 1), liftTerm_one_diagTerm,
@@ -123,77 +115,13 @@ theorem liar_isSentence {Tr : Formula} (hTr : liftFormula 1 Tr = Tr) : IsSentenc
   rw [FOL.Lift0.liftFormula_subst _ 0 0 (Nat.le_refl 0),
     ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_numeral, hβ]
 
-/-- `godelPred' = ¬ provFormulaC'` tiene a lo sumo `#0` libre. -/
-theorem godelPred'_lift2 : liftFormula 2 godelPred' = godelPred' := by
-  simp only [godelPred', neg, provFormulaC', liftFormula, liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, reduceIte]
-
-theorem godelBeta'_lift1 : liftFormula (0 + 1) godelBeta' = godelBeta' := by
-  unfold godelBeta'
-  rw [FOL.Lift0.liftFormula_subst _ 0 1 (Nat.zero_le 1), liftTerm_one_diagTerm, godelPred'_lift2]
-
-/-- 🏁 **La sentencia de Gödel es una SENTENCIA** (T12, ADR‑187): la gemela de `liar_isSentence` para `godelCN`. Por
-    `unfold` y `rw` con lemas universales: el numeral `numeral (codeNat godelBeta')` no se evalúa nunca. -/
-theorem godelCN_isSentence : IsSentence godelCN := by
-  unfold IsSentence godelCN selfAppN
-  rw [FOL.Lift0.liftFormula_subst _ 0 0 (Nat.le_refl 0),
-    ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_numeral, godelBeta'_lift1]
-
 /-! ## §6 · Control negativo: con `Prf ⊥`, el bicondicional del mentiroso SÍ sería teorema (la consistencia no
 sobra) -/
 example (hbot : Prf Formula.bottom) (Tr : Formula) :
     Prf (substFormula 0 (numeral (codeNat (liar Tr))) Tr ⇔ liar Tr) :=
   prf_mp (Prf.incl (Prfᵢ.efq _)) hbot
 
-/-! ## §7 · TARSKI SEMÁNTICO: en TODO modelo estándar, y en `MNV V₀`
-
-Si `Tr(⌜L⌝)` y `L` valieran a la vez en el modelo, como el modelo satisface `L ⇔ ¬Tr(⌜L⌝)`, `Tr(⌜L⌝)` valdría y no
-valdría. Vale en todo `M` con `Estandar M` (T75a, ADR‑175); `tarski_semantico` es la instancia en `MNV V₀`
-(`estandar_MN`), que es también el control de que la hipótesis no es vacía.
-
-✏️ *(ADR‑191)*: hasta ADR‑190, `L ⇔ ¬Tr(⌜L⌝)` se leía en el modelo por la solidez en `Prop` (`prf_sound`), que lleva la
-lógica clásica (`p3`). Con `Tr` arbitraria eso no se puede leer de otro modo; lo que se lee ahora es UNA IGUALDAD, la del
-término diagonal (`prf_diag_arith_num`): por la solidez doble‑negada vale en `M`, porque en `Nat` la igualdad es
-decidible (`eq_de_prf`). Con ella, `L` es literalmente `¬Tr(t)` con `t` del mismo valor que `⌜L⌝`, y el resto es
-lógica intuicionista. -/
-open FOL.Metamath.Semantics in
-/-- 🏁 Ninguna `Tr` define la verdad en un modelo estándar CUALQUIERA: falla en su mentiroso, para toda asignación. -/
-theorem tarski_semantico_de {M : Model Nat} (hM : ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar M) (Tr : Formula)
-    (v : Nat → Nat) :
-    ¬ (evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) ↔ evalFormula M v (liar Tr)) := by
-  intro h1
-  -- el término diagonal vale lo que el numeral del mentiroso: una igualdad que `Prf` demuestra
-  have he : evalTerm M v (substTerm 0 (numeral (codeNat (diagBeta (neg Tr)))) diagTerm) =
-      evalTerm M v (numeral (codeNat (liar Tr))) :=
-    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.eq_de_prf
-      (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de hM) (prf_diag_arith_num (diagBeta (neg Tr))) v
-  -- `L` ES `¬ Tr(t)`, con `t` el término diagonal
-  have hL : liar Tr = neg (substFormula 0 (substTerm 0 (numeral (codeNat (diagBeta (neg Tr)))) diagTerm) Tr) := by
-    unfold liar selfAppN
-    rw [diagBeta_comp, substFormula_neg]
-  -- luego `L ↔ ¬ Tr(⌜L⌝)` en `M`, por el valor del término
-  have hLT : evalFormula M v (liar Tr) ↔ ¬ evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) := by
-    have h2 : evalFormula M v (liar Tr) ↔
-        ¬ evalFormula M v (substFormula 0 (substTerm 0 (numeral (codeNat (diagBeta (neg Tr)))) diagTerm) Tr) := by
-      rw [hL]; exact Iff.rfl
-    rw [h2, eval_substFormula_zero, eval_substFormula_zero M v (numeral (codeNat (liar Tr))), he]
-  have hnT : ¬ evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) := fun hT => hLT.mp (h1.mp hT) hT
-  exact hnT (h1.mpr (hLT.mpr hnT))
-
-open FOL.Metamath.Semantics in
-/-- 🏁 Ninguna `Tr` define la verdad en `MNV V₀`: la instancia de `tarski_semantico_de` en `estandar_MN`. -/
-theorem tarski_semantico (Tr : Formula) (v : Nat → Nat) :
-    ¬ (evalFormula (ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v
-          (substFormula 0 (numeral (codeNat (liar Tr))) Tr) ↔
-        evalFormula (ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v
-          (liar Tr)) :=
-  tarski_semantico_de ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN Tr v
-
 end ROBINSON_PlusPlus.Meta.TarskiPrf
 
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.prf_diagonal
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
-#print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
-#print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
-#print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
-#print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.godelCN_isSentence

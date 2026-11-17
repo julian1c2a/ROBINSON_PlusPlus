@@ -4,7 +4,6 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.RosserNumEval
-import ROBINSON_PlusPlus.Meta.Consistencia
 
 /-!
 # `Meta/RosserGuardNeg.lean` — Rosser, etapa 3: GuardNeg, la guarda FALSA se refuta (ADR‑146 §3, ADR‑147, ADR‑153)
@@ -654,29 +653,6 @@ theorem control_neg_hasWit_zero : Prf (neg (hasWit (numeralM 0))) :=
 theorem control_neg_hasWitF_zero : Prf (neg (hasWitF (numeralM 0))) :=
   prf_neg_hasWitF fun h => codF_ne_zero (codF_of_hasWitFN h) rfl
 
-/-- ✅ **…y sólo donde la guarda es falsa**: donde vale en ℕ, `Prf` no la refuta, por la solidez en `MNV V₀` (la doble‑negada, ADR‑191: lo verdadero con `P` no se refuta). Nombra la
-    semántica: es el control positivo del `#pureza`. -/
-theorem control_exacta (c : Nat) (h : hasWitN c) : ¬ Prf (neg (hasWit (numeralM c))) := by
-  intro hp
-  have hs := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
-    hp (fun _ => 0)
-  apply hs
-  apply (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ _).1 rfl
-  rw [ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_hasWit, ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM]
-  exact h
-
-/-- ✅ Lo mismo para la guarda de fórmula. -/
-theorem control_exactaF (c : Nat) (h : hasWitFN c) : ¬ Prf (neg (hasWitF (numeralM c))) := by
-  intro hp
-  have hs := ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn ROBINSON_PlusPlus.Meta.Consistencia.estandarDN_MN
-    hp (fun _ => 0)
-  apply hs
-  apply (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ _).1 rfl
-  rw [ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_hasWitF, ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM]
-  exact h
-
 end ROBINSON_PlusPlus.Meta.RosserGuardNeg
 
 #print axioms ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitN_of_codT
@@ -688,6 +664,8 @@ end ROBINSON_PlusPlus.Meta.RosserGuardNeg
 
 /-! T08 en el módulo (ADR‑147): lo de esta etapa no nombra la semántica; `control_exacta`, que usa la solidez en el
     modelo, sí. -/
+-- (✏️ 2026‑11‑17, ADR‑268: el control POSITIVO de este `#pureza` —lo que nombra la semántica— está en
+-- `Meta/Controles.lean`, en C8: aquí no se importa la semántica.)
 #pureza ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitN_of_codT ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitFN_of_codF
   ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitN_iff ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitFN_iff
   ROBINSON_PlusPlus.Meta.RosserGuardNeg.codT_or_rejT ROBINSON_PlusPlus.Meta.RosserGuardNeg.codF_or_rejF
@@ -695,4 +673,4 @@ end ROBINSON_PlusPlus.Meta.RosserGuardNeg
   ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWit_decide ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitF_decide
   ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_neg_hasWit_zero
   ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_neg_hasWitF_zero
-  | ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exacta ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exactaF
+  |
