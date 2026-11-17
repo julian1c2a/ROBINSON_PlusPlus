@@ -6568,6 +6568,10 @@ en ADR‑268; `doc/registro/2026-11-17-capas-paso4/`.
    `SolidezVerificadorModelo`), `PuenteFOL` (`IsSentence`, en `Sentencia`), AXIOMS (`prf_completo`) y la tabla de
    README, que además decía de `goedel_I_semantico` «no titular» (lo es desde ADR‑250). Lo que queda de B1: el paso 3
    (N6, con A9), el 5 (el manifiesto y su control) y el 6 (los contratos por capa).
+7. **Y un registro atrasado** (en el commit siguiente, tras el run verde de master): `doc/control/fol-sha.txt` no tenía
+   el commit de FOL de ADR‑265 (`3770333`, el núcleo de `[B]`), y la CI avisaba desde entonces —«el par cambió»; aviso,
+   no rojo—. M‑12 pide anotarlo en el commit de RPP que sigue al push de FOL; ADR‑265 no lo hizo. Anotado.
 
 **Véase también:** ADR‑266 (el diseño), ADR‑267 y ADR‑268 (los pasos anteriores), ADR‑165 (T07), ADR‑143 y ADR‑157
-(T08), ADR‑193 (T53, `choice.tsv`), ADR‑262 (la regla (H) y la medida de NAMING‑CONVENTIONS §6).
+(T08), ADR‑193 (T53, `choice.tsv`), ADR‑262 (la regla (H) y la medida de NAMING‑CONVENTIONS §6), ADR‑202 (T40,
+`fol-sha.txt`).
