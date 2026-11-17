@@ -113,14 +113,14 @@ def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf, "i"),
   (``ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski, "i"),
   (``ROBINSON_PlusPlus.Meta.Consistencia.consistencia, "—"),
-  (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I, "ii"),
-  (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, "ii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesII.goedel_I, "ii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesII.goedel_II, "ii"),
   (``ROBINSON_PlusPlus.Meta.TitularesII.tarski, "ii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_indecidible, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico, "iii")]
 
 /-- ¿Es de ELABORACIÓN? Su tipo, quitados los `∀`, tiene la cabeza en `Lean.*` o en `IO`: sintaxis, macros,

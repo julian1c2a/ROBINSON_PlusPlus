@@ -270,8 +270,8 @@ end InduccionTitulares
 #induccion ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
 #induccion ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
 #induccion ROBINSON_PlusPlus.Meta.Consistencia.consistencia
-#induccion ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
-#induccion ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+#induccion ROBINSON_PlusPlus.Meta.TitularesII.goedel_I
+#induccion ROBINSON_PlusPlus.Meta.TitularesII.goedel_II
 #induccion ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg
 #induccion ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
 #induccion ROBINSON_PlusPlus.Meta.TitularesII.tarski
@@ -286,10 +286,10 @@ end InduccionTitulares
 #induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
 #induccion ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible
 -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
-#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
-#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
-#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
-#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.prf_of_prov_de
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff_de
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera_de
+#induccion ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera_de
 -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
 #induccion ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico_de
 
@@ -333,14 +333,14 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
 #modelo ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
 #modelo ROBINSON_PlusPlus.Meta.Consistencia.consistencia
-#modelo ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
-#modelo ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+#modelo ROBINSON_PlusPlus.Meta.TitularesII.goedel_I
+#modelo ROBINSON_PlusPlus.Meta.TitularesII.goedel_II
 #modelo ROBINSON_PlusPlus.Meta.TitularesII.tarski
 #modelo ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg
 #modelo ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_indecidible
 #modelo ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera
 #modelo ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera
-#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff
 #modelo ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico
 -- ✏️ 2026‑10‑18 (ADR‑157): los dos titulares de Rosser.
 #modelo ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
@@ -352,18 +352,18 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
 #modelo ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible
 -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
-#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
-#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
-#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
-#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.prf_of_prov_de
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff_de
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera_de
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera_de
 -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
 #modelo ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico_de
 -- ✏️ 2026‑10‑28 (ADR‑210): los tres sintácticos del puente con FOL.
-#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
-#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol
-#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol
+#modelo ROBINSON_PlusPlus.Meta.TitularesII.goedel_I_fol
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg_fol
+#modelo ROBINSON_PlusPlus.Meta.TitularesII.goedel_II_fol
 
 -- ✏️ 2026‑11‑02 (ADR‑250): los tres semánticos del puente con FOL, titulares por decisión del propietario.
-#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo
-#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
-#modelo ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.prf_completo
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.modelo_sin_G
+#modelo ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_semantico

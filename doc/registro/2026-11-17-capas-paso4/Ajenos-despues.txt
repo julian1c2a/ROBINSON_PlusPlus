@@ -1,0 +1,342 @@
+declaraciones con un espacio de nombres AJENO a su módulo: 303, en 38 módulos
+  ROBINSON_PlusPlus.Full.Induction (19):
+      ROBINSON_PlusPlus.Full.axiomsBase_len
+      ROBINSON_PlusPlus.Full.axioms_len
+      ROBINSON_PlusPlus.Full.codingAxioms_len
+      ROBINSON_PlusPlus.Full.coreAxioms_len
+      ROBINSON_PlusPlus.Full.inductionFormula
+      ROBINSON_PlusPlus.Full.primAxioms
+      ROBINSON_PlusPlus.Full.primAxioms.eq_1
+      ROBINSON_PlusPlus.Full.primAxioms_len
+      ROBINSON_PlusPlus.Full.primAxioms_subset
+      ROBINSON_PlusPlus.Full.step_eq_reduce
+      ROBINSON_PlusPlus.Full.step_reduce
+      ROBINSON_PlusPlus.Full.substFormula_eq_succ_lift
+      ROBINSON_PlusPlus.Full.substFormula_succ_lift
+      ROBINSON_PlusPlus.Full.substFormula_succ_lift_gen
+      ROBINSON_PlusPlus.Full.substTerm_subst_succ_lift
+      ROBINSON_PlusPlus.Full.substTerm_subst_succ_lift_gen
+      ROBINSON_PlusPlus.Full.substTerms_subst_succ_lift
+      ROBINSON_PlusPlus.Full.substTerms_subst_succ_lift_gen
+      ROBINSON_PlusPlus.Minimal.Axioms.axioms.eq_1
+  ROBINSON_PlusPlus.Meta.ArithPrf (9):
+      ROBINSON_PlusPlus.Minimal.Axioms.add.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.atomc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.funcc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.liftc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.liftsc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.pred.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.substtc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.substtsc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.varc.eq_1
+  ROBINSON_PlusPlus.Meta.CantorMonoPrf (3):
+      ROBINSON_PlusPlus.Minimal.Axioms.cantor_func.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.cantor_poly.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.pair.eq_1
+  ROBINSON_PlusPlus.Meta.ChainPrf (1):
+      neg.eq_1
+  ROBINSON_PlusPlus.Meta.CodeNatInjPrf (9):
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_2
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_3
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_4
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_5
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_6
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_7
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_8
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNat.eq_def
+  ROBINSON_PlusPlus.Meta.CodeWitnessPrf (4):
+      ROBINSON_PlusPlus.Minimal.Axioms.cdrc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.objList.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.objList.eq_2
+      ROBINSON_PlusPlus.Minimal.Axioms.objList.eq_def
+  ROBINSON_PlusPlus.Meta.D3InDotPrf (11):
+      ROBINSON_PlusPlus.Meta.EvalBoundedPrf.bdExCode.eq_1
+      ROBINSON_PlusPlus.Meta.EvalListPrf.carcT.eq_1
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_1
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_2
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_3
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_4
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_5
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_6
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_7
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_8
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeF.eq_def
+  ROBINSON_PlusPlus.Meta.EvalBoundedPrf (1):
+      ROBINSON_PlusPlus.Meta.EvalLtPrf.ltCodeFn.eq_1
+  ROBINSON_PlusPlus.Meta.EvalLtPrf (1):
+      ROBINSON_PlusPlus.Meta.EvalArithPrf.succcT.eq_1
+  ROBINSON_PlusPlus.Meta.ExIntroCodePrf (1):
+      ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode.eq_1
+  ROBINSON_PlusPlus.Meta.GodelTwoPrf (3):
+      ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN.eq_1
+      ROBINSON_PlusPlus.Meta.DiagonalNumeral.provCodeN.eq_1
+      ROBINSON_PlusPlus.Meta.DiagonalNumeral.selfAppN.eq_1
+  ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf (2):
+      ROBINSON_PlusPlus.Meta.CodeCtorKit.nulT.eq_1
+      ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.argsInDotC.eq_1
+  ROBINSON_PlusPlus.Meta.HasWitTcFnPrf (1):
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_tc_succ.eq_1
+  ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (5):
+      ROBINSON_PlusPlus.Meta.CodeCtorKit.binT.eq_1
+      ROBINSON_PlusPlus.Meta.CodeCtorKit.unT.eq_1
+      ROBINSON_PlusPlus.Meta.DotConsPrf.consT.eq_1
+      ROBINSON_PlusPlus.Meta.EvalBoundedPrf.bdAllCode.eq_1
+      ROBINSON_PlusPlus.Meta.Sigma1CorePrf.inFormCodeFn.eq_1
+  ROBINSON_PlusPlus.Meta.Hilbert (3):
+      ROBINSON_PlusPlus.Minimal.Axioms.axiomsBase.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.codingAxioms.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.coreAxioms.eq_1
+  ROBINSON_PlusPlus.Meta.HilbertDeduction (1):
+      ROBINSON_PlusPlus.Meta.Hilbert.confinementFormula.eq_1
+  ROBINSON_PlusPlus.Meta.LineWFConsPrf (1):
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_cons.eq_1
+  ROBINSON_PlusPlus.Meta.LineWFMpPrf (1):
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_mp.eq_1
+  ROBINSON_PlusPlus.Meta.LineWFThyPrf (1):
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_thy.eq_1
+  ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (1):
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_eqrefl.eq_1
+  ROBINSON_PlusPlus.Meta.ModeloCodificacion (9):
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.premsOfN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.tcFnN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.tcFnN.eq_2
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.tcFnN.eq_def
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_def.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.forall_.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.forall_2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.forall_3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.forall_4.eq_1
+  ROBINSON_PlusPlus.Meta.ModeloCodigo (2):
+      ROBINSON_PlusPlus.Meta.CodeNumeralPrf.pairN.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.consN.eq_1
+  ROBINSON_PlusPlus.Meta.ModeloEstandar (50):
+      FOL.Metamath.Semantics.evalTerms.eq_1
+      FOL.Metamath.Semantics.evalTerms.eq_2
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.argsInN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.clAtomN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.clBinN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.clBotN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.clEqN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.clUnN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.codeNatList.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.codeNatList.eq_2
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.codeNatList.eq_def
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.hasWitFN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.hasWitN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.isFormCodeE2N.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.isTermCodeE1N.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.shapeBinN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.shapeUnN.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.wfAll1N.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.wfAllFN.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.add_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax25_pred_zero.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_prodp_nil.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatChars.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatChars.eq_2
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatChars.eq_def
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerm.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerm.eq_2
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerm.eq_def
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerms.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerms.eq_2
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerms.eq_def
+      ROBINSON_PlusPlus.Minimal.Axioms.concat_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.cons_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.div2_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.in_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.lt_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.mod2_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.mul_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.pow.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.pow_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.pred_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.prod_pairs.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.prodp_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.sq.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.sqrt.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.sqrt_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.sub.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.sub_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.succ_sym.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.zero_sym.eq_1
+  ROBINSON_PlusPlus.Meta.NatMulPrf (5):
+      ROBINSON_PlusPlus.Minimal.Axioms.div2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.mod2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.mul.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.one.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.two.eq_1
+  ROBINSON_PlusPlus.Meta.NatOrderPrf (1):
+      ROBINSON_PlusPlus.Minimal.Axioms.le.eq_1
+  ROBINSON_PlusPlus.Meta.PremsBdAllPrf (14):
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_1
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_2
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_3
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_4
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_5
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_6
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_7
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_8
+      ROBINSON_PlusPlus.Meta.BdAllIntroPrf.substCodeF2.eq_def
+      ROBINSON_PlusPlus.Meta.D3BodyPrf.premsPsi.eq_1
+      ROBINSON_PlusPlus.Meta.PremsOfDotPrf.premsOfT.eq_1
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeTs2.eq_1
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeTs2.eq_2
+      ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.substCodeTs2.eq_def
+  ROBINSON_PlusPlus.Meta.PremsOfTagPrf (24):
+      ROBINSON_PlusPlus.Meta.ListEtaPrf.etaAt.eq_1
+      ROBINSON_PlusPlus.Meta.ListEtaPrf.etaAt.eq_2
+      ROBINSON_PlusPlus.Meta.ListEtaPrf.etaAt.eq_def
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_c1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_c2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_c3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_efq.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_eqrefl.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_gen.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_ind.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_j1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_j2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_j3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_leibniz.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_listInd.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_mp.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_p1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_p2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_p3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_q1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_q2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_q3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_qconf.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_thy.eq_1
+  ROBINSON_PlusPlus.Meta.ProvFiel (1):
+      ROBINSON_PlusPlus.Meta.RosserPosNum.PfF.eq_1
+  ROBINSON_PlusPlus.Meta.ReprPrf (23):
+      ROBINSON_PlusPlus.Minimal.Axioms.allIn.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.andc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_allIn_nil.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_chainOk_nil.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lenc_cons.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lenc_nil.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_nthc_succ.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_nthc_zero.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.botc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.carc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.chainOk.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.eqc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.exc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.forallc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.implc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.liftfc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.lineOk.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.lineWF.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.orc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.premsOf.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.runFn.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.substfc.eq_1
+      iff.eq_1
+  ROBINSON_PlusPlus.Meta.Representability2Prf (28):
+      ROBINSON_PlusPlus.Meta.HilbertSeq.checkProof.eq_1
+      ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'.eq_1
+      ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC'.eq_1
+      ROBINSON_PlusPlus.Meta.Representability2.lineCode'.eq_1
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_1
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_10
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_11
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_12
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_13
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_14
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_15
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_16
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_17
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_18
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_19
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_2
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_20
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_21
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_3
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_4
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_5
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_6
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_7
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_8
+      ROBINSON_PlusPlus.Meta.Representability2.lineJustif.eq_9
+      ROBINSON_PlusPlus.Meta.Representability2.proofCode'.eq_1
+      ROBINSON_PlusPlus.Meta.Representability2.proofCode'.eq_2
+      ROBINSON_PlusPlus.Meta.Representability2.proofCode'.eq_def
+  ROBINSON_PlusPlus.Meta.RigidezEstandar (46):
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_10
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_11
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_12
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_13
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_14
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_15
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_16
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_17
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_18
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_19
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_2
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_20
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_21
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_22
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_3
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_4
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_5
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_6
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_7
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_8
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT.eq_9
+      ROBINSON_PlusPlus.Minimal.Axioms.ax26_pred_succ.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax4_add_zero.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_C1_concat_nil.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_carc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_cdrc.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_efq.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_gen.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_ind.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_leibniz.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_listInd.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q1.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q2.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q3.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_qconf.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.strCodeM.eq_1
+  ROBINSON_PlusPlus.Meta.RosserNumerales (3):
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL.eq_1
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL.eq_2
+      ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnL.eq_def
+  ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (5):
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_inv.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.lineTag.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.tagDisj.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.tagDisj.eq_2
+      ROBINSON_PlusPlus.Minimal.Axioms.tagDisj.eq_def
+  ROBINSON_PlusPlus.Meta.SolidezPrf (5):
+      ROBINSON_PlusPlus.Full.inductionFormula.eq_1
+      ROBINSON_PlusPlus.Meta.Hilbert.listInductionFormula.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.triN.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.triN.eq_2
+      ROBINSON_PlusPlus.Minimal.Axioms.triN.eq_def
+  ROBINSON_PlusPlus.Meta.SolidezVerificador (1):
+      ROBINSON_PlusPlus.Minimal.Axioms.codeNatStr.eq_1
+  ROBINSON_PlusPlus.Meta.SubstTreeReflect (5):
+      ROBINSON_PlusPlus.Meta.LineWFGuardPrf.GuardSlot.toF.eq_1
+      ROBINSON_PlusPlus.Meta.LineWFGuardPrf.GuardSlot.toF.eq_2
+      ROBINSON_PlusPlus.Meta.LineWFGuardPrf.guardedCond.eq_1
+      ROBINSON_PlusPlus.Meta.LineWFGuardPrf.guardedCond.eq_2
+      ROBINSON_PlusPlus.Meta.LineWFGuardPrf.guardedCond.eq_def
+  ROBINSON_PlusPlus.Meta.TcArithPrf (2):
+      ROBINSON_PlusPlus.Minimal.Axioms.ax_tc_zero.eq_1
+      ROBINSON_PlusPlus.Minimal.Axioms.tcFn.eq_1
+  ROBINSON_PlusPlus.Meta.TitularesIII (1):
+      ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula'.eq_1

@@ -3,7 +3,7 @@
 > **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
 > Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
-**Last updated:** 2026-11-02 — [ADR‑250](DECISIONS.md): los tres semánticos del puente con FOL, titulares (35), con el choice de la completitud de FOL. Antes, 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, y un modelo de T_Prf en que G es falsa. Antes, 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): T_Prf, con 120 axiomas (el verificador antiguo, fuera de T); el resto, igual. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
+**Last updated:** 2026-11-17 — [ADR‑269](DECISIONS.md): el módulo de `verificador_solido` (`Meta/SolidezVerificadorModelo.lean` desde ADR‑268). Antes, 2026-11-02 — [ADR‑250](DECISIONS.md): los tres semánticos del puente con FOL, titulares (35), con el choice de la completitud de FOL. Antes, 2026-10-28 — [ADR‑210](DECISIONS.md): los tres sintácticos del puente con FOL, titulares (32). Antes, el mismo día — [ADR‑195](DECISIONS.md) (T67): Gödel I en la lógica de primer orden, y un modelo de T_Prf en que G es falsa. Antes, 2026-10-27 — [ADR‑192](DECISIONS.md) (T68): T_Prf, con 120 axiomas (el verificador antiguo, fuera de T); el resto, igual. Antes, 2026-10-21 — [ADR‑185](DECISIONS.md) (T28): reescrito entero. El documento de antes —escrito el
 2026‑06‑06 para el Nivel C con meta‑axiomas, con su «Resumen al día» del 2026‑07‑20 y un §4 que declaraba fuera de
 alcance lo que hoy está demostrado— está, tal cual, en
 [doc/historia/GODEL-STATUS-hasta-2026-10-21.md](doc/historia/GODEL-STATUS-hasta-2026-10-21.md).
@@ -30,7 +30,7 @@ que se supone, en [AXIOMS.md](AXIOMS.md) §0.
 | **las condiciones de derivabilidad** | D1 `repr_pos'_prf`, D2 `d2_prf` y D3 `d3_prf_real`: teoremas, ninguna postulada; D3 es la Σ₁‑completitud demostrable del verificador | `Meta/Representability2Prf.lean`, `Meta/DerivCondPrf.lean`, `Meta/PremsBdAllPrf.lean` |
 | **el punto fijo** | `prf_godelCN_fixedpoint` para la sentencia de Gödel `godelCN`, y `prf_diagonal` para un predicado cualquiera | `Meta/GodelTwoPrf.lean`, `Meta/TarskiPrf.lean` |
 | **la consistencia** | el TEOREMA `consistencia : ConsistentH`, por un modelo de los 120 (`MNV V₀`) y la solidez doble‑negada de `Prf` (`prf_sound_dn`; hasta ADR‑191, `prf_sound`). Relativa a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) ([TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §4) | `Meta/Consistencia.lean`, `Meta/SolidezPrf.lean` |
-| **para `⊬¬G`, más que la consistencia** | la verdad en ℕ en vez de la ω‑consistencia: el verificador es sólido en el modelo (W1, `verificador_solido`) | `Meta/SolidezVerificador.lean` |
+| **para `⊬¬G`, más que la consistencia** | la verdad en ℕ en vez de la ω‑consistencia: el verificador es sólido en el modelo (W1, `verificador_solido`) | `Meta/SolidezVerificadorModelo.lean` |
 
 ---
 

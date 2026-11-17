@@ -1,6 +1,6 @@
 # El plan de A7, A9, B1 y D1
 
-**Last updated:** 2026-11-17 — [ADR‑268](../DECISIONS.md): B1, los pasos 2 y 3 (§4). Antes, 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
+**Last updated:** 2026-11-17 — [ADR‑269](../DECISIONS.md): B1, el paso 4 (§4), y la numeración de los pasos de ADR‑268, corregida. Antes, el mismo día — [ADR‑268](../DECISIONS.md): B1, los pasos 2 y 3 (§4). Antes, 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
 [ADR‑265](../DECISIONS.md): las decisiones del propietario (§0) y **A7, hecho** (§2).
 Antes, 2026-11-10 — creado con [ADR‑264](../DECISIONS.md): el estudio y el plan de cuatro filas de
 `doc/AUDITORIAS.md` §2 (el núcleo de `[B]`, `prf_list_induction` sin `listInd`, las capas dentro de RPP y las preguntas
@@ -150,6 +150,9 @@ mucho, el corte crece. **Coste:** de uno a dos días (ESTIMACIÓN).
 > seis pasos (ADR‑266 §6). Lo que aquí sigue es el plan tal como se escribió.
 > ✏️ 2026‑11‑17: el paso 1 (ADR‑267) y los pasos 2 y 3 (ADR‑268), hechos: la regla de C7.i se cumple; los imports que
 > suben, de 11 a 5 (dos provisionales hasta el paso 4).
+> ✏️ El mismo día (ADR‑269): el paso 4 (N3 y N4), hecho: todos los titulares de las clases (ii) y (iii) en C7, y C5 y
+> C6 sin titulares; los imports que suben, de 5 a 2 (los de N6). ADR‑268 se llamó «pasos 2 y 3», pero por la
+> numeración de ADR‑266 §6 hizo el 2 (N2), N5 y parte del 4 (N3): queda el 3, N6 con A9, y el 5 y el 6.
 
 **Lo medido.** No hay manifiesto ni control. Lo que sí hay: `DEPENDENCIES.md`, generado y con `--check` en la CI
 (ADR‑238: 120 módulos activos, 402 aristas, profundidad 59, sin ciclos); las familias de `Meta/` en prosa

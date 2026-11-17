@@ -161,14 +161,14 @@ def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf, "i"),
   (``ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski, "i"),
   (``ROBINSON_PlusPlus.Meta.Consistencia.consistencia, "—"),
-  (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I, "ii"),
-  (``ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, "ii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesII.goedel_I, "ii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesII.goedel_II, "ii"),
   (``ROBINSON_PlusPlus.Meta.TitularesII.tarski, "ii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_indecidible, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera, "iii"),
-  (``ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff, "iii"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico, "iii"),
   -- ✏️ 2026‑10‑18 (ADR‑160): los tres titulares nuevos de ADR‑157 y ADR‑159.
   (``ROBINSON_PlusPlus.Meta.Rosser.rosser_ext, "i"),
@@ -179,10 +179,10 @@ def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado, "i"),
   (``ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible, "iii"),
   -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
-  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de, "iii"),
-  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de, "iii"),
-  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de, "iii"),
-  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.prf_of_prov_de, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff_de, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera_de, "iii"),
+  (``ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera_de, "iii"),
   -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
   (``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico_de, "iii")]
 

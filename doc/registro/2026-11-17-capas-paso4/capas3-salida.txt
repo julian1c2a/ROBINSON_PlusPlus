@@ -1,0 +1,22 @@
+módulos por capa: {'C0': 4, 'C1': 9, 'C2': 11, 'C3': 10, 'C4': 70, 'C5': 8, 'C6': 1, 'C7i': 5, 'C7ii': 1, 'C7iii': 2, 'C8': 4} · imports: 427 · SUBEN: 2
+    C3    GodelTwo               → C4    PremsBdAllPrf
+    C3    Representability2      → C4    CodeWitnessPrf
+
+la regla de C7.i: módulos de C5 o C6 en el cierre de imports de cada módulo de C7.i (y de D1, D2 y D3):
+    DerivCondPrf           ninguno
+    GodelCorolarios        ninguno
+    GodelTwoPrf            ninguno
+    Lob                    ninguno
+    PremsBdAllPrf          ninguno
+    Representability2Prf   ninguno
+    Rosser                 ninguno
+    TarskiPrf              ninguno
+
+los titulares de T07 (TITULARES, Meta/ContratoTitulares.lean), por la capa de su módulo (espacio de nombres = módulo):
+    C3     2  DerivCondPrf.d2_prf, Representability2Prf.repr_pos'_prf
+    C4     1  PremsBdAllPrf.d3_prf_real
+    C5     1  Consistencia.consistencia
+    C7i    9  GodelCorolarios.goedel_second_formalizado, GodelCorolarios.prf_godel_iff_con, GodelTwoPrf.goedel_first_prf, GodelTwoPrf.goedel_second_prf, GodelTwoPrf.prf_con_imp_godel, GodelTwoPrf.prf_godelCN_fixedpoint, Lob.lob, Rosser.rosser_ext, TarskiPrf.prf_tarski
+    C7ii   6  TitularesII.goedel_I, TitularesII.goedel_II, TitularesII.goedel_II_fol, TitularesII.goedel_I_fol, TitularesII.rosser, TitularesII.tarski
+    C7iii 16  TitularesIII.con_indecidible, TitularesIII.con_verdadera, TitularesIII.con_verdadera_de, TitularesIII.godelCN_indecidible, TitularesIII.godelCN_verdadera, TitularesIII.godelCN_verdadera_de, TitularesIII.goedel_I_neg, TitularesIII.goedel_I_neg_fol, TitularesIII.goedel_I_semantico, TitularesIII.modelo_prov_iff, TitularesIII.modelo_prov_iff_de, TitularesIII.modelo_sin_G, TitularesIII.prf_completo, TitularesIII.prf_of_prov_de, TitularesIII.tarski_semantico, TitularesIII.tarski_semantico_de
+    total 35

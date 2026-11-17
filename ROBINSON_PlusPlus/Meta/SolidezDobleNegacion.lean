@@ -401,12 +401,13 @@ theorem axiomas_clas : ∀ a, List.Mem a ROBINSON_PlusPlus.Minimal.Axioms.axioms
 end ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
 
 /-! ### Bajados de `Meta/RigidezEstandar.lean` (ADR‑191): la solidez doble‑negada en todo modelo estándar pide que
-`∈` sea el de verdad, y aquí está antes de `Meta/Consistencia.lean`. Conservan su nombre. -/
+`∈` sea el de verdad, y aquí está antes de `Meta/Consistencia.lean`. ✏️ 2026‑11‑17 (ADR‑269): con el espacio de
+nombres de este módulo (NAMING‑CONVENTIONS §6); conservaban el de `RigidezEstandar`. -/
 
 section Bajados
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.ModeloCodigo ROBINSON_PlusPlus.Meta.SolidezPrf
 
-namespace ROBINSON_PlusPlus.Meta.RigidezEstandar
+namespace ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
 
 variable {M : Model Nat}
 
@@ -434,7 +435,7 @@ theorem M_mem (hM : Estandar M) : ∀ (l x : Nat), M.rel in_sym [x, l] ↔ memN 
       rw [show M.rel in_sym [x, consN a b] ↔ Or (x = a) (M.rel in_sym [x, b]) from ⟨h.1, h.2⟩,
         memN_consN, ih b hb x]
 
-end ROBINSON_PlusPlus.Meta.RigidezEstandar
+end ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
 
 end Bajados
 
@@ -451,7 +452,7 @@ def decMem (hM : Estandar M) :
       have hp : p = ROBINSON_PlusPlus.Minimal.Axioms.in_sym := beq_iff_eq.mp h
       subst hp
       haveI : Decidable (memN x l) := by unfold memN; infer_instance
-      exact decidable_of_iff (memN x l) (ROBINSON_PlusPlus.Meta.RigidezEstandar.M_mem hM l x).symm
+      exact decidable_of_iff (memN x l) (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.M_mem hM l x).symm
   | _, [], h => absurd h Bool.false_ne_true
   | _, [_], h => absurd h Bool.false_ne_true
   | _, _ :: _ :: _ :: _, h => absurd h Bool.false_ne_true
@@ -548,24 +549,25 @@ end Herramientas
 
 end ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
 
-namespace ROBINSON_PlusPlus.Meta.SolidezPrf
+namespace ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
 
-open ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.SolidezPrf
 
 variable {M : Model Nat}
 
 /-- `ConsistentH` a partir de CUALQUIER modelo estándar; `estandar_MN` lo instancia en `MNV V₀`. Desde ADR‑191, por la
-    solidez doble‑negada (`estandarDN_de`, `consistentH_dn`): sin `p3` en `Prop`, sin lógica clásica. -/
+    solidez doble‑negada (`estandarDN_de`, `consistentH_dn`): sin `p3` en `Prop`, sin lógica clásica. ✏️ 2026‑11‑17 (ADR‑269):
+    con el espacio de nombres de este módulo (NAMING‑CONVENTIONS §6); era el de `SolidezPrf`. -/
 theorem consistentH_de (hM : Estandar M) : ConsistentH :=
   ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.consistentH_dn
     (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de hM)
 
-end ROBINSON_PlusPlus.Meta.SolidezPrf
+end ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
 
 #print axioms ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.prf_sound_dn
 #print axioms ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer
 #print axioms ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.axiomas_clas
 #print axioms ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de
-#print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de
+#print axioms ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.consistentH_de
 #print axioms ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.eq_de_prf
 #print axioms ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.no_refuta

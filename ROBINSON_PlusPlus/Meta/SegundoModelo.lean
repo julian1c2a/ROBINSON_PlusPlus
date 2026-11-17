@@ -3,7 +3,7 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.ProvFiel
+import ROBINSON_PlusPlus.Meta.TitularesIII
 
 /-!
 # `Meta/SegundoModelo.lean` — 🏁 UN SEGUNDO modelo estándar: sobre la basura, `M` es libre (T75d, ADR‑175)
@@ -479,7 +479,7 @@ theorem segundo_modelo : And (Estandar (MNB V₀)) (MNB V₀ ≠ MNV V₀) := �
 /-- Y `Prov` es fiel también en él: `modelo_prov_iff_de` (T75e) en una instancia que NO es `MNV V₀`. -/
 theorem modelo_prov_iff_MB (φ : Formula) (v : Nat → Nat) :
     evalFormula (MNB V₀) v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔ Prf φ :=
-  ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de estandar_MB φ v
+  ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff_de estandar_MB φ v
 
 end ROBINSON_PlusPlus.Meta.SegundoModelo
 

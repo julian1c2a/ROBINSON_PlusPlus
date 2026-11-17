@@ -10,7 +10,7 @@
 
 ## Cifras
 
-* **125 módulos activos** (Minimal 2 + Meta 122 + Full 1), **426 aristas** `import` entre ellos, profundidad máxima **56**. Sin ciclos.
+* **125 módulos activos** (Minimal 2 + Meta 122 + Full 1), **427 aristas** `import` entre ellos, profundidad máxima **55**. Sin ciclos.
 * 1 `lean_lib`, `ROBINSON_PlusPlus`, con `globs := #[.andSubmodules …]`: el build compila el barril
   y TODO su directorio (T15, ADR‑163). Que todo módulo esté además en el cierre de imports del barril lo comprueba [L]
   de `check-doc-sync.bash`, y la cifra de módulos activos de arriba la compara [A] con la suya.
@@ -38,9 +38,9 @@
 * **17** — `Meta.CodeNatInjPrf`, `Meta.DiagonalNumeral`, `Meta.Representability2Prf`, `Meta.SolidezPrf`
 * **18** — `Meta.DerivCondPrf`, `Meta.ModeloCodigo`
 * **19** — `Meta.ModeloEstandar`, `Meta.RosserNumerales`, `Meta.Sentencia`, `Meta.Sigma1Prf`, `Meta.SolidezDobleNegacion`, `Meta.SolidezVerificador`
-* **20** — `Meta.HasWitTcFnPrf`, `Meta.ModeloCodificacion`, `Meta.RosserPosNum`, `Meta.RosserW1`, `Meta.Sigma1CorePrf`
-* **21** — `Meta.ExIntroCodePrf`, `Meta.LineWFCases`, `Meta.SubstfcWitnessPrf`
-* **22** — `Meta.ListEtaPrf`, `Meta.TrackedCorePrf`
+* **20** — `Meta.HasWitTcFnPrf`, `Meta.ModeloCodificacion`, `Meta.PuenteFOL`, `Meta.RosserPosNum`, `Meta.RosserW1`, `Meta.Sigma1CorePrf`
+* **21** — `Meta.Consistencia`, `Meta.ExIntroCodePrf`, `Meta.LineWFCases`, `Meta.SubstfcWitnessPrf`
+* **22** — `Meta.ListEtaPrf`, `Meta.SolidezVerificadorModelo`, `Meta.TrackedCorePrf`
 * **23** — `Meta.ForallElimCodePrf`, `Meta.Sigma1AtomPrf`
 * **24** — `Meta.MpCodePrf`
 * **25** — `Meta.EvalArithPrf`
@@ -67,14 +67,13 @@
 * **46** — `Meta.D3BodyPrf`
 * **47** — `Meta.PremsBdAllPrf`
 * **48** — `Meta.GodelTwo`
-* **49** — `Meta.GodelTwoPrf`
-* **50** — `Meta.Consistencia`, `Meta.GodelCorolarios`, `Meta.TarskiPrf`
-* **51** — `Meta.Lob`, `Meta.Rosser`, `Meta.SolidezVerificadorModelo`
-* **52** — `Meta.TitularesII`, `Meta.TitularesIII`
-* **53** — `Meta.Controles`, `Meta.RigidezEstandar`
-* **54** — `Meta.ProvFiel`, `Meta.PuenteFOL`
-* **55** — `Meta.ContratoTitulares`, `Meta.SegundoModelo`
-* **56** — `Meta.PurezaTitulares`
+* **49** — `Meta.GodelTwoPrf`, `Meta.RigidezEstandar`
+* **50** — `Meta.GodelCorolarios`, `Meta.ProvFiel`, `Meta.TarskiPrf`
+* **51** — `Meta.Lob`, `Meta.Rosser`
+* **52** — `Meta.TitularesII`
+* **53** — `Meta.TitularesIII`
+* **54** — `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.SegundoModelo`
+* **55** — `Meta.PurezaTitulares`
 
 ## Grafo
 
@@ -110,8 +109,8 @@ graph BT
     Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_NatArithPrf["Meta.NatArithPrf"]
     Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_NatOrderPrf["Meta.NatOrderPrf"]
     Meta_CodeWitnessPrf["Meta.CodeWitnessPrf"] --> Meta_ReprPrf["Meta.ReprPrf"]
-    Meta_Consistencia["Meta.Consistencia"] --> Meta_GodelTwoPrf["Meta.GodelTwoPrf"]
     Meta_Consistencia["Meta.Consistencia"] --> Meta_ModeloCodificacion["Meta.ModeloCodificacion"]
+    Meta_Consistencia["Meta.Consistencia"] --> Meta_Representability2Prf["Meta.Representability2Prf"]
     Meta_Consistencia["Meta.Consistencia"] --> Meta_SolidezDobleNegacion["Meta.SolidezDobleNegacion"]
     Meta_Consistencia["Meta.Consistencia"] --> Meta_SolidezPrf["Meta.SolidezPrf"]
     Meta_ContratoTitulares["Meta.ContratoTitulares"] --> Meta_Consistencia["Meta.Consistencia"]
@@ -367,15 +366,13 @@ graph BT
     Meta_ProofChain["Meta.ProofChain"] --> Meta_CheckArith["Meta.CheckArith"]
     Meta_ProofChain["Meta.ProofChain"] --> Minimal_Axioms["Minimal.Axioms"]
     Meta_PropCodePrf["Meta.PropCodePrf"] --> Meta_EvalBoundedPrf["Meta.EvalBoundedPrf"]
+    Meta_ProvFiel["Meta.ProvFiel"] --> Meta_Consistencia["Meta.Consistencia"]
     Meta_ProvFiel["Meta.ProvFiel"] --> Meta_RigidezEstandar["Meta.RigidezEstandar"]
     Meta_ProvFiel["Meta.ProvFiel"] --> Meta_RosserNegNum["Meta.RosserNegNum"]
-    Meta_ProvFiel["Meta.ProvFiel"] --> Meta_SolidezVerificadorModelo["Meta.SolidezVerificadorModelo"]
     Meta_Provability["Meta.Provability"] --> Meta_Godel["Meta.Godel"]
     Meta_Provability["Meta.Provability"] --> Minimal_Axioms["Minimal.Axioms"]
     Meta_PuenteFOL["Meta.PuenteFOL"] --> Meta_HilbertDeduction["Meta.HilbertDeduction"]
-    Meta_PuenteFOL["Meta.PuenteFOL"] --> Meta_RigidezEstandar["Meta.RigidezEstandar"]
     Meta_PuenteFOL["Meta.PuenteFOL"] --> Meta_Sentencia["Meta.Sentencia"]
-    Meta_PuenteFOL["Meta.PuenteFOL"] --> Meta_TitularesIII["Meta.TitularesIII"]
     Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_Consistencia["Meta.Consistencia"]
     Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_ContratoTabla["Meta.ContratoTabla"]
     Meta_PurezaTitulares["Meta.PurezaTitulares"] --> Meta_ContratoTitulares["Meta.ContratoTitulares"]
@@ -405,10 +402,10 @@ graph BT
     Meta_Representability2Prf["Meta.Representability2Prf"] --> Meta_CodeNumeralPrf["Meta.CodeNumeralPrf"]
     Meta_Representability2Prf["Meta.Representability2Prf"] --> Meta_Representability2["Meta.Representability2"]
     Meta_Representability2Prf["Meta.Representability2Prf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
+    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_GodelTwo["Meta.GodelTwo"]
+    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_ModeloCodificacion["Meta.ModeloCodificacion"]
     Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_RosserNumEval["Meta.RosserNumEval"]
-    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_SolidezVerificador["Meta.SolidezVerificador"]
-    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_SolidezVerificadorModelo["Meta.SolidezVerificadorModelo"]
-    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_TitularesIII["Meta.TitularesIII"]
+    Meta_RigidezEstandar["Meta.RigidezEstandar"] --> Meta_SolidezDobleNegacion["Meta.SolidezDobleNegacion"]
     Meta_Rosser["Meta.Rosser"] --> Meta_RosserNegNum["Meta.RosserNegNum"]
     Meta_Rosser["Meta.Rosser"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
     Meta_RosserGuardNeg["Meta.RosserGuardNeg"] --> Meta_RosserNumEval["Meta.RosserNumEval"]
@@ -435,7 +432,7 @@ graph BT
     Meta_RosserW1["Meta.RosserW1"] --> Meta_PurezaComando["Meta.PurezaComando"]
     Meta_RosserW1["Meta.RosserW1"] --> Meta_SolidezVerificador["Meta.SolidezVerificador"]
     Meta_RunFnBoundedPrf["Meta.RunFnBoundedPrf"] --> Meta_BoundedInPrf["Meta.BoundedInPrf"]
-    Meta_SegundoModelo["Meta.SegundoModelo"] --> Meta_ProvFiel["Meta.ProvFiel"]
+    Meta_SegundoModelo["Meta.SegundoModelo"] --> Meta_TitularesIII["Meta.TitularesIII"]
     Meta_Sentencia["Meta.Sentencia"] --> Meta_DerivCondPrf["Meta.DerivCondPrf"]
     Meta_Sentencia["Meta.Sentencia"] --> Meta_DiagonalNumeral["Meta.DiagonalNumeral"]
     Meta_Sigma1AtomPrf["Meta.Sigma1AtomPrf"] --> Meta_TcArithPrf["Meta.TcArithPrf"]
@@ -493,11 +490,14 @@ graph BT
     Meta_TcArithPrf["Meta.TcArithPrf"] --> Meta_ArithPrf["Meta.ArithPrf"]
     Meta_TcArithPrf["Meta.TcArithPrf"] --> Meta_Representability["Meta.Representability"]
     Meta_TitularesII["Meta.TitularesII"] --> Meta_Consistencia["Meta.Consistencia"]
+    Meta_TitularesII["Meta.TitularesII"] --> Meta_PuenteFOL["Meta.PuenteFOL"]
     Meta_TitularesII["Meta.TitularesII"] --> Meta_Rosser["Meta.Rosser"]
     Meta_TitularesII["Meta.TitularesII"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
     Meta_TitularesIII["Meta.TitularesIII"] --> Meta_GodelCorolarios["Meta.GodelCorolarios"]
+    Meta_TitularesIII["Meta.TitularesIII"] --> Meta_ProvFiel["Meta.ProvFiel"]
     Meta_TitularesIII["Meta.TitularesIII"] --> Meta_SolidezVerificadorModelo["Meta.SolidezVerificadorModelo"]
     Meta_TitularesIII["Meta.TitularesIII"] --> Meta_TarskiPrf["Meta.TarskiPrf"]
+    Meta_TitularesIII["Meta.TitularesIII"] --> Meta_TitularesII["Meta.TitularesII"]
     Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_BdAllIntroPrf["Meta.BdAllIntroPrf"]
     Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_CodeTreeReflect["Meta.CodeTreeReflect"]
     Meta_TrackedAtomsPrf["Meta.TrackedAtomsPrf"] --> Meta_D3InDotPrf["Meta.D3InDotPrf"]
@@ -553,7 +553,7 @@ graph BT
 | `Meta.ListIndAdmisible` | 16 | `Meta.ArithPrf`, `Meta.CantorMonoPrf`, `Meta.ChainPrf`, `Meta.CodeWitnessPrf`, `Meta.Div2ParityPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction`, `Meta.NatArithPrf`, `Meta.NatMulPrf`, `Meta.NatOrderPrf`, `Meta.ReprPrf`, `Meta.StrongInductionPrf`, `Minimal.Axioms` · externo: `FOL.Lift0`, `FOL.Theorems.Quantifiers` | — |
 | `Meta.CodeNatInjPrf` | 17 | `Meta.CodeNumeralPrf` | `Meta.ModeloCodigo`, `Meta.SolidezVerificador` |
 | `Meta.DiagonalNumeral` | 17 | `Meta.CodeNumeralPrf`, `Meta.DiagonalTwo` | `Meta.GodelTwoPrf`, `Meta.Sentencia` |
-| `Meta.Representability2Prf` | 17 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.Representability2`, `Meta.TcArithPrf` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.DerivCondPrf`, `Meta.GodelTwoPrf`, `Meta.InAxiomsCodePrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum` |
+| `Meta.Representability2Prf` | 17 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.Representability2`, `Meta.TcArithPrf` · externo: `FOL.FOL`, `FOL.Theorems.Eq` | `Meta.Consistencia`, `Meta.DerivCondPrf`, `Meta.GodelTwoPrf`, `Meta.InAxiomsCodePrf`, `Meta.RosserNegLinea`, `Meta.RosserPosNum` |
 | `Meta.SolidezPrf` | 17 | `Meta.CodeNumeralPrf`, `Meta.Hilbert`, `Meta.HilbertDeduction` · externo: `FOL.Semantics` | `Meta.Consistencia`, `Meta.SolidezDobleNegacion` |
 | `Meta.DerivCondPrf` | 18 | `Meta.ChainPrf`, `Meta.Representability2Prf` | `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.ExIntroCodePrf`, `Meta.GodelTwoPrf`, `Meta.LiftcCodePrf`, `Meta.Sentencia`, `Meta.Sigma1Prf`, `Meta.SubstfcCodePrf` |
 | `Meta.ModeloCodigo` | 18 | `Meta.CodeNatInjPrf`, `Meta.CodeNumeralPrf` | `Meta.ModeloEstandar`, `Meta.RosserNumerales`, `Meta.SolidezDobleNegacion`, `Meta.SolidezVerificador` |
@@ -561,17 +561,20 @@ graph BT
 | `Meta.RosserNumerales` | 19 | `Meta.CodeNumeralPrf`, `Meta.CodeWitnessPrf`, `Meta.ModeloCodigo`, `Meta.NumListPrf`, `Meta.PurezaComando` | `Meta.RosserNumEval` |
 | `Meta.Sentencia` | 19 | `Meta.DerivCondPrf`, `Meta.DiagonalNumeral` · externo: `FOL.Lift0` | `Meta.PuenteFOL`, `Meta.TarskiPrf` |
 | `Meta.Sigma1Prf` | 19 | `Meta.DerivCondPrf` | `Meta.EvalLiftcPrf`, `Meta.HasWitTcFnPrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1CorePrf`, `Meta.SubstfcCodePrf` |
-| `Meta.SolidezDobleNegacion` | 19 | `Meta.ModeloCodigo`, `Meta.SolidezPrf` | `Meta.Consistencia` |
-| `Meta.SolidezVerificador` | 19 | `Meta.CodeNatInjPrf`, `Meta.ModeloCodigo`, `Meta.Representability` | `Meta.RigidezEstandar`, `Meta.RosserPosNum`, `Meta.RosserW1`, `Meta.SolidezVerificadorModelo` |
+| `Meta.SolidezDobleNegacion` | 19 | `Meta.ModeloCodigo`, `Meta.SolidezPrf` | `Meta.Consistencia`, `Meta.RigidezEstandar` |
+| `Meta.SolidezVerificador` | 19 | `Meta.CodeNatInjPrf`, `Meta.ModeloCodigo`, `Meta.Representability` | `Meta.RosserPosNum`, `Meta.RosserW1`, `Meta.SolidezVerificadorModelo` |
 | `Meta.HasWitTcFnPrf` | 20 | `Meta.CodeWitnessPrf`, `Meta.NatArithPrf`, `Meta.NumListPrf`, `Meta.Sigma1Prf` | `Meta.RosserNegLinea`, `Meta.SubstfcWitnessPrf`, `Meta.TrackedCorePrf` |
-| `Meta.ModeloCodificacion` | 20 | `Meta.ModeloEstandar` | `Meta.Consistencia` |
+| `Meta.ModeloCodificacion` | 20 | `Meta.ModeloEstandar` | `Meta.Consistencia`, `Meta.RigidezEstandar` |
+| `Meta.PuenteFOL` | 20 | `Meta.HilbertDeduction`, `Meta.Sentencia` · externo: `FOL.Canonical0`, `FOL.Derives1`, `FOL.Sentence` | `Meta.ContratoTitulares`, `Meta.TitularesII` |
 | `Meta.RosserPosNum` | 20 | `Meta.PurezaComando`, `Meta.Representability2Prf`, `Meta.SolidezVerificador` | `Meta.RosserNegNum` |
 | `Meta.RosserW1` | 20 | `Meta.PurezaComando`, `Meta.SolidezVerificador` | `Meta.RosserNegNum` |
 | `Meta.Sigma1CorePrf` | 20 | `Meta.CodeNumeralPrf`, `Meta.Sigma1Prf`, `Meta.TcArithPrf` | `Meta.EvalLiftcPrf`, `Meta.ExIntroCodePrf`, `Meta.InAxiomsCodePrf`, `Meta.LineWFCases` |
+| `Meta.Consistencia` | 21 | `Meta.ModeloCodificacion`, `Meta.Representability2Prf`, `Meta.SolidezDobleNegacion`, `Meta.SolidezPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.ProvFiel`, `Meta.PurezaTitulares`, `Meta.SolidezVerificadorModelo`, `Meta.TitularesII` |
 | `Meta.ExIntroCodePrf` | 21 | `Meta.DerivCondPrf`, `Meta.Sigma1CorePrf` | `Meta.EvalLtPrf`, `Meta.ForallElimCodePrf`, `Meta.TrackedCorePrf` |
 | `Meta.LineWFCases` | 21 | `Meta.Provability`, `Meta.ReprPrf`, `Meta.Sigma1CorePrf`, `Minimal.Axioms` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf` |
 | `Meta.SubstfcWitnessPrf` | 21 | `Meta.BoundedInPrf`, `Meta.CantorMonoPrf`, `Meta.HasWitTcFnPrf`, `Meta.NumCodeClosedPrf`, `Meta.StrongInductionPrf`, `Meta.SubstArith` | `Meta.D3ChainDotPrf`, `Meta.EvalSubstfcPrf`, `Meta.EvalSubsttcPrf`, `Meta.LineWFGuardPrf`, `Meta.ListEtaPrf`, `Meta.MpCodePrf`, `Meta.RosserNegLinea`, `Meta.TrackedAtomsPrf` |
 | `Meta.ListEtaPrf` | 22 | `Meta.SubstfcWitnessPrf` | `Meta.PremsOfTagPrf` |
+| `Meta.SolidezVerificadorModelo` | 22 | `Meta.Consistencia`, `Meta.SolidezVerificador` | `Meta.TitularesIII` |
 | `Meta.TrackedCorePrf` | 22 | `Meta.ExIntroCodePrf`, `Meta.HasWitTcFnPrf` | `Meta.EvalLiftcPrf`, `Meta.ForallElimCodePrf`, `Meta.LiftcCodePrf`, `Meta.Sigma1AtomPrf` |
 | `Meta.ForallElimCodePrf` | 23 | `Meta.ExIntroCodePrf`, `Meta.TrackedCorePrf` | `Meta.EvalSubstfcPrf`, `Meta.MpCodePrf` |
 | `Meta.Sigma1AtomPrf` | 23 | `Meta.TcArithPrf`, `Meta.TrackedCorePrf` | `Meta.EvalArithPrf`, `Meta.EvalLiftcPrf`, `Meta.EvalPredPrf`, `Meta.LiftcCodePrf`, `Meta.LineWFTrackedPrf`, `Meta.SubstfcCodePrf` |
@@ -622,23 +625,20 @@ graph BT
 | `Meta.PremsOfDotPrf` | 45 | `Meta.PremsOfTagPrf`, `Meta.SubstTreeReflect` | `Meta.D3BodyPrf` |
 | `Meta.D3BodyPrf` | 46 | `Meta.D3ChainDotPrf`, `Meta.PremsOfDotPrf`, `Meta.SubstTreeReflect` | `Meta.PremsBdAllPrf` |
 | `Meta.PremsBdAllPrf` | 47 | `Meta.D3BodyPrf` | `Meta.GodelTwo`, `Meta.GodelTwoPrf` |
-| `Meta.GodelTwo` | 48 | `Meta.PremsBdAllPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf` |
-| `Meta.GodelTwoPrf` | 49 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.DerivCondPrf`, `Meta.DiagonalNumeral`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.LineWFCases`, `Meta.PremsBdAllPrf`, `Meta.ReprPrf`, `Meta.Representability2Prf`, `Meta.TcArithPrf` | `Meta.Consistencia`, `Meta.GodelCorolarios`, `Meta.TarskiPrf` |
-| `Meta.Consistencia` | 50 | `Meta.GodelTwoPrf`, `Meta.ModeloCodificacion`, `Meta.SolidezDobleNegacion`, `Meta.SolidezPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.SolidezVerificadorModelo`, `Meta.TitularesII` |
+| `Meta.GodelTwo` | 48 | `Meta.PremsBdAllPrf`, `Meta.ProofChain`, `Meta.ReprPrf`, `Meta.Representability2` · externo: `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers` | `Meta.GodelTwoPrf`, `Meta.RigidezEstandar` |
+| `Meta.GodelTwoPrf` | 49 | `Meta.ArithPrf`, `Meta.CodeNumeralPrf`, `Meta.DerivCondPrf`, `Meta.DiagonalNumeral`, `Meta.DiagonalTwo`, `Meta.GodelTwo`, `Meta.LineWFCases`, `Meta.PremsBdAllPrf`, `Meta.ReprPrf`, `Meta.Representability2Prf`, `Meta.TcArithPrf` | `Meta.GodelCorolarios`, `Meta.TarskiPrf` |
+| `Meta.RigidezEstandar` | 49 | `Meta.GodelTwo`, `Meta.ModeloCodificacion`, `Meta.RosserNumEval`, `Meta.SolidezDobleNegacion` | `Meta.ContratoTitulares`, `Meta.ProvFiel` |
 | `Meta.GodelCorolarios` | 50 | `Meta.GodelTwoPrf`, `Meta.PurezaComando` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares`, `Meta.TitularesIII` |
+| `Meta.ProvFiel` | 50 | `Meta.Consistencia`, `Meta.RigidezEstandar`, `Meta.RosserNegNum` | `Meta.ContratoTitulares`, `Meta.TitularesIII` |
 | `Meta.TarskiPrf` | 50 | `Meta.GodelTwoPrf`, `Meta.Sentencia` · externo: `FOL.Lift0` | `Meta.ContratoTitulares`, `Meta.Lob`, `Meta.PurezaTitulares`, `Meta.Rosser`, `Meta.TitularesII`, `Meta.TitularesIII` |
 | `Meta.Lob` | 51 | `Meta.PurezaComando`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares` |
 | `Meta.Rosser` | 51 | `Meta.RosserNegNum`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.PurezaTitulares`, `Meta.TitularesII` |
-| `Meta.SolidezVerificadorModelo` | 51 | `Meta.Consistencia`, `Meta.SolidezVerificador` | `Meta.ProvFiel`, `Meta.RigidezEstandar`, `Meta.TitularesIII` |
-| `Meta.TitularesII` | 52 | `Meta.Consistencia`, `Meta.Rosser`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares` |
-| `Meta.TitularesIII` | 52 | `Meta.GodelCorolarios`, `Meta.SolidezVerificadorModelo`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PuenteFOL`, `Meta.PurezaTitulares`, `Meta.RigidezEstandar` |
-| `Meta.Controles` | 53 | `Meta.Consistencia`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.RosserNegNum`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
-| `Meta.RigidezEstandar` | 53 | `Meta.RosserNumEval`, `Meta.SolidezVerificador`, `Meta.SolidezVerificadorModelo`, `Meta.TitularesIII` | `Meta.ContratoTitulares`, `Meta.ProvFiel`, `Meta.PuenteFOL` |
-| `Meta.ProvFiel` | 54 | `Meta.RigidezEstandar`, `Meta.RosserNegNum`, `Meta.SolidezVerificadorModelo` | `Meta.ContratoTitulares`, `Meta.SegundoModelo` |
-| `Meta.PuenteFOL` | 54 | `Meta.HilbertDeduction`, `Meta.RigidezEstandar`, `Meta.Sentencia`, `Meta.TitularesIII` · externo: `FOL.Canonical0`, `FOL.Derives1`, `FOL.Sentence` | `Meta.ContratoTitulares` |
-| `Meta.ContratoTitulares` | 55 | `Meta.Consistencia`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.ProvFiel`, `Meta.PuenteFOL`, `Meta.PurezaComando`, `Meta.RigidezEstandar`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
-| `Meta.SegundoModelo` | 55 | `Meta.ProvFiel` | — |
-| `Meta.PurezaTitulares` | 56 | `Meta.Consistencia`, `Meta.ContratoTabla`, `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | — |
+| `Meta.TitularesII` | 52 | `Meta.Consistencia`, `Meta.PuenteFOL`, `Meta.Rosser`, `Meta.TarskiPrf` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.TitularesIII` |
+| `Meta.TitularesIII` | 53 | `Meta.GodelCorolarios`, `Meta.ProvFiel`, `Meta.SolidezVerificadorModelo`, `Meta.TarskiPrf`, `Meta.TitularesII` | `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.PurezaTitulares`, `Meta.SegundoModelo` |
+| `Meta.ContratoTitulares` | 54 | `Meta.Consistencia`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.ProvFiel`, `Meta.PuenteFOL`, `Meta.PurezaComando`, `Meta.RigidezEstandar`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
+| `Meta.Controles` | 54 | `Meta.Consistencia`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.RosserNegNum`, `Meta.TitularesII`, `Meta.TitularesIII` | `Meta.PurezaTitulares` |
+| `Meta.SegundoModelo` | 54 | `Meta.TitularesIII` | — |
+| `Meta.PurezaTitulares` | 55 | `Meta.Consistencia`, `Meta.ContratoTabla`, `Meta.ContratoTitulares`, `Meta.Controles`, `Meta.GodelCorolarios`, `Meta.Lob`, `Meta.PurezaComando`, `Meta.Rosser`, `Meta.TarskiPrf`, `Meta.TitularesII`, `Meta.TitularesIII` | — |
 
 ## Barriles
 

@@ -13,7 +13,7 @@ import ROBINSON_PlusPlus.Meta.PurezaComando
 de los 120 —`codeNatList axioms`— y `y` es una de sus conclusiones. **`w1Ax`**: lo que concluye, decodificado, es
 teorema de `Prf`.
 
-**Por qué así.** W1 (`verificador_solido`, `Meta/SolidezVerificador.lean`) habla de `V₀`, el valor de `axiomsCodeT`
+**Por qué así.** W1 (`verificador_solido`, `Meta/SolidezVerificadorModelo.lean` desde ADR‑268) habla de `V₀`, el valor de `axiomsCodeT`
 en el modelo, y de `V₀` sólo se sabe que es el código de los 120 por la solidez (`V₀_eq_codigo`): por eso W1 es
 IMPURO para T08. La cadena es la misma para cualquier `V` cuyos miembros, decodificados, sean teoremas (`cadena_buena`,
 paramétrica desde ADR‑148), y `codeNatList axioms` lo es por construcción (`bueno_codeNatList`). Rosser usa la

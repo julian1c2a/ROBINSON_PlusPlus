@@ -3,18 +3,16 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.SolidezVerificador
-import ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo
-import ROBINSON_PlusPlus.Meta.TitularesIII
--- (✏️ 2026‑11‑17, ADR‑268: `TitularesIII` por `gg_godelCN` y `clas_godelCN`, que usa `godelCN_verdadera_de`: un
--- import hacia ARRIBA, C5 → C7.iii, provisional hasta el paso 4 de ADR‑266, que sube los titulares de este módulo.)
 import ROBINSON_PlusPlus.Meta.RosserNumEval
+import ROBINSON_PlusPlus.Meta.ModeloCodificacion
+import ROBINSON_PlusPlus.Meta.SolidezDobleNegacion
+import ROBINSON_PlusPlus.Meta.GodelTwo
 
 /-!
 # `Meta/RigidezEstandar.lean` — 🏁 W1 y E10 en TODO modelo estándar (T75e, ADR‑173)
 
-Hasta aquí, `prf_of_prov`, `modelo_prov_iff`, `godelCN_verdadera` y `con_verdadera` (`Meta/SolidezVerificador.lean`)
-valían sólo para `MNV V₀`, el modelo construido. Aquí valen para TODO `M` con `Estandar M` (`Meta/SolidezPrf.lean`):
+Hasta aquí, `prf_of_prov`, `modelo_prov_iff`, `godelCN_verdadera` y `con_verdadera` (hoy, el primero en
+`Meta/SolidezVerificadorModelo.lean` y los otros tres en `Meta/TitularesIII.lean`) valían sólo para `MNV V₀`, el modelo construido. Aquí valen para TODO `M` con `Estandar M` (`Meta/SolidezPrf.lean`):
 el dominio es `Nat`, `0`, `σ` y `::` son los de verdad, y valen los 120.
 
 **Por qué no es inmediato.** Las ecuaciones de codificación sólo hablan de códigos con forma (`varc`, `funcc`,
@@ -33,9 +31,12 @@ que en `MNV`.
 * **§8–§10 · `lineWF`, las premisas, la cadena y `runFn`**: si `M` cree que `p` es una prueba, lo es, etiqueta por
   etiqueta (las 21), con el `V` del ancla.
 * **§11 · 🏁** `prf_of_prov_de`, `modelo_prov_iff_de`, `godelCN_verdadera_de` y `con_verdadera_de`: lo que `M` cree
-  demostrable lo es; `Prov` es fiel en `M`; `G` y `Con` son VERDADERAS en `M`. Las de `SolidezVerificador` son la
-  instancia en `MNV V₀` (`estandar_MN`), que también es el control de que la hipótesis no es vacía.
-* **§12 · ⛔ El control del ANCLA** (`control_ancla`, T75b, ADR‑175): sin el ancla, `Prov` puede mentir. `MNV V⊥`, con
+  demostrable lo es; `Prov` es fiel en `M`; `G` y `Con` son VERDADERAS en `M`. Las de `MNV V₀` son su instancia
+  (`estandar_MN`), que también es el control de que la hipótesis no es vacía (`control_instancia`). ✏️ 2026‑11‑17
+  (ADR‑269): los cuatro son titulares y están en `Meta/TitularesIII.lean` (C7.iii), y `control_instancia`, en
+  `Meta/Controles.lean` (C8): las capas de ADR‑266. Aquí queda lo que los prueba (§1–§10 y `M_provCodeC'`).
+* **§12 · ⛔ El control del ANCLA** (`control_ancla`, T75b, ADR‑175; ✏️ ADR‑269: en `Meta/Controles.lean`, con
+  sus piezas aquí): sin el ancla, `Prov` puede mentir. `MNV V⊥`, con
   `V⊥` la lista del código de `⊥` sola, satisface los 119 de la base y cree demostrable `⊥` (una cadena de una línea
   `thy`), así que `Con` es FALSA en él; y el ancla falla, sin evaluar su numeral: si valiera, `MNV V⊥` sería estándar
   y `con_verdadera_de` haría verdadera `Con`.
@@ -57,6 +58,8 @@ variable {M : Model Nat}
 
 -- (✏️ ADR‑191: `ax_de`, `consN_de` y `M_mem` bajaron a `Meta/SolidezDobleNegacion.lean`, con su nombre: la solidez
 -- doble‑negada en todo modelo estándar pide que `∈` sea el de verdad, y la consistencia va antes que este módulo.)
+-- ✏️ 2026‑11‑17 (ADR‑269): con el espacio de nombres de aquel módulo (NAMING‑CONVENTIONS §6); aquí se abren.
+open ROBINSON_PlusPlus.Meta.SolidezDobleNegacion (ax_de consN_de M_mem)
 
 /-! ## §1 · Los códigos cerrados -/
 
@@ -946,7 +949,9 @@ theorem M_cadena (hM : Estandar M) : ∀ (p c : Nat), M.rel sym!"chainOk" [c, p]
 
 
 
-/-! ## §11 · 🏁 `prf_of_prov` y E10 para TODO `Estandar M` -/
+/-! ## §11 · `Prov(⌜φ⌝)` en `M`: una cadena que `M` cree (✏️ 2026‑11‑17, ADR‑269: los titulares que salen de aquí
+—`prf_of_prov_de` y E10, `godelCN_verdadera_de` y `con_verdadera_de`— están en `Meta/TitularesIII.lean`, C7.iii, y
+`control_instancia`, en `Meta/Controles.lean`, C8: las capas de ADR‑266) -/
 
 theorem M_provCodeC' (hM : Estandar M) (φ : Formula) (v : Nat → Nat) :
     evalFormula M v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) →
@@ -958,51 +963,14 @@ theorem M_provCodeC' (hM : Estandar M) (φ : Formula) (v : Nat → Nat) :
     evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero, M_mem hM] at h
   exact h
 
-/-- 🏁 **Lo que un modelo estándar CUALQUIERA cree demostrable, lo es.** -/
-theorem prf_of_prov_de (hM : Estandar M) (φ : Formula) (v : Nat → Nat) :
-    evalFormula M v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) → Prf φ := by
-  intro hp
-  obtain ⟨p, hc, hm⟩ := M_provCodeC' hM φ v hp
-  obtain ⟨hch, hrun⟩ := M_cadena hM p 0 hc
-  rw [hrun] at hm
-  rw [M_axiomsCodeT hM] at hch
-  have h := ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena
-    ROBINSON_PlusPlus.Meta.SolidezVerificador.bueno_codeNatList (decodeL p) 0
-    ROBINSON_PlusPlus.Meta.SolidezVerificador.bueno_zero hch (codeNat φ) hm
-  rwa [ROBINSON_PlusPlus.Meta.SolidezVerificador.dec_codeNat] at h
-
--- (✏️ ADR‑191: `modelo_prov_iff_de` —`Prov` es fiel en todo modelo estándar— se mudó a `Meta/ProvFiel.lean`, con su
--- nombre: su vuelta pide el testigo de `proofN_of_prf` y la vuelta de la rigidez, `M_cadena_de`.)
-
-/-- 🏁 **E10: `G` es VERDADERA en todo modelo estándar**: `gg G` vale (`gg_godelCN`, con `prf_of_prov_de`) y `G`
-    tiene `S` (`clas_godelCN`). Sin lógica clásica (ADR‑191). -/
-theorem godelCN_verdadera_de (hM : Estandar M) (v : Nat → Nat) :
-    evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-  (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.transfer ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.Dnada
-    ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.decNada _ v).2.2
-    ROBINSON_PlusPlus.Meta.TitularesIII.clas_godelCN
-    (ROBINSON_PlusPlus.Meta.TitularesIII.gg_godelCN
-      (ROBINSON_PlusPlus.Meta.SolidezDobleNegacion.estandarDN_de hM) (fun v' hp => prf_of_prov_de hM _ v' hp) v)
-
-/-- 🏁 **E10: `Con` es VERDADERA en todo modelo estándar.** -/
-theorem con_verdadera_de (hM : Estandar M) (v : Nat → Nat) :
-    evalFormula M v ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
-  fun hp => ROBINSON_PlusPlus.Meta.Consistencia.consistencia (prf_of_prov_de hM _ _ hp)
-
-/-- El control de que la hipótesis no es vacía: `MNV V₀` es estándar (`estandar_MN`), y la instancia es
-    `prf_of_prov` de `Meta/SolidezVerificador.lean`. -/
-theorem control_instancia (φ : Formula) (v : Nat → Nat) :
-    evalFormula (ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v
-      (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) → Prf φ :=
-  prf_of_prov_de ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN φ v
-
 /-! ## §12 · ⛔ El control del ANCLA: sin él, `Prov` puede mentir (T75b, ADR‑175)
 
 `Estandar M` pide los 120, ancla incluida. Sin el ancla no basta: `MNV V` satisface los 119 de la base para TODO `V`
 (`MN_coreAxioms`, `MN_codingAxioms`), y en `MNV V` la regla `thy` acepta lo que haya en `V`. Con `V⊥` —la lista del
 código de `⊥` sola— la cadena de UNA línea `⟨⌜⊥⌝, 15⟩` es una prueba de `⊥`, y `Con` es FALSA. El ancla falla en
 `MNV V⊥`, y no hace falta evaluar su numeral: si valiera, `MNV V⊥` sería estándar y `con_verdadera_de` haría
-verdadera `Con`. -/
+verdadera `Con`. ✏️ 2026‑11‑17 (ADR‑269): el control mismo, `control_ancla`, está en `Meta/Controles.lean` (C8)
+—usa `con_verdadera_de`, de C7.iii—; aquí quedan sus piezas, que no usan ningún titular. -/
 
 section ControlAncla
 open ROBINSON_PlusPlus.Meta.ModeloEstandar
@@ -1050,22 +1018,6 @@ theorem MNbot_no_con (v : Nat → Nat) :
     ¬ evalFormula (MNV Vbot) v ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
   fun hc => hc (prov_de_mem Formula.bottom ((memN_consN _ _ _).2 (Or.inl rfl)) v)
 
-/-- ⛔ **El control del ancla**: `MNV V⊥` satisface los 119 de la base, `Con` es FALSA en él (cree demostrable `⊥`),
-    y el ancla FALLA —sin evaluar su numeral: si valiera, `MNV V⊥` sería estándar y `con_verdadera_de` lo
-    impediría—. Es el ancla la que fija el sentido de `Prov`; hermano de `control_tc_cons`. -/
-theorem control_ancla : And (∀ v, contextSatisfies (MNV Vbot) v axiomsBase)
-    (And (∀ v, ¬ evalFormula (MNV Vbot) v ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula')
-      (¬ ∀ v, evalFormula (MNV Vbot) v ax_axiomsCodeT_def)) := by
-  refine ⟨MNbot_base, MNbot_no_con, fun ha => ?_⟩
-  have hM : Estandar (MNV Vbot) :=
-    { hzero := MN_zero, hsucc := MN_succ, hcons := MN_cons,
-      haxs := fun v φ hφ => by
-        rw [axioms_split] at hφ
-        cases List.mem_append.mp hφ with
-        | inl h => exact MNbot_base v φ h
-        | inr h => rw [List.mem_singleton.mp h]; exact ha v }
-  exact MNbot_no_con (fun _ => 0) (con_verdadera_de hM _)
-
 end ControlAncla
 
 end ROBINSON_PlusPlus.Meta.RigidezEstandar
@@ -1074,7 +1026,3 @@ end ROBINSON_PlusPlus.Meta.RigidezEstandar
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.M_substfc
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.M_lineWF
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.M_cadena
-#print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
-#print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
-#print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
-#print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.control_ancla

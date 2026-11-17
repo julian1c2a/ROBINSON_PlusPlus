@@ -69,7 +69,7 @@ def PUROS : List Name := [
 
 /-- Los controles positivos: llaman a `consistencia`, así que su cierre TIENE que nombrar la semántica. -/
 def IMPUROS : List Name := [
-  ``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I,
+  ``ROBINSON_PlusPlus.Meta.TitularesII.goedel_I,
   ``ROBINSON_PlusPlus.Meta.TitularesII.tarski,
   ``ROBINSON_PlusPlus.Meta.TitularesII.rosser]
 

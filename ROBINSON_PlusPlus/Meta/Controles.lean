@@ -18,7 +18,9 @@ etapas de Rosser, de Rosser y de Löb y USAN el modelo —los de «la hipótesis
 `Prf` no la refuta, por la solidez en `MNV V₀`—, cada uno en un espacio de nombres con el nombre de su módulo de
 origen (`Controles.RosserGuardNeg.control_exacta`…); y, al final, los controles POSITIVOS de los `#pureza` de esos
 módulos: lo que TIENE que nombrar la semántica para que el criterio no esté ciego. En sus módulos queda cada
-`#pureza` con sus puros. Mismos enunciados y pruebas.
+`#pureza` con sus puros. Mismos enunciados y pruebas. ✏️ 2026‑11‑17 (ADR‑269): y los dos de `Meta/RigidezEstandar.lean`,
+que usan sus titulares, ahora de C7.iii: `control_instancia` (la hipótesis `Estandar M` no es vacía: `MNV V₀` la
+cumple) y `control_ancla` (sin el ancla, `Prov` puede mentir).
 -/
 
 set_option autoImplicit false
@@ -128,7 +130,7 @@ theorem consistente_neg_con :
   intro h
   have hnn : Prf (neg (neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula')) :=
     (prfH_iff_prf_impChain _ _).1 h
-  exact ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+  exact ROBINSON_PlusPlus.Meta.TitularesII.goedel_II
     (Prf.mp _ _ (Prf.p3 ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula') hnn)
 
 /-- ✅ Y allí Rosser vale, por el titular: con E = [¬Con] las dos hipótesis de `rosser_ext` valen a la vez, y la
@@ -159,9 +161,40 @@ theorem control_reflexion_bot : ¬ Prf (provCodeC' Formula.bottom ⇒ Formula.bo
 
 /-- ✅ Ni para la sentencia de Gödel: T no demuestra Prov⌜G⌝ ⇒ G (Löb y Gödel I). -/
 theorem control_reflexion_godel : ¬ Prf (provCodeC' godelCN ⇒ godelCN) :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (lob godelCN h)
+  fun h => ROBINSON_PlusPlus.Meta.TitularesII.goedel_I (lob godelCN h)
 
 end Lob
+
+namespace RigidezEstandar
+open FOL FOL.Metamath.Semantics
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.ModeloCodigo ROBINSON_PlusPlus.Meta.SolidezPrf
+open ROBINSON_PlusPlus.Meta.RigidezEstandar ROBINSON_PlusPlus.Meta.ModeloEstandar
+open ROBINSON_PlusPlus.Meta.TitularesIII (prf_of_prov_de con_verdadera_de)
+
+/-- El control de que la hipótesis no es vacía: `MNV V₀` es estándar (`estandar_MN`), y la instancia es
+    `prf_of_prov` de `Meta/SolidezVerificadorModelo.lean`. -/
+theorem control_instancia (φ : Formula) (v : Nat → Nat) :
+    evalFormula (ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v
+      (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) → Prf φ :=
+  prf_of_prov_de ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN φ v
+
+/-- ⛔ **El control del ancla**: `MNV V⊥` satisface los 119 de la base, `Con` es FALSA en él (cree demostrable `⊥`),
+    y el ancla FALLA —sin evaluar su numeral: si valiera, `MNV V⊥` sería estándar y `con_verdadera_de` lo
+    impediría—. Es el ancla la que fija el sentido de `Prov`; hermano de `control_tc_cons`. -/
+theorem control_ancla : And (∀ v, contextSatisfies (MNV Vbot) v axiomsBase)
+    (And (∀ v, ¬ evalFormula (MNV Vbot) v ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula')
+      (¬ ∀ v, evalFormula (MNV Vbot) v ax_axiomsCodeT_def)) := by
+  refine ⟨MNbot_base, MNbot_no_con, fun ha => ?_⟩
+  have hM : Estandar (MNV Vbot) :=
+    { hzero := MN_zero, hsucc := MN_succ, hcons := MN_cons,
+      haxs := fun v φ hφ => by
+        rw [axioms_split] at hφ
+        cases List.mem_append.mp hφ with
+        | inl h => exact MNbot_base v φ h
+        | inr h => rw [List.mem_singleton.mp h]; exact ha v }
+  exact MNbot_no_con (fun _ => 0) (con_verdadera_de hM _)
+
+end RigidezEstandar
 
 end ROBINSON_PlusPlus.Meta.Controles
 
@@ -178,3 +211,5 @@ end ROBINSON_PlusPlus.Meta.Controles
   ROBINSON_PlusPlus.Meta.TitularesII.rosser ROBINSON_PlusPlus.Meta.Controles.Rosser.control_neg_con
   ROBINSON_PlusPlus.Meta.Controles.Lob.control_reflexion_bot ROBINSON_PlusPlus.Meta.Controles.Lob.control_reflexion_godel
   ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible
+
+#print axioms ROBINSON_PlusPlus.Meta.Controles.RigidezEstandar.control_ancla

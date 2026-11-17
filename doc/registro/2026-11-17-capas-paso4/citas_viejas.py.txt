@@ -1,0 +1,47 @@
+"""Las citas «`nombre` … (`Meta/Viejo.lean`)» que quedaron viejas con ADR-268 y ADR-269: líneas (de la librería, los
+sondeos, los scripts y los .md vivos) donde un nombre que se mudó sale junto a la ruta de su módulo de ANTES, a menos
+de 120 caracteres después. Se revisan a mano. Uso: py -3.15 citas_viejas.py"""
+import io, os, re
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+MUD = {
+ # ADR-268
+ 'TarskiPrf': ['tarski', 'tarski_semantico', 'tarski_semantico_de', 'IsSentence', 'godelCN_isSentence'],
+ 'Rosser': ['rosser', 'consistente_neg_con', 'control_neg_con'],
+ 'Lob': ['control_reflexion_bot', 'control_reflexion_godel'],
+ 'GodelCorolarios': ['con_indecidible'],
+ 'SolidezVerificador': ['bueno_V₀', 'verificador_solido', "ev_provCodeC'", 'prf_of_prov', 'gg_godelCN', 'clas_godelCN',
+                        'goedel_I_neg', 'godelCN_indecidible', 'godelCN_verdadera', 'con_verdadera', 'modelo_prov_iff'],
+ 'RosserGuardNeg': ['control_exacta', 'control_exactaF'], 'RosserNegLinea': ['control_exacta'],
+ 'RosserNegNum': ['control_exacta', 'control_falla'],
+ # ADR-269
+ 'Consistencia': ['goedel_I', 'goedel_II'],
+ 'PuenteFOL': ['goedel_I_fol', 'goedel_II_fol', 'goedel_I_neg_fol', 'prf_completo', 'modelo_sin_G', 'goedel_I_semantico'],
+ 'RigidezEstandar': ['prf_of_prov_de', 'godelCN_verdadera_de', 'con_verdadera_de', 'modelo_prov_iff_de',
+                     'control_instancia', 'control_ancla'],
+ 'ProvFiel': ['modelo_prov_iff', 'modelo_prov_iff_de'],
+}
+NO = ('DECISIONS.md', 'doc/historia/', 'doc/registro/', 'doc/book/', '.lake/', 'auditoria', 'CHANGELOG')
+fich = []
+for d, _, fs in os.walk(R):
+    rel = d[len(R):].replace(os.sep, '/')
+    if rel.startswith(('.lake', '.git')):
+        continue
+    for f in fs:
+        if f.endswith(('.lean', '.md', '.bash')):
+            p = (rel + '/' + f).lstrip('/')
+            if not any(x in p for x in NO):
+                fich.append(p)
+n = 0
+for p in sorted(fich):
+    for i, l in enumerate(io.open(R + p, encoding='utf-8'), 1):
+        for mod, nombres in MUD.items():
+            ruta = 'Meta/%s.lean' % mod
+            k = l.find(ruta)
+            while k >= 0:
+                antes = l[max(0, k - 120):k]
+                cit = [x for x in re.findall(r'`([^`]+)`', antes) if x in nombres]
+                if cit:
+                    n += 1
+                    print('%s:%d  [%s → %s]  %s' % (p, i, ','.join(cit), mod, l.strip()[:200]))
+                k = l.find(ruta, k + 1)
+print(n, 'líneas')

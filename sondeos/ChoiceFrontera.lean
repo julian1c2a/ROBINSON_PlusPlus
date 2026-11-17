@@ -136,8 +136,8 @@ end ChoiceFrontera
 #frontera ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
 #frontera ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
 #frontera ROBINSON_PlusPlus.Meta.Consistencia.consistencia
-#frontera ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
-#frontera ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+#frontera ROBINSON_PlusPlus.Meta.TitularesII.goedel_I
+#frontera ROBINSON_PlusPlus.Meta.TitularesII.goedel_II
 #frontera ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg
 #frontera ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
 #frontera ROBINSON_PlusPlus.Meta.TitularesII.tarski

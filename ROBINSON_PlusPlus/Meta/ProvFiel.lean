@@ -5,7 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.RosserNegNum
 import ROBINSON_PlusPlus.Meta.RigidezEstandar
-import ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo
+import ROBINSON_PlusPlus.Meta.Consistencia
 
 /-!
 # `Meta/ProvFiel.lean` — `Prov` es FIEL, sin lógica clásica: la vuelta de `modelo_prov_iff` (ADR‑191)
@@ -19,13 +19,14 @@ leído por `gg` sólo sale `¬¬ ∃p …`, y quitar esa doble negación es el p
   (el código de la prueba); `proofN_decide` (Rosser, NegNum) decide `ProofN m ⌜φ⌝` o refuta `PfF m̄ ⌜φ⌝` en `Prf`, y
   la refutación choca, en `MNV V₀` y leída por `gg`, con `posNum`. Sin el modelo en el enunciado.
 * **§2 · `modelo_prov_iff`**, la vuelta: el testigo, en `MNV V₀`, es una cadena que el modelo cree, porque `chainOk`
-  ES `chainOkN` en él. Conserva su nombre (`SolidezVerificador`); vive aquí porque `posNum` y `proofN_decide` van
-  después de aquel módulo.
+  ES `chainOkN` en él (`prov_de_proofN`). ✏️ 2026‑11‑17 (ADR‑269): `modelo_prov_iff` es titular y está en
+  `Meta/TitularesIII.lean` (C7.iii, las capas de ADR‑266); vivía aquí, con el nombre de `SolidezVerificador`, porque
+  `posNum` y `proofN_decide` van después de aquel módulo.
 * **§3 · La vuelta de la rigidez en un `M` estándar cualquiera** (`M_lineWF_de`, `M_premsOf_de`, `M_cadena_de`): si `p`
   es una cadena de verdad, `M` la cree. Es la gemela de `M_lineWF` y `M_cadena` (`Meta/RigidezEstandar.lean`),
   etiqueta por etiqueta, con el otro sentido de los axiomas `ax_lineWF_*` y los `ax_premsOf_*`.
-* **§4 · `modelo_prov_iff_de`**, la vuelta en todo modelo estándar: el testigo de §1 y §3. Conserva su nombre
-  (`RigidezEstandar`).
+* **§4 · `modelo_prov_iff_de`**, la vuelta en todo modelo estándar: el testigo de §1 y §3. ✏️ 2026‑11‑17 (ADR‑269):
+  titular, en `Meta/TitularesIII.lean`; vivía aquí, con el nombre de `RigidezEstandar`.
 -/
 
 set_option autoImplicit false
@@ -59,9 +60,11 @@ theorem proofN_of_prf {φ : Formula} (h : Prf φ) : ∃ m, ProofN m (codeNat φ)
 
 end ROBINSON_PlusPlus.Meta.ProvFiel
 
-/-! ## §2 · `modelo_prov_iff`, la vuelta en `MNV V₀` -/
+/-! ## §2 · La vuelta en `MNV V₀`: un testigo de verdad da `Prov(⌜φ⌝)` (✏️ 2026‑11‑17, ADR‑269: `modelo_prov_iff`,
+que la usa, es titular y está en `Meta/TitularesIII.lean`, C7.iii; `prov_de_proofN` tiene el espacio de nombres de
+este módulo: era el de `SolidezVerificador`) -/
 
-namespace ROBINSON_PlusPlus.Meta.SolidezVerificador
+namespace ROBINSON_PlusPlus.Meta.ProvFiel
 
 /-- Lo que un testigo de verdad da en `MNV V₀`: `Prov(⌜φ⌝)`. -/
 theorem prov_de_proofN {φ : Formula} {m : Nat} (h : ProofN m (codeNat φ)) (v : Nat → Nat) :
@@ -74,21 +77,9 @@ theorem prov_de_proofN {φ : Formula} {m : Nat} (h : ProofN m (codeNat φ)) (v :
   rw [ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo]
   exact h.1
 
-/-- 🏁 **`Prov` es FIEL en `MNV V₀`**, el modelo estándar construido: `MNV V₀ ⊨ Prov(⌜φ⌝)` exactamente cuando `φ` es
-    teorema (en TODO modelo estándar: `modelo_prov_iff_de`). La ida es W1 (`prf_of_prov`); la vuelta, desde ADR‑191, el
-    testigo de `proofN_of_prf`: sin lógica clásica. Es también el control de vacuidad de W1: su hipótesis se cumple para
-    cada teorema. (Hasta ADR‑191 vivía en `Meta/SolidezVerificador.lean`, y su vuelta era D1 leído por `prf_sound`.) -/
-theorem modelo_prov_iff (φ : Formula) (v : Nat → Nat) :
-    evalFormula (MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔
-      Prf φ :=
-  ⟨ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo.prf_of_prov φ v, fun h => by
-    obtain ⟨m, hm⟩ := ROBINSON_PlusPlus.Meta.ProvFiel.proofN_of_prf h
-    exact prov_de_proofN hm v⟩
-
-end ROBINSON_PlusPlus.Meta.SolidezVerificador
+end ROBINSON_PlusPlus.Meta.ProvFiel
 
 #print axioms ROBINSON_PlusPlus.Meta.ProvFiel.proofN_of_prf
-#print axioms ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff
 
 /-! ## §3 · La vuelta de la rigidez: si `p` es una cadena de verdad, un `M` estándar cualquiera la cree -/
 
@@ -398,31 +389,10 @@ theorem M_cadena_de (hM : Estandar M) : ∀ (p c : Nat), chainOkN Vm c p → M.r
 
 end ROBINSON_PlusPlus.Meta.ProvFiel
 
-/-! ## §4 · `modelo_prov_iff_de`, la vuelta en todo modelo estándar -/
-
-namespace ROBINSON_PlusPlus.Meta.RigidezEstandar
-
-variable {M : Model Nat}
-
-/-- 🏁 **`Prov` es FIEL en todo modelo estándar.** La ida, `prf_of_prov_de` (W1 en `M`); la vuelta, desde ADR‑191, el
-    testigo de `proofN_of_prf`, que `M` cree (`M_cadena_de`): sin lógica clásica. (Hasta ADR‑191 vivía en
-    `Meta/RigidezEstandar.lean`, y su vuelta era D1 leído por `prf_sound`.) -/
-theorem modelo_prov_iff_de (hM : Estandar M) (φ : Formula) (v : Nat → Nat) :
-    evalFormula M v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔ Prf φ := by
-  refine ⟨prf_of_prov_de hM φ v, fun h => ?_⟩
-  obtain ⟨m, hc, hy⟩ := ROBINSON_PlusPlus.Meta.ProvFiel.proofN_of_prf h
-  have hc' : chainOkN (M.func sym!"axiomsCodeT" []) 0 m := by rw [M_axiomsCodeT hM]; exact hc
-  have hch := ROBINSON_PlusPlus.Meta.ProvFiel.M_cadena_de hM m 0 hc'
-  have hrun := (M_cadena hM m 0 hch).2
-  rw [ROBINSON_PlusPlus.Meta.ProofChain.provCodeC', eval_substFormula_zero,
-    ← ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq, M_formCodeM hM]
-  simp only [ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC', land, chainOk, In, runFn, nil, zero,
-    evalFormula, evalTerm, evalTerms, shiftEnv, hM.hzero, M_mem hM]
-  exact ⟨m, hch, by rw [hrun]; exact hy⟩
-
-end ROBINSON_PlusPlus.Meta.RigidezEstandar
+-- (✏️ 2026‑11‑17, ADR‑269: §4, `modelo_prov_iff_de` —`Prov` es fiel en todo modelo estándar: el testigo de §1 y la
+-- vuelta de §3—, es titular y está en `Meta/TitularesIII.lean`, C7.iii; vivía aquí con el espacio de nombres de
+-- `RigidezEstandar`.)
 
 end Vuelta
 
 #print axioms ROBINSON_PlusPlus.Meta.ProvFiel.M_cadena_de
-#print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de

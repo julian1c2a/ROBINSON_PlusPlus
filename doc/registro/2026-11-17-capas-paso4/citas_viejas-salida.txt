@@ -1,0 +1,26 @@
+AXIOMS.md:65  [prf_completo → PuenteFOL]  lo demuestra (`prf_completo`, `Meta/TitularesIII.lean` —el puente, `Meta/PuenteFOL.lean`—; ✏️ 2026‑10‑28, ADR‑195: hasta hoy decía «no está demostrado»).
+NEXT-STEPS.md:3  [rosser → Rosser]  **Last updated:** 2026-11-17 — [ADR‑269](DECISIONS.md): B1, paso 4 (la nota de abajo). Antes, el mismo día — [ADR‑268](DECISIONS.md): B1, pasos 2 y 3 (la nota de abajo). Antes, 2026-11-16 — [ADR‑267](
+NEXT-STEPS.md:479  [prf_of_prov_de → RigidezEstandar]  (`prf_of_prov_de` y E10 para todo `Estandar M`)~~ ✅ ADR‑173 (`Meta/RigidezEstandar.lean`).
+ROBINSON_PlusPlus/Meta.lean:20  [goedel_I,goedel_II → Consistencia]  · ✏️ 2026‑10‑14 (ADR‑134), sin hipótesis: `consistencia`, `goedel_I`, `goedel_II` (Meta/Consistencia.lean,
+ROBINSON_PlusPlus/Meta.lean:21  [goedel_I_neg,godelCN_indecidible → SolidezVerificador]  ADR‑120); `goedel_I_neg` y `godelCN_indecidible` (Meta/SolidezVerificador.lean, ADR‑121: Gödel I entero);
+ROBINSON_PlusPlus/Meta.lean:22  [tarski,tarski_semantico → TarskiPrf]  `tarski`, `tarski_semantico` (Meta/TarskiPrf.lean, ADR‑121).
+ROBINSON_PlusPlus/Meta.lean:56  [tarski_semantico_de → TarskiPrf]  · ✏️ 2026‑10‑20 (ADR‑175, T75): `tarski_semantico_de` (Tarski en todo modelo estándar, `Meta/TarskiPrf.lean`);
+ROBINSON_PlusPlus/Meta.lean:57  [control_ancla → RigidezEstandar]  `control_ancla` (sin el ancla, `Prov` puede mentir: `MNV V⊥` cree demostrable `⊥`, `Meta/RigidezEstandar.lean`);
+ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean:53  [goedel_I → Consistencia]  teorema desde ADR‑120: `goedel_I`, sin hipótesis, en `Meta/Consistencia.lean`; esa misma forma la consume
+ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean:54  [goedel_I_neg → SolidezVerificador]  `goedel_I_neg`, `Meta/SolidezVerificador.lean`.)
+ROBINSON_PlusPlus/Meta/DiagonalTwo.lean:52  [goedel_I → Consistencia]  > entero y sin hipótesis: `goedel_I` (`Meta/Consistencia.lean`) y `goedel_I_neg`, juntos en
+ROBINSON_PlusPlus/Meta/DiagonalTwo.lean:53  [godelCN_indecidible → SolidezVerificador]  > `godelCN_indecidible` (`Meta/SolidezVerificador.lean`).)
+ROBINSON_PlusPlus/Meta/DiagonalTwo.lean:98  [goedel_I_neg → SolidezVerificador]  `goedel_I_neg` (`Meta/SolidezVerificador.lean`, ADR‑121), por la solidez del verificador en `MNV V₀`; Rosser
+ROBINSON_PlusPlus/Meta/Div2ParityPrf.lean:32  [goedel_I_neg → SolidezVerificador]  `goedel_I` (`Meta/Consistencia.lean`) y `goedel_I_neg` (`Meta/SolidezVerificador.lean`).)
+ROBINSON_PlusPlus/Meta/Div2ParityPrf.lean:32  [goedel_I → Consistencia]  `goedel_I` (`Meta/Consistencia.lean`) y `goedel_I_neg` (`Meta/SolidezVerificador.lean`).)
+ROBINSON_PlusPlus/Meta/RosserPosNum.lean:187  [modelo_prov_iff → ProvFiel]  (✏️ ADR‑191: era `modelo_prov_iff`, que se mudó a `Meta/ProvFiel.lean`, después de este módulo). Si un paso de aquí
+ROBINSON_PlusPlus/Meta/SolidezVerificadorModelo.lean:61  [modelo_prov_iff → ProvFiel]  -- (✏️ ADR‑191: `modelo_prov_iff` —`Prov` es fiel en `MNV V₀`— se mudó a `Meta/ProvFiel.lean`, con su nombre: su
+ROBINSON_PlusPlus/Meta/TitularesII.lean:15  [rosser → Rosser]  `Meta/TarskiPrf.lean`) y `rosser` (de `Meta/Rosser.lean`), desde ADR‑268; y `goedel_I` y `goedel_II` (de
+ROBINSON_PlusPlus/Meta/TitularesII.lean:16  [goedel_I_fol,goedel_II_fol → PuenteFOL]  `Meta/Consistencia.lean`) y `goedel_I_fol` y `goedel_II_fol` (de `Meta/PuenteFOL.lean`), desde ADR‑269. Los cuatro
+ROBINSON_PlusPlus/Meta/TitularesIII.lean:18  [con_indecidible → GodelCorolarios]  `Meta/TarskiPrf.lean`) y `con_indecidible` (de `Meta/GodelCorolarios.lean`). Desde ADR‑269, los tres de
+doc/AUDITORIA-SUELO-2026-10-12.md:1239  [tarski_semantico_de → TarskiPrf]  *Estado el 2026‑10‑20 (noche):* ✅ **T75 CERRADO (ADR‑175).** (a) `tarski_semantico_de`, Tarski en todo `Estandar M` (`Meta/TarskiPrf.lean`; `tarski_semantico`, su instancia). (b) `control_ancla` (`Met
+doc/REFERENCE-Arithmetic.md:400  [goedel_I,goedel_II → Consistencia]  **Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem). El **Nivel B** (G, ⌜·⌝, Teo G1) ya está implementado en `Meta/Godel.lean` (ver §3.
+doc/REFERENCE-Incompleteness.md:946  [goedel_I_neg → SolidezVerificador]  > ADR‑115; en `pre-adr115`). Hoy `⊬¬G` es `goedel_I_neg` (`Meta/SolidezVerificador.lean`, ADR‑121,
+doc/REFERENCE-Incompleteness.md:5703  [modelo_prov_iff → ProvFiel]  `Classical.byContradiction` de antes; `modelo_prov_iff` se mudó a `Meta/ProvFiel.lean` (§3.79).
+doc/REFERENCE-Incompleteness.md:5749  [modelo_prov_iff_de → ProvFiel]  `Estandar M` y no para un modelo (TEOREMAS §1). (✏️ ADR‑191: `modelo_prov_iff_de` se mudó a `Meta/ProvFiel.lean`,
+25 líneas

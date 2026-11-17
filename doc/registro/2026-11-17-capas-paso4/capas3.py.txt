@@ -1,0 +1,68 @@
+"""B1 (ADR-266), medida tras el paso 4 (ADR-269): la asignación de capas, los imports que SUBEN, la regla de C7.i
+(ningún módulo de C5 ni de C6 en su cierre de imports) y en qué capa vive cada titular de T07. Medida textual."""
+import os, io, collections
+R = 'E:/dropbox/github/lean4/ROBINSON_PlusPlus/'
+P = 'ROBINSON_PlusPlus.'
+imps = {}
+for root, _, fs in os.walk(R + 'ROBINSON_PlusPlus'):
+    for f in fs:
+        if f.endswith('.lean'):
+            p = os.path.join(root, f).replace(os.sep, '/')
+            m = p[len(R):-5].replace('/', '.')
+            if m == P + 'Meta':
+                continue
+            imps[m] = [l.split()[1] for l in io.open(p, encoding='utf-8') if l.startswith('import ') and l.split()[1].startswith(P)]
+corto = lambda m: m.replace(P + 'Meta.', '').replace(P, '')
+memo = {}
+def clos(m):
+    if m not in memo:
+        s = set()
+        for i in imps.get(m, []):
+            s.add(i); s |= clos(i)
+        memo[m] = s
+    return memo[m]
+FAM = {
+ 'C0': 'Minimal.SymLit Minimal.Axioms Full.Induction Meta.PurezaComando',
+ 'C1': 'Meta.Godel Meta.Provability Meta.Hilbert Meta.HilbertDeduction Meta.HilbertSeq Meta.SubstArith Meta.CheckArith Meta.ProofChain Meta.Representability',
+ 'C2': 'Meta.ReprPrf Meta.ArithPrf Meta.ChainPrf Meta.NatArithPrf Meta.NatOrderPrf Meta.NatMulPrf Meta.CantorMonoPrf '
+       'Meta.Div2ParityPrf Meta.StrongInductionPrf Meta.NumListPrf Meta.TcArithPrf',
+ 'C3': 'Meta.Representability2 Meta.Representability2Prf Meta.DerivCondPrf Meta.CodeNumeralPrf Meta.CodeNatInjPrf '
+       'Meta.Diagonal Meta.DiagonalTwo Meta.DiagonalNumeral Meta.GodelTwo Meta.Sentencia',
+ # C4: D3 y el espejo en ℕ (lo que no se nombra va aquí), con las etapas de Rosser, ModeloCodigo y SolidezVerificador
+ 'C5': 'Meta.ModeloEstandar Meta.ModeloCodificacion Meta.SolidezPrf Meta.SolidezDobleNegacion '
+       'Meta.Consistencia Meta.SolidezVerificadorModelo Meta.RigidezEstandar Meta.ProvFiel',
+ 'C6': 'Meta.PuenteFOL',
+ 'C7i': 'Meta.GodelTwoPrf Meta.GodelCorolarios Meta.TarskiPrf Meta.Rosser Meta.Lob',
+ 'C7ii': 'Meta.TitularesII',
+ 'C7iii': 'Meta.TitularesIII Meta.SegundoModelo',
+ 'C8': 'Meta.PurezaTitulares Meta.ContratoTitulares Meta.ContratoTabla Meta.Controles',
+}
+capa = {}
+for c, ms in FAM.items():
+    for m in ms.split():
+        assert P + m in imps, m
+        capa[P + m] = c
+for m in imps:
+    capa.setdefault(m, 'C4')
+ORD = {'C0': 0, 'C1': 1, 'C2': 2, 'C3': 3, 'C4': 4, 'C5': 5, 'C6': 6, 'C7i': 7.1, 'C7ii': 7.2, 'C7iii': 7.3, 'C8': 8}
+aristas = [(a, b) for a in imps for b in imps[a]]
+sube = sorted((a, b) for a, b in aristas if ORD[capa[b]] > ORD[capa[a]])
+print('módulos por capa:', dict(sorted(collections.Counter(capa.values()).items(), key=lambda x: ORD[x[0]])),
+      '· imports:', len(aristas), '· SUBEN:', len(sube))
+for a, b in sube:
+    print('    %-5s %-22s → %-5s %s' % (capa[a], corto(a), capa[b], corto(b)))
+print('\nla regla de C7.i: módulos de C5 o C6 en el cierre de imports de cada módulo de C7.i (y de D1, D2 y D3):')
+for m in sorted(FAM['C7i'].split() + ['Meta.Representability2Prf', 'Meta.DerivCondPrf', 'Meta.PremsBdAllPrf']):
+    s = sorted(corto(x) for x in clos(P + m) if capa[x] in ('C5', 'C6'))
+    print('    %-22s %s' % (m.replace('Meta.', ''), s or 'ninguno'))
+print('\nlos titulares de T07 (TITULARES, Meta/ContratoTitulares.lean), por la capa de su módulo (espacio de nombres = módulo):')
+import re
+t = io.open(R + 'ROBINSON_PlusPlus/Meta/ContratoTitulares.lean', encoding='utf-8').read()
+lista = t[t.index('def TITULARES'):t.index(']', t.index('def TITULARES'))]
+tit = re.findall(r'``(ROBINSON_PlusPlus\.Meta\.\w+)\.([\w\'₀-₉]+)', lista)
+porcapa = collections.defaultdict(list)
+for m, n in tit:
+    porcapa[capa[m]].append(corto(m) + '.' + n)
+for c in sorted(porcapa, key=lambda x: ORD[x]):
+    print('    %-5s %2d  %s' % (c, len(porcapa[c]), ', '.join(sorted(porcapa[c]))))
+print('    total', len(tit))

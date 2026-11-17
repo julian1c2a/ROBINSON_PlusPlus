@@ -1,0 +1,32 @@
+ADR-269 (2026-11-17): B1, el paso 4 de las capas de ADR-266 (N3 y N4: la separación por clase, terminada).
+
+ANTES (sobre RPP d4eaf4a, con el elaborador; se ejecuta con `lake env lean X.lean` desde la raíz de RPP, con el .lean
+fuera del árbol de la librería, p. ej. en .lake/tmp/):
+  Paso4.lean.txt / Paso4-salida.txt   (a) `#ajenos`: las declaraciones con un espacio de nombres AJENO a su módulo
+                                      (NAMING-CONVENTIONS §6), por declaración; los lemas de ecuaciones (`f.eq_1`,
+                                      `f.eq_def`) salen también, porque Lean los genera en el módulo que los pide: no
+                                      cuentan. (b) `#corte`, para cada corte: lo que se QUEDA y usa algo que se va, de qué
+                                      módulos depende lo que se va y de cuáles lo que se queda (los imports que hacen falta).
+  ⚠️ Los cortes miden el árbol de ANTES: después, esos nombres ya no existen donde dicen, y `#corte` da error.
+
+EL CAMBIO:
+  paso4.py.txt     mueve los bloques (por anclas de texto, todo o nada) a TitularesII, TitularesIII y Controles, corrige
+                   los espacios de nombres ajenos de ProvFiel y SolidezDobleNegacion, cambia los imports y renombra en el
+                   árbol (la librería, sondeos/, scripts/ y los tres check-*.bash). Después: la tabla del contrato,
+                   regenerada con scripts/ContratoGenerar.lean (sólo cambian los nombres de 13 titulares, con la misma
+                   huella), doc/control/choice.tsv rehecha (`check-choice.bash --rehacer`: tres constantes de PuenteFOL
+                   pasan a TitularesIII), DEPENDENCIES.md (gen-dependencies.py) y doc/indice.tsv regenerados. Y, a mano,
+                   check-estratos.bash (la fila de `Prf` nombra `prf_completo`), que paso4.py no miraba: lo vio un grep
+                   de los nombres viejos en todos los scripts y la CI.
+  ⚠️ sondeos/AlcanceT62.lean y sondeos/ConoTitulares.lean ESCRIBEN su salida en doc/registro/2026-10-16-t62-alcance/ y
+     doc/registro/2026-10-21-cono/: al volver a ejecutarlos (para ver que compilan con los nombres nuevos) se reescriben.
+     Se restauraron con git: son la medida de su fecha.
+
+DESPUÉS:
+  capas3.py.txt / capas3-salida.txt   la asignación de capas (medida textual de los import): 2 imports suben (los de N6;
+                                      eran 5), la regla de C7.i se cumple, y los 35 titulares de T07 por la capa de su
+                                      módulo: (ii) en C7.ii, (iii) en C7.iii, C5 y C6 sin titulares salvo `consistencia`.
+  Ajenos-despues.txt                  `#ajenos` tras el cambio: 17 constantes, todas de Full/Induction.lean.
+  citas_viejas.py.txt / -salida.txt   las líneas que citan un titular movido (ADR-268 o ADR-269) junto a su módulo de
+                                      ANTES, tras corregir las que hablan del presente: las que quedan son notas FECHADAS
+                                      (registro; la regla (H) de ADR-262) o dicen de dónde vino cada titular.

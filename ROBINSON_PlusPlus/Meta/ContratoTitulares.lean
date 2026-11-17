@@ -59,12 +59,12 @@ def TITULARES : List Name := [
   ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel,
   ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint,
   ``ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski,
-  ``ROBINSON_PlusPlus.Meta.Consistencia.goedel_I,
-  ``ROBINSON_PlusPlus.Meta.Consistencia.goedel_II,
+  ``ROBINSON_PlusPlus.Meta.TitularesII.goedel_I,
+  ``ROBINSON_PlusPlus.Meta.TitularesII.goedel_II,
   ``ROBINSON_PlusPlus.Meta.TitularesII.tarski,
   ``ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg,
   ``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_indecidible,
-  ``ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff,
   ``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera,
   ``ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera,
   ``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico,
@@ -79,21 +79,21 @@ def TITULARES : List Name := [
   ``ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado,
   ``ROBINSON_PlusPlus.Meta.TitularesIII.con_indecidible,
   -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e, titulares por decisión del propietario.
-  ``ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de,
-  ``ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de,
-  ``ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de,
-  ``ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.prf_of_prov_de,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.modelo_prov_iff_de,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.godelCN_verdadera_de,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera_de,
   -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de` (T75a), titular por decisión del propietario.
   ``ROBINSON_PlusPlus.Meta.TitularesIII.tarski_semantico_de,
   -- ✏️ 2026‑10‑28 (ADR‑210): los tres sintácticos del puente con FOL (T67), titulares por decisión del propietario.
-  ``ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol,
-  ``ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol,
-  ``ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol,
+  ``ROBINSON_PlusPlus.Meta.TitularesII.goedel_I_fol,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg_fol,
+  ``ROBINSON_PlusPlus.Meta.TitularesII.goedel_II_fol,
   -- ✏️ 2026‑11‑02 (ADR‑250): los tres semánticos del puente con FOL, titulares por decisión del propietario. Llevan
   -- `Classical.choice`, el de la completitud de FOL (E7 de `../FOL/FOL/Esencialidad0.lean`): esencial.
-  ``ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo,
-  ``ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G,
-  ``ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico]
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.prf_completo,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.modelo_sin_G,
+  ``ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_semantico]
 
 /-- Las constantes de una expresión, también las estructuras de sus proyecciones (`Expr.proj`), que
     `getUsedConstants` no ve. -/

@@ -98,7 +98,7 @@ theorem consistente_neg_con :
   intro h
   have hnn : Prf (neg (neg ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula')) :=
     (prfH_iff_prf_impChain _ _).1 h
-  exact ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+  exact ROBINSON_PlusPlus.Meta.TitularesII.goedel_II
     (Prf.mp _ _ (Prf.p3 ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula') hnn)
 
 end ExtensionPorReduccion

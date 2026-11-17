@@ -58,7 +58,7 @@ LKc|15|0|FOL.SequentSound0.lkc_sound|FOL.Estratos0.lkc_complete|FOL.Hauptsatz0.c
 FOL.Calculus.Derivesᵢ|18|0|FOL.Estratos0.derivesI_soundness|-|FOL.Calculus.derivesI_to_derives0
 LKh|14|0|FOL.Estratos0.lkh_sound|FOL.Estratos0.lkh_complete|FOL.Hauptsatz0.lkh_to_lk0
 FOL.Craig0.LKp|13|0|FOL.Estratos0.lkp_sound|FOL.Estratos0.lkp_complete|FOL.Craig0.lkp_to_lk0
-ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo|-
+ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|ROBINSON_PlusPlus.Meta.TitularesIII.prf_completo|-
 ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ|17|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound|-|ROBINSON_PlusPlus.Meta.Hilbert.Prf.incl
 ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH|8|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfH_sound|-|ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
 EOF

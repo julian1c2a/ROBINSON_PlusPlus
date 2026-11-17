@@ -4,18 +4,21 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.HilbertDeduction
-import ROBINSON_PlusPlus.Meta.RigidezEstandar
 import FOL.Derives1
 import FOL.Canonical0
 import FOL.Sentence
 import ROBINSON_PlusPlus.Meta.Sentencia
-import ROBINSON_PlusPlus.Meta.TitularesIII
 
 /-!
 # `Meta/PuenteFOL.lean` — el puente de FOL a `Prf`, y Gödel I semántico (T67, ADR‑195)
 
 Hasta aquí `goedel_I` decía que ESTE cálculo, `Prf` (un Hilbert propio), no deriva `G`, y nada unía `Prf` con la
 consecuencia de primer orden de FOL (`AXIOMS.md` §0.1). Este módulo pone el puente en la dirección que hace falta:
+
+✏️ 2026‑11‑17 (ADR‑269): los SEIS titulares de §3 y §4 —`prf_completo`, `goedel_I_fol`, `goedel_I_neg_fol`,
+`goedel_II_fol`, `modelo_sin_G` y `goedel_I_semantico`— están en `Meta/TitularesII.lean` (los dos de la clase (ii))
+y en `Meta/TitularesIII.lean` (los cuatro de la (iii)): las capas de ADR‑266. Aquí queda el puente, que no importa
+el modelo de RPP; lo que sigue describe los dos sitios.
 
 * **§1 · `derives1_to_prfH`**: toda derivación de `Derives₁` (la deducción natural de FOL sin `rewrite_at`) es una de
   `PrfH`, con el MISMO contexto, constructor a constructor: la introducción de `⇒` es el teorema de deducción de
@@ -41,7 +44,7 @@ consecuencia de primer orden de FOL (`AXIOMS.md` §0.1). Este módulo pone el pu
   verdadera en todo modelo estándar (`godelCN_verdadera_de`); `goedel_I_semantico` junta los dos hechos, y de ahí se lee
   que ese modelo no es estándar (el teorema no lo enuncia: los modelos estándar son sobre ℕ). ✏️ 2026‑11‑02 (ADR‑250):
   `prf_completo`, `modelo_sin_G` y `goedel_I_semantico` también son TITULARES, con su `Classical.choice`.
-* **§5 · Las sentencias, con FOL** (T72, ADR‑215): la `IsSentence` de RPP (`liftFormula 0 φ = φ`, `Meta/TarskiPrf.lean`)
+* **§5 · Las sentencias, con FOL** (T72, ADR‑215): la `IsSentence` de RPP (`liftFormula 0 φ = φ`, `Meta/Sentencia.lean`)
   es la de FOL (`FOL.Sentence.IsSentence`: sin variables libres, decidible), `isSentence_iff_fol`; y `G` es una
   sentencia de FOL, así que su valor no depende de la valuación (`godelCN_eval_indep`): el de `modelo_sin_G`, tampoco.
 
@@ -519,86 +522,10 @@ theorem prf_iff_derivesSet_clausuras {f : Formula} : Iff (Prf f) (DerivesSet₀ 
 
 end Clausuras
 
-/-- 🏁 **`Prf` es COMPLETO** para su teoría, en el sentido de libro: lo que vale en todo modelo de `AxiomasT` —en
-    TODA valuación—, `Prf` lo demuestra. Por la existencia de modelo de FOL sobre las clausuras de `AxiomasT` y
-    `axiomasT_global`. ✏️ 2026‑11‑03 (ADR‑253): la hipótesis era la de UNA valuación (la semántica de FOL), más fuerte;
-    ésta es más débil y da un teorema más fuerte, del que aquél es un corolario (el `example` de abajo). Titular desde
-    ADR‑250, con el `Classical.choice` de la completitud de FOL. -/
-theorem prf_completo {f : Formula}
-    (h : ∀ (D : Type) (M : Model D), (∀ φ, AxiomasT φ → ∀ w, evalFormula M w φ) → ∀ w, evalFormula M w f) :
-    Prf f := by
-  refine Classical.byContradiction (fun hn => ?_)
-  have hc : ¬ DerivesSet₀ ClausurasT f := fun hd => hn (prf_iff_derivesSet_clausuras.mpr hd)
-  obtain ⟨D, M, v, hM⟩ := FOL.Canonical0.model_existence_lemma₀ (consistente_de hc)
-  exact hM (neg f) (Or.inr rfl) (h D M (axiomasT_global (fun σ hσ => hM σ (Or.inl hσ))) v)
-
--- La forma de una sola valuación, la de antes de ADR‑253, es un corolario.
-example {f : Formula}
-    (h : ∀ (D : Type) (M : Model D) (v : Nat → D), (∀ φ, AxiomasT φ → evalFormula M v φ) → evalFormula M v f) :
-    Prf f :=
-  prf_completo (fun D M hM w => h D M w (fun φ hφ => hM φ hφ w))
-
-/-! ## §4 · Gödel I en la lógica de primer orden, y el modelo en que `G` es falsa -/
-
-/-- 🏁 **Gödel I en FOL** (titular, ADR‑210): ningún conjunto `S` de teoremas de `Prf` deriva `G` en la lógica de
-    primer orden de FOL. `S` puede ser `AxiomasT` (los 120 y las instancias de los dos esquemas: `prf_of_axiomasT`),
-    sus clausuras universales (teoremas de `Prf` por `gen`) o todos los teoremas a la vez; el enunciado de libro, «las
-    clausuras de T no derivan G», es una instancia, y no pide que los 120 sean sentencias. -/
-theorem goedel_I_fol {S : Formula → Prop} (hS : ∀ φ, S φ → Prf φ) :
-    ¬ DerivesSet₀ S ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_I (prf_of_derivesSet hS h)
-
-/-- 🏁 Y tampoco `¬G` (titular, ADR‑210): con `goedel_I_fol`, todo conjunto de teoremas de `Prf` es INCOMPLETO en
-    FOL. -/
-theorem goedel_I_neg_fol {S : Formula → Prop} (hS : ∀ φ, S φ → Prf φ) :
-    ¬ DerivesSet₀ S (neg ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) :=
-  fun h => ROBINSON_PlusPlus.Meta.TitularesIII.goedel_I_neg (prf_of_derivesSet hS h)
-
-/-- 🏁 **Gödel II en FOL** (titular, ADR‑210): ningún conjunto de teoremas de `Prf` deriva en FOL la consistencia
-    de `T_Prf`. -/
-theorem goedel_II_fol {S : Formula → Prop} (hS : ∀ φ, S φ → Prf φ) :
-    ¬ DerivesSet₀ S ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
-  fun h => ROBINSON_PlusPlus.Meta.Consistencia.goedel_II (prf_of_derivesSet hS h)
-
--- La hipótesis no es vacía: la cumplen `AxiomasT` y el conjunto de TODOS los teoremas de `Prf` (que contiene las
--- clausuras universales de los axiomas, por `gen`).
-example : ¬ DerivesSet₀ AxiomasT ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-  goedel_I_fol (fun _ => prf_of_axiomasT)
-example (A : Formula) (h : AxiomasT A) : Prf (Formula.forall A) := Prf.gen A (prf_of_axiomasT h)
-example : ¬ DerivesSet₀ (fun g => Prf g) ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
-  goedel_II_fol (fun _ h => h)
-
--- Las clausuras de `AxiomasT` no derivan `G` en FOL: el enunciado de libro, una instancia más de `goedel_I_fol`.
-example : ¬ DerivesSet₀ ClausurasT ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-  goedel_I_fol (fun _ => prf_of_clausurasT)
-
-/-- 🏁 **Un modelo de `T_Prf` en el que `G` es FALSA**: satisface todos los teoremas de `Prf` en TODA valuación, y `G`
-    en ninguna. Por la existencia de modelo de FOL sobre los teoremas de `Prf` y `¬G`, consistentes por `goedel_I` y el
-    puente; de su valuación a todas, por las clausuras (`eval_forallN_toda`), y `G`, que es una sentencia, no depende
-    de ella. ✏️ 2026‑11‑03 (ADR‑253): decía «en una valuación». Titular desde ADR‑250. -/
-theorem modelo_sin_G : ∃ (D : Type) (M : Model D),
-    And (∀ φ, Prf φ → ∀ w, evalFormula M w φ)
-      (∀ w, ¬ evalFormula M w ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN) := by
-  have hc : ¬ DerivesSet₀ (fun g => Prf g) ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-    goedel_I_fol (fun _ h => h)
-  obtain ⟨D, M, v, hM⟩ := FOL.Canonical0.model_existence_lemma₀ (consistente_de hc)
-  refine ⟨D, M, fun φ hφ w => ?_, fun w hw => ?_⟩
-  · exact eval_forallN_toda M (existe_cota φ) (hM _ (Or.inl (prf_forallN φ hφ _))) w
-  · have hs : FOL.Sentence.IsSentence ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
-      (FOL.Sentence.isSentence_iff_lift _).mpr ROBINSON_PlusPlus.Meta.Sentencia.godelCN_isSentence
-    exact hM (neg _) (Or.inr rfl) ((FOL.Sentence.eval_sentence M hs w v).mp hw)
-
-/-- 🏁 **GÖDEL I SEMÁNTICO**: `G` es verdadera en todo modelo estándar (`godelCN_verdadera_de`) y falsa, en TODA
-    valuación, en un modelo de `T_Prf` (`modelo_sin_G`). Junta los dos hechos; que ese modelo no sea estándar es su
-    lectura, no parte del enunciado (los modelos estándar son sobre ℕ). ✏️ 2026‑11‑03 (ADR‑253): el modelo, en toda
-    valuación. Titular desde ADR‑250. -/
-theorem goedel_I_semantico :
-    And (∀ (M : Model Nat), ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar M →
-          ∀ v, evalFormula M v ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)
-      (∃ (D : Type) (M : Model D),
-          And (∀ φ, Prf φ → ∀ w, evalFormula M w φ)
-            (∀ w, ¬ evalFormula M w ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)) :=
-  ⟨fun _ hM v => ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de hM v, modelo_sin_G⟩
+-- (✏️ 2026‑11‑17, ADR‑269: `prf_completo`, que cerraba §3, y §4 entero —Gödel I y II en FOL, `modelo_sin_G` y
+-- `goedel_I_semantico`—, los SEIS titulares de este módulo, están en `Meta/TitularesII.lean` (`goedel_I_fol` y
+-- `goedel_II_fol`, de la clase (ii)) y en `Meta/TitularesIII.lean` (los otros cuatro, de la (iii)): las capas de
+-- ADR‑266. Aquí queda el puente.)
 
 /-! ## §5 · Las sentencias, con FOL (T72, ADR‑215) -/
 
@@ -623,12 +550,6 @@ end ROBINSON_PlusPlus.Meta.PuenteFOL
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.prf_of_derivesSet
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.axiomasT_global
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.prf_iff_derivesSet_clausuras
-#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.prf_completo
-#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_fol
-#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_neg_fol
-#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_II_fol
-#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.modelo_sin_G
-#print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.goedel_I_semantico
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.isSentence_iff_fol
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.godelCN_isSentence_fol
 #print axioms ROBINSON_PlusPlus.Meta.PuenteFOL.godelCN_eval_indep

@@ -58,6 +58,11 @@ Public API:
     y `Meta/SegundoModelo.lean`, un segundo modelo estándar, distinto de `MNV V₀` (`segundo_modelo`).
   · ✏️ 2026‑11‑05 (ADR‑259): `Meta/ListIndAdmisible.lean`, `listInd_admisible`: la inducción de listas sale de `ind`, sin
     el constructor `Prf.listInd` (la prueba, del sondeo de T69, ADR‑244).
+  · ✏️ 2026‑11‑17 (ADR‑266…269, B1): las capas dentro de RPP. Los titulares de las clases (ii) y (iii), en
+    `Meta/TitularesII.lean` y `Meta/TitularesIII.lean` —allí viven desde entonces `goedel_I`, `goedel_II`, `tarski`,
+    `rosser`, los dos de Gödel en FOL y los dieciséis de la (iii), que las líneas de arriba citan con su módulo de
+    entonces—; los controles que nombran la semántica, en `Meta/Controles.lean`; y `Meta/Sentencia.lean`
+    (`IsSentence`) y `Meta/SolidezVerificadorModelo.lean` (W1 leído en el modelo).
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),

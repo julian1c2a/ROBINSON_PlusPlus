@@ -9,7 +9,7 @@
 > La prosa de este documento (explicaciones, motivación) va en español para que quede
 > clara sin ambigüedad.
 
-**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): §6 y §9, al día con notas fechadas —`Full/` con un solo módulo, los axiomas objeto (`def`, ningún `axiom` de Lean) con su prefijo, el índice que abre `scoped FOL`, 6 de los 120 módulos— y los ADR‑001…130, en `doc/historia/`. Antes, 2026-09-26 — §9: subíndices de cálculo (`Prf₀` → `Prfᵢ`, ADR-102) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+**Last updated:** 2026-11-17 — [ADR‑269](DECISIONS.md): §6, la medida por declaración (siete constantes de `ProvFiel` y `SolidezDobleNegacion` en espacios de nombres ajenos, corregidas). Antes, 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): §6 y §9, al día con notas fechadas —`Full/` con un solo módulo, los axiomas objeto (`def`, ningún `axiom` de Lean) con su prefijo, el índice que abre `scoped FOL`, 6 de los 120 módulos— y los ADR‑001…130, en `doc/historia/`. Antes, 2026-09-26 — §9: subíndices de cálculo (`Prf₀` → `Prfᵢ`, ADR-102) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor**: Julián Calderón Almendros
 
 ---
@@ -275,7 +275,10 @@ predecible.
 - **Namespace = ruta del fichero** (ADR-005, en `doc/historia/DECISIONS-001-130.md`):
   `Meta/ArithPrf.lean` → `namespace ROBINSON_PlusPlus.Meta.ArithPrf`. Aquí el mirroring
   **sí se sigue** —109 de 122 módulos, medido el 2026-09-09; ✏️ 2026‑11‑09 (ADR‑262), 119 de los 120, medido con el
-  primer `namespace ROBINSON_PlusPlus…` de cada fichero: la excepción es `Full/Induction.lean`—, y por eso ROBINSON_PlusPlus
+  primer `namespace ROBINSON_PlusPlus…` de cada fichero: la excepción es `Full/Induction.lean`; ✏️ 2026‑11‑17 (ADR‑269),
+  medido por DECLARACIÓN —el espacio de nombres de cada constante contra su módulo, sin los lemas de ecuaciones que
+  Lean genera en el módulo que los pide—, `ProvFiel` y `SolidezDobleNegacion` declaraban además siete constantes en
+  espacios de nombres ajenos; ya no, y la única excepción sigue siendo `Full/Induction.lean`, con 17—, y por eso ROBINSON_PlusPlus
   **no** adopta la regla «namespace plano» que los proyectos hermanos corrigieron en su
   ADR-005: allí nadie seguía el mirroring, aquí sí. Ver el addendum de ADR-005.
 - ⚠️ **Un namespace, un fichero — nunca compartido.** Que dos ficheros «traten del mismo
