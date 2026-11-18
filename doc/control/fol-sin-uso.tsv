@@ -76,6 +76,10 @@ FOL.Esencialidad0	FOL.Esencialidad0.E7.model_existence_stmt_implies_wlem	teorema
 FOL.Esencialidad0	FOL.Esencialidad0.ExElimFin.ex_elim_refutable_fin	teorema	vigilada
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E10.infinite_large_fresh_stmt_implies_wlem	teorema	vigilada
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E10.infinite_large_stmt_implies_wlem	teorema	vigilada
+FOL.EsencialidadSem0	FOL.EsencialidadSem0.E11.countable_infinite_stmt_dns_implies_nnem	teorema	vigilada
+FOL.EsencialidadSem0	FOL.EsencialidadSem0.E11.infinite_large_fresh_stmt_dns_implies_nnem	teorema	vigilada
+FOL.EsencialidadSem0	FOL.EsencialidadSem0.E11.infinite_large_stmt_dns_implies_nnem	teorema	vigilada
+FOL.EsencialidadSem0	FOL.EsencialidadSem0.E11.ls_down_stmt_nnem_iff_dns	teorema	vigilada
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E8.compactness_mpr_L3_implies_wlem	teorema	vigilada
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E8.compactness_stmt_implies_wlem	teorema	vigilada
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E8.sat_of_finSat_of_em_noVacuo	teorema	vigilada
