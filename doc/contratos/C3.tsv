@@ -1,0 +1,115 @@
+# doc/contratos/C3.tsv — el CONTRATO de la capa C3 (D1, D2, el punto fijo y el verificador con sus guardas):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj	ROBINSON_PlusPlus.Meta.CodeNatInjPrf	1401758813	C4 C5
+ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_ne_zero	ROBINSON_PlusPlus.Meta.CodeNatInjPrf	4065924904	C4 C5 C7.iii
+ROBINSON_PlusPlus.Meta.CodeNatInjPrf.triN_succ	ROBINSON_PlusPlus.Meta.CodeNatInjPrf	4173385151	C4
+ROBINSON_PlusPlus.Meta.CodeNumeralPrf.pairN	ROBINSON_PlusPlus.Meta.CodeNumeralPrf	9906956	C4 C5
+ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval	ROBINSON_PlusPlus.Meta.CodeNumeralPrf	784866145	C4
+ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval_of	ROBINSON_PlusPlus.Meta.CodeNumeralPrf	2132852525	C4
+ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral	ROBINSON_PlusPlus.Meta.CodeNumeralPrf	3831500171	C4 C7.i
+ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_termCode_numeral	ROBINSON_PlusPlus.Meta.CodeNumeralPrf	3035512845	C4
+ROBINSON_PlusPlus.Meta.CodeNumeralPrf.two_mul_pairN	ROBINSON_PlusPlus.Meta.CodeNumeralPrf	347537617	C5
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_lift	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	788795103	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_real	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	457510606	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.PrfH_congr_isFormCodeE2	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3890870317	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.PrfH_inst_wfAllF	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	448287057	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.liftF_hasWit	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3888046525	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.liftF_hasWitF	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1566683205	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.liftF_isFC1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1757274816	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.liftF_isFormCodeE2	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3228679824	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.liftF_isTC1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	719480048	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.liftF_wfAllF	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1255464691	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.prf_isFormCodeE2_of_In	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	908493196	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.prf_isFormCodeE2_str	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3299840262	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.prf_shapeNul_str	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3211782325	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_In_left	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1620512658	C4 C7.i
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_argsIn	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	187242455	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_isTermCodeE1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3818997409	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_lenc	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	359513966	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_nthc_idx	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	746576359	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_nthc_lst	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2601415405	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_succ	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2294992152	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_inst_argsIn	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	4039622560	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_inst_wfAll1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2856735498	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.binOkF	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1750594754	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.cOk	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3190816927	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.closed_mem_tcodes1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3478440094	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_cOk2_absurd	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2711092335	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_cOk3_absurd	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	4032710672	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_num_ne	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2495275667	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_tag_absurd	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2779393658	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.funcOkT1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3648254550	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.impT	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	174811039	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.isFormCodeB2	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3197018298	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.isTermCodeB1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3648254550	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.liftF_argsIn	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3747837293	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.liftF_isTermCodeE1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1443257794	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.liftF_wfAll1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	49078471	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.liftT_liftc	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	757433660	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.liftTerm_objList	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	471766031	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.mem_of_getElem?	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3902204466	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.mem_tcodes1s_of_mem	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1054950098	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.nulOkF	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2238458006	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_In_objList	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1379094554	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_head	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	198220820	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_of_closed	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1946675406	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_tail	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3146595088	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	894972288	C7.i
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_congr_In_left	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2768262598	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_congr_lenc	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3833066985	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_congr_nthc_lst	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2288156732	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTC1_lift	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2869471187	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTC1_tcodes	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2829276032	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	644226748	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_str	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1618177212	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_var	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1776517088	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_lenc_termsCodeM	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2190565126	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_nthc_c1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1663987868	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_nthc_c2	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2280320264	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_nthc_termsCodeM	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3631427174	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_orL	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3240410878	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_orR	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3657530721	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_or_elim_imp	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	1102032158	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_shapeBin_str	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3993050873	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_shapeUn_str	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	3207353064	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.strBinOkF1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	8684678	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.substTerm_objList	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2022415851	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.tcodes1	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2037649555	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.tcodes1s	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	417294011	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.unOkF	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	8684678	C4
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.varOkT	ROBINSON_PlusPlus.Meta.CodeWitnessPrf	2238458006	C4
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf	ROBINSON_PlusPlus.Meta.DerivCondPrf	3696831763	C4 C7.i
+ROBINSON_PlusPlus.Meta.DerivCondPrf.liftFormula_provCodeC'	ROBINSON_PlusPlus.Meta.DerivCondPrf	393534368	C4
+ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_formCode	ROBINSON_PlusPlus.Meta.DerivCondPrf	839407263	C4 C7.i
+ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_numeral	ROBINSON_PlusPlus.Meta.DerivCondPrf	3950969149	C4 C7.i
+ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_strCode	ROBINSON_PlusPlus.Meta.DerivCondPrf	2089657302	C4
+ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_termCode	ROBINSON_PlusPlus.Meta.DerivCondPrf	1303574924	C4
+ROBINSON_PlusPlus.Meta.DerivCondPrf.substTerm_numeral	ROBINSON_PlusPlus.Meta.DerivCondPrf	3666805040	C4 C7.i
+ROBINSON_PlusPlus.Meta.DerivCondPrf.substTerm_strCode	ROBINSON_PlusPlus.Meta.DerivCondPrf	4018865929	C4
+ROBINSON_PlusPlus.Meta.Diagonal.diagTerm	ROBINSON_PlusPlus.Meta.Diagonal	2878596787	C7.i C7.iii
+ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN	ROBINSON_PlusPlus.Meta.DiagonalNumeral	1539953984	C6 C7.i C7.ii C7.iii C8
+ROBINSON_PlusPlus.Meta.DiagonalNumeral.provCodeN	ROBINSON_PlusPlus.Meta.DiagonalNumeral	2924998079	C7.i
+ROBINSON_PlusPlus.Meta.DiagonalNumeral.selfAppN	ROBINSON_PlusPlus.Meta.DiagonalNumeral	2924998079	C7.i C7.iii
+ROBINSON_PlusPlus.Meta.DiagonalTwo.godelBeta'	ROBINSON_PlusPlus.Meta.DiagonalTwo	1539953984	C7.i C7.iii
+ROBINSON_PlusPlus.Meta.DiagonalTwo.godelPred'	ROBINSON_PlusPlus.Meta.DiagonalTwo	1539953984	C7.i C7.iii
+ROBINSON_PlusPlus.Meta.DiagonalTwo.godel_comp'	ROBINSON_PlusPlus.Meta.DiagonalTwo	2404911255	C7.i
+ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula'	ROBINSON_PlusPlus.Meta.GodelTwo	1539953984	C5 C7.i C7.ii C7.iii C8
+ROBINSON_PlusPlus.Meta.Representability2.lineCode'	ROBINSON_PlusPlus.Meta.Representability2	746643396	C4
+ROBINSON_PlusPlus.Meta.Representability2.lineJustif	ROBINSON_PlusPlus.Meta.Representability2	941974295	C4
+ROBINSON_PlusPlus.Meta.Representability2.prf_hasWitF_fc	ROBINSON_PlusPlus.Meta.Representability2	2109087693	C4
+ROBINSON_PlusPlus.Meta.Representability2.prf_hasWit_tc	ROBINSON_PlusPlus.Meta.Representability2	1447243646	C4
+ROBINSON_PlusPlus.Meta.Representability2.proofCode'	ROBINSON_PlusPlus.Meta.Representability2	2233247207	C4
+ROBINSON_PlusPlus.Meta.Representability2Prf.prf_In_runFn_of_mem	ROBINSON_PlusPlus.Meta.Representability2Prf	1987476588	C4
+ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla	ROBINSON_PlusPlus.Meta.Representability2Prf	3022055073	C4 C5
+ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track	ROBINSON_PlusPlus.Meta.Representability2Prf	92925453	C4
+ROBINSON_PlusPlus.Meta.Representability2Prf.prf_inAxC	ROBINSON_PlusPlus.Meta.Representability2Prf	800851388	C4
+ROBINSON_PlusPlus.Meta.Representability2Prf.provCodeC'_intro_prf	ROBINSON_PlusPlus.Meta.Representability2Prf	158664901	C4
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf	ROBINSON_PlusPlus.Meta.Representability2Prf	3002450326	C4 C7.i
+ROBINSON_PlusPlus.Meta.Sentencia.IsSentence	ROBINSON_PlusPlus.Meta.Sentencia	1395574141	C6 C7.i C7.ii C8
+ROBINSON_PlusPlus.Meta.Sentencia.godelCN_isSentence	ROBINSON_PlusPlus.Meta.Sentencia	1337669813	C6 C7.iii
+ROBINSON_PlusPlus.Meta.Sentencia.liftTerm_one_diagTerm	ROBINSON_PlusPlus.Meta.Sentencia	3907615318	C7.i

@@ -1,0 +1,28 @@
+════ AUTOTEST DE check-capas.bash: los mutantes, sobre una copia del árbol ════
+  ✓ la copia limpia: verde, con las cifras del árbol (3 líneas de resumen)
+  ✓ una fila borrada: rojo, FALTA
+  ✓ un módulo nuevo sin fila: rojo, FALTA
+  ✓ una fila dos veces: rojo, DOS_VECES
+  ✓ una fila de un módulo que no existe: rojo, NO_EXISTE
+  ✓ una capa que no existe: rojo, CAPA
+  ✓ una capa de la regla sin su fila: rojo, CAPA
+  ✓ C2 importa C5: rojo, SUBE
+  ✓ C7.i importa C5 (la regla no es un orden): rojo, SUBE
+  ✓ C7.i importa C6: rojo, SUBE
+  ✓ un import que sube, tras comentarios: rojo, SUBE
+  ✓ un import tras la cabecera: rojo, NO_LEIDA
+  ✓ un import dentro de un comentario: rojo, NO_LEIDA
+  ✓ una línea de import que no se sabe leer: rojo, CABECERA
+  ✓ un import de un módulo que no existe: rojo, IMPORT_DESCONOCIDO
+  ✓ un módulo importa un barril: rojo, BARRIL
+  ✓ una excepción con su razón (control positivo): verde
+  ✓ una excepción sin razón: rojo, SIN_RAZON
+  ✓ una excepción sin import: rojo, SOBRA
+  ✓ una excepción que no sube: rojo, SOBRA
+  ✓ un titular nuevo en C5: rojo, TITULAR
+  ✓ un titular de la clase (ii) en PUROS: rojo, TITULAR
+  ✓ un titular cuyo espacio de nombres no es un módulo: rojo, TITULAR_MODULO
+  ✓ sin la excepción de consistencia: rojo, TITULAR
+  ✓ una excepción de un titular que está en C7: rojo, SOBRA
+  ✓ TITULARES que no se lee: rojo, EXTRACCION
+✅ autotest de check-capas.bash: la copia limpia, verde; la excepción con razón, verde; cada mutante, rojo con su código.

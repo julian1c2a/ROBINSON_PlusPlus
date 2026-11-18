@@ -1,0 +1,18 @@
+## (a) la regla de C7.i, debilitada (C7.i puede importar C5): la regla se vuelve un orden
+1
+✓ C7.i ve C5: rojo (1 mutantes del árbol fallan; entre ellos «C7.i importa C5»)
+## (b) la cabecera, sin los comentarios anidados
+1
+✓ sin anidar: rojo (1 mutantes del árbol fallan; entre ellos «un import que sube, tras comentarios»)
+## (c) sin comprobar que una excepción hace falta
+1
+✓ sin SOBRA: rojo (1 mutantes del árbol fallan; entre ellos «una excepción que no sube»)
+## (d) sin la segunda lectura de los imports (vistas)
+1
+✓ sin NO_LEIDA: rojo (2 mutantes del árbol fallan; entre ellos «un import tras la cabecera»)
+## (e) sin la regla de los barriles (un barril, como C8)
+1
+✓ sin BARRIL: rojo (1 mutantes del árbol fallan; entre ellos «un módulo importa un barril»)
+## (f) los titulares de la clase (i), donde sea de C7
+1
+✓ PUROS en cualquier C7: rojo (1 mutantes del árbol fallan; entre ellos «un titular de la clase (ii) en PUROS»)

@@ -1,6 +1,6 @@
 # El plan de A7, A9, B1 y D1
 
-**Last updated:** 2026-11-18 — [ADR‑270](../DECISIONS.md): A9, hecho (§3), con el paso 3 de B1 (§4). Antes, 2026-11-17 — [ADR‑269](../DECISIONS.md): B1, el paso 4 (§4), y la numeración de los pasos de ADR‑268, corregida. Antes, el mismo día — [ADR‑268](../DECISIONS.md): B1, los pasos 2 y 3 (§4). Antes, 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
+**Last updated:** 2026-11-18 — [ADR‑271](../DECISIONS.md) y [ADR‑272](../DECISIONS.md): B1, los pasos 5 y 6 (§4), y B1 terminado. Antes, el mismo día — [ADR‑270](../DECISIONS.md): A9, hecho (§3), con el paso 3 de B1 (§4). Antes, 2026-11-17 — [ADR‑269](../DECISIONS.md): B1, el paso 4 (§4), y la numeración de los pasos de ADR‑268, corregida. Antes, el mismo día — [ADR‑268](../DECISIONS.md): B1, los pasos 2 y 3 (§4). Antes, 2026-11-16 — [ADR‑266](../DECISIONS.md): el diseño de B1, decidido (§4). Antes, el mismo día —
 [ADR‑265](../DECISIONS.md): las decisiones del propietario (§0) y **A7, hecho** (§2).
 Antes, 2026-11-10 — creado con [ADR‑264](../DECISIONS.md): el estudio y el plan de cuatro filas de
 `doc/AUDITORIAS.md` §2 (el núcleo de `[B]`, `prf_list_induction` sin `listInd`, las capas dentro de RPP y las preguntas
@@ -164,6 +164,11 @@ mucho, el corte crece. **Coste:** de uno a dos días (ESTIMACIÓN).
 > ✏️ 2026‑11‑18 (ADR‑270): el paso 3, hecho (N6 con A9): **ningún import sube de capa**. `GodelTwo` importa sólo
 > `ProofChain`; `CodeWitnessPrf` (los testigos de las guardas) va a C3, y `BoundedInPrf`, `ListIndAdmisible` y
 > `ReglasPrfH`, a C2 (sus imports ya lo permitían; la asignación por familias los dejaba en C4). Quedan el 5 y el 6.
+> ✏️ El mismo día (ADR‑271 y ADR‑272): los pasos 5 y 6, hechos —**B1, terminado**—. El punto 2 de abajo, como está
+> escrito (el manifiesto, con una fila más por clase: las capas, y los titulares fuera de C7), salvo «en las dos CI»: el
+> control corre en la de RPP, a la que también lanza la de FOL (ADR‑216), porque FOL no tiene capas (ADR‑271 §7). El
+> punto 3, en `check-indice.bash`, que ya tenía el entorno y la medida de uso: `doc/contratos/`, un fichero por capa con
+> lo que las OTRAS usan de ella (no todo lo que declara, que es el índice); y FOL como la capa de debajo.
 
 **Lo medido.** No hay manifiesto ni control. Lo que sí hay: `DEPENDENCIES.md`, generado y con `--check` en la CI
 (ADR‑238: 120 módulos activos, 402 aristas, profundidad 59, sin ciclos); las familias de `Meta/` en prosa

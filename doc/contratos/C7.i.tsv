@@ -1,0 +1,22 @@
+# doc/contratos/C7.i.tsv — el CONTRATO de la capa C7.i (los titulares de la clase (i): ni C5 ni C6, tampoco de forma transitiva):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf	ROBINSON_PlusPlus.Meta.GodelTwoPrf	2402478544	C7.ii
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf	ROBINSON_PlusPlus.Meta.GodelTwoPrf	1256504857	C7.ii
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_diag_arith_num	ROBINSON_PlusPlus.Meta.GodelTwoPrf	3846975835	C7.iii
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint	ROBINSON_PlusPlus.Meta.GodelTwoPrf	1930369724	C7.iii
+ROBINSON_PlusPlus.Meta.Lob.lob	ROBINSON_PlusPlus.Meta.Lob	3687783843	C8
+ROBINSON_PlusPlus.Meta.Rosser.R	ROBINSON_PlusPlus.Meta.Rosser	1507442410	C7.ii C8
+ROBINSON_PlusPlus.Meta.Rosser.impChain	ROBINSON_PlusPlus.Meta.Rosser	282143280	C8
+ROBINSON_PlusPlus.Meta.Rosser.negCon_isSentence	ROBINSON_PlusPlus.Meta.Rosser	1490494500	C8
+ROBINSON_PlusPlus.Meta.Rosser.prfH_iff_prf_impChain	ROBINSON_PlusPlus.Meta.Rosser	2265207386	C8
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext	ROBINSON_PlusPlus.Meta.Rosser	590738255	C7.ii C8
+ROBINSON_PlusPlus.Meta.TarskiPrf.diagBeta	ROBINSON_PlusPlus.Meta.TarskiPrf	2924998079	C7.iii
+ROBINSON_PlusPlus.Meta.TarskiPrf.diagBeta_comp	ROBINSON_PlusPlus.Meta.TarskiPrf	2306471782	C7.iii
+ROBINSON_PlusPlus.Meta.TarskiPrf.liar	ROBINSON_PlusPlus.Meta.TarskiPrf	2924998079	C7.ii C7.iii
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski	ROBINSON_PlusPlus.Meta.TarskiPrf	18827076	C7.ii
+ROBINSON_PlusPlus.Meta.TarskiPrf.substFormula_neg	ROBINSON_PlusPlus.Meta.TarskiPrf	3844541105	C7.iii

@@ -1,0 +1,51 @@
+# doc/contratos/C1.tsv — el CONTRATO de la capa C1 (la codificación y el cálculo (Gödel, Prf, PrfH, la aritmética de los códigos)):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq	ROBINSON_PlusPlus.Meta.CheckArith	4197354854	C2 C3 C4
+ROBINSON_PlusPlus.Meta.Godel.numeral	ROBINSON_PlusPlus.Meta.Godel	3428504659	C2 C3 C4 C7.i C7.ii C7.iii
+ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH	ROBINSON_PlusPlus.Meta.Hilbert	3944470172	C5 C7.i C8
+ROBINSON_PlusPlus.Meta.Hilbert.Prf	ROBINSON_PlusPlus.Meta.Hilbert	13336098529979476084	C2 C3 C4 C5 C6 C7.i C7.ii C7.iii C8
+ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ	ROBINSON_PlusPlus.Meta.Hilbert	1955880337983147542	C2 C3 C4 C5 C6 C7.i
+ROBINSON_PlusPlus.Meta.Hilbert.axioms_lift_eq	ROBINSON_PlusPlus.Meta.Hilbert	3264526558	C6
+ROBINSON_PlusPlus.Meta.Hilbert.confinementFormula	ROBINSON_PlusPlus.Meta.Hilbert	2849181159	C3 C4 C5 C6
+ROBINSON_PlusPlus.Meta.Hilbert.listInductionFormula	ROBINSON_PlusPlus.Meta.Hilbert	2924998079	C2 C3 C5 C6
+ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH	ROBINSON_PlusPlus.Meta.HilbertDeduction	9230003872239906495	C2 C3 C4 C5 C6 C7.i C7.ii C8
+ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_ex_elim	ROBINSON_PlusPlus.Meta.HilbertDeduction	3329665001	C3 C4
+ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_ex_intro	ROBINSON_PlusPlus.Meta.HilbertDeduction	2344861313	C2 C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono	ROBINSON_PlusPlus.Meta.HilbertDeduction	3803789953	C6
+ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_w1	ROBINSON_PlusPlus.Meta.HilbertDeduction	2969257619	C2
+ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux	ROBINSON_PlusPlus.Meta.HilbertDeduction	1212170910	C2 C3 C4 C6 C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_hyp_self	ROBINSON_PlusPlus.Meta.HilbertDeduction	2932784946	C2 C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf	ROBINSON_PlusPlus.Meta.HilbertDeduction	236409699	C2 C3 C4 C5 C6 C7.i C7.ii
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_s_app	ROBINSON_PlusPlus.Meta.HilbertDeduction	3353214232	C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_weaken	ROBINSON_PlusPlus.Meta.HilbertDeduction	381883647	C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prfI_id	ROBINSON_PlusPlus.Meta.HilbertDeduction	1847857758	C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_deduction	ROBINSON_PlusPlus.Meta.HilbertDeduction	2320175407	C2 C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_ex_elim_imp	ROBINSON_PlusPlus.Meta.HilbertDeduction	1706551909	C2 C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH	ROBINSON_PlusPlus.Meta.HilbertDeduction	1883983394	C2 C3 C4 C7.i C7.ii
+ROBINSON_PlusPlus.Meta.HilbertSeq.Derivation	ROBINSON_PlusPlus.Meta.HilbertSeq	3076043887	C3 C4
+ROBINSON_PlusPlus.Meta.HilbertSeq.Rule	ROBINSON_PlusPlus.Meta.HilbertSeq	16648513234693613062	C3 C4
+ROBINSON_PlusPlus.Meta.HilbertSeq.checkAux	ROBINSON_PlusPlus.Meta.HilbertSeq	2218977259	C3 C4
+ROBINSON_PlusPlus.Meta.HilbertSeq.checkProof	ROBINSON_PlusPlus.Meta.HilbertSeq	3178478117	C3 C4
+ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl	ROBINSON_PlusPlus.Meta.HilbertSeq	1737853392	C3
+ROBINSON_PlusPlus.Meta.HilbertSeq.mpConcl_eq	ROBINSON_PlusPlus.Meta.HilbertSeq	2108725187	C3
+ROBINSON_PlusPlus.Meta.HilbertSeq.prf_iff_derivation	ROBINSON_PlusPlus.Meta.HilbertSeq	1301028522	C3 C4
+ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl	ROBINSON_PlusPlus.Meta.HilbertSeq	4232525025	C3 C4
+ROBINSON_PlusPlus.Meta.ProofChain.provCodeC'	ROBINSON_PlusPlus.Meta.ProofChain	2924998079	C3 C4 C5 C7.i C7.iii C8
+ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC'	ROBINSON_PlusPlus.Meta.ProofChain	1539953984	C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Meta.Provability.charsCode	ROBINSON_PlusPlus.Meta.Provability	2002081433	C3
+ROBINSON_PlusPlus.Meta.Provability.formCode	ROBINSON_PlusPlus.Meta.Provability	2000685534	C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Meta.Provability.strCode	ROBINSON_PlusPlus.Meta.Provability	2002081433	C2 C3 C4
+ROBINSON_PlusPlus.Meta.Provability.termCode	ROBINSON_PlusPlus.Meta.Provability	2320954255	C2 C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.Provability.termsCode	ROBINSON_PlusPlus.Meta.Provability	1934573371	C2 C3 C4
+ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq	ROBINSON_PlusPlus.Meta.Representability	3047130976	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Meta.Representability.listFormCode	ROBINSON_PlusPlus.Meta.Representability	909089148	C2 C3
+ROBINSON_PlusPlus.Meta.Representability.listFormCodeM_eq	ROBINSON_PlusPlus.Meta.Representability	209143246	C3
+ROBINSON_PlusPlus.Meta.Representability.strCodeM_eq	ROBINSON_PlusPlus.Meta.Representability	1635268493	C2
+ROBINSON_PlusPlus.Meta.Representability.termCodeM_eq	ROBINSON_PlusPlus.Meta.Representability	1318831568	C3 C4
+ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift	ROBINSON_PlusPlus.Meta.SubstArith	1142109123	C2 C4
+ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLiftLift	ROBINSON_PlusPlus.Meta.SubstArith	1804510492	C4

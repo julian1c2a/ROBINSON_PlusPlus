@@ -1,0 +1,19 @@
+## (a) la medida de uso, sin los usos del VALOR
+1
+✓ sin el valor: rojo (❌ calibración de los contratos: la medida de los usos entre capas no dice lo esperado:)
+## (b) la medida de uso, sin los usos del TIPO
+1
+✓ sin el tipo: rojo (❌ calibración de los contratos: la medida de los usos entre capas no dice lo esperado:)
+## (c) el cruce de capas, sin el filtro de la misma capa
+0
+✓ sin el filtro de capa: rojo (❌ calibración del cruce de capas: con usos inventados no da lo esperado:)
+## (d) la calibración, como una capa más (C8)
+1
+✓ CALIB como C8: rojo (❌ calibración del cruce de capas: con usos inventados no da lo esperado:)
+## (e) un módulo sin fila en el manifiesto (Lob)
+✓ Lob sin capa: rojo (❌ módulos sin capa en .mut-capas.tsv (los ve check-capas.bash): ROBINSON_PlusPlus.Meta.Lob )
+## (f) el contrato de C1, con la huella de Prf cambiada (un cambio de API que el diff tiene que ver)
+1
+✓ la huella de Prf: rojo (❌ .mut-contratos/C1.tsv NO es lo que se genera (1 de más en lo generado, 1 de menos): «bash check-indice.bash --rehacer»)
+## (g) un contrato de más (una capa que ya no lo tiene)
+✓ C8.tsv de más: rojo (❌ .mut-contratos/C8.tsv sobra: esa capa ya no tiene contrato (nadie usa nada suyo): «bash check-indice.bash --rehacer»)

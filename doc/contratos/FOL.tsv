@@ -1,0 +1,66 @@
+# doc/contratos/FOL.tsv — el CONTRATO de la capa FOL, la capa de debajo de todas: lo que RPP usa de la librería FOL (el contrato de ADR-139, paso 3.1):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+Derives₀	FOL.Derives0	16103170388031388020	C6
+Derives₁	FOL.Derives1	228281953520682270	C6
+FOL.Canonical0.IsSatisfiable	FOL.Canonical0	3953985202	C7.iii
+FOL.Canonical0.model_existence_lemma₀	FOL.Canonical0	1203325373	C7.iii
+FOL.DecEq.instDecidableEqTermG	FOL.DecEq	132956988	C3 C4
+FOL.Derives1.derives0_to_derives1	FOL.Derives1	129145271	C6
+FOL.Henkin0.DerivesSet₀	FOL.Henkin0	1839912227	C6 C7.ii C7.iii
+FOL.Henkin0.IsConsistent₀	FOL.Henkin0	3953985202	C6
+FOL.Lift0.derives0_lift	FOL.Lift0	825780275	C6
+FOL.Lift0.liftFormula_lift	FOL.Lift0	1399682720	C7.i
+FOL.Lift0.liftFormula_subst	FOL.Lift0	3953951881	C2 C3 C7.i
+FOL.Lift0.substFormula_lift_var	FOL.Lift0	2500948905	C6
+FOL.Lindenbaum0.derivesSet0_elim_impl	FOL.Lindenbaum0	847369618	C6
+FOL.Lindenbaum0.derivesSet0_hyp	FOL.Lindenbaum0	3938293816	C6
+FOL.Lindenbaum0.derivesSet0_intro_impl	FOL.Lindenbaum0	126888373	C6
+FOL.Metamath.Semantics.Model	FOL.Semantics	2330190150	C5 C6 C7.iii C8
+FOL.Metamath.Semantics.ModelG	FOL.Semantics	16414911848448476355	C5 C7.iii C8
+FOL.Metamath.Semantics.contextSatisfies	FOL.Semantics	526023652	C5 C7.iii C8
+FOL.Metamath.Semantics.evalFormula	FOL.Semantics	2014117272	C5 C6 C7.iii C8
+FOL.Metamath.Semantics.evalTerm	FOL.Semantics	1948214447	C5 C7.iii C8
+FOL.Metamath.Semantics.evalTerms	FOL.Semantics	3462067895	C5 C7.iii C8
+FOL.Metamath.Semantics.eval_liftFormula_ext	FOL.Semantics	648715460	C5
+FOL.Metamath.Semantics.eval_liftFormula_zero	FOL.Semantics	4168423363	C5
+FOL.Metamath.Semantics.eval_liftTerm_ext	FOL.Semantics	1433161317	C5 C7.iii
+FOL.Metamath.Semantics.eval_substFormula_zero	FOL.Semantics	562125711	C5 C7.iii
+FOL.Metamath.Semantics.shiftEnv	FOL.Semantics	4045447670	C5 C6 C7.iii
+FOL.Metamath.Semantics.shift_updateEnv_comm	FOL.Semantics	2063913624	C5
+FOL.Metamath.Semantics.updateEnv	FOL.Semantics	1666753868	C5 C7.iii
+FOL.Metamath.Semantics.updateEnv_zero	FOL.Semantics	3471536046	C5 C7.iii
+FOL.Sentence.IsSentence	FOL.Sentence	2133844535	C6 C7.iii
+FOL.Sentence.closedAt	FOL.Sentence	2541475538	C6
+FOL.Sentence.closedAtTerm	FOL.Sentence	1442025219	C6
+FOL.Sentence.closedAtTerms	FOL.Sentence	3826285774	C6
+FOL.Sentence.evalFormula_agree	FOL.Sentence	3908626779	C6
+FOL.Sentence.eval_sentence	FOL.Sentence	2871701895	C6 C7.iii
+FOL.Sentence.isSentence_iff_lift	FOL.Sentence	894310910	C6 C7.iii
+FOL.Theorems.Quantifiers.subst_lift_cancel_formula	FOL.Theorems.Quantifiers	2500948905	C2
+FOL.liftTerm_comm_zero	FOL.Theorems.Eq	965048447	C2 C3 C4
+FOL.substFormula_liftFormula	FOL.Theorems.Eq	264142859	C1 C2 C7.i
+FOL.substTerm_liftLift	FOL.Theorems.Eq	501448478	C2 C4
+FOL.substTerm_liftTerm	FOL.Theorems.Eq	3445966071	C2 C3 C4
+FOL.substTerm_lift_comm	FOL.Theorems.Eq	14490866	C3
+FOL.substTerm_lift_comm_zero	FOL.Theorems.Eq	3788820838	C0 C2 C3 C4
+FOL.subst_subst_comm_succ	FOL.Theorems.Eq	1264268487	C2
+FOL.subst_subst_lift_gen	FOL.Theorems.Eq	2556314576	C2 C7.i
+Formula	FOL.FOL	3931117990	C0 C1 C2 C3 C4 C5 C6 C7.i C7.ii C7.iii C8
+FormulaG	FOL.FOL	444294259358923640	C0 C1 C2 C3 C4 C5 C6 C7.i C7.ii C7.iii C8
+Term	FOL.FOL	3931117990	C0 C1 C2 C3 C4 C5 C6 C7.i C7.iii
+TermG	FOL.FOL	17497320846031453501	C0 C1 C2 C3 C4 C5 C6 C7.i C7.iii C8
+iff	FOL.FOL	1254374946	C0 C1 C2 C4 C5 C7.i C7.ii C7.iii
+instDecidableEqFormulaG	FOL.DecEq	2884475271	C1
+instReprTermG	FOL.FOL	189190652	C4
+liftFormula	FOL.FOL	2942597494	C0 C1 C2 C3 C4 C5 C6 C7.i C7.iii
+liftTerm	FOL.FOL	3170429927	C0 C1 C2 C3 C4 C5 C7.i C7.iii
+liftTerms	FOL.FOL	144008272	C0 C1 C2 C3 C4 C5 C7.iii
+neg	FOL.FOL	567486217	C0 C2 C3 C4 C5 C6 C7.i C7.ii C7.iii C8
+substFormula	FOL.FOL	806408660	C0 C1 C2 C3 C4 C5 C6 C7.i C7.ii C7.iii
+substTerm	FOL.FOL	2419815727	C0 C1 C2 C3 C4 C7.i C7.iii
+substTerms	FOL.FOL	2766372322	C0 C1 C2 C3 C4 C5 C7.i

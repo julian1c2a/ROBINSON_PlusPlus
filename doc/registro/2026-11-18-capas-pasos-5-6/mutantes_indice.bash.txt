@@ -1,0 +1,42 @@
+#!/bin/bash
+# ADR-272: la parte de los contratos de check-indice.bash, VISTA FALLAR. Cada mutante es una copia del script (o de sus
+# entradas) con una pieza rota; tiene que salir rojo y decir por qué. Desde la raíz de RPP, con `lake` en el PATH.
+cd "$(dirname "$0")/../../.." 2>/dev/null || true
+[ -f check-indice.bash ] || { echo "desde doc/registro/2026-11-18-capas-pasos-5-6/ o con la raíz de RPP"; exit 2; }
+M=.mut-indice.bash
+corre() {  # NOMBRE PATRÓN-ESPERADO
+  local sal rc
+  sal=$(bash $M 2>&1); rc=$?
+  if [ $rc -ne 0 ] && grep -q "❌.*$2" <<< "$sal"; then echo "✓ $1: rojo ($(grep -m1 "❌.*$2" <<< "$sal" | sed 's/^ *//' | cut -c1-150))"
+  else echo "✗ $1: rc=$rc"; grep '❌' <<< "$sal" | head -5; fi
+}
+echo "## (a) la medida de uso, sin los usos del VALOR"
+sed 's/for u in ci.type.getUsedConstants ++ ((val.map (·.getUsedConstants)).getD #\[\]) do/for u in ci.type.getUsedConstants do/' check-indice.bash > $M
+grep -c 'for u in ci.type.getUsedConstants do' $M
+corre "sin el valor" "calibración de los contratos"
+echo "## (b) la medida de uso, sin los usos del TIPO"
+sed 's/for u in ci.type.getUsedConstants ++ ((val.map (·.getUsedConstants)).getD #\[\]) do/for u in ((val.map (·.getUsedConstants)).getD #[]) do/' check-indice.bash > $M
+grep -c 'for u in ((val.map' $M
+corre "sin el tipo" "calibración de los contratos"
+echo "## (c) el cruce de capas, sin el filtro de la misma capa"
+grep -v '^    if (cu == cm) next$' check-indice.bash > $M
+grep -c 'if (cu == cm) next' $M
+corre "sin el filtro de capa" "calibración del cruce de capas"
+echo "## (d) la calibración, como una capa más (C8)"
+sed 's/if (m == "_calibracion") return "CALIB"/if (m == "_calibracion") return "C8"/' check-indice.bash > $M
+grep -c 'return "C8"' $M
+corre "CALIB como C8" "calibración"
+echo "## (e) un módulo sin fila en el manifiesto (Lob)"
+grep -v $'^ROBINSON_PlusPlus.Meta.Lob\t' doc/control/capas.tsv > .mut-capas.tsv
+sed 's|^CAPAS_TSV=doc/control/capas.tsv|CAPAS_TSV=.mut-capas.tsv|' check-indice.bash > $M
+corre "Lob sin capa" "módulos sin capa"
+echo "## (f) el contrato de C1, con la huella de Prf cambiada (un cambio de API que el diff tiene que ver)"
+rm -rf .mut-contratos; cp -r doc/contratos .mut-contratos
+sed -i 's/^\(ROBINSON_PlusPlus\.Meta\.Hilbert\.Prf\t[^\t]*\t\)[0-9]*/\1123/' .mut-contratos/C1.tsv
+grep -c $'Hilbert.Prf\t[^\t]*\t123\t' .mut-contratos/C1.tsv
+sed 's|^CONTRATOS=doc/contratos|CONTRATOS=.mut-contratos|' check-indice.bash > $M
+corre "la huella de Prf" "C1.tsv NO es lo que se genera"
+echo "## (g) un contrato de más (una capa que ya no lo tiene)"
+rm -rf .mut-contratos; cp -r doc/contratos .mut-contratos; printf '# x\nx\tROBINSON_PlusPlus.Meta.Controles\t1\tC8\n' > .mut-contratos/C8.tsv
+corre "C8.tsv de más" "sobra"
+rm -rf $M .mut-capas.tsv .mut-contratos

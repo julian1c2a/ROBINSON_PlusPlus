@@ -1,0 +1,189 @@
+# doc/control/capas.tsv — el MANIFIESTO de las capas de RPP (B1: el diseño, ADR-266; el manifiesto y su control,
+# ADR-271). Lo comprueba check-capas.bash, en cada run de la CI: rojo si un módulo de la librería no tiene fila o la tiene
+# dos veces, si una fila nombra un módulo que no existe, si un import va a una capa que la suya no puede importar sin una
+# excepción, o si una excepción no tiene razón o sobra. De qué capas puede importar cada una (ADR-266 §2):
+#   C0 ← C0 · C1 ← C0–C1 · C2 ← C0–C2 · C3 ← C0–C3 · C4 ← C0–C4 · C5 ← C0–C5 · C6 ← C0–C6
+#   C7.i ← C0–C4 y C7.i (ni C5 ni C6) · C7.ii ← C0–C6, C7.i y C7.ii · C7.iii ← C0–C6 y C7.i–C7.iii · C8 ← todas
+#   (el barril, de todas; nadie importa un barril). Lo que viene de fuera (FOL, Lean) no tiene capa: lo puede importar
+#   cualquiera. Los contratos de cada capa (lo que las otras usan de ella), en doc/contratos/ (ADR-272).
+# Un módulo nuevo entra aquí en el mismo commit, con la capa de lo que contiene (no la de lo que importa).
+#
+# Cuatro clases de fila, por su primer campo (separadas por tabuladores):
+#   capa      CAPA  QUÉ CONTIENE                 las capas, una vez cada una
+#   MÓDULO    CAPA                               cada módulo de la librería y los dos barriles, una vez
+#   sube      IMPORTADOR  IMPORTADO  RAZÓN       un import que la regla no permite, admitido con su razón (hoy, ninguno)
+#   titular   NOMBRE  RAZÓN                      un titular de T07 fuera de C7, con su razón (los de la clase (i), en
+#                                                C7.i; los demás, en C7.ii o C7.iii: TITULARES y PUROS)
+
+capa	C0	el lenguaje, los axiomas y las herramientas (la macro de los símbolos, el comando #pureza sin su autoprueba)
+capa	C1	la codificación y el cálculo (Gödel, Prf, PrfH, la aritmética de los códigos)
+capa	C2	la aritmética dentro de Prf (y la admisibilidad de listInd)
+capa	C3	D1, D2, el punto fijo y el verificador con sus guardas
+capa	C4	D3 y el espejo en ℕ (la Σ₁-completitud y las etapas de Rosser: lo que no es una prueba se refuta)
+capa	C5	la maquinaria semántica (el modelo, la solidez, consistencia)
+capa	C6	el puente con FOL
+capa	C7.i	los titulares de la clase (i): ni C5 ni C6, tampoco de forma transitiva
+capa	C7.ii	los titulares de la clase (ii)
+capa	C7.iii	los titulares de la clase (iii)
+capa	C8	los controles del build (T07, T08, los controles positivos)
+capa	barril	los barriles: importan todo, y nadie los importa
+
+# ── C0 · el lenguaje, los axiomas y las herramientas (la macro de los símbolos, el comando #pureza sin su autoprueba)
+ROBINSON_PlusPlus.Full.Induction	C0
+ROBINSON_PlusPlus.Meta.PurezaComando	C0
+ROBINSON_PlusPlus.Minimal.Axioms	C0
+ROBINSON_PlusPlus.Minimal.SymLit	C0
+
+# ── C1 · la codificación y el cálculo (Gödel, Prf, PrfH, la aritmética de los códigos)
+ROBINSON_PlusPlus.Meta.CheckArith	C1
+ROBINSON_PlusPlus.Meta.Godel	C1
+ROBINSON_PlusPlus.Meta.Hilbert	C1
+ROBINSON_PlusPlus.Meta.HilbertDeduction	C1
+ROBINSON_PlusPlus.Meta.HilbertSeq	C1
+ROBINSON_PlusPlus.Meta.ProofChain	C1
+ROBINSON_PlusPlus.Meta.Provability	C1
+ROBINSON_PlusPlus.Meta.Representability	C1
+ROBINSON_PlusPlus.Meta.SubstArith	C1
+
+# ── C2 · la aritmética dentro de Prf (y la admisibilidad de listInd)
+ROBINSON_PlusPlus.Meta.ArithPrf	C2
+ROBINSON_PlusPlus.Meta.BoundedInPrf	C2
+ROBINSON_PlusPlus.Meta.CantorMonoPrf	C2
+ROBINSON_PlusPlus.Meta.ChainPrf	C2
+ROBINSON_PlusPlus.Meta.Div2ParityPrf	C2
+ROBINSON_PlusPlus.Meta.ListIndAdmisible	C2
+ROBINSON_PlusPlus.Meta.NatArithPrf	C2
+ROBINSON_PlusPlus.Meta.NatMulPrf	C2
+ROBINSON_PlusPlus.Meta.NatOrderPrf	C2
+ROBINSON_PlusPlus.Meta.NumListPrf	C2
+ROBINSON_PlusPlus.Meta.ReglasPrfH	C2
+ROBINSON_PlusPlus.Meta.ReprPrf	C2
+ROBINSON_PlusPlus.Meta.StrongInductionPrf	C2
+ROBINSON_PlusPlus.Meta.TcArithPrf	C2
+
+# ── C3 · D1, D2, el punto fijo y el verificador con sus guardas
+ROBINSON_PlusPlus.Meta.CodeNatInjPrf	C3
+ROBINSON_PlusPlus.Meta.CodeNumeralPrf	C3
+ROBINSON_PlusPlus.Meta.CodeWitnessPrf	C3
+ROBINSON_PlusPlus.Meta.DerivCondPrf	C3
+ROBINSON_PlusPlus.Meta.Diagonal	C3
+ROBINSON_PlusPlus.Meta.DiagonalNumeral	C3
+ROBINSON_PlusPlus.Meta.DiagonalTwo	C3
+ROBINSON_PlusPlus.Meta.GodelTwo	C3
+ROBINSON_PlusPlus.Meta.Representability2	C3
+ROBINSON_PlusPlus.Meta.Representability2Prf	C3
+ROBINSON_PlusPlus.Meta.Sentencia	C3
+
+# ── C4 · D3 y el espejo en ℕ (la Σ₁-completitud y las etapas de Rosser: lo que no es una prueba se refuta)
+ROBINSON_PlusPlus.Meta.BdAllIntroPrf	C4
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf	C4
+ROBINSON_PlusPlus.Meta.CodeCtorKit	C4
+ROBINSON_PlusPlus.Meta.CodeTreeReflect	C4
+ROBINSON_PlusPlus.Meta.D3BodyPrf	C4
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf	C4
+ROBINSON_PlusPlus.Meta.D3DottedPrf	C4
+ROBINSON_PlusPlus.Meta.D3InDotPrf	C4
+ROBINSON_PlusPlus.Meta.Delta0ReflectPrf	C4
+ROBINSON_PlusPlus.Meta.DotConsPrf	C4
+ROBINSON_PlusPlus.Meta.EvalArithPrf	C4
+ROBINSON_PlusPlus.Meta.EvalBoundedPrf	C4
+ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf	C4
+ROBINSON_PlusPlus.Meta.EvalLiftcPrf	C4
+ROBINSON_PlusPlus.Meta.EvalLiftfcPrf	C4
+ROBINSON_PlusPlus.Meta.EvalListPrf	C4
+ROBINSON_PlusPlus.Meta.EvalLtPrf	C4
+ROBINSON_PlusPlus.Meta.EvalMulPrf	C4
+ROBINSON_PlusPlus.Meta.EvalNthcPrf	C4
+ROBINSON_PlusPlus.Meta.EvalPredPrf	C4
+ROBINSON_PlusPlus.Meta.EvalRunFnPrf	C4
+ROBINSON_PlusPlus.Meta.EvalSubstfcPrf	C4
+ROBINSON_PlusPlus.Meta.EvalSubsttcPrf	C4
+ROBINSON_PlusPlus.Meta.ExIntroCodePrf	C4
+ROBINSON_PlusPlus.Meta.ForallElimCodePrf	C4
+ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf	C4
+ROBINSON_PlusPlus.Meta.HasWitTcFnPrf	C4
+ROBINSON_PlusPlus.Meta.HasWitTrackedPrf	C4
+ROBINSON_PlusPlus.Meta.InAxiomsCodePrf	C4
+ROBINSON_PlusPlus.Meta.LiftcCodePrf	C4
+ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFAssemblePrf	C4
+ROBINSON_PlusPlus.Meta.LineWFCases	C4
+ROBINSON_PlusPlus.Meta.LineWFConsPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFEfqPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFGuardPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFMpPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFPropPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFSchemaPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFThyPrf	C4
+ROBINSON_PlusPlus.Meta.LineWFTrackedPrf	C4
+ROBINSON_PlusPlus.Meta.ListEtaPrf	C4
+ROBINSON_PlusPlus.Meta.ModeloCodigo	C4
+ROBINSON_PlusPlus.Meta.MpCodePrf	C4
+ROBINSON_PlusPlus.Meta.NumCodeClosedPrf	C4
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf	C4
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf	C4
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf	C4
+ROBINSON_PlusPlus.Meta.PropCodePrf	C4
+ROBINSON_PlusPlus.Meta.RosserGuardNeg	C4
+ROBINSON_PlusPlus.Meta.RosserNegLinea	C4
+ROBINSON_PlusPlus.Meta.RosserNegNum	C4
+ROBINSON_PlusPlus.Meta.RosserNumEval	C4
+ROBINSON_PlusPlus.Meta.RosserNumerales	C4
+ROBINSON_PlusPlus.Meta.RosserPosNum	C4
+ROBINSON_PlusPlus.Meta.RosserW1	C4
+ROBINSON_PlusPlus.Meta.RunFnBoundedPrf	C4
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf	C4
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf	C4
+ROBINSON_PlusPlus.Meta.Sigma1Prf	C4
+ROBINSON_PlusPlus.Meta.SolidezVerificador	C4
+ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf	C4
+ROBINSON_PlusPlus.Meta.SubstTreeReflect	C4
+ROBINSON_PlusPlus.Meta.SubstfcCodePrf	C4
+ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf	C4
+ROBINSON_PlusPlus.Meta.TrackedAtomsPrf	C4
+ROBINSON_PlusPlus.Meta.TrackedCorePrf	C4
+
+# ── C5 · la maquinaria semántica (el modelo, la solidez, consistencia)
+ROBINSON_PlusPlus.Meta.Consistencia	C5
+ROBINSON_PlusPlus.Meta.ModeloCodificacion	C5
+ROBINSON_PlusPlus.Meta.ModeloEstandar	C5
+ROBINSON_PlusPlus.Meta.ProvFiel	C5
+ROBINSON_PlusPlus.Meta.RigidezEstandar	C5
+ROBINSON_PlusPlus.Meta.SolidezDobleNegacion	C5
+ROBINSON_PlusPlus.Meta.SolidezPrf	C5
+ROBINSON_PlusPlus.Meta.SolidezVerificadorModelo	C5
+
+# ── C6 · el puente con FOL
+ROBINSON_PlusPlus.Meta.PuenteFOL	C6
+
+# ── C7.i · los titulares de la clase (i): ni C5 ni C6, tampoco de forma transitiva
+ROBINSON_PlusPlus.Meta.GodelCorolarios	C7.i
+ROBINSON_PlusPlus.Meta.GodelTwoPrf	C7.i
+ROBINSON_PlusPlus.Meta.Lob	C7.i
+ROBINSON_PlusPlus.Meta.Rosser	C7.i
+ROBINSON_PlusPlus.Meta.TarskiPrf	C7.i
+
+# ── C7.ii · los titulares de la clase (ii)
+ROBINSON_PlusPlus.Meta.TitularesII	C7.ii
+
+# ── C7.iii · los titulares de la clase (iii)
+ROBINSON_PlusPlus.Meta.SegundoModelo	C7.iii
+ROBINSON_PlusPlus.Meta.TitularesIII	C7.iii
+
+# ── C8 · los controles del build (T07, T08, los controles positivos)
+ROBINSON_PlusPlus.Meta.ContratoTabla	C8
+ROBINSON_PlusPlus.Meta.ContratoTitulares	C8
+ROBINSON_PlusPlus.Meta.Controles	C8
+ROBINSON_PlusPlus.Meta.PurezaTitulares	C8
+
+# ── barril · los barriles: importan todo, y nadie los importa
+ROBINSON_PlusPlus	barril
+ROBINSON_PlusPlus.Meta	barril
+
+# ── las excepciones de los imports (ninguna: desde ADR-270, ningún import sube de capa)
+
+# ── los titulares fuera de C7
+titular	ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf	D1, de la clase (i): la maquinaria de los demás, en C3 (ADR-266 §2)
+titular	ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf	D2, de la clase (i): la maquinaria de los demás, en C3 (ADR-266 §2)
+titular	ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real	D3, de la clase (i): la maquinaria de los demás, en C4 (ADR-266 §2)
+titular	ROBINSON_PlusPlus.Meta.Consistencia.consistencia	el nodo de corte, sin clase: la semántica de los de la (ii) y la (iii), en C5 (ADR-266 §3)

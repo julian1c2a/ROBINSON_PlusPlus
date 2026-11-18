@@ -1,0 +1,9 @@
+# doc/contratos/C7.iii.tsv — el CONTRATO de la capa C7.iii (los titulares de la clase (iii)):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Meta.TitularesIII.con_verdadera_de	ROBINSON_PlusPlus.Meta.TitularesIII	2318897476	C8
+ROBINSON_PlusPlus.Meta.TitularesIII.prf_of_prov_de	ROBINSON_PlusPlus.Meta.TitularesIII	3683108006	C8

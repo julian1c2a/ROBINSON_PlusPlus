@@ -1,0 +1,31 @@
+#!/bin/bash
+# ADR-271: el AUTOTEST de check-capas.bash, VISTO FALLAR. Cada mutante es una copia del script con una pieza del control
+# rota (no del árbol: eso lo hace el autotest); su autotest tiene que salir rojo y señalar el mutante que la vigila.
+cd "$(dirname "$0")/../../.." 2>/dev/null || true
+[ -f check-capas.bash ] || { echo "desde doc/registro/2026-11-18-capas-pasos-5-6/ o con la raíz de RPP"; exit 2; }
+S=check-capas.bash; M=.mut-capas.bash
+corre() {  # NOMBRE PATRÓN-DEL-MUTANTE-QUE-TIENE-QUE-FALLAR
+  local sal rc
+  sal=$(bash $M --autotest 2>&1); rc=$?
+  if [ $rc -ne 0 ] && grep -q "✗ $2" <<< "$sal"; then echo "✓ $1: rojo ($(grep -c '  ✗' <<< "$sal") mutantes del árbol fallan; entre ellos «$2»)"
+  else echo "✗ $1: rc=$rc"; grep '✗' <<< "$sal" | head -5; fi
+}
+echo "## (a) la regla de C7.i, debilitada (C7.i puede importar C5): la regla se vuelve un orden"
+sed 's/P\["C7.i"\] = "C0 C1 C2 C3 C4 C7.i"/P["C7.i"] = "C0 C1 C2 C3 C4 C5 C7.i"/' $S > $M; grep -c 'C4 C5 C7.i"' $M
+corre "C7.i ve C5" "C7.i importa C5"
+echo "## (b) la cabecera, sin los comentarios anidados"
+sed 's/if (a > 0 \&\& (c == 0 || a < c)) { prof++/if (0) { prof++/' $S > $M; grep -c 'if (0) { prof++' $M
+corre "sin anidar" "un import que sube, tras comentarios"
+echo "## (c) sin comprobar que una excepción hace falta"
+sed 's/if ((a1, b1) in sube) err("SOBRA"/if (0) err("SOBRA"/' $S > $M; grep -c 'if (0) err("SOBRA"' $M
+corre "sin SOBRA" "una excepción que no sube"
+echo "## (d) sin la segunda lectura de los imports (vistas)"
+sed 's/if (f\[3\] != f\[4\]) err("NO_LEIDA"/if (0) err("NO_LEIDA"/' $S > $M; grep -c 'if (0) err("NO_LEIDA"' $M
+corre "sin NO_LEIDA" "un import tras la cabecera"
+echo "## (e) sin la regla de los barriles (un barril, como C8)"
+sed 's/if (cb == "barril") err("BARRIL"/if (0) err("BARRIL"/' $S > $M; grep -c 'if (0) err("BARRIL"' $M
+corre "sin BARRIL" "un módulo importa un barril"
+echo "## (f) los titulares de la clase (i), donde sea de C7"
+sed 's/if (ct != "C7.i") err("TITULAR"/if (ct !~ \/^C7\/) err("TITULAR"/' $S > $M; grep -c 'if (ct !~ /^C7/) err("TITULAR"' $M
+corre "PUROS en cualquier C7" "un titular de la clase (ii) en PUROS"
+rm -f $M

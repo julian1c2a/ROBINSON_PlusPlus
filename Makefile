@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: footprints estratos warnings choice indice build clean rebuild sorry status lock unlock list init help probar-controles update-toolchain
+.PHONY: footprints estratos warnings choice indice capas build clean rebuild sorry status lock unlock list init help probar-controles update-toolchain
 
 ## Build the project
 build:
@@ -44,10 +44,17 @@ warnings:
 choice:
 	@bash check-choice.bash
 
-## El índice de las constantes de RPP (doc/indice.tsv) y lo que nadie usa de FOL (doc/control/fol-sin-uso.tsv),
-## contra lo que se genera (L5-11 y B-5, ADR-254); «bash check-indice.bash --rehacer» los reescribe
+## El índice de las constantes de RPP (doc/indice.tsv), lo que nadie usa de FOL (doc/control/fol-sin-uso.tsv) y los
+## contratos de las capas (doc/contratos/, ADR-272), contra lo que se genera (L5-11 y B-5, ADR-254); «bash
+## check-indice.bash --rehacer» los reescribe
 indice:
 	@bash check-indice.bash
+
+## Las capas (B1, ADR-271): el manifiesto doc/control/capas.tsv contra el árbol y la dirección de los imports, con su
+## autotest; sin lake
+capas:
+	@bash check-capas.bash --autotest
+	@bash check-capas.bash
 
 ## Idem, sin lake build (para iterar rapido)
 docsync-quick:

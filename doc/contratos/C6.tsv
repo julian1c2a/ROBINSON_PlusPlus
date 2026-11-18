@@ -1,0 +1,17 @@
+# doc/contratos/C6.tsv — el CONTRATO de la capa C6 (el puente con FOL):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Meta.PuenteFOL.AxiomasT	ROBINSON_PlusPlus.Meta.PuenteFOL	1395574141	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.ClausurasT	ROBINSON_PlusPlus.Meta.PuenteFOL	1395574141	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.axiomasT_global	ROBINSON_PlusPlus.Meta.PuenteFOL	2441765456	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.consistente_de	ROBINSON_PlusPlus.Meta.PuenteFOL	831470490	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.cotaF	ROBINSON_PlusPlus.Meta.PuenteFOL	1555066171	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.eval_forallN_toda	ROBINSON_PlusPlus.Meta.PuenteFOL	3770240580	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.existe_cota	ROBINSON_PlusPlus.Meta.PuenteFOL	1500392793	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_forallN	ROBINSON_PlusPlus.Meta.PuenteFOL	1062122219	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_iff_derivesSet_clausuras	ROBINSON_PlusPlus.Meta.PuenteFOL	1086683561	C7.iii
+ROBINSON_PlusPlus.Meta.PuenteFOL.prf_of_derivesSet	ROBINSON_PlusPlus.Meta.PuenteFOL	4171821382	C7.ii C7.iii

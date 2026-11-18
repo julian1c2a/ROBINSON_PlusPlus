@@ -1,0 +1,27 @@
+════ EL ÍNDICE DE LAS CONSTANTES DE RPP, LO QUE NADIE USA DE FOL Y LOS CONTRATOS DE LAS CAPAS ════
+  censo: 200 módulos, 27 s
+  ✓ calibración del índice: las diez declaraciones de prueba (dos constructores), con su enunciado, y nada más
+  ✓ calibración del uso: calibT y CalibI, usadas; calibU, calibP, calibM y calibR (la nombra su _sunfold), no
+  RPP   4193 declaradas ( 3264 generadas, fuera)
+  FOL   1520 declaradas ( 2334 generadas, fuera) ·   59 las usa RPP · 1037 sólo FOL o TF ·  211 nadie
+  TF     113 declaradas (  102 generadas, fuera) ·    0 las usa RPP ·   62 sólo FOL o TF ·   30 nadie
+  1 constantes sin rango de declaración (generadas), fuera: ROBINSON_PlusPlus.Meta.Godel.Sym.ofNat_ctorIdx
+  lo que nadie usa, por etiqueta: — 106 · meta 28 · instancia 5 · simp 1 · vigilada 101
+  ✓ calibración del cruce de capas: lo de una misma capa, fuera; las que usan, una vez y en orden; FOL; sin capa; CALIB
+  ✓ calibración de los contratos: Prf y Formula (por el tipo) y Prfᵢ (por el valor), de C1 y de FOL, y nada más
+  contratos: 14713 usos entre módulos; entre capas, por la capa de lo usado: C0 270 · C1 44 · C2 231 · C3 108 · C4 127 · C5 168 · C6 10 · C7.i 15 · C7.ii 3 · C7.iii 2 · FOL 59
+  ✓ doc/indice.tsv: 4193 líneas, las que se generan
+  ✓ doc/control/fol-sin-uso.tsv: 241 líneas, las que se generan
+  ✓ doc/contratos/C0.tsv: 270 líneas, las que se generan
+  ✓ doc/contratos/C1.tsv: 44 líneas, las que se generan
+  ✓ doc/contratos/C2.tsv: 231 líneas, las que se generan
+  ✓ doc/contratos/C3.tsv: 108 líneas, las que se generan
+  ✓ doc/contratos/C4.tsv: 127 líneas, las que se generan
+  ✓ doc/contratos/C5.tsv: 168 líneas, las que se generan
+  ✓ doc/contratos/C6.tsv: 10 líneas, las que se generan
+  ✓ doc/contratos/C7.i.tsv: 15 líneas, las que se generan
+  ✓ doc/contratos/C7.ii.tsv: 3 líneas, las que se generan
+  ✓ doc/contratos/C7.iii.tsv: 2 líneas, las que se generan
+  ✓ doc/contratos/FOL.tsv: 59 líneas, las que se generan
+✅ EL ÍNDICE, LO QUE NADIE USA DE FOL Y LOS CONTRATOS DE LAS CAPAS, AL DÍA.
+rc=0

@@ -28,6 +28,15 @@
 #                                  —          ninguna de las anteriores
 #                                No se cuentan los sondeos, el libro ni los consumidores archivados (ADR-216); y un
 #                                bloque `mutual` se usa a sí mismo.
+#   doc/contratos/CAPA.tsv       ✏️ 2026-11-18 (B1 paso 6, ADR-272): el CONTRATO de cada capa de doc/control/capas.tsv
+#                                (y de FOL, la de debajo de todas): las constantes declaradas en un módulo de la capa que
+#                                nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de OTRA
+#                                capa —con el mismo «dueño» y la misma medida de uso que la tabla de arriba—, una por
+#                                línea: «nombre · módulo · huella del tipo · las capas que la usan». La huella es el
+#                                `Expr.hash` del tipo (en un inductivo, con los de sus constructores), la de las huellas de
+#                                ADR-261 y la de T07: cambia si cambia el enunciado, no si sólo cambia la notación. Así, un
+#                                cambio de la API de una capa baja, o un uso nuevo entre dos capas, se ve en el diff.
+#                                El enunciado de cada una, en doc/indice.tsv.
 #
 # ⭐ Las dos tablas se comparan con lo que se GENERA, línea a línea: cualquier diferencia es rojo. Se rehacen con
 # `--rehacer` en el mismo commit que cambia una declaración (como DEPENDENCIES.md con gen-dependencies.py); un push de
@@ -41,7 +50,11 @@
 # de prueba sin rango (la falta de rango es un segundo filtro, y sin esto no se le vería fallar al primero), que se
 # generen al menos cuatro constantes más, y que la medida de uso diga cuáles se usan (la recursiva, no: sólo la nombra
 # lo que Lean genera con ella, y sin el «dueño» saldría usada). Si el censo no corre o no llega al final (la línea
-# FIN), es rojo.
+# FIN), es rojo. ✏️ ADR-272, los contratos: dos constantes de prueba más, de la pseudocapa CALIB —`calibC` nombra `Prf`
+# (C1) y `Formula` (FOL) sólo en su TIPO; `calibV`, `Prfᵢ` (C1) sólo en su VALOR— tienen que dar exactamente esas tres
+# filas (y ninguna por los usos entre las de prueba, que son del mismo fichero); el cruce de capas (el awk), con unos usos
+# inventados, lo esperado —el filtro de la misma capa, que en la calibración de Lean taparía el de módulo—; un módulo sin
+# fila en doc/control/capas.tsv, rojo; y cada capa de C0 a C6, y FOL, con contrato (si una se queda sin él, nadie la usa).
 #
 # 🔧 Desde la raíz de RPP, con el build al día (`lake build` y `lake build "@FOL/FOL" "@FOL/TheoryFramework"`), desde
 # PowerShell o desde un bash con `lake` en el PATH.
@@ -61,7 +74,7 @@ SINUSO=doc/control/fol-sin-uso.tsv
 REHACER=0
 [ "${1:-}" = "--rehacer" ] && REHACER=1
 
-echo "════ EL ÍNDICE DE LAS CONSTANTES DE RPP, Y LO QUE NADIE USA DE FOL ════"
+echo "════ EL ÍNDICE DE LAS CONSTANTES DE RPP, LO QUE NADIE USA DE FOL Y LOS CONTRATOS DE LAS CAPAS ════"
 
 if ! command -v lake >/dev/null 2>&1; then
   echo "  ⚠️  SIN MEDIR — 'lake' no está en el PATH de este shell. Un control que no se ejecuta NO es un control."
@@ -116,7 +129,19 @@ def calibM : CalibI → Nat
 def calibR : Nat → Nat
   | 0 => 0
   | n + 1 => calibR n
+-- (ADR-272) la calibración de los contratos: `Prf` y `Formula`, sólo en el tipo (la prueba es `trivial`); `Prfᵢ`, sólo
+-- en el valor (el tipo es `Prop`)
+theorem calibC : (fun _ : Prop => True) (∀ φ, ROBINSON_PlusPlus.Meta.Hilbert.Prf φ) := trivial
+def calibV : Prop := ∀ φ, ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ φ
 end IndiceCalib
+
+/-- La huella de una constante en un contrato de capa (ADR-272): el `Expr.hash` de su tipo; en un inductivo, con el
+    nombre y el tipo de cada constructor (los constructores son del inductivo: cambiarlos cambia su API). -/
+def contratoHuella (env : Environment) (ci : ConstantInfo) : UInt64 :=
+  match ci with
+  | .inductInfo v =>
+    v.ctors.foldl (fun h c => mixHash h (mixHash (hash c) (((env.find? c).map (·.type.hash)).getD 0))) ci.type.hash
+  | _ => ci.type.hash
 
 def indiceRaiz (m : Name) : Option String :=
   let r := m.getRoot.toString
@@ -201,9 +226,11 @@ def indiceLinea (s : String) : String := Id.run do
   -- 2. el uso: qué dueño nombra a qué otro, en el tipo o en el valor (1 RPP, 2 FOL, 4 TF, 8 la calibración)
   let bit (r : String) : Nat := if r == "RPP" then 1 else if r == "FOL" then 2 else if r == "TF" then 4 else 8
   let mut usada : Std.HashMap Name Nat := {}
+  -- (ADR-272) y, para los contratos de las capas, de qué MÓDULO de RPP (o de la calibración) se usa cada dueño de otro
+  let mut usos : Std.HashSet (Name × String) := {}
   let mut sinValor := 0
   for (c, ci) in env.constants.toList do
-    let some (repo, _) := repoDe c | continue
+    let some (repo, modC) := repoDe c | continue
     let dc := dueno c
     let val := ci.value? (allowOpaque := true)
     if val.isNone && (ci.isTheorem || ci.isDefinition) then sinValor := sinValor + 1
@@ -211,6 +238,9 @@ def indiceLinea (s : String) : String := Id.run do
       let du := dueno u
       if du != dc && decl.contains du then
         usada := usada.insert du ((usada.getD du 0) ||| bit repo)
+        if repo == "RPP" || repo == "CALIB" then
+          if let some (_, mu) := decl.get? du then
+            if mu != modC then usos := usos.insert (du, modC)
   -- 3. las filas
   let mut indice : Array String := #[]
   let mut sinUso : Array String := #[]
@@ -265,6 +295,15 @@ def indiceLinea (s : String) : String := Id.run do
       else if repo == "CALIB" then calib := calib.push s!"CALIB\tU\t{u}"
   IO.FS.writeFile rutaI ("\n".intercalate indice.toList ++ "\n")
   IO.FS.writeFile rutaS ("\n".intercalate sinUso.toList ++ "\n")
+  -- (ADR-272) los usos entre módulos: «dueño usado · su módulo · su huella · el módulo que lo usa»
+  let some rutaU ← IO.getEnv "INDICE_USOS" | throwError "falta INDICE_USOS"
+  let mut lineasU : Array String := #[]
+  for (du, mc) in usos.toList do
+    let some (_, md) := decl.get? du | continue
+    let some ci := env.find? du | continue
+    lineasU := lineasU.push s!"{(privateToUserName? du).getD du}\t{md}\t{contratoHuella env ci}\t{mc}"
+  IO.FS.writeFile rutaU ("\n".intercalate lineasU.toList ++ "\n")
+  IO.println s!"USOS\t{lineasU.size}"
   for l in calib do IO.println l
   for r in ["RPP", "FOL", "TF", "CALIB"] do
     IO.println s!"TOTAL\t{r}\t{nDecl.getD r 0}\t{nGen.getD r 0}\t{nUsoRPP.getD r 0}\t{nUsoDentro.getD r 0}\t{nSinUso.getD r 0}"
@@ -281,7 +320,7 @@ EOF
 GEN_I="$TMP/indice.tsv"; GEN_S="$TMP/sinuso.tsv"
 T0=$(date +%s)
 SALIDA=$(INDICE_RPP="$(win "$TMP/indice.crudo")" INDICE_SINUSO="$(win "$TMP/sinuso.crudo")" \
-  INDICE_VIGILADAS="$(win "$VIGILADAS")" lake env lean "$(win "$LEANFILE")" 2>&1)
+  INDICE_VIGILADAS="$(win "$VIGILADAS")" INDICE_USOS="$(win "$TMP/usos.crudo")" lake env lean "$(win "$LEANFILE")" 2>&1)
 RC=$?
 T1=$(date +%s)
 FAIL=0
@@ -301,15 +340,17 @@ ESP_I=$(LC_ALL=C sort <<'EOF'
 IndiceCalib.CalibI	inductivo	Type
 IndiceCalib.CalibI.dos	constructor	Nat → IndiceCalib.CalibI
 IndiceCalib.CalibI.uno	constructor	IndiceCalib.CalibI
+IndiceCalib.calibC	teorema	(fun x => True) (∀ (φ : Formula), ROBINSON_PlusPlus.Meta.Hilbert.Prf φ)
 IndiceCalib.calibM	def	IndiceCalib.CalibI → Nat
 IndiceCalib.calibP	def·privada	Nat
 IndiceCalib.calibR	def	Nat → Nat
 IndiceCalib.calibT	teorema	∀ (n : Nat), n + 0 = n
 IndiceCalib.calibU	teorema	3 + 0 = 3
+IndiceCalib.calibV	def	Prop
 EOF
 )
 if [ "$CAL_I" = "$ESP_I" ]; then
-  echo "  ✓ calibración del índice: las ocho declaraciones de prueba (dos constructores), con su enunciado, y nada más"
+  echo "  ✓ calibración del índice: las diez declaraciones de prueba (dos constructores), con su enunciado, y nada más"
 else
   echo "  ❌ calibración del índice: no ve exactamente las declaraciones de prueba —no comprueba lo que dice—:"
   diff <(printf '%s\n' "$ESP_I") <(printf '%s\n' "$CAL_I") | sed 's/^/      /'
@@ -317,6 +358,8 @@ else
 fi
 CAL_U=$(printf '%s\n' "$SALIDA" | awk -F'\t' '$1 == "CALIB" && $2 == "U" { print "usada " $3 } $1 == "CALIB" && $2 == "S" { print "sin uso " $4 }' | LC_ALL=C sort)
 ESP_U=$(LC_ALL=C sort <<'EOF'
+sin uso IndiceCalib.calibC
+sin uso IndiceCalib.calibV
 sin uso IndiceCalib.calibM
 sin uso IndiceCalib.calibP
 sin uso IndiceCalib.calibR
@@ -355,6 +398,107 @@ printf '%s\n' "$SALIDA" | awk -F'\t' '
   $1 == "CORTADOS" && $2 > 0 { printf "  %d enunciados de más de 4000 caracteres, cortados (lo dice la línea)\n", $2 }'
 echo "  lo que nadie usa, por etiqueta: $(awk -F'\t' '{ n[$4]++ } END { for (e in n) printf "%s %d · ", e, n[e] }' "$GEN_S" | sed 's/ · $//')"
 
+# ── (ADR-272) los CONTRATOS de las capas: de los usos entre módulos, los que cruzan de una capa a otra. La capa de un
+#    módulo de RPP, la de doc/control/capas.tsv; FOL y TheoryFramework, las suyas (debajo de todas); el fichero
+#    generado, la pseudocapa CALIB, que sólo vale para la calibración.
+CAPAS_TSV=doc/control/capas.tsv
+CONTRATOS=doc/contratos
+GEN_C="$TMP/contratos"
+mkdir -p "$GEN_C"
+if [ ! -f "$CAPAS_TSV" ]; then
+  echo "  ❌ no existe $CAPAS_TSV: sin el manifiesto de las capas no hay contratos."
+  exit 1
+fi
+# contratos USOS DIR: de cada uso «usado · su módulo · huella · módulo que lo usa», los que cruzan de capa, a DIR/CAPA.tsv
+# (ordenados); y por la salida, «SINCAPA módulo» y «CALIB capa usado» (los usos desde la calibración, que no van a DIR)
+contratos() {
+  LC_ALL=C awk -F'\t' -v MAN="$CAPAS_TSV" -v OUT="$2" '
+  function capaDe(m) {
+    if (m in capa) return capa[m]
+    if (m == "_calibracion") return "CALIB"
+    if (m == "FOL" || index(m, "FOL.") == 1) return "FOL"
+    if (m == "TheoryFramework" || index(m, "TheoryFramework.") == 1) return "TF"
+    return ""
+  }
+  BEGIN {
+    ORDEN = "FOL TF C0 C1 C2 C3 C4 C5 C6 C7.i C7.ii C7.iii C8 barril CALIB"
+    n = split(ORDEN, O, " ")
+    while ((getline l < MAN) > 0) { sub(/\r$/, "", l); split(l, f, "\t"); if (index(f[1], "ROBINSON_PlusPlus") == 1) capa[f[1]] = f[2] }
+  }
+  {
+    cu = capaDe($2); cm = capaDe($4)
+    if (cu == "") { sincapa[$2] = 1; next }
+    if (cm == "") { sincapa[$4] = 1; next }
+    if (cu == cm) next
+    k = cu SUBSEP $1
+    mod[k] = $2; hu[k] = $3
+    if (!((k, cm) in visto)) { visto[k, cm] = 1; usan[k] = usan[k] " " cm }
+  }
+  END {
+    for (x in sincapa) print "SINCAPA\t" x
+    for (k in mod) {
+      split(k, kk, SUBSEP)
+      m = split(usan[k], us, " "); s = ""; cal = 0
+      for (i = 1; i <= n; i++) for (j = 1; j <= m; j++) if (us[j] == O[i]) {
+        if (O[i] == "CALIB") cal = 1; else s = s (s == "" ? "" : " ") O[i]
+      }
+      if (cal) print "CALIB\t" kk[1] "\t" kk[2]
+      if (s != "") print kk[2] "\t" mod[k] "\t" hu[k] "\t" s > (OUT "/" kk[1] ".tsv")
+    }
+  }' "$1"
+  for f in "$2"/*.tsv; do [ -f "$f" ] && LC_ALL=C sort -o "$f" "$f"; done
+}
+# la calibración de ESTA pieza, por el mismo camino (la de Lean no la ve: allí, lo de dentro del fichero de prueba ya lo
+# quita el filtro de módulo, que sólo aligera, y el de capa quedaría tapado): unos usos inventados entre módulos reales
+mkdir -p "$TMP/cal-contratos"
+printf '%s\n' \
+  $'prueba.a\tROBINSON_PlusPlus.Meta.NatArithPrf\t1\tROBINSON_PlusPlus.Meta.NatOrderPrf' \
+  $'prueba.b\tROBINSON_PlusPlus.Meta.NatArithPrf\t2\tROBINSON_PlusPlus.Meta.Lob' \
+  $'prueba.b\tROBINSON_PlusPlus.Meta.NatArithPrf\t2\tROBINSON_PlusPlus.Meta.DerivCondPrf' \
+  $'prueba.b\tROBINSON_PlusPlus.Meta.NatArithPrf\t2\tROBINSON_PlusPlus.Meta.GodelTwoPrf' \
+  $'prueba.c\tFOL.FOL\t3\tROBINSON_PlusPlus.Minimal.Axioms' \
+  $'prueba.d\tROBINSON_PlusPlus.Meta.NoExiste\t4\tROBINSON_PlusPlus.Meta.Lob' \
+  $'prueba.e\tROBINSON_PlusPlus.Meta.Lob\t5\t_calibracion' > "$TMP/cal-usos.tsv"
+CAL_P=$( { contratos "$TMP/cal-usos.tsv" "$TMP/cal-contratos" | LC_ALL=C sort
+           for f in "$TMP/cal-contratos"/*.tsv; do [ -f "$f" ] && sed "s|^|$(basename "$f" .tsv): |" "$f"; done; } )
+ESP_P=$(printf '%s\n' $'CALIB\tC7.i\tprueba.e' $'SINCAPA\tROBINSON_PlusPlus.Meta.NoExiste' \
+  $'C2: prueba.b\tROBINSON_PlusPlus.Meta.NatArithPrf\t2\tC3 C7.i' $'FOL: prueba.c\tFOL.FOL\t3\tC0')
+if [ "$CAL_P" = "$ESP_P" ]; then
+  echo "  ✓ calibración del cruce de capas: lo de una misma capa, fuera; las que usan, una vez y en orden; FOL; sin capa; CALIB"
+else
+  echo "  ❌ calibración del cruce de capas: con usos inventados no da lo esperado:"
+  diff <(printf '%s\n' "$ESP_P") <(printf '%s\n' "$CAL_P") | sed 's/^/      /'
+  FAIL=1
+fi
+tr -d '\r' < "$TMP/usos.crudo" | grep . > "$TMP/usos.tsv"
+contratos "$TMP/usos.tsv" "$GEN_C" > "$TMP/contratos.salida"
+SINCAPA=$(grep '^SINCAPA' "$TMP/contratos.salida" | cut -f2)
+if [ -n "$SINCAPA" ]; then
+  echo "  ❌ módulos sin capa en $CAPAS_TSV (los ve check-capas.bash): $(printf '%s ' $SINCAPA)"
+  FAIL=1
+fi
+CAL_C=$(grep '^CALIB' "$TMP/contratos.salida" | LC_ALL=C sort)
+ESP_C=$(LC_ALL=C sort <<'EOF'
+CALIB	C1	ROBINSON_PlusPlus.Meta.Hilbert.Prf
+CALIB	C1	ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ
+CALIB	FOL	Formula
+EOF
+)
+if [ "$CAL_C" = "$ESP_C" ]; then
+  echo "  ✓ calibración de los contratos: Prf y Formula (por el tipo) y Prfᵢ (por el valor), de C1 y de FOL, y nada más"
+else
+  echo "  ❌ calibración de los contratos: la medida de los usos entre capas no dice lo esperado:"
+  diff <(printf '%s\n' "$ESP_C") <(printf '%s\n' "$CAL_C") | sed 's/^/      /'
+  FAIL=1
+fi
+for c in FOL C0 C1 C2 C3 C4 C5 C6; do
+  if [ ! -s "$GEN_C/$c.tsv" ]; then
+    echo "  ❌ la capa $c no tiene contrato: ninguna otra capa usa nada suyo (o la medida no lo ve)."
+    FAIL=1
+  fi
+done
+echo "  contratos: $(printf '%s\n' "$SALIDA" | awk -F'\t' '$1 == "USOS" { print $2 }') usos entre módulos; entre capas, por la capa de lo usado: $(for f in "$GEN_C"/*.tsv; do printf '%s %s · ' "$(basename "$f" .tsv)" "$(grep -c . "$f")"; done | sed 's/ · $//')"
+
 if [ "$REHACER" = "1" ]; then
   {
     echo "# doc/indice.tsv — el ÍNDICE de las constantes DECLARADAS de RPP (sin las que genera Lean): nombre, clase, módulo y"
@@ -375,6 +519,27 @@ if [ "$REHACER" = "1" ]; then
     cat "$GEN_S"
   } > "$SINUSO"
   echo "  ✏️  $INDICE ($(grep -c . "$GEN_I") líneas) y $SINUSO ($(grep -c . "$GEN_S")), rehechas."
+  mkdir -p "$CONTRATOS"
+  for f in "$CONTRATOS"/*.tsv; do [ -f "$f" ] && [ ! -f "$GEN_C/$(basename "$f")" ] && rm -f "$f"; done
+  for f in "$GEN_C"/*.tsv; do
+    c=$(basename "$f" .tsv)
+    case "$c" in
+      FOL) d="FOL, la capa de debajo de todas: lo que RPP usa de la librería FOL (el contrato de ADR-139, paso 3.1)" ;;
+      TF) d="TheoryFramework: lo que RPP usa de él" ;;
+      *) d="$c ($(awk -F'\t' -v C="$c" '$1 == "capa" && $2 == C { print $3 }' "$CAPAS_TSV" | tr -d '\r'))" ;;
+    esac
+    {
+      echo "# doc/contratos/$c.tsv — el CONTRATO de la capa $d:"
+      echo "# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que"
+      echo "# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en"
+      echo "# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia"
+      echo "# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv)."
+      echo "# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer»."
+      echo "# nombre	módulo	huella del tipo	la usan"
+      cat "$f"
+    } > "$CONTRATOS/$c.tsv"
+  done
+  echo "  ✏️  $CONTRATOS/: $(ls "$GEN_C" | wc -l | tr -d ' ') contratos, rehechos."
 fi
 
 compara() {  # tabla generado nombre
@@ -399,10 +564,17 @@ compara() {  # tabla generado nombre
 }
 compara "$INDICE" "$GEN_I" indice
 compara "$SINUSO" "$GEN_S" sinuso
+for f in "$GEN_C"/*.tsv; do [ -f "$f" ] && compara "$CONTRATOS/$(basename "$f")" "$f" "contrato.$(basename "$f")"; done
+for f in "$CONTRATOS"/*.tsv; do
+  if [ -f "$f" ] && [ ! -f "$GEN_C/$(basename "$f")" ]; then
+    echo "  ❌ $f sobra: esa capa ya no tiene contrato (nadie usa nada suyo): «bash check-indice.bash --rehacer»"
+    FAIL=1
+  fi
+done
 
 if [ "$FAIL" = "0" ]; then
-  echo "✅ EL ÍNDICE Y LO QUE NADIE USA DE FOL, AL DÍA."
+  echo "✅ EL ÍNDICE, LO QUE NADIE USA DE FOL Y LOS CONTRATOS DE LAS CAPAS, AL DÍA."
 else
-  echo "❌ EL ÍNDICE O LO QUE NADIE USA DE FOL NO CUADRAN (o la calibración falló)."
+  echo "❌ EL ÍNDICE, LO QUE NADIE USA DE FOL O LOS CONTRATOS DE LAS CAPAS NO CUADRAN (o la calibración falló)."
   exit 1
 fi

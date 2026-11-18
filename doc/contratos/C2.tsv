@@ -1,0 +1,238 @@
+# doc/contratos/C2.tsv — el CONTRATO de la capa C2 (la aritmética dentro de Prf (y la admisibilidad de listInd)):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_add_succ_t	ROBINSON_PlusPlus.Meta.ArithPrf	4060050530	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_add_zero_t	ROBINSON_PlusPlus.Meta.ArithPrf	379975946	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_congr_liftfc_arg2	ROBINSON_PlusPlus.Meta.ArithPrf	1282822901	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_congr_substfc_arg2	ROBINSON_PlusPlus.Meta.ArithPrf	2962061368	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_congr_substfc_arg3	ROBINSON_PlusPlus.Meta.ArithPrf	3438934838	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_eq_congr_succ	ROBINSON_PlusPlus.Meta.ArithPrf	4168851503	C3 C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_ex_intro	ROBINSON_PlusPlus.Meta.ArithPrf	3100121668	C3 C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_ind_concl_code	ROBINSON_PlusPlus.Meta.ArithPrf	1588780850	C3
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_leibniz_concl_code	ROBINSON_PlusPlus.Meta.ArithPrf	4056437679	C3
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftFormula_arith	ROBINSON_PlusPlus.Meta.ArithPrf	334571484	C3
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftc_func	ROBINSON_PlusPlus.Meta.ArithPrf	2875986968	C3 C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftc_var_ge	ROBINSON_PlusPlus.Meta.ArithPrf	3338637044	C3 C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftc_var_lt	ROBINSON_PlusPlus.Meta.ArithPrf	3536805449	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_and	ROBINSON_PlusPlus.Meta.ArithPrf	3244726833	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_atom	ROBINSON_PlusPlus.Meta.ArithPrf	1588330827	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_bottom	ROBINSON_PlusPlus.Meta.ArithPrf	465845761	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_eq	ROBINSON_PlusPlus.Meta.ArithPrf	822006422	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_ex	ROBINSON_PlusPlus.Meta.ArithPrf	1824389102	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_forall	ROBINSON_PlusPlus.Meta.ArithPrf	2797008920	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_impl	ROBINSON_PlusPlus.Meta.ArithPrf	3539768127	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftfc_or	ROBINSON_PlusPlus.Meta.ArithPrf	498331186	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftsc_cons	ROBINSON_PlusPlus.Meta.ArithPrf	4227979897	C3 C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftsc_nil	ROBINSON_PlusPlus.Meta.ArithPrf	2871376549	C3 C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_listInd_concl_code	ROBINSON_PlusPlus.Meta.ArithPrf	3882385514	C3
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_numeral_add	ROBINSON_PlusPlus.Meta.ArithPrf	457185245	C3
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_numeral_lt	ROBINSON_PlusPlus.Meta.ArithPrf	3360527035	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_pred_numeral	ROBINSON_PlusPlus.Meta.ArithPrf	3472491558	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_q1_concl_code	ROBINSON_PlusPlus.Meta.ArithPrf	3993946452	C3
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_q2_concl_code	ROBINSON_PlusPlus.Meta.ArithPrf	3816204223	C3
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substFormula_arith	ROBINSON_PlusPlus.Meta.ArithPrf	3452360601	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_and	ROBINSON_PlusPlus.Meta.ArithPrf	1535061649	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_atom	ROBINSON_PlusPlus.Meta.ArithPrf	3371357301	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_bottom	ROBINSON_PlusPlus.Meta.ArithPrf	732369633	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_eq	ROBINSON_PlusPlus.Meta.ArithPrf	3794392687	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_ex	ROBINSON_PlusPlus.Meta.ArithPrf	343573337	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_forall	ROBINSON_PlusPlus.Meta.ArithPrf	792772777	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_impl	ROBINSON_PlusPlus.Meta.ArithPrf	370731372	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substfc_or	ROBINSON_PlusPlus.Meta.ArithPrf	1645065504	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substtc_func	ROBINSON_PlusPlus.Meta.ArithPrf	3343552967	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substtc_var_eq	ROBINSON_PlusPlus.Meta.ArithPrf	2974686244	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substtc_var_gt	ROBINSON_PlusPlus.Meta.ArithPrf	4110812008	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substtc_var_lt	ROBINSON_PlusPlus.Meta.ArithPrf	2297232208	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substtsc_cons	ROBINSON_PlusPlus.Meta.ArithPrf	887610505	C4
+ROBINSON_PlusPlus.Meta.ArithPrf.prf_substtsc_nil	ROBINSON_PlusPlus.Meta.ArithPrf	2797458773	C4
+ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_eq_congr_nthc2	ROBINSON_PlusPlus.Meta.BoundedInPrf	4064208046	C4
+ROBINSON_PlusPlus.Meta.BoundedInPrf.boundedIn	ROBINSON_PlusPlus.Meta.BoundedInPrf	3648254550	C3 C4
+ROBINSON_PlusPlus.Meta.BoundedInPrf.liftFormula_boundedIn	ROBINSON_PlusPlus.Meta.BoundedInPrf	3749805473	C3
+ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_In_iff_boundedIn	ROBINSON_PlusPlus.Meta.BoundedInPrf	725257883	C4
+ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_In_of_boundedIn	ROBINSON_PlusPlus.Meta.BoundedInPrf	2541289453	C3 C4
+ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_boundedIn_of_In	ROBINSON_PlusPlus.Meta.BoundedInPrf	694163244	C3 C4
+ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_subst2	ROBINSON_PlusPlus.Meta.BoundedInPrf	1480278336	C4
+ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_split	ROBINSON_PlusPlus.Meta.BoundedInPrf	2201118808	C3 C4
+ROBINSON_PlusPlus.Meta.CantorMonoPrf.cpOf	ROBINSON_PlusPlus.Meta.CantorMonoPrf	3712149296	C3 C4
+ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_cantor_mono_left	ROBINSON_PlusPlus.Meta.CantorMonoPrf	4112773405	C4
+ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_cantor_mono_right	ROBINSON_PlusPlus.Meta.CantorMonoPrf	1202493422	C3 C4
+ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_cons_div2	ROBINSON_PlusPlus.Meta.CantorMonoPrf	1297799323	C3 C4
+ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_lt_subst2_cm	ROBINSON_PlusPlus.Meta.CantorMonoPrf	1480278336	C3
+ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_or_elim	ROBINSON_PlusPlus.Meta.CantorMonoPrf	433260903	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_allIn_subst2	ROBINSON_PlusPlus.Meta.ChainPrf	3864894876	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_and_elim_left	ROBINSON_PlusPlus.Meta.ChainPrf	987073288	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_and_elim_right	ROBINSON_PlusPlus.Meta.ChainPrf	3409397112	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_and_intro	ROBINSON_PlusPlus.Meta.ChainPrf	3988365404	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_chainOk_subst1	ROBINSON_PlusPlus.Meta.ChainPrf	2341256429	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_chainOk_subst2	ROBINSON_PlusPlus.Meta.ChainPrf	96353556	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_congr_cons_tail	ROBINSON_PlusPlus.Meta.ChainPrf	2837132490	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_congr_liftc	ROBINSON_PlusPlus.Meta.ChainPrf	2298879341	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_eq_subst_in	ROBINSON_PlusPlus.Meta.ChainPrf	384041220	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_in_cons_tail	ROBINSON_PlusPlus.Meta.ChainPrf	974145961	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.norm21	ROBINSON_PlusPlus.Meta.ChainPrf	3112255739	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_In_mono	ROBINSON_PlusPlus.Meta.ChainPrf	1770873961	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_In_mono_imp	ROBINSON_PlusPlus.Meta.ChainPrf	326148745	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_In_mono_right_imp	ROBINSON_PlusPlus.Meta.ChainPrf	3319822857	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat	ROBINSON_PlusPlus.Meta.ChainPrf	3320336331	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp	ROBINSON_PlusPlus.Meta.ChainPrf	3961383185	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_subst2	ROBINSON_PlusPlus.Meta.ChainPrf	501934446	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_concat_assoc	ROBINSON_PlusPlus.Meta.ChainPrf	3171990742	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_concat_nil_right	ROBINSON_PlusPlus.Meta.ChainPrf	114667296	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_congr_concat_first	ROBINSON_PlusPlus.Meta.ChainPrf	3571785050	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_in_cons_iff	ROBINSON_PlusPlus.Meta.ChainPrf	908403896	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction	ROBINSON_PlusPlus.Meta.ChainPrf	3640843681	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_not_in_nil	ROBINSON_PlusPlus.Meta.ChainPrf	2974265830	C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat	ROBINSON_PlusPlus.Meta.ChainPrf	1431646150	C3 C4
+ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken	ROBINSON_PlusPlus.Meta.ChainPrf	2839701395	C3 C4
+ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_double	ROBINSON_PlusPlus.Meta.Div2ParityPrf	120260503	C4
+ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_numeral	ROBINSON_PlusPlus.Meta.Div2ParityPrf	662836525	C3
+ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_eq_congr_div2	ROBINSON_PlusPlus.Meta.Div2ParityPrf	1343267636	C3
+ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_numeral_mul	ROBINSON_PlusPlus.Meta.Div2ParityPrf	156968400	C3
+ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_pair_double	ROBINSON_PlusPlus.Meta.Div2ParityPrf	350894691	C4
+ROBINSON_PlusPlus.Meta.ListIndAdmisible.listInd_admisible	ROBINSON_PlusPlus.Meta.ListIndAdmisible	687203496	C4 C6
+ROBINSON_PlusPlus.Meta.NatArithPrf.PrfH_eq_congr_succ	ROBINSON_PlusPlus.Meta.NatArithPrf	2294992152	C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.PrfH_lt_intro	ROBINSON_PlusPlus.Meta.NatArithPrf	719704452	C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.norm11	ROBINSON_PlusPlus.Meta.NatArithPrf	420270960	C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_lt_iff	ROBINSON_PlusPlus.Meta.NatArithPrf	2910831819	C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_lt_intro	ROBINSON_PlusPlus.Meta.NatArithPrf	2326329839	C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_lt_of_succ_lt_succ	ROBINSON_PlusPlus.Meta.NatArithPrf	1405221952	C3 C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction	ROBINSON_PlusPlus.Meta.NatArithPrf	2031092598	C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_not_lt_zero	ROBINSON_PlusPlus.Meta.NatArithPrf	2669884586	C3 C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_pred_succ	ROBINSON_PlusPlus.Meta.NatArithPrf	3728444773	C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_succ_inj	ROBINSON_PlusPlus.Meta.NatArithPrf	2846321453	C3 C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_succ_lt_succ_of_lt	ROBINSON_PlusPlus.Meta.NatArithPrf	786879274	C3 C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_succ_ne_zero	ROBINSON_PlusPlus.Meta.NatArithPrf	2202094488	C3 C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_lt_succ	ROBINSON_PlusPlus.Meta.NatArithPrf	3367646126	C3 C4
+ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_eq_succ_pred	ROBINSON_PlusPlus.Meta.NatArithPrf	2311669802	C3 C4
+ROBINSON_PlusPlus.Meta.NatMulPrf.PrfH_absurd_lt	ROBINSON_PlusPlus.Meta.NatMulPrf	1952606390	C4
+ROBINSON_PlusPlus.Meta.NatMulPrf.prf_eq_congr_mul1	ROBINSON_PlusPlus.Meta.NatMulPrf	1333132871	C3
+ROBINSON_PlusPlus.Meta.NatMulPrf.prf_eq_congr_mul2	ROBINSON_PlusPlus.Meta.NatMulPrf	1567126602	C3
+ROBINSON_PlusPlus.Meta.NatMulPrf.prf_lt_irrefl	ROBINSON_PlusPlus.Meta.NatMulPrf	3680474250	C3
+ROBINSON_PlusPlus.Meta.NatMulPrf.prf_lt_trichotomy	ROBINSON_PlusPlus.Meta.NatMulPrf	1335298260	C4 C7.i
+ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_succ	ROBINSON_PlusPlus.Meta.NatMulPrf	822272424	C4
+ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_zero	ROBINSON_PlusPlus.Meta.NatMulPrf	3254058542	C4
+ROBINSON_PlusPlus.Meta.NatOrderPrf.prf_eq_congr_add1	ROBINSON_PlusPlus.Meta.NatOrderPrf	2763237939	C3
+ROBINSON_PlusPlus.Meta.NatOrderPrf.prf_eq_congr_add2	ROBINSON_PlusPlus.Meta.NatOrderPrf	4278884402	C3
+ROBINSON_PlusPlus.Meta.NatOrderPrf.prf_lt_trans	ROBINSON_PlusPlus.Meta.NatOrderPrf	1631201819	C4
+ROBINSON_PlusPlus.Meta.NumListPrf.consOk	ROBINSON_PlusPlus.Meta.NumListPrf	2238458006	C3 C4
+ROBINSON_PlusPlus.Meta.NumListPrf.prf_cdrc_cons	ROBINSON_PlusPlus.Meta.NumListPrf	2785757909	C4
+ROBINSON_PlusPlus.Meta.NumListPrf.prf_consOk_cons	ROBINSON_PlusPlus.Meta.NumListPrf	3551908367	C3 C4
+ROBINSON_PlusPlus.Meta.NumListPrf.prf_lenc_cons	ROBINSON_PlusPlus.Meta.NumListPrf	66010359	C3 C4
+ROBINSON_PlusPlus.Meta.NumListPrf.prf_lenc_nil	ROBINSON_PlusPlus.Meta.NumListPrf	2570936146	C3 C4
+ROBINSON_PlusPlus.Meta.NumListPrf.prf_nthc_succ	ROBINSON_PlusPlus.Meta.NumListPrf	1133546798	C3 C4
+ROBINSON_PlusPlus.Meta.NumListPrf.prf_nthc_zero	ROBINSON_PlusPlus.Meta.NumListPrf	663636543	C3 C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_congr_cons_head	ROBINSON_PlusPlus.Meta.ReglasPrfH	2349128931	C3 C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_eq_symm	ROBINSON_PlusPlus.Meta.ReglasPrfH	1178979184	C3 C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_eq_trans	ROBINSON_PlusPlus.Meta.ReglasPrfH	4048355931	C3 C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_iff_mp	ROBINSON_PlusPlus.Meta.ReglasPrfH	3129906625	C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_iff_mpr	ROBINSON_PlusPlus.Meta.ReglasPrfH	1376462183	C3 C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_leibniz_subst	ROBINSON_PlusPlus.Meta.ReglasPrfH	1685024372	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_lt_subst1	ROBINSON_PlusPlus.Meta.ReglasPrfH	4218382302	C3 C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_lt_subst2	ROBINSON_PlusPlus.Meta.ReglasPrfH	2734248770	C3 C4
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_or_elim	ROBINSON_PlusPlus.Meta.ReglasPrfH	2976567956	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReglasPrfH.PrfH_spec	ROBINSON_PlusPlus.Meta.ReglasPrfH	2065625019	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_In_listFormCode	ROBINSON_PlusPlus.Meta.ReprPrf	3468581917	C3
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_allIn_cons	ROBINSON_PlusPlus.Meta.ReprPrf	2149266364	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_allIn_nil	ROBINSON_PlusPlus.Meta.ReprPrf	2215541706	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_allIn_subst2	ROBINSON_PlusPlus.Meta.ReprPrf	2940643247	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_and_elim_left	ROBINSON_PlusPlus.Meta.ReprPrf	2286644142	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_and_elim_right	ROBINSON_PlusPlus.Meta.ReprPrf	1136226550	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_and_intro	ROBINSON_PlusPlus.Meta.ReprPrf	1201956913	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_ax	ROBINSON_PlusPlus.Meta.ReprPrf	3464646784	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_carc_cons	ROBINSON_PlusPlus.Meta.ReprPrf	3522770261	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_chainOk_cons	ROBINSON_PlusPlus.Meta.ReprPrf	964987044	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_chainOk_nil	ROBINSON_PlusPlus.Meta.ReprPrf	4192063159	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_chainOk_subst1	ROBINSON_PlusPlus.Meta.ReprPrf	539092294	C3
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_concat_cons_eq	ROBINSON_PlusPlus.Meta.ReprPrf	2501433344	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_concat_nil_eq	ROBINSON_PlusPlus.Meta.ReprPrf	2712382026	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_bin1	ROBINSON_PlusPlus.Meta.ReprPrf	3052993527	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_bin2	ROBINSON_PlusPlus.Meta.ReprPrf	402911296	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_concat_left	ROBINSON_PlusPlus.Meta.ReprPrf	1206565890	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_cons_head	ROBINSON_PlusPlus.Meta.ReprPrf	1266802402	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_cons_tail	ROBINSON_PlusPlus.Meta.ReprPrf	1145416983	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_hasWit	ROBINSON_PlusPlus.Meta.ReprPrf	1096948090	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_hasWitF	ROBINSON_PlusPlus.Meta.ReprPrf	114500476	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_runFn_1	ROBINSON_PlusPlus.Meta.ReprPrf	3396278179	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_runFn_2	ROBINSON_PlusPlus.Meta.ReprPrf	3590985427	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_un	ROBINSON_PlusPlus.Meta.ReprPrf	2660840362	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_eq_subst_in	ROBINSON_PlusPlus.Meta.ReprPrf	4118006152	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_eq_symm	ROBINSON_PlusPlus.Meta.ReprPrf	1229524532	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_eq_trans	ROBINSON_PlusPlus.Meta.ReprPrf	2437081418	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_iff_mpr	ROBINSON_PlusPlus.Meta.ReprPrf	3356709625	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_in_cons_head	ROBINSON_PlusPlus.Meta.ReprPrf	2822623771	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_in_cons_tail	ROBINSON_PlusPlus.Meta.ReprPrf	855154605	C3
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_leibniz_subst	ROBINSON_PlusPlus.Meta.ReprPrf	4010254308	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_c1	ROBINSON_PlusPlus.Meta.ReprPrf	4055741542	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_c2	ROBINSON_PlusPlus.Meta.ReprPrf	1219377750	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_c3	ROBINSON_PlusPlus.Meta.ReprPrf	3023247404	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_efq	ROBINSON_PlusPlus.Meta.ReprPrf	3628280045	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_eqrefl	ROBINSON_PlusPlus.Meta.ReprPrf	3979719896	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_gen	ROBINSON_PlusPlus.Meta.ReprPrf	754814892	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_ind	ROBINSON_PlusPlus.Meta.ReprPrf	1591065644	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_ind_imp	ROBINSON_PlusPlus.Meta.ReprPrf	3090264550	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_j1	ROBINSON_PlusPlus.Meta.ReprPrf	3098208199	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_j2	ROBINSON_PlusPlus.Meta.ReprPrf	3703289807	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_j3	ROBINSON_PlusPlus.Meta.ReprPrf	2828471850	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_leibniz	ROBINSON_PlusPlus.Meta.ReprPrf	2488356554	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_leibniz_imp	ROBINSON_PlusPlus.Meta.ReprPrf	3659421260	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_listInd	ROBINSON_PlusPlus.Meta.ReprPrf	2463792466	C3
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_listInd_imp	ROBINSON_PlusPlus.Meta.ReprPrf	1948614075	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_mp	ROBINSON_PlusPlus.Meta.ReprPrf	492752156	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_p1	ROBINSON_PlusPlus.Meta.ReprPrf	1838746071	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_p2	ROBINSON_PlusPlus.Meta.ReprPrf	3369049188	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_p3	ROBINSON_PlusPlus.Meta.ReprPrf	3666920207	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q1	ROBINSON_PlusPlus.Meta.ReprPrf	1205783537	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q1_imp	ROBINSON_PlusPlus.Meta.ReprPrf	3997846137	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q2	ROBINSON_PlusPlus.Meta.ReprPrf	4033288734	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q2_imp	ROBINSON_PlusPlus.Meta.ReprPrf	3254175010	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q3	ROBINSON_PlusPlus.Meta.ReprPrf	3496098705	C3
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q3_imp	ROBINSON_PlusPlus.Meta.ReprPrf	4206957865	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_qconf	ROBINSON_PlusPlus.Meta.ReprPrf	3630023544	C3
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_qconf_imp	ROBINSON_PlusPlus.Meta.ReprPrf	3253204147	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_thy	ROBINSON_PlusPlus.Meta.ReprPrf	1394666831	C3
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_mp	ROBINSON_PlusPlus.Meta.ReprPrf	724464843	C3 C4 C7.i C7.ii
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_or_intro_right	ROBINSON_PlusPlus.Meta.ReprPrf	4276380101	C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_c1	ROBINSON_PlusPlus.Meta.ReprPrf	1614884278	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_c2	ROBINSON_PlusPlus.Meta.ReprPrf	1658300426	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_c3	ROBINSON_PlusPlus.Meta.ReprPrf	426300734	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_efq	ROBINSON_PlusPlus.Meta.ReprPrf	1919542757	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_eqrefl	ROBINSON_PlusPlus.Meta.ReprPrf	1306730608	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_gen	ROBINSON_PlusPlus.Meta.ReprPrf	1020909003	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_ind	ROBINSON_PlusPlus.Meta.ReprPrf	3120246965	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_j1	ROBINSON_PlusPlus.Meta.ReprPrf	3108851264	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_j2	ROBINSON_PlusPlus.Meta.ReprPrf	3504194823	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_j3	ROBINSON_PlusPlus.Meta.ReprPrf	2077088308	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_leibniz	ROBINSON_PlusPlus.Meta.ReprPrf	2606900316	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_listInd	ROBINSON_PlusPlus.Meta.ReprPrf	3394310575	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_mp	ROBINSON_PlusPlus.Meta.ReprPrf	2692564379	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_p1	ROBINSON_PlusPlus.Meta.ReprPrf	3371304584	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_p2	ROBINSON_PlusPlus.Meta.ReprPrf	2097657797	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_p3	ROBINSON_PlusPlus.Meta.ReprPrf	2696001452	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_q1	ROBINSON_PlusPlus.Meta.ReprPrf	109075196	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_q2	ROBINSON_PlusPlus.Meta.ReprPrf	1315093473	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_q3	ROBINSON_PlusPlus.Meta.ReprPrf	3813480120	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_qconf	ROBINSON_PlusPlus.Meta.ReprPrf	753118561	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_premsOf_thy	ROBINSON_PlusPlus.Meta.ReprPrf	3318880848	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_refl	ROBINSON_PlusPlus.Meta.ReprPrf	3931141319	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_runFn_cons	ROBINSON_PlusPlus.Meta.ReprPrf	3637147979	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_runFn_nil	ROBINSON_PlusPlus.Meta.ReprPrf	783392901	C3 C4
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_spec	ROBINSON_PlusPlus.Meta.ReprPrf	1612535640	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.ReprPrf.prf_syll	ROBINSON_PlusPlus.Meta.ReprPrf	174811039	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.PSI	ROBINSON_PlusPlus.Meta.StrongInductionPrf	2924998079	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.PSI_inst	ROBINSON_PlusPlus.Meta.StrongInductionPrf	520757727	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.PSI_inst2	ROBINSON_PlusPlus.Meta.StrongInductionPrf	1956438959	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.PSI_inst3	ROBINSON_PlusPlus.Meta.StrongInductionPrf	3377591820	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.PSI_inst4	ROBINSON_PlusPlus.Meta.StrongInductionPrf	3643435651	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.liftTerm_swap	ROBINSON_PlusPlus.Meta.StrongInductionPrf	1096541674	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.prf_strong_induction	ROBINSON_PlusPlus.Meta.StrongInductionPrf	3138344395	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.psi_at	ROBINSON_PlusPlus.Meta.StrongInductionPrf	1592049883	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.psi_lift_form3	ROBINSON_PlusPlus.Meta.StrongInductionPrf	4267205011	C4
+ROBINSON_PlusPlus.Meta.StrongInductionPrf.psi_lift_form4	ROBINSON_PlusPlus.Meta.StrongInductionPrf	1752420159	C4
+ROBINSON_PlusPlus.Meta.TcArithPrf.prf_congr_tcFn	ROBINSON_PlusPlus.Meta.TcArithPrf	1344846762	C4
+ROBINSON_PlusPlus.Meta.TcArithPrf.prf_tc_numeral	ROBINSON_PlusPlus.Meta.TcArithPrf	662151109	C3 C4 C7.i
+ROBINSON_PlusPlus.Meta.TcArithPrf.prf_tc_succ	ROBINSON_PlusPlus.Meta.TcArithPrf	4195631637	C4
+ROBINSON_PlusPlus.Meta.TcArithPrf.prf_tc_zero	ROBINSON_PlusPlus.Meta.TcArithPrf	817801395	C4

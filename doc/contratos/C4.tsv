@@ -1,0 +1,134 @@
+# doc/contratos/C4.tsv — el CONTRATO de la capa C4 (D3 y el espejo en ℕ (la Σ₁-completitud y las etapas de Rosser: lo que no es una prueba se refuta)):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Meta.LiftcCodePrf.substTerm_formCode	ROBINSON_PlusPlus.Meta.LiftcCodePrf	1871087534	C7.i
+ROBINSON_PlusPlus.Meta.LineWFCases.prf_imp_trans	ROBINSON_PlusPlus.Meta.LineWFCases	174811039	C7.i
+ROBINSON_PlusPlus.Meta.ModeloCodigo.TC0	ROBINSON_PlusPlus.Meta.ModeloCodigo	421340980	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.TCONS	ROBINSON_PlusPlus.Meta.ModeloCodigo	421340980	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.TCS	ROBINSON_PlusPlus.Meta.ModeloCodigo	421340980	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.TNIL	ROBINSON_PlusPlus.Meta.ModeloCodigo	421340980	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀	ROBINSON_PlusPlus.Meta.ModeloCodigo	421340980	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.ModeloCodigo.allInN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.allInN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2279695868	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.allInN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	2265256875	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.andcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.argsInN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.botcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	421340980	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.carN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.carN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3263709295	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.cdrN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.cdrN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2153684721	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.cdrN_lt	ROBINSON_PlusPlus.Meta.ModeloCodigo	1459736293	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkN	ROBINSON_PlusPlus.Meta.ModeloCodigo	1384856243	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	484474204	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.chainOkN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	2207812536	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.clAtomN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.clBinN	ROBINSON_PlusPlus.Meta.ModeloCodigo	1384856243	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.clBotN	ROBINSON_PlusPlus.Meta.ModeloCodigo	1379455552	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.clEqN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.clUnN	ROBINSON_PlusPlus.Meta.ModeloCodigo	1384856243	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.codeNatList	ROBINSON_PlusPlus.Meta.ModeloCodigo	1915796881	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.ModeloCodigo.concatN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.concatN_assoc	ROBINSON_PlusPlus.Meta.ModeloCodigo	775138354	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.concatN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	861793465	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.concatN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	1706861620	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.consN_car_cdr	ROBINSON_PlusPlus.Meta.ModeloCodigo	3986718824	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.consN_eq	ROBINSON_PlusPlus.Meta.ModeloCodigo	610904708	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.decodeL	ROBINSON_PlusPlus.Meta.ModeloCodigo	3208536212	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.eqcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.excN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.forallcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.hasWitFN	ROBINSON_PlusPlus.Meta.ModeloCodigo	1379455552	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.ModeloCodigo.hasWitN	ROBINSON_PlusPlus.Meta.ModeloCodigo	1379455552	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.ModeloCodigo.implcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.isFormCodeE2N	ROBINSON_PlusPlus.Meta.ModeloCodigo	1384856243	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.isTermCodeE1N	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.lenN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.lenN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3169972407	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.lenN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	4000848613	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftcN_func	ROBINSON_PlusPlus.Meta.ModeloCodigo	4134547102	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftcN_var	ROBINSON_PlusPlus.Meta.ModeloCodigo	1717347118	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_and	ROBINSON_PlusPlus.Meta.ModeloCodigo	2501485657	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_atom	ROBINSON_PlusPlus.Meta.ModeloCodigo	500425780	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_bot	ROBINSON_PlusPlus.Meta.ModeloCodigo	3949003590	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_eq	ROBINSON_PlusPlus.Meta.ModeloCodigo	3884069614	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_ex	ROBINSON_PlusPlus.Meta.ModeloCodigo	1307233868	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_forall	ROBINSON_PlusPlus.Meta.ModeloCodigo	2494320867	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_impl	ROBINSON_PlusPlus.Meta.ModeloCodigo	227766635	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftfcN_or	ROBINSON_PlusPlus.Meta.ModeloCodigo	3212983225	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftscN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftscN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3174982620	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.liftscN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	2996005099	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFN_of_tag	ROBINSON_PlusPlus.Meta.ModeloCodigo	3130260122	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.lineWFT	ROBINSON_PlusPlus.Meta.ModeloCodigo	1384856243	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.lt_sq_succ_sqrtN	ROBINSON_PlusPlus.Meta.ModeloCodigo	881213262	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.memN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.memN_concatN	ROBINSON_PlusPlus.Meta.ModeloCodigo	184305245	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.memN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3705271150	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.memN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	3646815532	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.nthN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.nthN_cs	ROBINSON_PlusPlus.Meta.ModeloCodigo	2593030155	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.nthN_cz	ROBINSON_PlusPlus.Meta.ModeloCodigo	1060857288	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.nthN_lt	ROBINSON_PlusPlus.Meta.ModeloCodigo	2640246769	C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.nthN_zero_l	ROBINSON_PlusPlus.Meta.ModeloCodigo	2568721684	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.orcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.premsOfN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.prodpN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.prodpN_consN_pairN	ROBINSON_PlusPlus.Meta.ModeloCodigo	1532745006	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.prodpN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	406797065	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnN	ROBINSON_PlusPlus.Meta.ModeloCodigo	9906956	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2677880532	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.runFnN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	3518643354	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.shapeBinN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.shapeUnN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.sqrtN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.sqrtN_le	ROBINSON_PlusPlus.Meta.ModeloCodigo	2789670352	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3512939730	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_and	ROBINSON_PlusPlus.Meta.ModeloCodigo	364392197	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_atom	ROBINSON_PlusPlus.Meta.ModeloCodigo	751059392	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_bot	ROBINSON_PlusPlus.Meta.ModeloCodigo	2222512670	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_eq	ROBINSON_PlusPlus.Meta.ModeloCodigo	1456922137	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_ex	ROBINSON_PlusPlus.Meta.ModeloCodigo	263671041	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_forall	ROBINSON_PlusPlus.Meta.ModeloCodigo	486041584	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_impl	ROBINSON_PlusPlus.Meta.ModeloCodigo	1083008933	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substfcN_or	ROBINSON_PlusPlus.Meta.ModeloCodigo	3216773601	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substtcN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3512939730	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substtcN_func	ROBINSON_PlusPlus.Meta.ModeloCodigo	848285475	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substtcN_var	ROBINSON_PlusPlus.Meta.ModeloCodigo	1047223970	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substtscN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3512939730	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substtscN_consN	ROBINSON_PlusPlus.Meta.ModeloCodigo	349173572	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.substtscN_zero	ROBINSON_PlusPlus.Meta.ModeloCodigo	583473577	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.tcFnN	ROBINSON_PlusPlus.Meta.ModeloCodigo	2546708756	C5 C7.iii
+ROBINSON_PlusPlus.Meta.ModeloCodigo.wfAll1N	ROBINSON_PlusPlus.Meta.ModeloCodigo	1379455552	C5
+ROBINSON_PlusPlus.Meta.ModeloCodigo.wfAllFN	ROBINSON_PlusPlus.Meta.ModeloCodigo	3277217472	C5
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real	ROBINSON_PlusPlus.Meta.PremsBdAllPrf	3720823077	C7.i
+ROBINSON_PlusPlus.Meta.RosserNegLinea.Vax	ROBINSON_PlusPlus.Meta.RosserNegLinea	421340980	C8
+ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formCode	ROBINSON_PlusPlus.Meta.RosserNegNum	2950937217	C7.i
+ROBINSON_PlusPlus.Meta.RosserNegNum.proofN_decide	ROBINSON_PlusPlus.Meta.RosserNegNum	2748196187	C5
+ROBINSON_PlusPlus.Meta.RosserNumEval.CodF	ROBINSON_PlusPlus.Meta.RosserNumEval	14640633615078692600	C5 C7.iii
+ROBINSON_PlusPlus.Meta.RosserNumEval.CodT	ROBINSON_PlusPlus.Meta.RosserNumEval	2981443132519092110	C5 C7.iii
+ROBINSON_PlusPlus.Meta.RosserNumEval.CodTs	ROBINSON_PlusPlus.Meta.RosserNumEval	18257839196447075650	C5 C7.iii
+ROBINSON_PlusPlus.Meta.RosserNumEval.codF_codeNat	ROBINSON_PlusPlus.Meta.RosserNumEval	2839911620	C7.iii
+ROBINSON_PlusPlus.Meta.RosserNumEval.codF_liftfcN	ROBINSON_PlusPlus.Meta.RosserNumEval	2717861364	C5 C7.iii
+ROBINSON_PlusPlus.Meta.RosserNumEval.codF_of_hasWitFN	ROBINSON_PlusPlus.Meta.RosserNumEval	1253388657	C5 C7.iii
+ROBINSON_PlusPlus.Meta.RosserNumEval.codT_codeNatTerm	ROBINSON_PlusPlus.Meta.RosserNumEval	2767910537	C5
+ROBINSON_PlusPlus.Meta.RosserNumEval.codT_liftcN	ROBINSON_PlusPlus.Meta.RosserNumEval	2288714998	C5
+ROBINSON_PlusPlus.Meta.RosserNumEval.codT_of_hasWitN	ROBINSON_PlusPlus.Meta.RosserNumEval	1608944123	C5
+ROBINSON_PlusPlus.Meta.RosserPosNum.PfF	ROBINSON_PlusPlus.Meta.RosserPosNum	3648254550	C5 C7.i C8
+ROBINSON_PlusPlus.Meta.RosserPosNum.posNum	ROBINSON_PlusPlus.Meta.RosserPosNum	2356384098	C5 C7.i
+ROBINSON_PlusPlus.Meta.RosserW1.ProofN	ROBINSON_PlusPlus.Meta.RosserW1	3277217472	C5 C7.iii C8
+ROBINSON_PlusPlus.Meta.RosserW1.lineaThy	ROBINSON_PlusPlus.Meta.RosserW1	1555066171	C8
+ROBINSON_PlusPlus.Meta.RosserW1.proofN_axioma	ROBINSON_PlusPlus.Meta.RosserW1	2781978900	C8
+ROBINSON_PlusPlus.Meta.SolidezVerificador.Bueno	ROBINSON_PlusPlus.Meta.SolidezVerificador	1379455552	C5
+ROBINSON_PlusPlus.Meta.SolidezVerificador.bueno_codeNatList	ROBINSON_PlusPlus.Meta.SolidezVerificador	3994010367	C5 C7.iii
+ROBINSON_PlusPlus.Meta.SolidezVerificador.bueno_zero	ROBINSON_PlusPlus.Meta.SolidezVerificador	1411893310	C5 C7.iii
+ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena	ROBINSON_PlusPlus.Meta.SolidezVerificador	3094138871	C5 C7.iii
+ROBINSON_PlusPlus.Meta.SolidezVerificador.dec	ROBINSON_PlusPlus.Meta.SolidezVerificador	1388708799	C5 C7.iii
+ROBINSON_PlusPlus.Meta.SolidezVerificador.dec_codeNat	ROBINSON_PlusPlus.Meta.SolidezVerificador	3711237228	C5 C7.iii

@@ -1,0 +1,5 @@
+════ LAS CAPAS DE RPP: el manifiesto (doc/control/capas.tsv) y la dirección de los imports (ADR-266, ADR-271) ════
+  128 módulos (con los dos barriles), por capa: C0:4 C1:9 C2:14 C3:11 C4:67 C5:8 C6:1 C7.i:5 C7.ii:1 C7.iii:2 C8:4 barril:2
+  556 imports entre módulos de RPP (431 entre los módulos y 125 de los barriles); suben de capa, con su excepción: 0 (excepciones declaradas: 0)
+  35 titulares de T07, por la capa de su módulo: C3:2 C4:1 C5:1 C7.i:9 C7.ii:6 C7.iii:16
+✅ las capas: cada módulo con su fila, ningún import que suba sin excepción, los titulares en su capa.

@@ -131,6 +131,15 @@ jobs:
       - name: Los thaws de FOL, autorizados
         run: bash scripts/thaws-fol.bash ../FOL
 
+      # ⭐ AÑADIDO el 2026-11-18 (B1 paso 5, ADR-271). Las CAPAS de RPP (el diseño, ADR-266): el manifiesto
+      # `doc/control/capas.tsv` (módulo → capa) contra el árbol y la dirección de cada `import` —C7.i no importa ni C5 ni
+      # C6—, con las excepciones razonadas y los titulares de T07 en C7 por su clase. Lee texto: va antes del build, y
+      # tarda un segundo. Primero su autotest (veinticinco mutantes sobre una copia del árbol, cada uno con su código).
+      - name: Las capas (el manifiesto y la dirección de los imports)
+        run: |
+          bash check-capas.bash --autotest
+          bash check-capas.bash
+
       # ⭐ 2026-10-28 (T40, ADR-202): la clave de caché lleva el hash de la LISTA de módulos de FOL, y el mismo hash va
       # en `restore-keys`: una caché con otra lista no se restaura nunca (un `.olean` de un módulo borrado volvería como
       # FANTASMA). Sustituye al prefijo que había que subir a mano (`lake-v2-`, ADR-115). Y se restaura ANTES de
@@ -276,7 +285,11 @@ jobs:
       # NINGUNA constante de RPP, FOL o TheoryFramework usa de FOL (`doc/control/fol-sin-uso.tsv`, etiquetado y sin
       # borrar): rojo si lo versionado no es lo que se genera. Con calibración, vista fallar con tres mutantes
       # (doc/registro/2026-11-04-indice/). Medido en local: unos 35 s.
-      - name: El índice de las constantes y lo que nadie usa de FOL
+      # ✏️ 2026-11-18 (B1 paso 6, ADR-272): y los CONTRATOS de las capas (`doc/contratos/CAPA.tsv`: lo que las otras capas
+      # usan de cada una, con la huella del tipo), del mismo entorno; con su calibración y vistos fallar con siete
+      # mutantes (doc/registro/2026-11-18-capas-pasos-5-6/). Este run lo lanza también cada push al master de FOL
+      # (ADR-216): un cambio de lo que RPP usa de FOL se ve en `doc/contratos/FOL.tsv`.
+      - name: El índice de las constantes, lo que nadie usa de FOL y los contratos de las capas
         run: bash check-indice.bash
 
       # ⭐ AÑADIDO el 2026-11-04 (R3-5-14 y R3-3-09 de la ronda 3, ADR-255). `guarda_y_bloquea.bash` se «probó con el fallo

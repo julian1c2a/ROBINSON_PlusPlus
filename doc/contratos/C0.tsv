@@ -1,0 +1,277 @@
+# doc/contratos/C0.tsv — el CONTRATO de la capa C0 (el lenguaje, los axiomas y las herramientas (la macro de los símbolos, el comando #pureza sin su autoprueba)):
+# lo que las OTRAS capas usan de ella (B1 paso 6, ADR-272). Cada constante declarada en un módulo de la capa que
+# nombra, en su tipo o en su valor, una constante declarada en un módulo de RPP de otra capa (las capas, en
+# doc/control/capas.tsv); la huella de su TIPO (Expr.hash; en un inductivo, con sus constructores: cambia si cambia
+# el enunciado, no la notación); y las capas que la usan. El enunciado, en doc/indice.tsv (o ../FOL/doc/indice.tsv).
+# Lo genera y lo compara check-indice.bash en cada run de la CI; se rehace con «bash check-indice.bash --rehacer».
+# nombre	módulo	huella del tipo	la usan
+ROBINSON_PlusPlus.Full.inductionFormula	ROBINSON_PlusPlus.Full.Induction	2924998079	C1 C2 C3 C5 C6
+ROBINSON_PlusPlus.Meta.PurezaComando.comprobar	ROBINSON_PlusPlus.Meta.PurezaComando	1670625890	C8
+ROBINSON_PlusPlus.Meta.PurezaComando.delProyecto	ROBINSON_PlusPlus.Meta.PurezaComando	1920488358	C8
+ROBINSON_PlusPlus.Meta.PurezaComando.nombreUsuario	ROBINSON_PlusPlus.Meta.PurezaComando	3842310885	C8
+ROBINSON_PlusPlus.Minimal.Axioms.In	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C1 C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.add	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.add_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.allIn	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.andc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.argsIn	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.argsInBody	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.atomc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax10_mul_comm	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax11_mul_assoc	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax12_mul_distrib	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax13_lt_def	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax14_sqrt_le	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax15_lt_succ_sqrt	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax16_mod2_succ	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax17_div_mod_eq	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax18_lt_irrefl	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax19_lt_trichotomy	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax21_mod2_range	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax24_mod2_of_even	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax25_pred_zero	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax26_pred_succ	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax29_sub_witness	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax2_peano_succ_neq_zero	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax3_peano_succ_inj	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax4_add_zero	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax5_add_succ	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax6_add_comm	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax7_add_assoc	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax8_mul_zero	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax9_mul_succ	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.axD	ROBINSON_PlusPlus.Minimal.Axioms	1507442410	C3 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_C1_concat_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_C2_concat_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_C3_concat_assoc	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_L0_cons_def	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_L1_in_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_L2_in_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_L3_in_concat	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_allIn_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_allIn_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_def	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C3 C4 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_def_lift	ROBINSON_PlusPlus.Minimal.Axioms	629804618	C1
+ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_def_mem	ROBINSON_PlusPlus.Minimal.Axioms	3508437156	C3
+ROBINSON_PlusPlus.Minimal.Axioms.ax_carc	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_cdrc	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_chainOk_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_chainOk_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lenc_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lenc_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftc_func	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftc_var_ge	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftc_var_lt	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_and	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_atom	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_bottom	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_eq	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_ex	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_forall	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_impl	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftfc_or	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftsc_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_liftsc_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_efq	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_eqrefl	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_gen	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_ind	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_inv	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_leibniz	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_listInd	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_mp	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_qconf	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_thy	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_nthc_succ	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_nthc_zero	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_pow_succ	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_pow_zero	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_c1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_c2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_c3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_efq	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_eqrefl	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_gen	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_ind	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_j1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_j2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_j3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_leibniz	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_listInd	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_mp	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_p1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_p2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_p3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_q1	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_q2	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_q3	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_qconf	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_premsOf_thy	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_prodp_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_prodp_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_runFn_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_runFn_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_and	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_atom	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_bottom	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_eq	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_ex	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_forall	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_impl	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substfc_or	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substtc_func	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substtc_var_eq	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substtc_var_gt	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substtc_var_lt	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substtsc_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_substtsc_nil	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_tc_cons	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C5
+ROBINSON_PlusPlus.Minimal.Axioms.ax_tc_succ	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ax_tc_zero	ROBINSON_PlusPlus.Minimal.Axioms	1539953984	C1 C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.axioms	ROBINSON_PlusPlus.Minimal.Axioms	144424381	C1 C2 C3 C4 C5 C6 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.axiomsBase	ROBINSON_PlusPlus.Minimal.Axioms	144424381	C1 C3 C4 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.axiomsCodeT	ROBINSON_PlusPlus.Minimal.Axioms	2878596787	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.axioms_split	ROBINSON_PlusPlus.Minimal.Axioms	1962310035	C1 C3 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.botc	ROBINSON_PlusPlus.Minimal.Axioms	2878596787	C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.cantor_func	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2
+ROBINSON_PlusPlus.Minimal.Axioms.cantor_poly	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2
+ROBINSON_PlusPlus.Minimal.Axioms.carc	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.cdrc	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.chainOk	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C1 C2 C3 C4 C5 C7.i
+ROBINSON_PlusPlus.Minimal.Axioms.charsCodeM	ROBINSON_PlusPlus.Minimal.Axioms	2002081433	C1 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.clAtom	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.clBin	ROBINSON_PlusPlus.Minimal.Axioms	8684678	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.clBot	ROBINSON_PlusPlus.Minimal.Axioms	2238458006	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.clEq	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.clUn	ROBINSON_PlusPlus.Minimal.Axioms	8684678	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.codeNat	ROBINSON_PlusPlus.Minimal.Axioms	1555066171	C3 C4 C5 C7.i C7.ii C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.codeNatChars	ROBINSON_PlusPlus.Minimal.Axioms	948478879	C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.codeNatStr	ROBINSON_PlusPlus.Minimal.Axioms	948478879	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerm	ROBINSON_PlusPlus.Minimal.Axioms	1767413935	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.codeNatTerms	ROBINSON_PlusPlus.Minimal.Axioms	4108917461	C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.codingAxioms	ROBINSON_PlusPlus.Minimal.Axioms	144424381	C1 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.concat	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C1 C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.concat_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.cons	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C1 C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.consN	ROBINSON_PlusPlus.Minimal.Axioms	9906956	C3 C4 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.cons_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C1 C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.coreAxioms	ROBINSON_PlusPlus.Minimal.Axioms	144424381	C1 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.deltaD	ROBINSON_PlusPlus.Minimal.Axioms	909089148	C3 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.div2	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.div2_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2 C4
+ROBINSON_PlusPlus.Minimal.Axioms.eqc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.ex	ROBINSON_PlusPlus.Minimal.Axioms	567486217	C2 C5
+ROBINSON_PlusPlus.Minimal.Axioms.exc	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.forallN	ROBINSON_PlusPlus.Minimal.Axioms	2302078331	C6 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.forall_	ROBINSON_PlusPlus.Minimal.Axioms	2924998079	C2 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.forall_2	ROBINSON_PlusPlus.Minimal.Axioms	2924998079	C2 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.forall_3	ROBINSON_PlusPlus.Minimal.Axioms	2924998079	C2 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.forall_4	ROBINSON_PlusPlus.Minimal.Axioms	2924998079	C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.forallc	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.formCodeM	ROBINSON_PlusPlus.Minimal.Axioms	2000685534	C1 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.funcc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.hasWit	ROBINSON_PlusPlus.Minimal.Axioms	2238458006	C2 C3 C4 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.hasWitF	ROBINSON_PlusPlus.Minimal.Axioms	2238458006	C2 C3 C4 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.implc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.in_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2 C3 C4 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.isFC1	ROBINSON_PlusPlus.Minimal.Axioms	3197018298	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.isFormCodeE2	ROBINSON_PlusPlus.Minimal.Axioms	3197018298	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.isTC1	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.isTermCodeE1	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.land	ROBINSON_PlusPlus.Minimal.Axioms	2849181159	C1 C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.le	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C2 C5
+ROBINSON_PlusPlus.Minimal.Axioms.lenc	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_formCodeM	ROBINSON_PlusPlus.Minimal.Axioms	2422022336	C3
+ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_listFormCodeM	ROBINSON_PlusPlus.Minimal.Axioms	1407637979	C4
+ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_nil	ROBINSON_PlusPlus.Minimal.Axioms	371324610	C2
+ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM	ROBINSON_PlusPlus.Minimal.Axioms	2532510491	C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_strCodeM	ROBINSON_PlusPlus.Minimal.Axioms	462973289	C4
+ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_termCodeM	ROBINSON_PlusPlus.Minimal.Axioms	523854311	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_termsCodeM	ROBINSON_PlusPlus.Minimal.Axioms	1923842197	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.liftc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.liftfc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.liftsc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.lineOk	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.lineTag	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.lineWF	ROBINSON_PlusPlus.Minimal.Axioms	2238458006	C2 C3 C4 C5 C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.listFormCodeM	ROBINSON_PlusPlus.Minimal.Axioms	909089148	C1 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.lor	ROBINSON_PlusPlus.Minimal.Axioms	2849181159	C2 C3 C4 C5 C7.i
+ROBINSON_PlusPlus.Minimal.Axioms.lorAll	ROBINSON_PlusPlus.Minimal.Axioms	453732694	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.lt	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.lt_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2 C3 C4 C5 C7.i
+ROBINSON_PlusPlus.Minimal.Axioms.mod2	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C5
+ROBINSON_PlusPlus.Minimal.Axioms.mod2_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2
+ROBINSON_PlusPlus.Minimal.Axioms.mul	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.mul_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2 C4
+ROBINSON_PlusPlus.Minimal.Axioms.nD	ROBINSON_PlusPlus.Minimal.Axioms	909089148	C3 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.nil	ROBINSON_PlusPlus.Minimal.Axioms	2878596787	C1 C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.nthc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.numeralM	ROBINSON_PlusPlus.Minimal.Axioms	3428504659	C1 C2 C3 C4 C5 C7.i C7.iii C8
+ROBINSON_PlusPlus.Minimal.Axioms.objList	ROBINSON_PlusPlus.Minimal.Axioms	1934573371	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.one	ROBINSON_PlusPlus.Minimal.Axioms	2878596787	C2 C5
+ROBINSON_PlusPlus.Minimal.Axioms.orc	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.pair	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C2 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.pow	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C5
+ROBINSON_PlusPlus.Minimal.Axioms.pow_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C5
+ROBINSON_PlusPlus.Minimal.Axioms.pred	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.pred_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.premsOf	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.prod_pairs	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C5
+ROBINSON_PlusPlus.Minimal.Axioms.prodp_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C5
+ROBINSON_PlusPlus.Minimal.Axioms.psiD	ROBINSON_PlusPlus.Minimal.Axioms	1507442410	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.runFn	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C1 C2 C3 C4 C5 C7.i
+ROBINSON_PlusPlus.Minimal.Axioms.shapeBin	ROBINSON_PlusPlus.Minimal.Axioms	821000639	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.shapeNul	ROBINSON_PlusPlus.Minimal.Axioms	821000639	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.shapeUn	ROBINSON_PlusPlus.Minimal.Axioms	821000639	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.sq	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C5
+ROBINSON_PlusPlus.Minimal.Axioms.sqrt	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C5
+ROBINSON_PlusPlus.Minimal.Axioms.sqrt_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C5
+ROBINSON_PlusPlus.Minimal.Axioms.strCodeM	ROBINSON_PlusPlus.Minimal.Axioms	2002081433	C1 C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.sub	ROBINSON_PlusPlus.Minimal.Axioms	3712149296	C5
+ROBINSON_PlusPlus.Minimal.Axioms.sub_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C5
+ROBINSON_PlusPlus.Minimal.Axioms.substF_argsIn	ROBINSON_PlusPlus.Minimal.Axioms	2965636279	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_hasWit	ROBINSON_PlusPlus.Minimal.Axioms	875505885	C2 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_hasWitF	ROBINSON_PlusPlus.Minimal.Axioms	456476926	C2 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_isFC1	ROBINSON_PlusPlus.Minimal.Axioms	938966594	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_isFormCodeE2	ROBINSON_PlusPlus.Minimal.Axioms	1798681713	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_isTC1	ROBINSON_PlusPlus.Minimal.Axioms	3751506639	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_isTermCodeE1	ROBINSON_PlusPlus.Minimal.Axioms	3898818	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_wfAll1	ROBINSON_PlusPlus.Minimal.Axioms	4034438121	C4
+ROBINSON_PlusPlus.Minimal.Axioms.substF_wfAllF	ROBINSON_PlusPlus.Minimal.Axioms	273529597	C4
+ROBINSON_PlusPlus.Minimal.Axioms.substTerm_formCodeM	ROBINSON_PlusPlus.Minimal.Axioms	1230373848	C3
+ROBINSON_PlusPlus.Minimal.Axioms.substTerm_numeralM	ROBINSON_PlusPlus.Minimal.Axioms	3960713954	C2 C3 C4 C7.i
+ROBINSON_PlusPlus.Minimal.Axioms.substTerm_strCodeM	ROBINSON_PlusPlus.Minimal.Axioms	3098521256	C2 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substTerm_termCodeM	ROBINSON_PlusPlus.Minimal.Axioms	3240622779	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.substTerm_termsCodeM	ROBINSON_PlusPlus.Minimal.Axioms	1828716387	C3 C4
+ROBINSON_PlusPlus.Minimal.Axioms.subst_psiD	ROBINSON_PlusPlus.Minimal.Axioms	628104897	C3
+ROBINSON_PlusPlus.Minimal.Axioms.substfc	ROBINSON_PlusPlus.Minimal.Axioms	1351749540	C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.substtc	ROBINSON_PlusPlus.Minimal.Axioms	1351749540	C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.substtsc	ROBINSON_PlusPlus.Minimal.Axioms	1351749540	C2 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.succ	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C1 C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.succ_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C1 C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.tagDisj	ROBINSON_PlusPlus.Minimal.Axioms	821000639	C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.tcFn	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.termCodeM	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C1 C2 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.termsCodeM	ROBINSON_PlusPlus.Minimal.Axioms	1934573371	C1 C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.triN	ROBINSON_PlusPlus.Minimal.Axioms	2546708756	C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.two	ROBINSON_PlusPlus.Minimal.Axioms	2878596787	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.varc	ROBINSON_PlusPlus.Minimal.Axioms	2320954255	C2 C3 C4 C5
+ROBINSON_PlusPlus.Minimal.Axioms.wfAll1	ROBINSON_PlusPlus.Minimal.Axioms	2238458006	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.wfAll1Body	ROBINSON_PlusPlus.Minimal.Axioms	2238458006	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.wfAllF	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.wfAllFBody	ROBINSON_PlusPlus.Minimal.Axioms	3648254550	C3 C4 C5 C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.zero	ROBINSON_PlusPlus.Minimal.Axioms	2878596787	C1 C2 C3 C4 C5 C7.i C7.iii
+ROBINSON_PlusPlus.Minimal.Axioms.zero_sym	ROBINSON_PlusPlus.Minimal.Axioms	61721375	C1 C2 C3 C4 C5 C7.iii C8

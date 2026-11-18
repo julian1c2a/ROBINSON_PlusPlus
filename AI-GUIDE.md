@@ -1,6 +1,6 @@
 # Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-**Last updated:** 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): lo que ADR‑235 no midió y lo que cambió después (nanoda con cuatro hilos, ADR‑251; el veredicto de `update-toolchain.bash`, ADR‑256; el `CHANGELOG.md` congelado, ADR‑142; la cita partida de §27.1; los nombres de la plantilla, por los de RPP), y notas fechadas, medidas, donde la regla no describe RPP (el `.gitignore`, los barriles, las listas de bloqueo, el recordatorio de §11, la cabecera de copyright, la hora de §22). Antes, 2026-09-09 (§27.1, «un control que no comprueba nada»; banner de MANDATORIES) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
+**Last updated:** 2026-11-18 — [ADR‑271](DECISIONS.md) y [ADR‑272](DECISIONS.md): `check-capas.bash` (las capas) y los contratos de las capas en `check-indice.bash`, en la tabla de comandos y en los pasos de un commit. Antes, 2026-11-09 — revisado contra el árbol ([ADR‑262](DECISIONS.md)): lo que ADR‑235 no midió y lo que cambió después (nanoda con cuatro hilos, ADR‑251; el veredicto de `update-toolchain.bash`, ADR‑256; el `CHANGELOG.md` congelado, ADR‑142; la cita partida de §27.1; los nombres de la plantilla, por los de RPP), y notas fechadas, medidas, donde la regla no describe RPP (el `.gitignore`, los barriles, las listas de bloqueo, el recordatorio de §11, la cabecera de copyright, la hora de §22). Antes, 2026-09-09 (§27.1, «un control que no comprueba nada»; banner de MANDATORIES) *(✏️ 2026‑10‑31, T24, ADR‑233: decía «Última actualización», que [E] no lee; la fecha, la suya)*
 **Autor:** Julián Calderón Almendros
 
 > Este documento define lo **universal**: aplica a cualquier proyecto Lean 4 que nazca
@@ -208,6 +208,8 @@ genera Lean): nombre, clase, módulo y enunciado, impreso con los nombres comple
 completo de una constante da todos los enunciados que la mencionan. Los genera `check-indice.bash` de cada repo, y su
 CI comprueba que están al día. La regla se repetía en seis ADR y vivía sólo en la memoria de las sesiones: si una
 re‑derivación sale idéntica a algo que ya estaba, el trabajo era buscarlo.
+✏️ 2026‑11‑18 (ADR‑272): para trabajar en una capa sin leer las de debajo, sus contratos: `doc/contratos/` tiene, por
+capa (las de `doc/control/capas.tsv`, y FOL), lo que las demás capas ya usan de ella; el enunciado, en el índice.
 
 ---
 
@@ -385,7 +387,8 @@ mismo `deltaD`, `ax_axiomsCodeT_def`, el código de `godelBeta'` dentro de `gode
 | `bash check-estratos.bash` | Censo POR ENTORNO: por cada noción de derivabilidad, sus constructores, los `axiom` que la habitan, su solidez, su completitud y su puente (la tabla de `REFERENCE.md` §0bis); ninguna constante con `sorryAx`, un axioma de confianza, implemented_by/extern o de una librería ajena; los `partial`, con igualdad; un señuelo; y la escalera de binders. Rojo; en la CI (el script; a mano, también `make estratos`) |
 | `bash check-footprints.bash` | El `#print axioms` de cada fila de su tabla, con igualdad, y [COBERTURA]: todo titular que el árbol imprime y todo `#print axioms` de la fuente tienen fila. Rojo; en la CI (el script; a mano, también `make footprints`) |
 | `bash check-choice.bash [--rehacer]` | Toda constante de RPP, FOL y TheoryFramework con `Classical.choice`, `noncomputable` o `String`, contra `doc/control/choice.tsv`, en los dos sentidos (con --rehacer la reescribe, sólo con un ADR; T53, ADR‑193). Rojo; en la CI (el script; a mano, también `make choice`) |
-| `bash check-indice.bash [--rehacer]` | El ÍNDICE de las constantes declaradas de RPP (nombre, clase, módulo y enunciado), `doc/indice.tsv`, y lo que ninguna constante de RPP, FOL o TheoryFramework usa de FOL, etiquetado, `doc/control/fol-sin-uso.tsv`, contra lo que se genera del entorno de Lean, con calibración (L5‑11 y B‑5, ADR‑254); el de FOL, su `check-indice.bash`. Con --rehacer las reescribe: en el commit que cambia una declaración. Rojo; en la CI (el script; a mano, también `make indice`) |
+| `bash check-indice.bash [--rehacer]` | El ÍNDICE de las constantes declaradas de RPP (nombre, clase, módulo y enunciado), `doc/indice.tsv`, y lo que ninguna constante de RPP, FOL o TheoryFramework usa de FOL, etiquetado, `doc/control/fol-sin-uso.tsv`, contra lo que se genera del entorno de Lean, con calibración (L5‑11 y B‑5, ADR‑254); el de FOL, su `check-indice.bash`. ✏️ 2026‑11‑18 (ADR‑272): y los CONTRATOS de las capas, `doc/contratos/` (por capa, lo que las otras usan de ella, con la huella del tipo; FOL, la de debajo). Con --rehacer las reescribe: en el commit que cambia una declaración o un uso entre capas. Rojo; en la CI (el script; a mano, también `make indice`) |
+| `bash check-capas.bash [--autotest]` | Las CAPAS (B1, ADR‑271): `doc/control/capas.tsv` (módulo → capa) contra el árbol —cada módulo con una fila—, la dirección de cada `import` (la regla de ADR‑266 §2; las excepciones, con su razón) y los titulares de T07 en C7 por su clase. Lee texto, sin `lake`. `--autotest`: veinticinco mutantes sobre una copia del árbol. Rojo; en la CI, antes del build (a mano, también `make capas`) |
 | `bash check-warnings.bash [--generar-opciones]` | Los avisos de los dos builds contra su tabla, VACÍA desde ADR‑227 (todo aviso es rojo), y el censo de los set_option que apagan un linter o suben un límite, de fichero y «… in» (ADR‑229; ninguno de fichero), contra `doc/control/opciones.tsv`, con igualdad. Rojo; en la CI (el script; a mano, también `make warnings`) |
 | `bash check-sondeos.bash [--controles]` | Con --controles, compila los sondeos de `sondeos/CONTROLES.txt` y el control NEGATIVO de `autoImplicit` (ADR‑255: una variable implícita automática tiene que fallar con `lake lean`): rojo, y en la CI. Sin él, todos, como informe (sale con 0) |
 | `bash guarda_y_bloquea.bash <fichero> "<mensaje>"` | Commitea un fichero BLOQUEADO sin tocar la lista y lo vuelve a bloquear (T52, ADR‑201); rechaza un congelado, también si ya está en el índice (ADR‑255). `--autotest`, en un repositorio de prueba: en la CI de los dos repos |
@@ -819,6 +822,10 @@ preservando los bloqueos locales.
    Si el segundo falla, corregir ANTES de commitear — no después.
    ✏️ 2026‑11‑04 (ADR‑254): si cambió una declaración, `bash check-indice.bash --rehacer` (y el de FOL, si cambió allí),
    en el mismo commit: la CI compara los índices con lo que se genera.
+   ✏️ 2026‑11‑18 (ADR‑271 y ADR‑272): un módulo nuevo, con su fila en `doc/control/capas.tsv` —la capa de lo que contiene—,
+   y `bash check-capas.bash`; un `import` que la regla de las capas no permite, sólo con su excepción razonada (y su
+   ADR). Y `--rehacer` también si cambió el tipo de algo que otra capa usa, o un uso entre capas: los contratos de
+   `doc/contratos/` son lo que se genera.
 2. Desbloquear los ficheros `.lean` en los que se ha trabajado:
    `bash git-lock.bash unlock modulo_1.lean ... modulo_n.lean`
 3. Añadir los cambios al staging area (ficheros concretos, evitar `git add -A`/`*`

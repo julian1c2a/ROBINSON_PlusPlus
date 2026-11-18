@@ -1,0 +1,27 @@
+ADR-271 y ADR-272 (2026-11-18): B1, los pasos 5 y 6 de ADR-266 §6 —el manifiesto de las capas y su control; los
+contratos de las capas—. Sobre RPP 69e3395 (FOL 3770333) y este cambio. Los scripts, desde la raíz de RPP o desde aquí
+(se van a la raíz solos): `bash doc/registro/2026-11-18-capas-pasos-5-6/X.bash.txt`; los de check-indice, con `lake` en
+el PATH y el build al día.
+
+EL PASO 5 (ADR-271): doc/control/capas.tsv y check-capas.bash
+  doc/control/capas.tsv lo escribió UNA vez un script (la asignación de capas4.py, de ../2026-11-18-capas-paso3/, con
+  las filas `capa` y `titular`); desde entonces se edita a mano: es la declaración.
+  check-capas-salida.txt         el control sobre el árbol: 128 filas, 556 imports (431 entre módulos, 125 de los
+                                 barriles), ninguno sube; los 35 titulares por capa.
+  check-capas-autotest.txt       su autotest: la copia limpia, verde; la excepción con razón, verde; los veinticinco
+                                 mutantes, rojos, cada uno con su código.
+  mutantes_capas.bash.txt / mutantes-capas-salida.txt
+                                 el autotest VISTO FALLAR: seis copias del script con una pieza rota (la regla de C7.i,
+                                 los comentarios anidados, SOBRA, la segunda lectura, BARRIL, la clase (i) en C7.i); las
+                                 seis, rojas, por el mutante que vigila cada pieza.
+  Y en WSL, con mawk (el awk de la CI): el control y su autotest, verdes (una copia del script con «mawk» por «awk»;
+  el PATH higiénico del script pisa un atajo en el PATH).
+
+EL PASO 6 (ADR-272): doc/contratos/, en check-indice.bash
+  check-indice-salida.txt        el censo, con sus cuatro calibraciones (el índice, el uso, el cruce de capas y los
+                                 contratos) y las trece tablas, las que se generan.
+  mutantes_indice.bash.txt / mutantes-indice-salida.txt
+                                 la parte de los contratos VISTA FALLAR: sin los usos del valor, sin los del tipo, sin
+                                 el filtro de la misma capa, con la calibración como C8, con un módulo sin fila en el
+                                 manifiesto, con una huella cambiada en un contrato y con un contrato de más; los siete,
+                                 rojos, cada uno por su razón (un «❌» con ella, no sólo una salida ≠ 0).
