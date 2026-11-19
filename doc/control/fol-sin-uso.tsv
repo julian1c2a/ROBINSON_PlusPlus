@@ -72,8 +72,11 @@ FOL.Esencialidad0	FOL.Esencialidad0.E3.or'	teorema	vigilada
 FOL.Esencialidad0	FOL.Esencialidad0.E3.or_stmt_implies_dne	teorema	vigilada
 FOL.Esencialidad0	FOL.Esencialidad0.E6.ac_implies_em	teorema	vigilada
 FOL.Esencialidad0	FOL.Esencialidad0.E6.skolem_expansion_implies_ac	teorema	vigilada
-FOL.Esencialidad0	FOL.Esencialidad0.E7.model_existence_stmt_implies_wlem	teorema	vigilada
 FOL.Esencialidad0	FOL.Esencialidad0.ExElimFin.ex_elim_refutable_fin	teorema	vigilada
+FOL.EsencialidadCota0	FOL.EsencialidadCota0.cinco_of_wlem_nnem	teorema	vigilada
+FOL.EsencialidadCota0	FOL.EsencialidadCota0.consistency_iff_nnem	teorema	vigilada
+FOL.EsencialidadCota0	FOL.EsencialidadCota0.model_existence_iff_wlem	teorema	vigilada
+FOL.EsencialidadCota0	FOL.EsencialidadCota0.«term_⊢₀*_»	meta·privada	meta
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E10.infinite_large_fresh_stmt_implies_wlem	teorema	vigilada
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E10.infinite_large_stmt_implies_wlem	teorema	vigilada
 FOL.EsencialidadSem0	FOL.EsencialidadSem0.E11.countable_infinite_stmt_dns_implies_nnem	teorema	vigilada
