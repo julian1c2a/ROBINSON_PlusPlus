@@ -212,6 +212,9 @@ FOL.EsencialidadSem0.E11.countable_infinite_stmt_dns_implies_nnem|-
 FOL.EsencialidadSem0.E11.infinite_large_stmt_dns_implies_nnem|-
 FOL.EsencialidadSem0.E11.infinite_large_fresh_stmt_dns_implies_nnem|-
 FOL.EsencialidadSem0.E11.ls_down_stmt_nnem_iff_dns|-
+FOL.EsencialidadSem0.E12.ksst_iff_rep_mp|-
+FOL.EsencialidadSem0.E12.wks_mp_implies_ksst|-
+FOL.EsencialidadSem0.E12.wks_stable_bks|-
 FOL.Finitary0.derives0_consistent_fin|Quot.sound,propext
 FOL.Finitary0.lk0_empty|Quot.sound,propext
 FOL.Finitary0.lk0_empty_of_no_bot|-
